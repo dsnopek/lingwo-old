@@ -1,0 +1,5 @@
+; $Id$
+name = Lingwo Dictionary integration
+description = Provides integration with the Lingwo Dictionary API
+core = 6.x
+

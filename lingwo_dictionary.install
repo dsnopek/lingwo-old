@@ -1,0 +1,78 @@
+<?php
+// $Id: $
+
+/**
+ * Implementation of hook_schema().
+ */
+function lingwo_dictionary_schema() {
+  $schema['lingwo_dictionary_entry'] = array(
+    'description' => 'Dictionary entry',
+    'fields' => array(
+      'vid' => array(
+        'description' => 'The current {node_revisions}.vid version identifier',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'nid' => array(
+        'description' => 'The primary identifier for a node.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'lang_nid' => array(
+        'description' => 'Node id of the language this belongs to',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        //'not null' => TRUE,
+      ),
+	  'headword' => array(
+	  	'description' => 'Entry headword (same as node title)',
+		'type' => 'varchar',
+		'length' => 255,
+		'not null' => TRUE,
+	  ),
+      'pos' => array(
+        'description' => 'Part of speech',
+        'type' => 'varchar',
+        'length' => 25,
+        'not null' => TRUE,
+      ),
+      'senses' => array(
+        'description' => 'Serialized array representing the entries senses',
+        'type' => 'text',
+      ),
+    ),
+    'primary key' => array('vid', 'nid'),
+	'unique keys' => array('lang_headword_pos_index' => array('lang_nid', 'headword', 'pos')),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function lingwo_dictionary_install() {
+  drupal_install_schema('lingwo_dictionary');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function lingwo_dictionary_uninstall() {
+  drupal_uninstall_schema('lingwo_dictionary');
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function lingwo_dictionary_enable() {
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function lingwo_dictionary_disable() {
+}
+
