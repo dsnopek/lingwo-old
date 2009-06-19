@@ -1,0 +1,36 @@
+
+== 2009-06-19 ==
+
+ * List available languages when adding an entry node.
+ 
+ * Setup translation content type and get translation work flow going again.
+
+== 2009-02-26 ==
+
+ * Get searching and looking up definitions alot tighter (meaning easier to use for the end
+   user).
+
+== 2009-02-15 ==
+
+ * Figure out proper 404 behaviour.
+
+ * Figure out a good way to do the title on the translation view/edit pages.
+
+ * Figure out a good way to link back to the entry from the translation view/edit pages.
+ 
+ * Seperate the word translation from the "note" (ie. some info to go into paranthesis,
+   or maybe just use convention, which is, if they write anything in parantheses?).  Or
+   maybe the reverse, that either the whole thing is the word, or the contents of [brackets]
+   are.  So, then the English translation of "szkolny", would be "pertaining to [school:noun]".
+   Putting ":noun" is necessary because "szkolny" is an adjective, so it would default to link
+   to "[school:adjective]".
+ 
+ * Add the "Same as" selector on translation senses, so that senses can be consolidated.
+
+== 2009-02-12 ==
+
+ * Finish up "/languages":
+   
+   - Add a search bit, where we can try and find a language from keywords (fuzzily!)
+     and the language code.
+
