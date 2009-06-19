@@ -12,6 +12,7 @@
 
 // TODO: Is this the right place/way to do this?
 module_load_include('inc', 'lingwo_dictionary', 'types/entry');
+module_load_include('inc', 'lingwo_dictionary', 'types/lang');
 
 /**
  * Implementation of hook_node_info().
@@ -25,6 +26,15 @@ function lingwo_dictionary_node_info() {
       'has_title' => TRUE,
       'title_label' => t('Headword'),
       'has_body' => FALSE,
+    ),
+    'lingwo_dictionary_lang' => array(
+      'name' => t('Dictionary Language'),
+      'module' => 'lingwo_dictionary_lang',
+      'description' => t('This represents a language dictionary entries and translations can be in'),
+      'has_title' => TRUE,
+      'title_label' => t('Language name'),
+      'has_body' => TRUE,
+      'body_label' => t('Description'),
     ),
   );
 }
@@ -72,8 +82,8 @@ function lingwo_dictionary_entry_nodeapi(&$node, $op, $teaser, $page) {
   $type = node_get_types($node);
   switch ($op) {
     case 'delete revision':
-	  $func = $type .'_delete_revision';
-	  $func($name);
+    $func = $type .'_delete_revision';
+    $func($name);
       break;
   }
 };
@@ -100,7 +110,7 @@ function lingwo_dictionary_block($op = 'list', $delta = 0) {
     return $block;
   }
   else if ($op == 'view') {
-	module_load_include('inc', 'lingwo_dictionary', 'pages/lingwo_dictionary.entry.inc');
+  module_load_include('inc', 'lingwo_dictionary', 'pages/lingwo_dictionary.entry.inc');
     $block['subject'] = t('Search Dictionary');
     $block['content'] = drupal_get_form('lingwo_dictionary_search_form');
     return $block;
@@ -122,17 +132,16 @@ function lingwo_dictionary_menu() {
     'type' => MENU_NORMAL_ITEM
   );
 
-  /*
   if ($lookup_path = lingwo_dictionary_lookup_path()) {
     $items[$lookup_path .'/%/%'] = array(
       'page callback' => 'lingwo_dictionary_lookup_page',
       'page arguments' => array(1, 2),
       'access arguments' => array('access lingwo_dictionary content'),
-      'file' => 'pages/lingwo_dictionary.entry.inc',
+      'file' => 'pages/search.inc',
       'type' => MENU_CALLBACK
     );
   }
-  */
+
   return $items;
 }
 
@@ -163,7 +172,7 @@ function lingwo_dictionary_theme() {
       'arguments' => array('form' => NULL),
     ),
 
-	/*
+  /*
     'lingwo_dictionary_language_list' => array(
       'file' => 'pages/lingwo_dictionary.lang.inc',
       'arguments' => array('languages' => NULL),
@@ -187,7 +196,7 @@ function lingwo_dictionary_theme() {
     'lingwo_dictionary_senses_widget' => array(
       'arguments' => array('element' => NULL),
     ),
-	*/
+  */
   );
 }
 

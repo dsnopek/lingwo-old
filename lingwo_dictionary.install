@@ -26,12 +26,12 @@ function lingwo_dictionary_schema() {
         'unsigned' => TRUE,
         //'not null' => TRUE,
       ),
-	  'headword' => array(
-	  	'description' => 'Entry headword (same as node title)',
-		'type' => 'varchar',
-		'length' => 255,
-		'not null' => TRUE,
-	  ),
+      'headword' => array(
+        'description' => 'Entry headword (same as node title)',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
       'pos' => array(
         'description' => 'Part of speech',
         'type' => 'varchar',
@@ -44,7 +44,32 @@ function lingwo_dictionary_schema() {
       ),
     ),
     'primary key' => array('vid', 'nid'),
-	'unique keys' => array('lang_headword_pos_index' => array('lang_nid', 'headword', 'pos')),
+    'unique keys' => array('lang_headword_pos_index' => array('lang_nid', 'headword', 'pos')),
+  );
+
+  $schema['lingwo_dictionary_lang'] = array(
+    'description' => 'Dictionary Language',
+    'fields' => array(
+      'vid' => array(
+        'description' => 'The current {node_revisions}.vid version identifier',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'nid' => array(
+        'description' => 'The primary identifier for a node.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'lang_code' => array(
+        'description' => 'The iso-639-3 language code.',
+        'type' => 'char',
+        'length' => 3,
+      ),
+    ),
+    'primary key' => array('vid', 'nid'),
+    'indexes' => array('lang_code_index' => array('lang_code')),
   );
 
   return $schema;
@@ -54,6 +79,7 @@ function lingwo_dictionary_schema() {
  * Implementation of hook_install().
  */
 function lingwo_dictionary_install() {
+  variable_set('lingwo_dictionary_schema_version', 6000);
   drupal_install_schema('lingwo_dictionary');
 }
 
@@ -62,6 +88,7 @@ function lingwo_dictionary_install() {
  */
 function lingwo_dictionary_uninstall() {
   drupal_uninstall_schema('lingwo_dictionary');
+  variable_del('lingwo_dictionary_schema_version');
 }
 
 /**
