@@ -8,16 +8,17 @@ function lingwo_dictionary_schema() {
   $schema['lingwo_dictionary_entry'] = array(
     'description' => 'Used to look-up dictionary entries and ensure uniqueness.',
     'fields' => array(
-      'nid' => array(
-        'description' => 'The primary identifier for a node.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE
-      ),
       'language' => array(
         'description' => 'The {languages}.language of this node.',
         'type' => 'varchar',
 		'length' => 12,
+        'not null' => TRUE,
+		'default' => '',
+      ),
+      'pos' => array(
+        'description' => 'Part of speech',
+        'type' => 'varchar',
+        'length' => 12,
         'not null' => TRUE,
 		'default' => '',
       ),
@@ -28,14 +29,14 @@ function lingwo_dictionary_schema() {
         'not null' => TRUE,
 		'default' => '',
       ),
-      'pos' => array(
-        'description' => 'Part of speech',
-        'type' => 'varchar',
-        'length' => 12,
-        'not null' => TRUE,
+      'nid' => array(
+        'description' => 'The primary identifier for a node.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE
       ),
     ),
-    'primary key' => array('nid', 'language', 'title', 'pos'),
+    'primary key' => array('language', 'pos', 'title'),
   );
 
   return $schema;
