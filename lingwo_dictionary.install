@@ -6,70 +6,36 @@
  */
 function lingwo_dictionary_schema() {
   $schema['lingwo_dictionary_entry'] = array(
-    'description' => 'Dictionary entry',
+    'description' => 'Used to look-up dictionary entries and ensure uniqueness.',
     'fields' => array(
-      'vid' => array(
-        'description' => 'The current {node_revisions}.vid version identifier',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE
-      ),
       'nid' => array(
         'description' => 'The primary identifier for a node.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE
       ),
-      'lang_nid' => array(
-        'description' => 'Node id of the language this belongs to',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        //'not null' => TRUE,
+      'language' => array(
+        'description' => 'The {languages}.language of this node.',
+        'type' => 'varchar',
+		'length' => 12,
+        'not null' => TRUE,
+		'default' => '',
       ),
-      'headword' => array(
-        'description' => 'Entry headword (same as node title)',
+      'title' => array(
+        'description' => 'The title of this node.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
+		'default' => '',
       ),
       'pos' => array(
         'description' => 'Part of speech',
         'type' => 'varchar',
-        'length' => 25,
+        'length' => 12,
         'not null' => TRUE,
       ),
-      'senses' => array(
-        'description' => 'Serialized array representing the entries senses',
-        'type' => 'text',
-      ),
     ),
-    'primary key' => array('vid', 'nid'),
-    'unique keys' => array('lang_headword_pos_index' => array('lang_nid', 'headword', 'pos')),
-  );
-
-  $schema['lingwo_dictionary_lang'] = array(
-    'description' => 'Dictionary Language',
-    'fields' => array(
-      'vid' => array(
-        'description' => 'The current {node_revisions}.vid version identifier',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE
-      ),
-      'nid' => array(
-        'description' => 'The primary identifier for a node.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE
-      ),
-      'lang_code' => array(
-        'description' => 'The iso-639-3 language code.',
-        'type' => 'char',
-        'length' => 3,
-      ),
-    ),
-    'primary key' => array('vid', 'nid'),
-    'indexes' => array('lang_code_index' => array('lang_code')),
+    'primary key' => array('nid', 'language', 'title', 'pos'),
   );
 
   return $schema;
@@ -79,6 +45,9 @@ function lingwo_dictionary_schema() {
  * Implementation of hook_install().
  */
 function lingwo_dictionary_install() {
+  drupal_load('module', 'content');
+  content_notify('install', 'lingwo_dictionary_senses');
+
   variable_set('lingwo_dictionary_schema_version', 6000);
   drupal_install_schema('lingwo_dictionary');
 }
@@ -87,6 +56,9 @@ function lingwo_dictionary_install() {
  * Implementation of hook_uninstall().
  */
 function lingwo_dictionary_uninstall() {
+  drupal_load('module', 'content');
+  content_notify('uninstall', 'lingwo_dictionary_senses');
+
   drupal_uninstall_schema('lingwo_dictionary');
   variable_del('lingwo_dictionary_schema_version');
 }
@@ -95,11 +67,15 @@ function lingwo_dictionary_uninstall() {
  * Implementation of hook_enable().
  */
 function lingwo_dictionary_enable() {
+  drupal_load('module', 'content');
+  content_notify('enable', 'lingwo_dictionary_senses');
 }
 
 /**
  * Implementation of hook_disable().
  */
 function lingwo_dictionary_disable() {
+  drupal_load('module', 'content');
+  content_notify('disable', 'lingwo_dictionary_senses');
 }
 

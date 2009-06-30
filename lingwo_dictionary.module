@@ -2,164 +2,149 @@
 // $Id$
 
 /**
- * @file
- * Integration with Lingwo Dictionary API.
+ * New CCK-based implementation
  */
 
 /**
- * content_type based implemantation:
+ * Implementation of hook_field_info().
  */
 
-// TODO: Is this the right place/way to do this?
-module_load_include('inc', 'lingwo_dictionary', 'types/entry');
-module_load_include('inc', 'lingwo_dictionary', 'types/lang');
-
-/**
- * Implementation of hook_node_info().
- */
-function lingwo_dictionary_node_info() {
+function lingwo_dictionary_field_info() {
   return array(
-    'lingwo_dictionary_entry' => array(
-      'name' => t('Dictionary Entry'),
-      'module' => 'lingwo_dictionary_entry',
-      'description' => t('This represents a dictionary entry.'),
-      'has_title' => TRUE,
-      'title_label' => t('Headword'),
-      'has_body' => FALSE,
-    ),
-    'lingwo_dictionary_lang' => array(
-      'name' => t('Dictionary Language'),
-      'module' => 'lingwo_dictionary_lang',
-      'description' => t('This represents a language dictionary entries and translations can be in'),
-      'has_title' => TRUE,
-      'title_label' => t('Language name'),
-      'has_body' => TRUE,
-      'body_label' => t('Description'),
+    'lingwo_dictionary_senses' => array(
+      'label' => t('Lingwo Dictionary Senses'),
+      'description' => t('Store definition senses in the database.'),
     ),
   );
 }
 
 /**
- * Implementation of hook_access().
+ * Implementation of hook_field_settings().
  */
-function lingwo_dictionary_access($op, $node, $account) {
-  // TODO: break up for the different content types.
-  if ($op == 'create') {
-    return user_access('create lingwo_dictionary content', $account);
-  }
-
-  if ($op == 'update') {
-    if (user_access('edit any lingwo_dictionary content', $account) || (user_access('edit own lingwo_dictionary content', $account) && ($account->uid == $node->uid))) {
-      return TRUE;
-    }
-  }
-
-  if ($op == 'delete') {
-    if (user_access('delete any lingwo_dictionary content', $account) || (user_access('delete own lingwo_dictionary content', $account) && ($account->uid == $node->uid))) {
-      return TRUE;
-    }
-  }
-}
-
-/**
- * Implementation of hook_perm().
- */
-function lingwo_dictionary_perm() {
-  // TODO: make useful, smart.
-  return array(
-    'create lingwo_dictionary content',
-    'delete own lingwo_dictionary content',
-    'delete any lingwo_dictionary content',
-    'edit own lingwo_dictionary content',
-    'edit any lingwo_dictionary content',
-  );
-}
-
-/**
- * Implementation of hook_nodeapi().
- */
-function lingwo_dictionary_entry_nodeapi(&$node, $op, $teaser, $page) {
-  $type = node_get_types($node);
+function lingwo_dictionary_field_settings($op, $field) {
   switch ($op) {
-    case 'delete revision':
-    $func = $type .'_delete_revision';
-    $func($name);
-      break;
-  }
-};
+    /*
+    case 'form':
+      $form = array();
+      return $form;
 
-/**
- * Implementation of hook_help
- */
-function lingwo_dictionary_help($path, $arg) {
-  $output = '';
-  switch ($path) {
-    case 'admin/help#lingwo_dictionary':
-      $output = '<p>'. t('Create a multilingual dictionary with Drupal.') .'</p>';
-      break;
-  }
-  return $output;
-}
+    case 'save':
+      return array();
+    */
 
-/**
- * Implementation of hook_block
- */
-function lingwo_dictionary_block($op = 'list', $delta = 0) {
-  if ($op == 'list') {
-    $block[0]['info'] = t('Search Dictionary');
-    return $block;
-  }
-  else if ($op == 'view') {
-  module_load_include('inc', 'lingwo_dictionary', 'pages/lingwo_dictionary.entry.inc');
-    $block['subject'] = t('Search Dictionary');
-    $block['content'] = drupal_get_form('lingwo_dictionary_search_form');
-    return $block;
+    case 'database columns':
+      $columns['data'] = array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => FALSE, 'serialize' => TRUE);
+      return $columns;
   }
 }
 
 /**
- * Implementation of hook_menu().
+ * Implementation of hook_field().
  */
-function lingwo_dictionary_menu() {
-  $items = array();
-  $items['admin/settings/lingwo_dictionary'] = array(
-    'title' => 'Lingwo Dictionary',
-    'description' => t('Settings for Lingwo Dictionary integration module.'),
-    'access arguments' => array('administer site configuration'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('lingwo_dictionary_admin_settings'),
-    'file' => 'pages/lingwo_dictionary.admin.inc',
-    'type' => MENU_NORMAL_ITEM
+function lingwo_dictionary_field($op, &$node, $field, &$items, $teaser, $page) {
+  switch ($op) {
+    /*
+    case 'load':
+      // Content_storage does serialize each field item's columns (if the 
+      // 'serialize' key for that column is set) upon writing to the db,
+      // but does not unserialize when reading from the db. Hopefully,
+      // this will be fixed in the future, but for now, we have to 
+      // explicitly unserialize.
+      if (is_array($items)) {
+        foreach ($items as &$item) {
+          if (is_string($item['data'])) {
+            $item['data'] = unserialize($item['data']);
+          }
+        }
+        return (array($field['field_name'] => $items));
+      }
+      break;
+    */
+
+    case 'validate':
+      return $items;
+  }
+}
+
+/**
+ * Implementation of hook_widget_info().
+ */
+function lingwo_dictionary_widget_info() {
+  return array(
+    'lingwo_dictionary_senses_widget' => array(
+      'label' => 'Lingwo Dictionary Senses Widget',
+      'field types' => array('lingwo_dictionary_senses'),
+      //'multiple values' => CONTENT_HANDLE_MODULE,
+      'multiple values' => CONTENT_HANDLE_CORE,
+      'description' => t('Widget for editing senses for a dictionary entry .'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_elements().
+ */
+function lingwo_dictionary_content_is_empty($item, $field) {
+  if (empty($item['data']['difference']) && empty($item['data']['example'])) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Implementation of hook_elements().
+ */
+function lingwo_dictionary_elements() {
+  $elements = array(
+    'lingwo_dictionary_senses_widget' => array(
+      '#input' => TRUE,
+      '#process' => array('lingwo_dictionary_senses_widget_process'),
+    )
+  );
+  return $elements;
+}
+
+
+function lingwo_dictionary_senses_widget_process($element, $edit, &$form_state, $form) {
+  $tsrc = $form_state['values']['translation_source'];
+  if (isset($tsrc)) {
+    //print "translation";
+  }
+  else {
+    //print "original";
+  }
+
+  $defaults = $element['#value']['data'];
+  if (!is_array($defaults)) {
+    $defaults = unserialize($defaults);
+  }
+
+  $field = content_fields($element['#field_name'], $element['#type_name']);
+
+  $element['data']['difference'] = array(
+    '#title' => 'Difference',
+    '#type' => 'textfield',
+    '#default_value' => $defaults['difference'],
+  );
+  $element['data']['example'] = array(
+    '#title' => 'Example',
+    '#type' => 'textfield',
+    '#default_value' => $defaults['example'],
   );
 
-  if ($lookup_path = lingwo_dictionary_lookup_path()) {
-    $items[$lookup_path .'/%/%'] = array(
-      'page callback' => 'lingwo_dictionary_lookup_page',
-      'page arguments' => array(1, 2),
-      'access arguments' => array('access lingwo_dictionary content'),
-      'file' => 'pages/search.inc',
-      'type' => MENU_CALLBACK
-    );
-  }
-
-  return $items;
+  return $element;
 }
 
+function theme_lingwo_dictionary_senses_widget(&$element) {
+  return theme('form_element', $element, $element['#children']);
+}
 
-/**
- * Implementation of hook_forms().
- */
-function lingwo_dictionary_forms() {
-  $form_names = array(
-    'search',
+function lingwo_dictionary_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+  $element = array(
+    '#type' => $field['widget']['type'],
+    '#default_value' => isset($items[$delta]) ? $items[$delta] : '',
   );
-
-  foreach ($form_names as $name) {
-    $forms['lingwo_dictionary_'. $name .'_form'] = array(
-      'callback' => 'lingwo_dictionary_'. $name .'_form'
-    );
-  }
-  return $forms;
+  return $element;
 }
 
 /**
@@ -167,94 +152,10 @@ function lingwo_dictionary_forms() {
  */
 function lingwo_dictionary_theme() {
   return array(
-    'lingwo_dictionary_entry_senses_form' => array(
-      'file' => 'types/entry.inc',
-      'arguments' => array('form' => NULL),
-    ),
-
-  /*
-    'lingwo_dictionary_language_list' => array(
-      'file' => 'pages/lingwo_dictionary.lang.inc',
-      'arguments' => array('languages' => NULL),
-    ),
-    'lingwo_dictionary_entry' => array(
-      'file' => 'pages/lingwo_dictionary.entry.inc',
-      'arguments' => array('entry' => NULL),
-    ),
-    'lingwo_dictionary_trans_edit_senses' => array(
-      'file' => 'pages/lingwo_dictionary.trans.inc',
-      'arguments' => array('form' => NULL),
-    ),
-    'lingwo_dictionary_translation' => array(
-      'file' => 'pages/lingwo_dictionary.trans.inc',
-      'arguments' => array('entry' => NULL, 'trans' => NULL),
-    ),
-    'lingwo_dictionary_entry_heading' => array(
-      'file' => 'pages/lingwo_dictionary.trans.inc',
-      'arguments' => array('entry' => NULL),
-    ),
     'lingwo_dictionary_senses_widget' => array(
       'arguments' => array('element' => NULL),
     ),
-  */
   );
 }
 
-/*
- * Settings
- */
-
-/**
- * Drupal path for dictionary lookup.
- */
-function lingwo_dictionary_lookup_path($value = NULL) {
-  if (is_null($value)) {
-    return variable_get('lingwo_dictionary_lookup_path', 'lookup');
-  }
-  variable_set('lingwo_dictionary_lookup_path', $value);
-}
-
-/**
- * What 404 error settings are set?
- */
-function lingwo_dictionary_404_type($value = NULL) {
-  if (is_null($value)) {
-    return variable_get('lingow_dictionary_404_type', array('Link to similar', 'Creation form'));
-  }
-  variable_set('lingow_dictionary_404_type', $values);
-}
-
-/**
- * Various lingwo_dictionary options.
- */
-function lingwo_dictionary_options($value = NULL) {
-  if (is_null($value)) {
-    return variable_get('lingwo_dictionary_options', array('entry edit', 'search similar', 'view revisions'));
-  }
-  return variable_set('lingwo_dictionary_options', $value);
-}
-
-/**
- * Is entry editting enabled?
- */
-function lingwo_dictionary_entry_edit() {
-  $options = lingwo_dictionary_options();
-  return $options['entry edit'];
-}
-
-/**
- * Is searching for similar entries enabled?
- */
-function lingwo_dictionary_search_similar() {
-  $options = lingwo_dictionary_options();
-  return $options['search similar'];
-}
-
-/**
- * Is revision viewing enabled?
- */
-function lingwo_dictionary_view_revisions() {
-  $options = lingwo_dictionary_options();
-  return $options['view revisions'];
-}
 
