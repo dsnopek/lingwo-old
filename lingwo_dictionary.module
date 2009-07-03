@@ -47,7 +47,7 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
     unset($form['language']['#options']['']);
     $form['language']['#required'] = TRUE;
 
-    // when editting a translations...
+    // when editting a translation or existing node...
     if (isset($node->nid) || isset($node->translation_source)) {
       // make title uneditable
       $form['title']['#name'] = 'title-disabled';

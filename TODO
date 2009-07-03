@@ -3,6 +3,12 @@
 
  * Fix issue where submitting on the node form causes the taxonomy to reset.
 
+ * Make it so that we could use either the normal taxonomy form stuff or a content_taxonomy
+   CCK field.  (Ie. it needs to disable it correctly).
+ 
+ * Use AHAH to smoothen the adding/removing of senses.  (Will fix temporarily and only for JS
+   users the taxonomy reseting issue)
+
 == 2009-07-02 ==
 
  * Hi-jack the node edit form for the "entry" type and MAYBE make the language be the default
