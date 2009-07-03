@@ -4,23 +4,13 @@
  * Add a settings page where we can select which content type is the "entry" type and which
    taxonomy vocabulary will represent the "Part of Speech" field.
 
- * Hi-jack the node edit form for the "entry" type, remove the "Language neutral" option and
-   (possibly) force the default to be the current language.
+ * Hi-jack the node edit form for the "entry" type and MAYBE make the language be the default
+   language.
   
- * Hi-jack the node edit form for the "entry" type and force the "Part of Speech" taxonomy
-   selection to be the same as the entries original, if it is a translation.  (NOTE: actually,
-   we could do this with the translaion synchronization!  Because we want all taxonomy -- including
-   tags -- to be synchronized).
-
  * Hi-jack the node edit form for the "entry" type and make it so that "title" and "Part of Speech"
    cannot be changed when editting an existing node.  (NOTE: we should attempt to validate this
    in some save or validate hook as well!)
 
- * Hi-jack the node edit form for the "entry" type and make sure that the title is made to be
-   something special when the "entry" is a translation, ie. remain the same as the original or
-   maybe be a combination of the original title and the translation language.  This is to lessen
-   confusion between translations and originals.
- 
  * Hi-jack node save (or some validate hook?) and make sure that entries are unique by language,
    pos and title, add new nodes to the lingwo_dictionary_entry table.
  

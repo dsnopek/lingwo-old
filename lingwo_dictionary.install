@@ -51,6 +51,10 @@ function lingwo_dictionary_install() {
 
   variable_set('lingwo_dictionary_schema_version', 6000);
   drupal_install_schema('lingwo_dictionary');
+
+  // we need to happen after the "locale" module (which we would if the module name was
+  // alphabetically higher) and probably after some other modules too..
+  db_query("UPDATE {system} SET weight = 50 WHERE name = 'lingwo_dictionary'");
 }
 
 /**
