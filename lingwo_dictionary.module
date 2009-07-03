@@ -2,7 +2,8 @@
 // $Id$
 
 /**
- * New CCK-based implementation
+ * @file
+ * Implements extensions for Lingwo Dictionary
  */
 
 /**
@@ -36,158 +37,6 @@ function lingwo_dictionary_menu() {
 }
 
 /**
- * Implementation of hook_field_info().
- */
-function lingwo_dictionary_field_info() {
-  return array(
-    'lingwo_dictionary_senses' => array(
-      'label' => t('Lingwo Dictionary Senses'),
-      'description' => t('Store definition senses in the database.'),
-    ),
-  );
-}
-
-/**
- * Implementation of hook_field_settings().
- */
-function lingwo_dictionary_field_settings($op, $field) {
-  switch ($op) {
-    /*
-    case 'form':
-      $form = array();
-      return $form;
-
-    case 'save':
-      return array();
-    */
-
-    case 'database columns':
-      $columns['data'] = array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => FALSE, 'serialize' => TRUE);
-      return $columns;
-  }
-}
-
-/**
- * Implementation of hook_field().
- */
-function lingwo_dictionary_field($op, &$node, $field, &$items, $teaser, $page) {
-  switch ($op) {
-    /*
-    case 'load':
-      // Content_storage does serialize each field item's columns (if the 
-      // 'serialize' key for that column is set) upon writing to the db,
-      // but does not unserialize when reading from the db. Hopefully,
-      // this will be fixed in the future, but for now, we have to 
-      // explicitly unserialize.
-      if (is_array($items)) {
-        foreach ($items as &$item) {
-          if (is_string($item['data'])) {
-            $item['data'] = unserialize($item['data']);
-          }
-        }
-        return (array($field['field_name'] => $items));
-      }
-      break;
-    */
-
-    case 'validate':
-      return $items;
-  }
-}
-
-/**
- * Implementation of hook_widget_info().
- */
-function lingwo_dictionary_widget_info() {
-  return array(
-    'lingwo_dictionary_senses_widget' => array(
-      'label' => 'Lingwo Dictionary Senses Widget',
-      'field types' => array('lingwo_dictionary_senses'),
-      //'multiple values' => CONTENT_HANDLE_MODULE,
-      'multiple values' => CONTENT_HANDLE_CORE,
-      'description' => t('Widget for editing senses for a dictionary entry .'),
-    ),
-  );
-}
-
-/**
- * Implementation of hook_elements().
- */
-function lingwo_dictionary_content_is_empty($item, $field) {
-  if (empty($item['data']['difference']) && empty($item['data']['example'])) {
-    return TRUE;
-  }
-  return FALSE;
-}
-
-/**
- * Implementation of hook_elements().
- */
-function lingwo_dictionary_elements() {
-  $elements = array(
-    'lingwo_dictionary_senses_widget' => array(
-      '#input' => TRUE,
-      '#process' => array('lingwo_dictionary_senses_widget_process'),
-    )
-  );
-  return $elements;
-}
-
-
-function lingwo_dictionary_senses_widget_process($element, $edit, &$form_state, $form) {
-  $tsrc = $form_state['values']['translation_source'];
-  if (isset($tsrc)) {
-    //print "translation";
-  }
-  else {
-    //print "original";
-  }
-
-  $defaults = $element['#value']['data'];
-  if (!is_array($defaults)) {
-    $defaults = unserialize($defaults);
-  }
-
-  $field = content_fields($element['#field_name'], $element['#type_name']);
-
-  $element['data']['difference'] = array(
-    '#title' => 'Difference',
-    '#type' => 'textfield',
-    '#default_value' => $defaults['difference'],
-  );
-  $element['data']['example'] = array(
-    '#title' => 'Example',
-    '#type' => 'textfield',
-    '#default_value' => $defaults['example'],
-  );
-
-  return $element;
-}
-
-function theme_lingwo_dictionary_senses_widget(&$element) {
-  return theme('form_element', $element, $element['#children']);
-}
-
-function lingwo_dictionary_widget(&$form, &$form_state, $field, $items, $delta = 0) {
-  $element = array(
-    '#type' => $field['widget']['type'],
-    '#default_value' => isset($items[$delta]) ? $items[$delta] : '',
-  );
-  return $element;
-}
-
-/**
- * Implementation of hook_theme().
- */
-function lingwo_dictionary_theme() {
-  return array(
-    'lingwo_dictionary_senses_widget' => array(
-      'arguments' => array('element' => NULL),
-    ),
-  );
-}
-
-/**
  * Implementation of hook_form_alter().
  */
 function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
@@ -216,6 +65,94 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
       $form['taxonomy'][lingwo_dictionary_pos_vocabulary()]['#disabled'] = TRUE;
     }
   }
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function lingwo_dictionary_theme() {
+  return array(
+    'lingwo_dictionary_senses_widget' => array(
+      'arguments' => array('element' => NULL),
+    ),
+  );
+}
+
+// TODO: I don't want to use FAPI and hook_elements() to build the widget.
+/**
+ * Implementation of hook_elements().
+ */
+function lingwo_dictionary_elements() {
+  $elements = array(
+    'lingwo_dictionary_senses_widget' => array(
+      '#input' => TRUE,
+      '#process' => array('lingwo_dictionary_senses_widget_process'),
+    )
+  );
+  return $elements;
+}
+
+/**
+ * CCK hooks
+ */
+
+// TODO: Is this the right place/way to do this?
+module_load_include('inc', 'lingwo_dictionary', 'fields/senses');
+
+/**
+ * Implementation of hook_field_info().
+ */
+function lingwo_dictionary_field_info() {
+  return array(
+    'lingwo_dictionary_senses' => array(
+      'label' => t('Lingwo Dictionary Senses'),
+      'description' => t('Store definition senses in the database.'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_widget_info().
+ */
+function lingwo_dictionary_widget_info() {
+  return array(
+    'lingwo_dictionary_senses_widget' => array(
+      'label' => 'Lingwo Dictionary Senses Widget',
+      'field types' => array('lingwo_dictionary_senses'),
+      //'multiple values' => CONTENT_HANDLE_MODULE,
+      'multiple values' => CONTENT_HANDLE_CORE,
+      'description' => t('Widget for editing senses for a dictionary entry .'),
+    ),
+  );
+}
+
+function lingwo_dictionary_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+  $func = $field['type'] .'_widget';
+  return $func($form, $form_state, $field, $items, $delta);
+}
+
+/**
+ * Implementation of hook_field_settings().
+ */
+function lingwo_dictionary_field_settings($op, $field) {
+  $func = $field['type'] .'_field_settings';
+  return $func($op, $field);
+}
+
+/**
+ * Implementation of hook_field().
+ */
+function lingwo_dictionary_field($op, &$node, $field, &$items, $teaser, $page) {
+  $func = $field['type'] .'_field';
+  return $func($op, $node, $field, $items, $teaser, $page);
+}
+
+/**
+ * Implementation of hook_content_is_empty().
+ */
+function lingwo_dictionary_content_is_empty($item, $field) {
+  $func = $field['type'] .'_content_is_empty';
+  return $func($item, $field);
 }
 
 /*
