@@ -1,15 +1,11 @@
 
 == 2009-06-19 ==
 
- * Add a settings page where we can select which content type is the "entry" type and which
-   taxonomy vocabulary will represent the "Part of Speech" field.
-
  * Hi-jack the node edit form for the "entry" type and MAYBE make the language be the default
    language.
   
- * Hi-jack the node edit form for the "entry" type and make it so that "title" and "Part of Speech"
-   cannot be changed when editting an existing node.  (NOTE: we should attempt to validate this
-   in some save or validate hook as well!)
+ * Use some validate hook to validate that "title", "language" and "Part of Speech" can't be 
+   changed on an existing node or on a translation.
 
  * Hi-jack node save (or some validate hook?) and make sure that entries are unique by language,
    pos and title, add new nodes to the lingwo_dictionary_entry table.

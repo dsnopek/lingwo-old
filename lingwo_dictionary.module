@@ -209,7 +209,11 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
         '#value' => $form['title']['#default_value'],
       );
 
-      // TODO: we want to make the Part of Speech uneditable too!
+      // make language uneditable
+      $form['language']['#disabled'] = TRUE;
+
+      // make the "Part of Speech" taxonomy uneditable
+      $form['taxonomy'][lingwo_dictionary_pos_vocabulary()]['#disabled'] = TRUE;
     }
   }
 }
