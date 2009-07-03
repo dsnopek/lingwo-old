@@ -1,5 +1,9 @@
 
-== 2009-06-19 ==
+== 2009-07-03 ==
+
+ * Fix issue where submitting on the node form causes the taxonomy to reset.
+
+== 2009-07-02 ==
 
  * Hi-jack the node edit form for the "entry" type and MAYBE make the language be the default
    language.

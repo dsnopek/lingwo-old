@@ -36,49 +36,9 @@ function lingwo_dictionary_senses_content_is_empty($item, $field) {
   return FALSE;
 }
 
-
-function lingwo_dictionary_senses_widget_process($element, $edit, &$form_state, $form) {
-  $tsrc = $form_state['values']['translation_source'];
-  if (isset($tsrc)) {
-    //print "translation";
-  }
-  else {
-    //print "original";
-  }
-
-  $defaults = $element['#value']['data'];
-  if (!is_array($defaults)) {
-    $defaults = unserialize($defaults);
-  }
-
-  $field = content_fields($element['#field_name'], $element['#type_name']);
-
-  $element['data']['difference'] = array(
-    '#title' => 'Difference',
-    '#type' => 'textfield',
-    '#default_value' => $defaults['difference'],
-  );
-  $element['data']['example'] = array(
-    '#title' => 'Example',
-    '#type' => 'textfield',
-    '#default_value' => $defaults['example'],
-  );
-
-  return $element;
-}
-
-function theme_lingwo_dictionary_senses_widget(&$element) {
-  return theme('form_element', $element, $element['#children']);
-}
-
-function _lingwo_dictionary_entry_from_form($form, &$form_state) {
-  $node = node_form_submit_build_node($form, $form_state);
-  // TODO: process senses onto form_state somehow, maybe..
-  return $node;
-}
-
 function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   $node = $form['#node'];
+  //print_r($node->taxonomy);
   $tsrc = $form->translation_source;
 
   if (isset($tsrc)) {
@@ -88,15 +48,20 @@ function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $
     // original
   }
 
+  $field_name = $field['field_name'];
+  if (isset($form_state[$field_name]['senses'])) {
+    $items = $form_state[$field_name]['senses'];
+  }
+
   $element['wrapper'] = array(
     '#prefix' => '<div id="lingwo-senses">',
     '#suffix' => '</div>',
     '#title' => 'Senses',
     '#type' => 'fieldset',
   );
-  
+
   // we count it as empty if there is less than 2 senses!
-  if (!empty($items) && !isset($items[1])) {
+  if (!empty($items) && isset($items[1])) {
     $element['wrapper']['senses'] = array(
       '#tree' => TRUE,
       '#theme' => 'lingwo_dictionary_senses_form',
@@ -136,11 +101,12 @@ function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $
         '#delta' => 50,
         '#default_value' => $index,
       );
-      if (count($node->senses) > 2) {
+      if (count($items) > 2) {
         $row['remove_sense'] = array(
           '#type' => 'submit',
           '#value' => t('Remove Sense #!num', array('!num' => $index + 1)),
           '#submit' => array('lingwo_dictionary_senses_remove_submit'),
+          '#field_name' => $field_name,
         );
       }
       $element['wrapper']['senses'][$index] = $row;
@@ -149,33 +115,54 @@ function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $
   }
   $element['wrapper']['add_sense'] = array(
     '#type' => 'submit',
-    '#value' => count($node->senses) == 0 ? t('Setup multiple senses') : t('Add Another Sense'),
+    '#value' => count($items) == 1 ? t('Setup multiple senses') : t('Add Another Sense'),
     '#submit' => array('lingwo_dictionary_senses_add_submit'),
+    '#field_name' => $field_name,
   );
-  if (count($node->senses) == 2) {
+  if (count($items) == 2) {
     $element['wrapper']['remove_sense'] = array(
       '#type' => 'submit',
       '#value' => t('Delete Senses'),
       '#submit' => array('lingwo_dictionary_senses_remove_submit'),
+      '#field_name' => $field_name,
     );
   }
 
   return $element;
 }
 
-function lingwo_dictionary_senses_add_submit($form, &$form_state) {
-  /*
-  $node = _lingwo_dictionary_entry_from_form($form, $form_state);
-  
-  if (count($node->field_senses) > 2) {
-    $node->field_senses[] = array();
+function _lingwo_dictionary_senses_from_form($form, &$form_state) {
+  $node = node_form_submit_build_node($form, $form_state);
+  $field_name = $form_state['clicked_button']['#field_name'];
+
+  $senses = $form_state['values'][$field_name]['wrapper']['senses'];
+  if ($senses) {
+    foreach ($senses as $sense) {
+      $weight[] = $sense['weight'];
+      unset($sense['weight']);
+      $values[] = $sense;
+    }
+    array_multisort($weight, SORT_ASC, $values);
+    $senses = $values;
   }
   else {
-    $node->field_senses = array( array(), array() );
+    $senses = array();
   }
 
-  $form_state['node'] = (array)$node;
-  */
+  $form_state[$field_name]['senses'] = $senses;
+  return $senses;
+}
+
+function lingwo_dictionary_senses_add_submit($form, &$form_state) {
+  $senses = _lingwo_dictionary_senses_from_form($form, $form_state);
+  $field_name = $form_state['clicked_button']['#field_name'];
+  
+  if (count($senses) > 1) {
+    $form_state[$field_name]['senses'][] = array();
+  }
+  else {
+    $form_state[$field_name]['senses'] = array( array(), array() );
+  }
 }
 
 function theme_lingwo_dictionary_senses_form($form) {
