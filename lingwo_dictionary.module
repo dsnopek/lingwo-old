@@ -75,6 +75,9 @@ function lingwo_dictionary_theme() {
     'lingwo_dictionary_senses_widget' => array(
       'arguments' => array('element' => NULL),
     ),
+    'lingwo_dictionary_senses_form' => array(
+      'arguments' => array('form' => NULL),
+    ),
   );
 }
 
@@ -119,8 +122,8 @@ function lingwo_dictionary_widget_info() {
     'lingwo_dictionary_senses_widget' => array(
       'label' => 'Lingwo Dictionary Senses Widget',
       'field types' => array('lingwo_dictionary_senses'),
-      //'multiple values' => CONTENT_HANDLE_MODULE,
-      'multiple values' => CONTENT_HANDLE_CORE,
+      'multiple values' => CONTENT_HANDLE_MODULE,
+      //'multiple values' => CONTENT_HANDLE_CORE,
       'description' => t('Widget for editing senses for a dictionary entry .'),
     ),
   );
