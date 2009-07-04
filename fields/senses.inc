@@ -21,6 +21,21 @@ function lingwo_dictionary_senses_field_settings($op, $field) {
  */
 function lingwo_dictionary_senses_field($op, &$node, $field, &$items, $teaser, $page) {
   switch ($op) {
+    case 'load':
+      // Content_storage does serialize each field item's columns (if the 
+      // 'serialize' key for that column is set) upon writing to the db,
+      // but does not unserialize when reading from the db. Hopefully,
+      // this will be fixed in the future, but for now, we have to 
+      // explicitly unserialize.
+      if (is_array($items)) {
+        foreach ($items as &$item) {
+          if (is_string($item['data'])) {
+            $item['data'] = unserialize($item['data']);
+          }
+        }
+        return (array($field['field_name'] => $items));
+      }
+      break;
     case 'validate':
       return $items;
   }
@@ -38,7 +53,6 @@ function lingwo_dictionary_senses_content_is_empty($item, $field) {
 
 function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   $node = $form['#node'];
-  //print_r($node->taxonomy);
   $tsrc = $form->translation_source;
 
   if (isset($tsrc)) {
@@ -53,18 +67,18 @@ function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $
     $items = $form_state[$field_name]['senses'];
   }
 
-  $element['wrapper'] = array(
+  $element = array(
     '#prefix' => '<div id="lingwo-senses">',
     '#suffix' => '</div>',
-    '#title' => 'Senses',
     '#type' => 'fieldset',
+    '#tree' => TRUE,
   );
 
   // we count it as empty if there is less than 2 senses!
   if (!empty($items) && isset($items[1])) {
-    $element['wrapper']['senses'] = array(
-      '#tree' => TRUE,
+    $element['senses'] = array(
       '#theme' => 'lingwo_dictionary_senses_form',
+      '#parents' => array($field['field_name']),
     );
 
     $index = 0;
@@ -109,18 +123,18 @@ function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $
           '#field_name' => $field_name,
         );
       }
-      $element['wrapper']['senses'][$index] = $row;
+      $element['senses'][$index]['data'] = $row;
       $index ++;
     }
   }
-  $element['wrapper']['add_sense'] = array(
+  $element['add_sense'] = array(
     '#type' => 'submit',
     '#value' => count($items) == 1 ? t('Setup multiple senses') : t('Add Another Sense'),
     '#submit' => array('lingwo_dictionary_senses_add_submit'),
     '#field_name' => $field_name,
   );
   if (count($items) == 2) {
-    $element['wrapper']['remove_sense'] = array(
+    $element['remove_sense'] = array(
       '#type' => 'submit',
       '#value' => t('Delete Senses'),
       '#submit' => array('lingwo_dictionary_senses_remove_submit'),
@@ -180,7 +194,7 @@ function theme_lingwo_dictionary_senses_form($form) {
 
   $rows = array();
   foreach (element_children($form) as $key) {
-    $element = &$form[$key];
+    $element = &$form[$key]['data'];
     $element['weight']['#attributes']['class'] = 'sense-weight';
 
     $weight = drupal_render($element['weight']);
