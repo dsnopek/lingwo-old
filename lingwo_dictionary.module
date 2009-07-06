@@ -45,6 +45,18 @@ function lingwo_dictionary_menu() {
   return $items;
 }
 
+// Helper for generating UUIDs
+function _ld_make_uuid() {
+  if (!isset($GLOBALS['uuid'])) {
+    uuid_create(&$GLOBALS['uuid']);
+  }
+
+  uuid_make($GLOBALS['uuid'], UUID_MAKE_V4);
+  uuid_export($GLOBALS['uuid'], UUID_FMT_STR, &$uuidstring);
+
+  return trim($uuidstring);
+}
+
 // Helper for implementing AHAH
 function _ld_disable_validation(&$form) {
   foreach (element_children($form) as $child) {

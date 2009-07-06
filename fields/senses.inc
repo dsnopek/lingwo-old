@@ -88,19 +88,14 @@ function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $
     foreach ($items as $sense) {
       $sense = $sense['data'];
 
-      /*
-      if (!isset($sense->id)) {
-        uuid_make($GLOBALS['uuid'], UUID_MAKE_V4);
-        uuid_export($GLOBALS['uuid'], UUID_FMT_STR, &$uuidstring);
-        $sense->id = trim($uuidstring);
+      if (!isset($sense['id'])) {
+        $sense['id'] = _ld_make_uuid();
       }
-      */
-      if (isset($sense['id'])) {
-        $row['id'] = array(
-          '#type' => 'hidden',
-          '#value' => $sense['id'],
-        );
-      }
+
+      $row['id'] = array(
+        '#type' => 'hidden',
+        '#value' => $sense['id'],
+      );
 
       $row['difference'] = array(
         '#title' => 'Difference',
