@@ -21,6 +21,15 @@ function lingwo_dictionary_menu() {
     'type' => MENU_NORMAL_ITEM
   );
 
+  $items['lingwo_dictionary_senses/ahah/%'] = array(
+    'title' => 'Lingwo Dictionary AHAH',
+    'page callback' => 'lingwo_dictionary_senses_ahah',
+    'page arguments' => array(2),
+    // TODO: What should this be?
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK
+  );
+
   /*
   if ($lookup_path = lingwo_dictionary_lookup_path()) {
     $items[$lookup_path .'/%/%'] = array(
@@ -34,6 +43,14 @@ function lingwo_dictionary_menu() {
   */
 
   return $items;
+}
+
+// Helper for implementing AHAH
+function _lg_disable_validation(&$form) {
+  foreach (element_children($form) as $child) {
+    $form[$child]['#validated'] = TRUE;
+    _lg_disable_validation(&$form[$child]);
+  }
 }
 
 /**

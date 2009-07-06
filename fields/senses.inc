@@ -68,19 +68,22 @@ function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $
   }
 
   $element = array(
-    '#prefix' => '<div id="lingwo-senses">',
-    '#suffix' => '</div>',
     '#type' => 'fieldset',
     '#tree' => TRUE,
   );
 
+  $element['wrapper'] = array(
+    '#prefix' => '<div id="'. $field_name .'-wrapper">',
+    '#suffix' => '</div>',
+  );
+
+  $element['wrapper']['senses'] = array(
+    '#theme' => 'lingwo_dictionary_senses_form',
+    '#parents' => array($field['field_name']),
+  );
+
   // we count it as empty if there is less than 2 senses!
   if (!empty($items) && isset($items[1])) {
-    $element['senses'] = array(
-      '#theme' => 'lingwo_dictionary_senses_form',
-      '#parents' => array($field['field_name']),
-    );
-
     $index = 0;
     foreach ($items as $sense) {
       $sense = $sense['data'];
@@ -123,18 +126,23 @@ function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $
           '#field_name' => $field_name,
         );
       }
-      $element['senses'][$index]['data'] = $row;
+      $element['wrapper']['senses'][$index]['data'] = $row;
       $index ++;
     }
   }
-  $element['add_sense'] = array(
+  $element['wrapper']['add_sense'] = array(
     '#type' => 'submit',
     '#value' => count($items) == 1 ? t('Setup multiple senses') : t('Add Another Sense'),
     '#submit' => array('lingwo_dictionary_senses_add_submit'),
     '#field_name' => $field_name,
+    '#ahah' => array(
+      'event' => 'click',
+      'path' => 'lingwo_dictionary_senses/ahah/'. $field_name,
+      'wrapper' => $field_name .'-wrapper',
+    ),
   );
   if (count($items) == 2) {
-    $element['remove_sense'] = array(
+    $element['wrapper']['remove_sense'] = array(
       '#type' => 'submit',
       '#value' => t('Delete Senses'),
       '#submit' => array('lingwo_dictionary_senses_remove_submit'),
@@ -149,14 +157,18 @@ function _lingwo_dictionary_senses_from_form($form, &$form_state) {
   $node = node_form_submit_build_node($form, $form_state);
   $field_name = $form_state['clicked_button']['#field_name'];
 
-  $senses = $form_state['values'][$field_name]['wrapper']['senses'];
+  $senses = $form_state['values'][$field_name];
   if ($senses) {
-    foreach ($senses as $sense) {
-      $weight[] = $sense['weight'];
-      unset($sense['weight']);
-      $values[] = $sense;
+    foreach ($senses as $index => $sense) {
+      if (is_numeric($index)) {
+        $weight[] = $sense['data']['weight'];
+        unset($sense['data']['weight']);
+        $values[] = $sense;
+      }
     }
-    array_multisort($weight, SORT_ASC, $values);
+    if (!empty($values)) {
+      array_multisort($weight, SORT_ASC, $values);
+    }
     $senses = $values;
   }
   else {
@@ -179,8 +191,43 @@ function lingwo_dictionary_senses_add_submit($form, &$form_state) {
   }
 }
 
+function lingwo_dictionary_senses_ahah($field_name) {
+  module_load_include('inc', 'node', 'node.pages');
+  $form_state = array('submitted' => FALSE);
+  $form_build_id = $_POST['form_build_id'];
+
+  $form = form_get_cache($form_build_id, $form_state);
+  $form += array(
+    '#post' => $_POST,
+    '#programmed' => FALSE,
+  );
+  $form['#validate'] = NULL;
+  $form_state['validate_handlers'] = NULL;
+  _lg_disable_validation($form);
+
+  $args = $form['#parameters'];
+  $form_id = array_shift($args);
+  drupal_process_form($form_id, $form, $form_state);
+
+  $form = drupal_rebuild_form($form_id, $form_state, $args, $form_build_id);
+  form_set_cache($form_build_id, $form, $form_state);
+
+  $element = $form[$field_name]['wrapper']; 
+  unset($element['#prefix']);
+  unset($element['#suffix']);
+  $output = theme('status_messages') . drupal_render($element);
+  $output .= $ddd;
+
+  drupal_json(array('status' => TRUE, 'data' => $output));
+}
+
 function theme_lingwo_dictionary_senses_form($form) {
+  drupal_add_tabledrag('lingwo-definition-table', 'order', 'sibling', 'sense-weight');
+
   $elements = element_children($form);
+  if (empty($elements)) {
+    return '';
+  }
 
   $header = array(
     '',
@@ -214,7 +261,6 @@ function theme_lingwo_dictionary_senses_form($form) {
     $rows[] = $row;
   }
 
-  drupal_add_tabledrag('lingwo-definition-table', 'order', 'sibling', 'sense-weight');
   return theme('table', $header, $rows, array('id' => 'lingwo-definition-table'));
 }
 
