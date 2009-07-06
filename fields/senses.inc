@@ -135,11 +135,14 @@ function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $
     '#value' => count($items) == 1 ? t('Setup multiple senses') : t('Add Another Sense'),
     '#submit' => array('lingwo_dictionary_senses_add_submit'),
     '#field_name' => $field_name,
+    /*
     '#ahah' => array(
       'event' => 'click',
       'path' => 'lingwo_dictionary_senses/ahah/'. $field_name,
       'wrapper' => $field_name .'-wrapper',
+      'effect' => 'fade',
     ),
+    */
   );
   if (count($items) == 2) {
     $element['wrapper']['remove_sense'] = array(
@@ -193,30 +196,26 @@ function lingwo_dictionary_senses_add_submit($form, &$form_state) {
 
 function lingwo_dictionary_senses_ahah($field_name) {
   module_load_include('inc', 'node', 'node.pages');
-  $form_state = array('submitted' => FALSE);
+  $form_state = array('storage' => NULL, 'submitted' => FALSE);
   $form_build_id = $_POST['form_build_id'];
 
   $form = form_get_cache($form_build_id, $form_state);
-  $form += array(
-    '#post' => $_POST,
-    '#programmed' => FALSE,
-  );
-  $form['#validate'] = NULL;
-  $form_state['validate_handlers'] = NULL;
-  _lg_disable_validation($form);
+
+  _ld_disable_validation($form);
 
   $args = $form['#parameters'];
   $form_id = array_shift($args);
+  $form_state['post'] = $form['#post'] = $_POST;
+  $form['#post']['form_id'] = $form_id;
+  $form['#programmed'] = $form['#redirect'] = FALSE;
+
   drupal_process_form($form_id, $form, $form_state);
 
   $form = drupal_rebuild_form($form_id, $form_state, $args, $form_build_id);
-  form_set_cache($form_build_id, $form, $form_state);
 
   $element = $form[$field_name]['wrapper']; 
-  unset($element['#prefix']);
-  unset($element['#suffix']);
+  unset($element['#prefix'], $element['#suffix']);
   $output = theme('status_messages') . drupal_render($element);
-  $output .= $ddd;
 
   drupal_json(array('status' => TRUE, 'data' => $output));
 }

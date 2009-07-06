@@ -46,10 +46,10 @@ function lingwo_dictionary_menu() {
 }
 
 // Helper for implementing AHAH
-function _lg_disable_validation(&$form) {
+function _ld_disable_validation(&$form) {
   foreach (element_children($form) as $child) {
     $form[$child]['#validated'] = TRUE;
-    _lg_disable_validation(&$form[$child]);
+    _ld_disable_validation(&$form[$child]);
   }
 }
 
