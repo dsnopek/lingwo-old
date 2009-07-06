@@ -83,7 +83,7 @@ function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $
   );
 
   // we count it as empty if there is less than 2 senses!
-  if (!empty($items) && isset($items[1])) {
+  if (!empty($items) && count($items) > 1) {
     $index = 0;
     foreach ($items as $sense) {
       $sense = $sense['data'];
@@ -194,6 +194,19 @@ function lingwo_dictionary_senses_add_submit($form, &$form_state) {
   }
   else {
     $form_state[$field_name]['senses'] = array( array(), array() );
+  }
+}
+
+function lingwo_dictionary_senses_remove_submit($form, &$form_state) {
+  $senses = _lingwo_dictionary_senses_from_form($form, $form_state);
+  $field_name = $form_state['clicked_button']['#field_name'];
+  
+  if (count($senses) == 2) {
+    $form_state[$field_name]['senses'] = array();
+  }
+  else {
+    $delta = $form_state['clicked_button']['#parents'][1];
+    unset($form_state[$field_name]['senses'][$delta]);
   }
 }
 
