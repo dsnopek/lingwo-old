@@ -160,6 +160,9 @@ function _lingwo_dictionary_senses_from_form($form, &$form_state) {
   $node = node_form_submit_build_node($form, $form_state);
   $field_name = $form_state['clicked_button']['#field_name'];
 
+  // hack to stop taxonomy from resetting when the form is rebuilt
+  $form_state['node']['taxonomy'] = taxonomy_preview_terms($node);
+
   $senses = $form_state['values'][$field_name];
   if ($senses) {
     foreach ($senses as $index => $sense) {

@@ -1,7 +1,9 @@
 
-== 2009-07-03 ==
+== 2009-07-06 ==
 
- * Fix issue where submitting on the node form causes the taxonomy to reset.
+ * Try and fix AHAH!  There are so many weird issues with it I'm not sure what to do..
+
+== 2009-07-03 ==
 
  * Make it so that we could use either the normal taxonomy form stuff or a content_taxonomy
    CCK field.  (Ie. it needs to disable it correctly).
