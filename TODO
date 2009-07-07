@@ -1,9 +1,19 @@
 
 == 2009-07-06 ==
 
- * Try and fix AHAH!  There are so many weird issues with it I'm not sure what to do..
-
  * Remove 'weight' and 'remove_sense' from each sense before it is saved.
+
+ * Put the info from "Translate" tab on the "View" area for original entries.  Also, make a more
+   convenient/obvious link back to the original entry.
+ 
+ * Restore the links to the pages for translated words.
+
+ * Make the "retire this obsolete translation" check box actually work (you could use
+   is_empty!)
+ 
+ * Fix the bug where new translations have one too many senses listed.
+
+ * Try and fix AHAH!  There are so many weird issues with it I'm not sure what to do..
 
 == 2009-07-03 ==
 
