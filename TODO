@@ -6,6 +6,8 @@
  * Put the info from "Translate" tab on the "View" area for original entries.  Also, make a more
    convenient/obvious link back to the original entry.
  
+ * Remove the "Select translations for ___" section from the "Translation" tab.
+ 
  * Restore the links to the pages for translated words.
 
  * Make the "retire this obsolete translation" check box actually work (you could use
