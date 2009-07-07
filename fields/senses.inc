@@ -272,9 +272,7 @@ function lingwo_dictionary_senses_get_translations($node, $field_name, $items) {
 
   foreach ($trans_map as $id => $trans_sense) {
     $trans_sense['id'] = $id;
-    if (!array_key_exists($id, $id_list)) {
-      $senses[] = $trans_sense;
-    }
+    $senses[] = $trans_sense;
   }
 
   return $senses;
@@ -477,10 +475,48 @@ function theme_lingwo_dictionary_senses_original($items) {
     $output .= '<p>'. t('No sense distinctions.') .'</p>';
   }
 
+  drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.css');
   return $output;
 }
 
 function theme_lingwo_dictionary_senses_translation($items) {
-  return 'translation';
+  $output = '';
+  $output .= '<div class="lingwo-entry">';
+  $output .= '<ol class="lingwo-sense-list">';
+
+  foreach ($items as $sense) {
+    $sense = $sense['data'];
+    $orig_senses = $sense['orig_sense'];
+    
+    $output .= '<li class="lingwo-sense">';
+    if ($sense['clue']) {
+      $output .= '<span class="lingwo-sense-clue">('. $sense['clue'] .')</span> ';
+    }
+
+    $values = array();
+    foreach ($sense['trans'] as $value) {
+      if (!empty($value)) {
+        // TODO: re-instate this!
+        //$values[] = l($value, 'entry/'. $trans->target_lang .'/'. $entry->pos .'/'. $value);
+        $values[] = $value;
+      }
+    };
+    if (empty($values)) {
+      $output .= t('No translation.');
+    }
+    else {
+      $output .= join(', ', $values);
+    }
+
+    if ($orig_sense['example']) {
+      $output .= ': <blockquote class="lingwo-example">"'. $entry_sense['example'] .'"</blockquote>';
+    }
+    $output .= '</li>';
+  };
+  $output .= '</ol>';
+  $output .= '</div>';
+
+  drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.css');
+  return $output;
 }
 
