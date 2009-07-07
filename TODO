@@ -10,9 +10,6 @@
  * Make it so that we could use either the normal taxonomy form stuff or a content_taxonomy
    CCK field.  (Ie. it needs to disable it correctly).
  
- * Use AHAH to smoothen the adding/removing of senses.  (Will fix temporarily and only for JS
-   users the taxonomy reseting issue)
-
 == 2009-07-02 ==
 
  * Hi-jack the node edit form for the "entry" type and MAYBE make the language be the default
@@ -23,12 +20,6 @@
 
  * Hi-jack node save (or some validate hook?) and make sure that entries are unique by language,
    pos and title, add new nodes to the lingwo_dictionary_entry table.
- 
- * Work on managing the multiple values of "senses" in the module itself, rather than letting
-   core handle that.
-
- * Make the seperate forms for the "senses" field when an entry is a translation and when it is
-   an original.
 
 == 2009-02-26 ==
 
