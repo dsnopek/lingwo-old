@@ -159,9 +159,6 @@ function lingwo_dictionary_senses_widget_translation(&$form, &$form_state, $fiel
   $node = $form['#node'];
   $field_name = $field['field_name'];
 
-  if (empty($node->translation_source)) {
-    $node->translation_source = node_load($node->tnid);
-  }
   $senses = lingwo_dictionary_senses_get_translations($node, $field_name, $items);
   $orig_senses = $node->translation_source->$field_name;
 
@@ -234,6 +231,10 @@ function lingwo_dictionary_senses_widget_translation(&$form, &$form_state, $fiel
  * order, connected to the entry senses if one exists.
  */
 function lingwo_dictionary_senses_get_translations($node, $field_name, $items) {
+  if (empty($node->translation_source)) {
+    $node->translation_source = node_load($node->tnid);
+  }
+
   $orig = $node->translation_source;
   $orig_senses = isset($orig) ? $orig->$field_name : array();
 
@@ -428,5 +429,58 @@ function theme_lingwo_dictionary_senses_translation_form($form) {
   }
 
   return theme('table', $header, $rows);
+}
+
+// TODO: should be marked by 'senses'
+function theme_lingwo_dictionary_formatter_default($element) {
+  $field_name = $element['#field_name'];
+  $node = $element['#node'];
+  $items = $node->$field_name;
+
+  $theme = 'lingwo_dictionary_senses';
+  if (isset($node->translation_source) || ($node->nid && $node->nid != $node->tnid)) {
+    $items = lingwo_dictionary_senses_get_translations($node, $field_name, $items);
+    $theme = $theme .'_translation';
+  }
+  else {
+    $theme = $theme .'_original';
+  }
+
+  return theme($theme, $items);
+}
+
+function theme_lingwo_dictionary_senses_original($items) {
+  if (!empty($items)) {
+    $output .= '<div class="lingwo-entry">';
+    $output .= '<ol class="lingwo-sense-list">';
+    foreach ($items as $sense) {
+      $sense = $sense['data'];
+
+      $output .= '<li class="lingwo-sense">';
+      if ($sense['difference']) {
+        $output .= '<span class="lingwo-sense-difference">'. $sense['difference'] .'</span>';
+      }
+      else {
+        $output .= '<span class="lingwo-sense-nodifference">(';
+        $output .= t('No difference given');
+        $output .= ')</span>';
+      }
+      if ($sense['example']) {
+        $output .= ': <blockquote class="lingwo-example">"'. $sense['example'] .'"</blockquote>';
+      }
+      $output .= '</li>';
+    };
+    $output .= '</ol>';
+    $output .= '</div>';
+  }
+  else {
+    $output .= '<p>'. t('No sense distinctions.') .'</p>';
+  }
+
+  return $output;
+}
+
+function theme_lingwo_dictionary_senses_translation($items) {
+  return 'translation';
 }
 

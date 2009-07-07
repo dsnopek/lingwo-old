@@ -110,21 +110,17 @@ function lingwo_dictionary_theme() {
     'lingwo_dictionary_senses_translation_form' => array(
       'arguments' => array('form' => NULL),
     ),
+    // TODO: should be marked by 'senses'
+    'lingwo_dictionary_formatter_default' => array(
+      'arguments' => array('element' => NULL),
+    ),
+    'lingwo_dictionary_senses_original' => array(
+      'arguments' => array('items' => NULL),
+    ),
+    'lingwo_dictionary_senses_translation' => array(
+      'arguments' => array('items' => NULL),
+    ),
   );
-}
-
-// TODO: I don't want to use FAPI and hook_elements() to build the widget.
-/**
- * Implementation of hook_elements().
- */
-function lingwo_dictionary_elements() {
-  $elements = array(
-    'lingwo_dictionary_senses_widget' => array(
-      '#input' => TRUE,
-      '#process' => array('lingwo_dictionary_senses_widget_process'),
-    )
-  );
-  return $elements;
 }
 
 /**
@@ -161,9 +157,17 @@ function lingwo_dictionary_widget_info() {
   );
 }
 
-function lingwo_dictionary_widget(&$form, &$form_state, $field, $items, $delta = 0) {
-  $func = $field['type'] .'_widget';
-  return $func($form, $form_state, $field, $items, $delta);
+/**
+ * Implementation of hook_field_formatter_info().
+ */
+function lingwo_dictionary_field_formatter_info() {
+  return array(
+    'default' => array(
+      'label' => t('Lingwo Dictionary Senses Formatter'),
+      'field types' => array('lingwo_dictionary_senses'),
+      'multiple values' => CONTENT_HANDLE_MODULE,
+    ),
+  );
 }
 
 /**
@@ -188,6 +192,14 @@ function lingwo_dictionary_field($op, &$node, $field, &$items, $teaser, $page) {
 function lingwo_dictionary_content_is_empty($item, $field) {
   $func = $field['type'] .'_content_is_empty';
   return $func($item, $field);
+}
+
+/**
+ * Implementation of hook_widget().
+ */
+function lingwo_dictionary_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+  $func = $field['type'] .'_widget';
+  return $func($form, $form_state, $field, $items, $delta);
 }
 
 /*
