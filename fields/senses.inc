@@ -45,7 +45,14 @@ function lingwo_dictionary_senses_field($op, &$node, $field, &$items, $teaser, $
  * Implementation of hook_content_is_empty().
  */
 function lingwo_dictionary_senses_content_is_empty($item, $field) {
-  if (empty($item['data']['difference']) && empty($item['data']['example'])) {
+  if (isset($item['data']['difference'])) {
+    // for originals
+    if (empty($item['data']['difference']) && empty($item['data']['example'])) {
+      return TRUE;
+    }
+  }
+  else if (empty($item['data']['clue']) && empty($item['data']['translation'])) {
+    // for translations
     return TRUE;
   }
   return FALSE;
@@ -53,7 +60,8 @@ function lingwo_dictionary_senses_content_is_empty($item, $field) {
 
 function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   $node = $form['#node'];
-  $func = 'lingwo_dictionary_senses_widget_'. (isset($node->translation_source) ? 'translation' : 'original');
+  $func = 'lingwo_dictionary_senses_widget_'.
+    ((isset($node->translation_source) || ($node->nid && $node->nid != $node->tnid)) ? 'translation' : 'original');
   return $func($form, $form_state, $field, $items, $delta);
 }
 
@@ -148,10 +156,14 @@ function lingwo_dictionary_senses_widget_original(&$form, &$form_state, $field, 
 }
 
 function lingwo_dictionary_senses_widget_translation(&$form, &$form_state, $field, $items, $delta = 0) {
+  $node = $form['#node'];
   $field_name = $field['field_name'];
 
-  $senses = lingwo_dictionary_senses_get_translations($form['#node'], $field_name, $items);
-  $orig_senses = $form['#node']->translation_source->$field_name;
+  if (empty($node->translation_source)) {
+    $node->translation_source = node_load($node->tnid);
+  }
+  $senses = lingwo_dictionary_senses_get_translations($node, $field_name, $items);
+  $orig_senses = $node->translation_source->$field_name;
 
   $element = array(
     '#type' => 'fieldset',
@@ -189,7 +201,7 @@ function lingwo_dictionary_senses_widget_translation(&$form, &$form_state, $fiel
         '#type' => 'textfield',
         '#title' => t('Clue'),
         '#description' => t('A couple words that will clue the reader to how this sense is different.'),
-        '#default_value' => $sense['clue'],
+        '#default_value' => $sense['data']['clue'],
       );
     }
     if (!$orig_sense && !($sense['id'] == '*' && count($orig_senses) == 0)) {
@@ -207,7 +219,7 @@ function lingwo_dictionary_senses_widget_translation(&$form, &$form_state, $fiel
     for ($t = 0; $t < max(3, count($sense['values'])); $t++) {
       $sense_form['data']['trans'][$t] = array(
         '#type' => 'textfield',
-        '#default_value' => $sense->values[$t]
+        '#default_value' => $sense['data']['trans'][$t]
       );
     }
     $sense_form['data']['trans']['0']['#title'] = t('Translation');
@@ -224,39 +236,43 @@ function lingwo_dictionary_senses_widget_translation(&$form, &$form_state, $fiel
 function lingwo_dictionary_senses_get_translations($node, $field_name, $items) {
   $orig = $node->translation_source;
   $orig_senses = isset($orig) ? $orig->$field_name : array();
+
+  $trans_map = array();
   $trans_senses = $node->nid ? $items : NULL;
+  if (!empty($trans_senses)) {
+    foreach ($trans_senses as $trans_sense) {
+      $trans_map[$trans_sense['data']['id']] = $trans_sense;
+    }
+  }
 
   $senses = array();
-  $id_list = array();
 
   if (isset($orig_senses) && count($orig_senses) > 0) {
     foreach ($orig_senses as $sense) {
-      $trans_sense['data'] = $trans_senses[$sense['data']['id']];
+      $trans_sense = $trans_map[$sense['data']['id']];
       $trans_sense['data']['orig_sense'] = $sense['data'];
       $trans_sense['data']['id'] = $sense['data']['id'];
       
       $senses[] = $trans_sense;
-      $id_list[$sense['data']['id']] = 1;
+      unset($trans_map[$sense['data']['id']]);
     }
   }
 
   if (count($senses) == 0) {
-    if ($trans_senses && isset($trans_senses['*'])) {
-      $only_sense = $trans_senses['*'];
+    if ($trans_map && isset($trans_map['*'])) {
+      $only_sense = $trans_map['*'];
     }
     else {
       $only_sense = array('id' => '*');
     }
     $senses[] = $only_sense;
-    $id_list['*'] = 1;
+    unset($trans_map['*']);
   }
 
-  if ($trans_senses) {
-    foreach ($trans_senses as $id => $trans_sense) {
-      $trans_sense['id'] = $id;
-      if (!array_key_exists($id, $id_list)) {
-        $senses[] = $trans_sense;
-      }
+  foreach ($trans_map as $id => $trans_sense) {
+    $trans_sense['id'] = $id;
+    if (!array_key_exists($id, $id_list)) {
+      $senses[] = $trans_sense;
     }
   }
 
