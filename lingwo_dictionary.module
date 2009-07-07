@@ -104,7 +104,10 @@ function lingwo_dictionary_theme() {
     'lingwo_dictionary_senses_widget' => array(
       'arguments' => array('element' => NULL),
     ),
-    'lingwo_dictionary_senses_form' => array(
+    'lingwo_dictionary_senses_original_form' => array(
+      'arguments' => array('form' => NULL),
+    ),
+    'lingwo_dictionary_senses_translation_form' => array(
       'arguments' => array('form' => NULL),
     ),
   );

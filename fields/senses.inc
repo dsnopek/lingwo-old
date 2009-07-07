@@ -53,15 +53,11 @@ function lingwo_dictionary_senses_content_is_empty($item, $field) {
 
 function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   $node = $form['#node'];
-  $tsrc = $form->translation_source;
+  $func = 'lingwo_dictionary_senses_widget_'. (isset($node->translation_source) ? 'translation' : 'original');
+  return $func($form, $form_state, $field, $items, $delta);
+}
 
-  if (isset($tsrc)) {
-    // translation
-  }
-  else {
-    // original
-  }
-
+function lingwo_dictionary_senses_widget_original(&$form, &$form_state, $field, $items, $delta = 0) {
   $field_name = $field['field_name'];
   if (isset($form_state[$field_name]['senses'])) {
     $items = $form_state[$field_name]['senses'];
@@ -78,7 +74,7 @@ function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $
   );
 
   $element['wrapper']['senses'] = array(
-    '#theme' => 'lingwo_dictionary_senses_form',
+    '#theme' => 'lingwo_dictionary_senses_original_form',
     '#parents' => array($field['field_name']),
   );
 
@@ -151,6 +147,122 @@ function lingwo_dictionary_senses_widget(&$form, &$form_state, $field, $items, $
   return $element;
 }
 
+function lingwo_dictionary_senses_widget_translation(&$form, &$form_state, $field, $items, $delta = 0) {
+  $field_name = $field['field_name'];
+
+  $senses = lingwo_dictionary_senses_get_translations($form['#node'], $field_name, $items);
+  $orig_senses = $form['#node']->translation_source->$field_name;
+
+  $element = array(
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+    '#theme' => 'lingwo_dictionary_senses_translation_form',
+  );
+
+  $index = 0;
+  foreach ($senses as $sense) {
+    $orig_sense = $sense['data']['orig_sense'];
+
+    $sense_form = array();
+    $sense_form['data']['id'] = array(
+      '#type' => 'hidden',
+      '#value' => $sense['data']['id'],
+    );
+    if ($orig_sense) {
+      if ($orig_sense['difference']) {
+        $sense_form['data']['difference'] = array(
+          '#type' => 'item',
+          '#title' => t('Difference'),
+          '#value' => $orig_sense['difference'],
+        );
+      }
+      if ($orig_sense['example']) {
+        $sense_form['data']['example'] = array(
+          '#type' => 'item',
+          '#title' => t('Example'),
+          '#value' => $orig_sense['example'],
+        );
+      }
+    }
+    if (count($senses) > 1) {
+      $sense_form['data']['clue'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Clue'),
+        '#description' => t('A couple words that will clue the reader to how this sense is different.'),
+        '#default_value' => $sense['clue'],
+      );
+    }
+    if (!$orig_sense && !($sense['id'] == '*' && count($orig_senses) == 0)) {
+      $sense_form['old_sense_message'] = array(
+        '#prefix' => '<div class="lingwo-sense-old-message">* ',
+        '#value' => t('This translation is for a sense that has been removed from the entry.'),
+        '#suffix' => '</div>',
+      );
+      $sense_form['retire_sense'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Retire this obsolete sense.'),
+      );
+    }
+    $sense_form['data']['trans'] = array();
+    for ($t = 0; $t < max(3, count($sense['values'])); $t++) {
+      $sense_form['data']['trans'][$t] = array(
+        '#type' => 'textfield',
+        '#default_value' => $sense->values[$t]
+      );
+    }
+    $sense_form['data']['trans']['0']['#title'] = t('Translation');
+
+    $element[$index++] = $sense_form;
+  }
+
+  return $element;
+}
+
+/* Takes an entry and a trans and makes a list of trans senses in the appropriate
+ * order, connected to the entry senses if one exists.
+ */
+function lingwo_dictionary_senses_get_translations($node, $field_name, $items) {
+  $orig = $node->translation_source;
+  $orig_senses = isset($orig) ? $orig->$field_name : array();
+  $trans_senses = $node->nid ? $items : NULL;
+
+  $senses = array();
+  $id_list = array();
+
+  if (isset($orig_senses) && count($orig_senses) > 0) {
+    foreach ($orig_senses as $sense) {
+      $trans_sense['data'] = $trans_senses[$sense['data']['id']];
+      $trans_sense['data']['orig_sense'] = $sense['data'];
+      $trans_sense['data']['id'] = $sense['data']['id'];
+      
+      $senses[] = $trans_sense;
+      $id_list[$sense['data']['id']] = 1;
+    }
+  }
+
+  if (count($senses) == 0) {
+    if ($trans_senses && isset($trans_senses['*'])) {
+      $only_sense = $trans_senses['*'];
+    }
+    else {
+      $only_sense = array('id' => '*');
+    }
+    $senses[] = $only_sense;
+    $id_list['*'] = 1;
+  }
+
+  if ($trans_senses) {
+    foreach ($trans_senses as $id => $trans_sense) {
+      $trans_sense['id'] = $id;
+      if (!array_key_exists($id, $id_list)) {
+        $senses[] = $trans_sense;
+      }
+    }
+  }
+
+  return $senses;
+}
+
 function _lingwo_dictionary_senses_from_form($form, &$form_state) {
   $node = node_form_submit_build_node($form, $form_state);
   $field_name = $form_state['clicked_button']['#field_name'];
@@ -163,7 +275,7 @@ function _lingwo_dictionary_senses_from_form($form, &$form_state) {
     foreach ($senses as $index => $sense) {
       if (is_numeric($index)) {
         $weight[] = $sense['data']['weight'];
-        unset($sense['data']['weight']);
+        unset($sense['data']['weight'], $sense['data']['remove_sense']);
         $values[] = $sense;
       }
     }
@@ -231,7 +343,7 @@ function lingwo_dictionary_senses_ahah($field_name) {
   drupal_json(array('status' => TRUE, 'data' => $output));
 }
 
-function theme_lingwo_dictionary_senses_form($form) {
+function theme_lingwo_dictionary_senses_original_form($form) {
   drupal_add_tabledrag('lingwo-definition-table', 'order', 'sibling', 'sense-weight');
 
   $elements = element_children($form);
@@ -274,4 +386,31 @@ function theme_lingwo_dictionary_senses_form($form) {
   return theme('table', $header, $rows, array('id' => 'lingwo-definition-table'));
 }
 
+function theme_lingwo_dictionary_senses_translation_form($form) {
+  $header = array(
+    t('No.'),
+    array('data' => t('Sense'), 'colspan' => 2),
+  );
+
+  $rows = array();
+  $elements = element_children($form);
+  foreach ($elements as $key) {
+    $row = array();
+    $row[] = ($key + 1);
+
+    if (count($elements) > 1) {
+      // split into trans in column 2 and everything else in column 1
+      $trans = drupal_render($form[$key]['trans']);
+      $row[] = drupal_render($form[$key]);
+      $row[] = $trans;
+    }
+    else {
+      $row[] = array('data' => drupal_render($form[$key]), 'colspan' => 2);
+    }
+
+    $rows[] = $row;
+  }
+
+  return theme('table', $header, $rows);
+}
 
