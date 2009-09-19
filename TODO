@@ -1,4 +1,13 @@
 
+== 2009-09-19 ==
+
+ * Morphology:
+
+   - Port the parseWord() function back from Python to be a part of language.
+   - Implement the matching function .ending() on Word.
+   - Implement all the actions for it, ie: .replace(), .result(), .bool(), .append(), etc..
+   - Implement the form/option/class stuff in Entry so that we can start testing actual morphology transformations.
+
 == 2009-07-06 ==
 
  * Remove 'weight' and 'remove_sense' from each sense before it is saved.

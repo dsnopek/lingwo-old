@@ -33,12 +33,26 @@ Lingwo = {'dictionary': {} };
         };
     };
 
+    var SubWord = function (word, start, len) {
+        this.word = word;
+        this.start = start;
+        this.len = len;
+    };
+    SubWord.prototype.replace = function (text) {
+    };
+
     var makeWordClass = makeClassMaker(
-        function (text) {
-            this.text = text || '';
+        function (letters) {
+            this.letters = letters || '';
         },
         {
-            'test': function () { return 'zumma'; },
+            'ending': function () {
+                for (var i = 0; i < arguments.length; i++) {
+                    // TODO: attempt to match one of the things given and return
+                    // a sub-word object.
+                }
+
+            },
         }
     );
 
@@ -184,6 +198,7 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
             var word = entry.getForm();
             // TODO: there has to be someway to force this to be a boolean without 
             // making the user add all kinds of ugly here.
+            // TODO: maybe provide a convenience hasEnding() function?
             return word.ending('i').bool() && !word.ending('ki', 'gi').bool();
         }
     };
@@ -197,7 +212,7 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
             return entry.getForm();
         },
 
-        'nominative.singular.feminin': function (entry) {
+        'nominative.singular.feminine': function (entry) {
             return entry.getForm('$stem').append(
                 entry.getOption('soft') ? 'ia' : 'a'
             );
