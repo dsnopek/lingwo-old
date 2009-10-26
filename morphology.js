@@ -70,16 +70,20 @@ Lingwo = {'dictionary': {} };
             'option': {},
             'form': {},
         };
+
     };
     extendPrototype(Language, {
         alphabet: null,
+
+        callMorphologyFunc: function (entry, type, which) {
+            return this.morphology[type][entry.pos][which].apply(null, new Array(entry));
+        },
 
         // creates a Word's "letter" from a string.
         //
         // A letter in this implementation is a 2 item array: [letter name, form name]
         //
-        parseLetter: function (s)
-        {
+        parseLetter: function (s) {
             if (!this.alphabet)
                 throw ("Cannot parseLetter() without a defined alphabet");
 
@@ -213,9 +217,37 @@ Lingwo = {'dictionary': {} };
         this.pos = args.pos;
         // TODO: Not filling in any of the above should probobaly be an exception?
 
+
         this.classes = args.classes || [];
         this.forms = args.forms || {};
+
+        this.clearCache();
     };
+    extendPrototype(lib.Entry, {
+        clearCache: function () {
+            this._baseForm = null;
+            this._cachedForms = {};
+        },
+
+        getForm: function (form) {
+            if (!form) {
+                if (this._baseForm === null)
+                    this._baseForm = this.lang.parseWord(this.name);
+                return this._baseForm;
+            }
+
+            if (this._cachedForms[form])
+                return this._cachedForms[form];
+
+            if (this.forms[form]) {
+                var form = this._cachedForms[form] = this.lang.parseWord(this.forms[form]);
+                return form;
+            }
+            else {
+                return this.lang.callMorphologyFunc(this, 'form', form);
+            }
+        }
+    });
 })();
 
 /*
@@ -374,4 +406,6 @@ var entry = new Lingwo.dictionary.Entry({
         'dative.singular': 'chłopcu'
     }
 });
+//print (entry.getForm('$stem').letters);
+print (entry.getForm('nominative.singular').letters);
 
