@@ -33,6 +33,12 @@ Lingwo = {'dictionary': {} };
         };
     };
 
+    var extendPrototype = function (cons, props) {
+        for (var name in props) {
+            cons.prototype[name] = props[name];
+        }
+    };
+
     var SubWord = function (word, start, len) {
         this.word = word;
         this.start = start;
@@ -43,7 +49,7 @@ Lingwo = {'dictionary': {} };
 
     var makeWordClass = makeClassMaker(
         function (letters) {
-            this.letters = letters || '';
+            this.letters = letters || [];
         },
         {
             'ending': function () {
@@ -65,9 +71,129 @@ Lingwo = {'dictionary': {} };
             'form': {},
         };
     };
-    // take a string and get word out of it.
-    Language.prototype.parseWord = function (s) {
-    };
+    extendPrototype(Language, {
+        alphabet: null,
+
+        // creates a Word's "letter" from a string.
+        //
+        // A letter in this implementation is a 2 item array: [letter name, form name]
+        //
+        parseLetter: function (s)
+        {
+            if (!this.alphabet)
+                throw ("Cannot parseLetter() without a defined alphabet");
+
+            for (name in this.alphabet)
+            {
+                var letter_def = this.alphabet[name];
+                for (form_name in letter_def.forms)
+                {
+                    if (letter_def.forms[form_name] == s)
+                        return [name, form_name];
+                }
+            }
+
+            return null;
+        },
+
+        // take a string and get word out of it.
+        parseWord: function (s) {
+            // This function works by trying the whole text, and progressively
+            // moving the start index forward, until a letter is found, then ignoring
+            // the chunk that was found.  So, for example, if we had the word "mila"
+            // we would try:
+            //
+            // 1. mila (no letter)
+            // 2. ila  (no letter)
+            // 3. la   (no letter)
+            // 4. a    (found "a")
+            // 5. mil  (no letter)
+            // 6. il   (no letter)
+            // 7. l    (found "l")
+            // 8. mi   (... and so on)
+            //
+            // It is done this way to try and detect diagraphs in left-to-right
+            // languages.  This will distinguish both "ch" from "h" and letters with
+            // trailing accents like "o" from "o'".  I imagine, but havent tested, that
+            // this would have to be reversed for right-to-left languages.
+
+            if (!this.alphabet)
+                throw ("Cannot parseWord() without a defined alphabet");
+
+            var index = 0;
+            var end   = s.length;
+
+            var letters = [ ];
+            while (end > 0)
+            {
+                index = 0;
+
+                while (index <= end)
+                {
+                    var test = s.substring(index, end);
+                    var res  = this.parseLetter(test);
+
+                    if (res != null)
+                    {
+                        letters.push(res);
+                        end -= test.length;
+                        break;
+                    }
+
+                    index ++;
+                }
+                
+                if (index > end)
+                {
+                    // Nothing was found.
+                    print ("nothing was found");
+                    return null;
+                }
+            }
+
+            // reverse the array
+            letters.reverse();
+
+            // build the word
+            return new this.Word(letters);
+        },
+
+        // Makes a word into a string
+        // TODO: This is copied from old code, modernize it!  This should really be put into the
+        // constructor for Word.  We should accept an array of tuples, or possibly tuplize arguments
+        // as shown below.
+        /*
+        unparseWord: function (letter_names, form) {
+            // Like the inverse of parse_word.  This takes a list of letter names and produces a 
+            // word object.  The letter names can be a two item array with a specific form, or 
+            // just a string that uses the form given.
+            //
+            //  For example:
+            //
+            // var word = lang.create_word([ 'b', 'y', 'c\'' ], 'lower');
+            // var word = lang.create_word([ 'h', 'o', 'r', 'o', 'sh', ['o', 'lower.accent'] ], 'lower');
+            //
+            // Omitting the form will use the LetterDefs default form.
+            //
+            var word = new Lingwo.Word(this);
+
+            for( var i = 0; i < letter_names.length; i++ )
+            {
+                var item = letter_names[i];
+                if ( dojo.lang.isString(item) )
+                {
+                    word.append_letter(item, form);
+                }
+                else
+                {
+                    word.append_letter(item[0], item[1]);
+                }
+            }
+
+            return word;
+        }
+        */
+    });
 
     // the external function used to create new language definitions.
     lib.defineLanguage = function (name, func) {
@@ -81,7 +207,15 @@ Lingwo = {'dictionary': {} };
     /*
      * TODO: Define an entry.
      */
-    lib.Entry = function () { };
+    lib.Entry = function (args) {
+        this.lang = args.lang;
+        this.name = args.name;
+        this.pos = args.pos;
+        // TODO: Not filling in any of the above should probobaly be an exception?
+
+        this.classes = args.classes || [];
+        this.forms = args.forms || {};
+    };
 })();
 
 /*
@@ -219,6 +353,12 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
         },
     };
 });
+
+//var w = Lingwo.dictionary.languages['pol'].parseWord('miła');
+var w = Lingwo.dictionary.languages['pol'].parseWord('gitarze');
+for(var i = 0; i < w.letters.length; i++) {
+    print(w.letters[i][0] + ' ' + w.letters[i][1]);
+}
 
 /*
  * This would exist on the entry edit page.  As the entry is editted, this object too
