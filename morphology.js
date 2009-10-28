@@ -41,8 +41,17 @@ Lingwo = {'dictionary': {} };
 
     var SubWord = function (word, start, len) {
         this.word = word;
-        this.start = start;
-        this.len = len;
+        this.wordcls = word.lang.Word;
+        this.start = start || -1;
+        this.len = len || 0;
+    };
+    SubWord.prototype.drop = function () {
+        if (this.start == -1)
+            return false;
+
+        var newWord = new this.wordcls(this.word.letters.slice(0));
+        newWord.letters.splice(this.start, this.len);
+        return newWord;
     };
     SubWord.prototype.replace = function (text) {
     };
@@ -53,11 +62,23 @@ Lingwo = {'dictionary': {} };
         },
         {
             'ending': function () {
+                checki:
                 for (var i = 0; i < arguments.length; i++) {
                     // TODO: attempt to match one of the things given and return
                     // a sub-word object.
+                    var testWord = this.lang.parseWord(arguments[i]);
+                    if (testWord.letters.length > this.letters.length)
+                        continue checki;
+
+                    for (var e = 0; e < testWord.letters.length; e++) {
+                        if (testWord.letters[testWord.letters.length-e-1][0] != this.letters[this.letters.length-e-1][0])
+                            continue checki;
+                    }
+
+                    return new SubWord(this, this.letters.length - testWord.letters.length, testWord.letters.length);
                 }
 
+                return new SubWord(this);
             },
         }
     );
@@ -167,7 +188,8 @@ Lingwo = {'dictionary': {} };
         // constructor for Word.  We should accept an array of tuples, or possibly tuplize arguments
         // as shown below.
         /*
-        unparseWord: function (letter_names, form) {
+        createWord: function (letter_names, form) {
+        //unparseWord: function (letter_names, form) {
             // Like the inverse of parse_word.  This takes a list of letter names and produces a 
             // word object.  The letter names can be a two item array with a specific form, or 
             // just a string that uses the form given.
@@ -199,11 +221,17 @@ Lingwo = {'dictionary': {} };
         */
     });
 
+    var utils = {
+        'cls': function (cls) {
+            return {'cls': cls};
+        },
+    };
+
     // the external function used to create new language definitions.
     lib.defineLanguage = function (name, func) {
         var lang = new Language();
         lang.name = name;
-        func.apply(lang, [lang]);
+        func.apply(lang, [lang, utils]);
         lib.languages[name] = lang;
         return lang;
     };
@@ -239,13 +267,15 @@ Lingwo = {'dictionary': {} };
             if (this._cachedForms[form])
                 return this._cachedForms[form];
 
+            var word;
             if (this.forms[form]) {
-                var form = this._cachedForms[form] = this.lang.parseWord(this.forms[form]);
-                return form;
+                word = this._cachedForms[form] = this.lang.parseWord(this.forms[form]);
             }
             else {
-                return this.lang.callMorphologyFunc(this, 'form', form);
+                word = this._cachedForms[form] = this.lang.callMorphologyFunc(this, 'form', form);
             }
+
+            return word;
         }
     });
 })();
@@ -320,35 +350,31 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
         'gender': function (entry) {
             // TODO: giving no form is the base form?  Does that sound cool?
             var word = entry.getForm();
-            return 
-                word.ending('o', 'e', 'ę', 'um').result('neuter') ||
-                word.ending(utils.cls('vowel')).result('feminine') ||
-                'masculine';
+            return word.ending('o', 'e', 'ę', 'um').result('neuter')  ||
+                   word.ending(utils.cls('vowel')).result('feminine') ||
+                   'masculine';
         }
     };
 
     lang.morphology.form.noun = {
         '$stem': function (entry) {
             var word = entry.getForm();
-            return
-                word.ending('a', 'o', 'e', 'um').drop() ||
-                word;
+            return word.ending('a', 'o', 'e', 'um').drop() ||
+                   word;
         },
 
         '$stem.singular': function (entry) {
             var word = entry.getForm();
-            return
-                word.ending('mię').replace('mieni') ||
-                word.ending('ę').append('ci') ||
-                entry.getForm('$stem');
+            return word.ending('mię').replace('mieni') ||
+                   word.ending('ę').append('ci')       ||
+                   entry.getForm('$stem');
         },
 
         '$stem.plural': function (entry) {
             var word = entry.getForm();
-            return
-                word.ending('mię').replace('mion') ||
-                word.ending('ę').append('t') ||
-                entry.getForm('$stem');
+            return word.ending('mię').replace('mion') ||
+                   word.ending('ę').append('t')       ||
+                   entry.getForm('$stem');
         },
 
         'nominative.singular': function (entry) {
@@ -387,15 +413,18 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
 });
 
 //var w = Lingwo.dictionary.languages['pol'].parseWord('miła');
+/*
 var w = Lingwo.dictionary.languages['pol'].parseWord('gitarze');
 for(var i = 0; i < w.letters.length; i++) {
     print(w.letters[i][0] + ' ' + w.letters[i][1]);
 }
+*/
 
 /*
  * This would exist on the entry edit page.  As the entry is editted, this object too
  * would be modified and queried from.
  */
+/*
 var entry = new Lingwo.dictionary.Entry({
     'lang': Lingwo.dictionary.languages['pol'],
     'name': 'chłopiec',
@@ -406,6 +435,13 @@ var entry = new Lingwo.dictionary.Entry({
         'dative.singular': 'chłopcu'
     }
 });
+*/
+var entry = new Lingwo.dictionary.Entry({
+    'lang': Lingwo.dictionary.languages['pol'],
+    'name': 'kobieta',
+    'pos': 'noun'
+});
 //print (entry.getForm('$stem').letters);
-print (entry.getForm('nominative.singular').letters);
+//print (entry.getForm('$stem').letters);
+print (entry.getForm('$stem').letters);
 
