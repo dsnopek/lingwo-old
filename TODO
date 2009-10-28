@@ -1,9 +1,13 @@
 
+== 2009-09-28 ==
+
+ * Use the asterisk ("*") for special forms instead of the dollar sign ("$") because this matches
+   linguistic convention of marking non-existant forms with an asterisk.
+
 == 2009-09-19 ==
 
  * Morphology:
 
-   - Port the parseWord() function back from Python to be a part of language.
    - Implement the matching function .ending() on Word.
    - Implement all the actions for it, ie: .replace(), .result(), .bool(), .append(), etc..
    - Implement the form/option/class stuff in Entry so that we can start testing actual morphology transformations.

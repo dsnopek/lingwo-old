@@ -97,7 +97,7 @@ Lingwo = {'dictionary': {} };
         alphabet: null,
 
         callMorphologyFunc: function (entry, type, which) {
-            return this.morphology[type][entry.pos][which].apply(null, new Array(entry));
+            return this.morphology[type][entry.pos][which].apply(this, new Array(entry));
         },
 
         // creates a Word's "letter" from a string.
