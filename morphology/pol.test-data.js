@@ -1,6 +1,13 @@
 
 entries = {};
 
+entries["jaki"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "jaki",
+    "pos": "question",
+    "like": "adjective"
+});
+
 entries["kobieta"] = new Lingwo.dictionary.Entry({
     "lang": Lingwo.dictionary.languages["pol"],
     "name": "kobieta",

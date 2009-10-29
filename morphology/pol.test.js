@@ -5,6 +5,20 @@ load('pol.test-data.js');
 load('test.js');
 
 PolishTest = TestCase.subclass({
+    checkForms: function (entry, forms) {
+        for(var name in forms) {
+            this.assertEquals(entry.getForm(name), forms[name], entry.name);
+        }
+    },
+
+    testJaki: function () {
+        this.checkForms(entries['jaki'], {
+            'nominative.singular.masculine': 'jaki',
+            'nominative.singular.feminine': 'jaka',
+            'nominative.singular.neuter': 'jakie'
+        });
+    },
+
     test_kobieta: function () {
         var entry = entries['kobieta'];
 

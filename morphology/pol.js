@@ -25,7 +25,7 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
         return alphabet;
     };
     
-    // TODO: must be done for diagraphs, maintaining forms and setting letter classes (ie. vowel).
+    // must be done for diagraphs, maintaining forms and setting letter classes (ie. vowel).
     lang.alphabet = generateAlphabet('aąbcćdeęfghijklłmnńoópqrsśtuvwxyzżź', ['ch','dz','dż','dź','sz','rz','sz'],
         function (l) {
             var classes = [];
@@ -125,6 +125,13 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
                 entry.isClass('soft') ? 'ia' : 'a'
             );
         },
+
+        'nominative.singular.neuter': function (entry) {
+            var stem = entry.getForm('*stem');
+            return stem.append(
+                (stem.hasEnding('k', 'g') || entry.isClass('soft')) ? 'ie': 'e'
+            );
+        }
     };
 });
 

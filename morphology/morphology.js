@@ -198,8 +198,20 @@ Lingwo.dictionary = {};
         alphabet: null,
 
         callMorphologyFunc: function (entry, type, which) {
-            // TODO: this should throw an exception when a function doesn't exist
-            return this.morphology[type][entry.pos][which].apply(this, new Array(entry));
+            var pos = entry.pos;
+            if (entry.like)
+                pos = entry.like;
+
+            if (typeof this.morphology[type] == 'undefined')
+                throw('Invalid morphology function type: '+type);
+
+            if (typeof this.morphology[type][pos] == 'undefined' ||
+                typeof this.morphology[type][pos][which] == 'undefined')
+            {
+                throw('No morphology function for "'+pos+'" called "'+which+'"');
+            }
+
+            return this.morphology[type][pos][which].apply(this, new Array(entry));
         },
 
         // creates a Word's "letter" from a string.
@@ -347,6 +359,7 @@ Lingwo.dictionary = {};
         this.pos = args.pos;
         // TODO: Not filling in any of the above should probobaly be an exception?
 
+        this.like = args.like || null;
 
         this.forms = args.forms || {};
         this.options = args.options || {};
