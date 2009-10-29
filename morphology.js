@@ -39,22 +39,48 @@ Lingwo = {'dictionary': {} };
         }
     };
 
+    // A helper for making Array.splice() a little easier to work with.
+    var arrayReplace = function (arr, i, len, items) {
+        arr.splice.apply(arr, [i, len].concat(items));
+    };
+
     var SubWord = function (word, start, len) {
         this.word = word;
         this.wordcls = word.lang.Word;
         this.start = start || -1;
         this.len = len || 0;
     };
-    SubWord.prototype.drop = function () {
-        if (this.start == -1)
-            return false;
+    extendPrototype(SubWord, {
+        '_cloneWord': function () {
+            return new this.wordcls(this.word.letters.slice(0));
+        },
+        'drop': function () {
+            if (this.start == -1)
+                return false;
 
-        var newWord = new this.wordcls(this.word.letters.slice(0));
-        newWord.letters.splice(this.start, this.len);
-        return newWord;
-    };
-    SubWord.prototype.replace = function (text) {
-    };
+            var newWord = this._cloneWord();
+            newWord.letters.splice(this.start, this.len);
+            return newWord;
+        },
+        'replace': function (text) {
+            if (this.start == -1)
+                return false;
+
+            var rWord = this.word.lang.parseWord(text);
+            var newWord = this._cloneWord();
+            arrayReplace(newWord.letters, this.start, this.len, rWord.letters);
+            return newWord;
+        },
+        'append': function (text) {
+            if (this.start == -1)
+                return false;
+
+            var rWord = this.word.lang.parseWord(text);
+            var newWord = this._cloneWord();
+            arrayReplace(newWord.letters, this.start+this.len, 0, rWord.letters);
+            return newWord;
+        }
+    });
 
     var makeWordClass = makeClassMaker(
         function (letters) {
@@ -441,7 +467,5 @@ var entry = new Lingwo.dictionary.Entry({
     'name': 'kobieta',
     'pos': 'noun'
 });
-//print (entry.getForm('$stem').letters);
-//print (entry.getForm('$stem').letters);
 print (entry.getForm('$stem').letters);
 
