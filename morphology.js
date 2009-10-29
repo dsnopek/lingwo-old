@@ -46,19 +46,15 @@ Lingwo = {'dictionary': {} };
 
     var SubWord = function (word, start, len) {
         this.word = word;
-        this.wordcls = word.lang.Word;
         this.start = start || -1;
         this.len = len || 0;
     };
     extendPrototype(SubWord, {
-        '_cloneWord': function () {
-            return new this.wordcls(this.word.letters.slice(0));
-        },
         'drop': function () {
             if (this.start == -1)
                 return false;
 
-            var newWord = this._cloneWord();
+            var newWord = this.word.clone();
             newWord.letters.splice(this.start, this.len);
             return newWord;
         },
@@ -67,7 +63,7 @@ Lingwo = {'dictionary': {} };
                 return false;
 
             var rWord = this.word.lang.parseWord(text);
-            var newWord = this._cloneWord();
+            var newWord = this.word.clone();
             arrayReplace(newWord.letters, this.start, this.len, rWord.letters);
             return newWord;
         },
@@ -76,10 +72,18 @@ Lingwo = {'dictionary': {} };
                 return false;
 
             var rWord = this.word.lang.parseWord(text);
-            var newWord = this._cloneWord();
+            var newWord = this.word.clone();
             arrayReplace(newWord.letters, this.start+this.len, 0, rWord.letters);
             return newWord;
-        }
+        },
+        'result': function (value) {
+            if (this.start == -1)
+                return false;
+            return value;
+        },
+        'bool': function () {
+            return this.start != -1;
+        },
     });
 
     var makeWordClass = makeClassMaker(
@@ -87,21 +91,73 @@ Lingwo = {'dictionary': {} };
             this.letters = letters || [];
         },
         {
-            'ending': function () {
-                checki:
-                for (var i = 0; i < arguments.length; i++) {
-                    // TODO: attempt to match one of the things given and return
-                    // a sub-word object.
-                    var testWord = this.lang.parseWord(arguments[i]);
-                    if (testWord.letters.length > this.letters.length)
-                        continue checki;
-
-                    for (var e = 0; e < testWord.letters.length; e++) {
-                        if (testWord.letters[testWord.letters.length-e-1][0] != this.letters[this.letters.length-e-1][0])
-                            continue checki;
+            '_parseSpec': function (spec) {
+                if (typeof spec == 'string') {
+                    return this.lang.parseWord(spec).letters;
+                }
+                if (typeof spec == 'object') {
+                    if (typeof spec['length'] == 'number') {
+                        // this is an Array, just return it
+                        return spec;
                     }
+                    
+                    // pack into an array and return it
+                    return [spec];
+                }
 
-                    return new SubWord(this, this.letters.length - testWord.letters.length, testWord.letters.length);
+                throw ("Bad spec error");
+            },
+
+            '_compLetter': function (letter, letter_spec) {
+                switch (letter_spec.spec) {
+                    case 'cls':
+                        var letterDef = this.lang.alphabet[letter[0]];
+                        for (var i = 0; i < letterDef.classes.length; i++) {
+                            if (letterDef.classes[i] == letter_spec.value)
+                                return true;
+                        }
+                        return false;
+                    default:
+                        // it is a letter!
+                        return letter[0] == letter_spec[0];
+                };
+            },
+
+            'clone': function () {
+                return new this.lang.Word(this.letters.slice(0));
+            },
+
+            'append': function (text) {
+                var newWord = this.clone();
+                var rWord = this.lang.parseWord(text);
+                arrayReplace(newWord.letters, newWord.letters.length, 0, rWord.letters);
+                return newWord;
+            },
+
+            'ending': function () {
+                if (arguments.length == 1 && typeof arguments[0] == 'number') {
+                    // A length-based ending spec
+                    var len = arguments[0];
+                    if (len <= this.letters.length) {
+                        return new SubWord(this, this.letters.length - len, len);
+                    }
+                }
+                else {
+                    checki:
+                    for (var i = 0; i < arguments.length; i++) {
+                        // TODO: attempt to match one of the things given and return
+                        // a sub-word object.
+                        var testSpec = this._parseSpec(arguments[i]);
+                        if (testSpec.length > this.letters.length)
+                            continue checki;
+
+                        for (var e = 0; e < testSpec.length; e++) {
+                            if (!this._compLetter(this.letters[this.letters.length-e-1], testSpec[testSpec.length-e-1]))
+                                continue checki;
+                        }
+
+                        return new SubWord(this, this.letters.length - testSpec.length, testSpec.length);
+                    }
                 }
 
                 return new SubWord(this);
@@ -249,7 +305,7 @@ Lingwo = {'dictionary': {} };
 
     var utils = {
         'cls': function (cls) {
-            return {'cls': cls};
+            return {'spec': 'cls', 'value': cls};
         },
     };
 
@@ -273,6 +329,7 @@ Lingwo = {'dictionary': {} };
 
 
         this.classes = args.classes || [];
+        this.options = args.options || {};
         this.forms = args.forms || {};
 
         this.clearCache();
@@ -281,27 +338,38 @@ Lingwo = {'dictionary': {} };
         clearCache: function () {
             this._baseForm = null;
             this._cachedForms = {};
+            this._cachedOptions = {};
         },
 
-        getForm: function (form) {
-            if (!form) {
+        getForm: function (name) {
+            if (!name) {
                 if (this._baseForm === null)
                     this._baseForm = this.lang.parseWord(this.name);
                 return this._baseForm;
             }
 
-            if (this._cachedForms[form])
-                return this._cachedForms[form];
+            if (this._cachedForms[name])
+                return this._cachedForms[name];
 
             var word;
-            if (this.forms[form]) {
-                word = this._cachedForms[form] = this.lang.parseWord(this.forms[form]);
+            if (this.forms[name]) {
+                word = this._cachedForms[name] = this.lang.parseWord(this.forms[name]);
             }
             else {
-                word = this._cachedForms[form] = this.lang.callMorphologyFunc(this, 'form', form);
+                word = this._cachedForms[name] = this.lang.callMorphologyFunc(this, 'form', name);
             }
 
             return word;
+        },
+
+        getOption: function (name) {
+            if (this.options[name])
+                return this.options[name];
+            if (this._cachedOptions[name])
+                return this._cachedOptions[name];
+            
+            var option = this._cachedOptions[name] = this.lang.callMorphologyFunc(this, 'option', name);
+            return option;
         }
     });
 })();
@@ -461,10 +529,23 @@ var entry = new Lingwo.dictionary.Entry({
     }
 });
 */
+
+/*
 var entry = new Lingwo.dictionary.Entry({
     'lang': Lingwo.dictionary.languages['pol'],
     'name': 'kobieta',
     'pos': 'noun'
 });
+print (entry.getForm('$stem.singular').letters);
+print (entry.getOption('gender'));
+*/
+
+var entry = new Lingwo.dictionary.Entry({
+    'lang': Lingwo.dictionary.languages['pol'],
+    'name': 'głupi',
+    'pos': 'adjective'
+});
 print (entry.getForm('$stem').letters);
+print (entry.getOption('soft'));
+print (entry.getForm('nominative.singular.feminine').letters);
 
