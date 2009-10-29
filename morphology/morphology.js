@@ -92,6 +92,29 @@ Lingwo = {'dictionary': {} };
             this.letters = letters || [];
         },
         {
+            'clone': function () {
+                return new this.lang.Word(this.letters.slice(0));
+            },
+
+            'append': function (text) {
+                var newWord = this.clone();
+                var rWord = this.lang.parseWord(text);
+                arrayReplace(newWord.letters, newWord.letters.length, 0, rWord.letters);
+                return newWord;
+            },
+
+            'toString': function () {
+                var chars = [];
+                for (var i = 0; i < this.letters.length; i++) {
+                    var letter = this.letters[i];
+                    var letter_def = this.lang.alphabet[letter[0]];
+                    chars.push(letter_def.forms[letter[1]]);
+                };
+                return chars.join('');
+            },
+
+            'valueOf': function () { return this.toString(); },
+
             '_parseSpec': function (spec) {
                 if (typeof spec == 'string') {
                     return this.lang.parseWord(spec).letters;
@@ -122,17 +145,6 @@ Lingwo = {'dictionary': {} };
                         // it is a letter!
                         return letter[0] == letter_spec[0];
                 };
-            },
-
-            'clone': function () {
-                return new this.lang.Word(this.letters.slice(0));
-            },
-
-            'append': function (text) {
-                var newWord = this.clone();
-                var rWord = this.lang.parseWord(text);
-                arrayReplace(newWord.letters, newWord.letters.length, 0, rWord.letters);
-                return newWord;
             },
 
             'ending': function () {

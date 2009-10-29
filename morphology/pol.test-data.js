@@ -8,3 +8,10 @@ entries["kobieta"] = new Lingwo.dictionary.Entry({
     "classes": ["animate"]
 });
 
+entries["głupi"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "głupi",
+    "pos": "adjective"
+});
+
+

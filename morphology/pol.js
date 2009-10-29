@@ -44,12 +44,13 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
         }
     );
 
+    /*
     lang.Word.extend({
         'thinger': function () { return 'blarney2' }
     });
-
     var word = new lang.Word('blah');
     print(word.thinger());
+    */
 
     var stemChange = function (word) {
         return word.ending('k').replace('c') ||
@@ -76,24 +77,24 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
     };
 
     lang.morphology.form.noun = {
-        '$stem': function (entry) {
+        '*stem': function (entry) {
             var word = entry.getForm();
             return word.ending('a', 'o', 'e', 'um').drop() ||
                    word;
         },
 
-        '$stem.singular': function (entry) {
+        '*stem.singular': function (entry) {
             var word = entry.getForm();
             return word.ending('mię').replace('mieni') ||
                    word.ending('ę').append('ci')       ||
-                   entry.getForm('$stem');
+                   entry.getForm('*stem');
         },
 
-        '$stem.plural': function (entry) {
+        '*stem.plural': function (entry) {
             var word = entry.getForm();
             return word.ending('mię').replace('mion') ||
                    word.ending('ę').append('t')       ||
-                   entry.getForm('$stem');
+                   entry.getForm('*stem');
         },
 
         'nominative.singular': function (entry) {
@@ -115,7 +116,7 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
     };
 
     lang.morphology.form.adjective = {
-        '$stem': function (entry) {
+        '*stem': function (entry) {
             return entry.getForm().ending(1).drop();
         },
 
@@ -124,7 +125,7 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
         },
 
         'nominative.singular.feminine': function (entry) {
-            return entry.getForm('$stem').append(
+            return entry.getForm('*stem').append(
                 entry.getOption('soft') ? 'ia' : 'a'
             );
         },
