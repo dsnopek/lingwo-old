@@ -3,7 +3,10 @@
  * The generic framework for making/using a morphology definition.
  */
 
-Lingwo = {'dictionary': {} };
+if (typeof Lingwo == 'undefined')
+    Lingwo = {};
+Lingwo.dictionary = {};
+
 (function () {
     var lib = Lingwo.dictionary;
 
@@ -173,6 +176,10 @@ Lingwo = {'dictionary': {} };
 
                 return new SubWord(this);
             },
+
+            'hasEnding': function () {
+                return this.ending.apply(this, arguments).bool();
+            },
         }
     );
 
@@ -181,8 +188,9 @@ Lingwo = {'dictionary': {} };
         this.Word = makeWordClass(this);
 
         this.morphology = {
-            'option': {},
-            'form': {},
+            'options': {},
+            'forms': {},
+            'classes': {},
         };
 
     };
@@ -190,6 +198,7 @@ Lingwo = {'dictionary': {} };
         alphabet: null,
 
         callMorphologyFunc: function (entry, type, which) {
+            // TODO: this should throw an exception when a function doesn't exist
             return this.morphology[type][entry.pos][which].apply(this, new Array(entry));
         },
 
@@ -330,7 +339,7 @@ Lingwo = {'dictionary': {} };
     };
 
     /*
-     * TODO: Define an entry.
+     * Defines a dictionary entry.
      */
     lib.Entry = function (args) {
         this.lang = args.lang;
@@ -339,17 +348,19 @@ Lingwo = {'dictionary': {} };
         // TODO: Not filling in any of the above should probobaly be an exception?
 
 
-        this.classes = args.classes || [];
-        this.options = args.options || {};
         this.forms = args.forms || {};
+        this.options = args.options || {};
+        this.classes = args.classes || [];
 
         this.clearCache();
     };
     extendPrototype(lib.Entry, {
         clearCache: function () {
             this._baseForm = null;
+
             this._cachedForms = {};
             this._cachedOptions = {};
+            this._cachedClasses = null;
         },
 
         getForm: function (name) {
@@ -367,7 +378,7 @@ Lingwo = {'dictionary': {} };
                 word = this._cachedForms[name] = this.lang.parseWord(this.forms[name]);
             }
             else {
-                word = this._cachedForms[name] = this.lang.callMorphologyFunc(this, 'form', name);
+                word = this._cachedForms[name] = this.lang.callMorphologyFunc(this, 'forms', name);
             }
 
             return word;
@@ -379,8 +390,25 @@ Lingwo = {'dictionary': {} };
             if (this._cachedOptions[name])
                 return this._cachedOptions[name];
             
-            var option = this._cachedOptions[name] = this.lang.callMorphologyFunc(this, 'option', name);
+            var option = this._cachedOptions[name] = this.lang.callMorphologyFunc(this, 'options', name);
             return option;
+        },
+
+        isClass: function (name) {
+            if (this._cachedClasses == null) {
+                this._cachedClasses = {};
+                for (var i = 0; i < this.classes.length; i++) {
+                    this._cachedClasses[this.classes[i]] = true;
+                }
+            }
+
+            if (typeof this._cachedClasses[name] != 'undefined')
+                return this._cachedClasses[name];
+
+            // TODO: if no morphology function with this name can be found, we should return false
+            // (AND CACHE THAT!!)
+            var value = this._cachedClasses[name] = this.lang.callMorphologyFunc(this, 'classes', name);
+            return value;
         }
     });
 })();

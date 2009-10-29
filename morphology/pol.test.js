@@ -16,7 +16,7 @@ PolishTest = TestCase.subclass({
         var entry = entries['głupi'];
 
         this.assertEquals(entry.getForm('*stem'), 'głup');
-        this.assertEquals(entry.getOption('soft'), true);
+        this.assertEquals(entry.isClass('soft'), true);
         this.assertEquals(entry.getForm('nominative.singular.feminine'), 'głupia');
     }
 });

@@ -66,9 +66,8 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
      * Nouns
      */
 
-    lang.morphology.option.noun = {
+    lang.morphology.options.noun = {
         'gender': function (entry) {
-            // TODO: giving no form is the base form?  Does that sound cool?
             var word = entry.getForm();
             return word.ending('o', 'e', 'ę', 'um').result('neuter')  ||
                    word.ending(utils.cls('vowel')).result('feminine') ||
@@ -76,7 +75,7 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
         }
     };
 
-    lang.morphology.form.noun = {
+    lang.morphology.forms.noun = {
         '*stem': function (entry) {
             var word = entry.getForm();
             return word.ending('a', 'o', 'e', 'um').drop() ||
@@ -105,17 +104,14 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
     /*
      * Adjectives
      */
-    lang.morphology.option.adjective = {
+    lang.morphology.classes.adjective = {
         'soft': function (entry) {
             var word = entry.getForm();
-            // TODO: there has to be someway to force this to be a boolean without 
-            // making the user add all kinds of ugly here.
-            // TODO: maybe provide a convenience hasEnding() function?
-            return word.ending('i').bool() && !word.ending('ki', 'gi').bool();
+            return word.hasEnding('i') && !word.hasEnding('ki', 'gi');
         }
     };
 
-    lang.morphology.form.adjective = {
+    lang.morphology.forms.adjective = {
         '*stem': function (entry) {
             return entry.getForm().ending(1).drop();
         },
@@ -126,7 +122,7 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
 
         'nominative.singular.feminine': function (entry) {
             return entry.getForm('*stem').append(
-                entry.getOption('soft') ? 'ia' : 'a'
+                entry.isClass('soft') ? 'ia' : 'a'
             );
         },
     };
