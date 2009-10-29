@@ -4,6 +4,12 @@
  * Start building some unit tests for the morphology code.  I have a lot of Polish language unit
    tests laying around somewhere that should be set up so we can start implementing the full
    morphology definition.
+   
+   Unit tests could be done with this framework:
+
+   http://thinkpond.org/articles/2008/jstest-intro.shtml
+
+   Or maybe adapted from the older JavaScript implementation of Lingwo.
 
  * Implement classes in an Entry.  This is a tough decision, because we really could use boolean
    options instead of classes, with the exception that every such option would need to have a 
