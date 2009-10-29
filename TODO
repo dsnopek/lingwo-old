@@ -1,4 +1,15 @@
 
+== 2009-09-29 ==
+
+ * Start building some unit tests for the morphology code.  I have a lot of Polish language unit
+   tests laying around somewhere that should be set up so we can start implementing the full
+   morphology definition.
+
+ * Implement classes in an Entry.  This is a tough decision, because we really could use boolean
+   options instead of classes, with the exception that every such option would need to have a 
+   default (via a morphology function) of false.  Since that's alot of overhead for a simple
+   "is this animate?" check, I think classes are a good idea.
+
 == 2009-09-28 ==
 
  * Use the asterisk ("*") for special forms instead of the dollar sign ("$") because this matches
@@ -8,8 +19,6 @@
 
  * Morphology:
 
-   - Implement the matching function .ending() on Word.
-   - Implement all the actions for it, ie: .replace(), .result(), .bool(), .append(), etc..
    - Implement the form/option/class stuff in Entry so that we can start testing actual morphology transformations.
 
 == 2009-07-06 ==
