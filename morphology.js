@@ -358,14 +358,13 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
     print(word.thinger());
 
     var stemChange = function (word) {
-        return 
-            word.ending('k').replace('c') ||
-            word.ending('g').replace('dz') ||
-            word.ending('r').replace('rz') ||
-            word.ending('st').replace('ści') ||
-            word.ending('t').replace('ci') ||
-            word.ending('sn').replace('śni') ||
-            word;
+        return word.ending('k').replace('c') ||
+               word.ending('g').replace('dz') ||
+               word.ending('r').replace('rz') ||
+               word.ending('st').replace('ści') ||
+               word.ending('t').replace('ci') ||
+               word.ending('sn').replace('śni') ||
+               word;
     };
 
     /*
