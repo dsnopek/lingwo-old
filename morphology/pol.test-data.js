@@ -1467,4 +1467,84 @@ entries["nazywać"] = new Lingwo.dictionary.Entry({
     }
 });
 
+entries["pies"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "pies",
+    "pos": "noun",
+    "classes": ["animate"],
+    "forms": {
+        "*stem": "ps",
+        "dative.singular": "psu"
+    }
+});
+
+entries["królik"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "królik",
+    "pos": "noun",
+    "classes": ["animate"]
+});
+
+entries["siostrzeniec"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "siostrzeniec",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "*stem": "siostrzeńc"
+    }
+});
+
+entries["dziadek"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "dziadek",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "*stem": "dziadk"
+    }
+});
+
+entries["szwagier"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "szwagier",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "*stem": "szwagr"
+    }
+});
+
+entries["gość"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "gość",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "instrumental.plural": "gośćmi"
+    }
+});
+
+entries["artysta"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "artysta",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "options": {
+        "gender": "masculine"
+    }
+});
+
+entries["ojciec"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "ojciec",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "*stem": "ojc",
+        "dative.singular": "ojcu",
+        "nominative.plural": "ojcowie"
+    }
+});
+
 

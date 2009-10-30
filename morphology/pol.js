@@ -117,6 +117,10 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
                    entry.getForm('*stem');
         },
 
+        /*
+         * Nominative.
+         */
+
         'nominative.singular': function (entry) {
             return entry.getForm();
         },
@@ -165,6 +169,10 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
             }
         },
 
+        /* 
+         * Accusative
+         */
+
         'accusative.singular': function (entry) {
             var word = entry.getForm();
 
@@ -176,6 +184,38 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
             }
             
             return word;
+        },
+
+        /*
+         * Genetive
+         */
+
+        'genitive.singular': function (entry) {
+            var word = entry.getForm(), stem = entry.getForm('*stem.singular');
+            var gender = entry.getOption('gender');
+
+            if (gender == 'masculine' && word.hasEnding('a')) {
+                return stem.ending('g','k').append('i') ||
+                       stem.append('y');
+            }
+            else if (gender == 'feminine') {
+                throw('unimplemented: genetive.singular - feminine');
+            }
+            else if (gender == 'masculine') {
+                if (entry.isClass('animate')) {
+                    if (stem.hasEnding(utils.cls('soft'))) {
+                        return append_i(stem).append('a');
+                    }
+
+                    return stem.append('a');
+                }
+
+                // the default ending for inanimate is 'u'
+                return stem.append('u');
+            }
+            else if (gender == 'neuter') {
+                return stem.append('a');
+            }
         }
     };
 

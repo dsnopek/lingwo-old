@@ -518,6 +518,30 @@ PolishTest = TestCase.subclass({
         });
     },
 
+    testNounMasculineAccusativeSingularAnimate: function () {
+        this.checkFormMulti('accusative.singular', {
+            'brat': 'brata',
+            'kelner': 'kelnera',
+            'królik': 'królika',
+            'Polak': 'Polaka',
+            'sąsiad': 'sąsiada',
+            'mąż': 'męża',
+            //'ksiądz': 'księdza',
+            'pies': 'psa',
+            'chłopiec': 'chłopca',
+            'ojciec': 'ojca',
+            'siostrzeniec': 'siostrzeńca',
+            'dziadek': 'dziadka',
+            'szwagier': 'szwagra',
+            'inżynier': 'inżyniera',
+            'koń': 'konia',
+            'gość': 'gościa',
+            'kolega': 'kolegę',
+            'artysta': 'artystę',
+            'kierowca': 'kierowcę'
+        });
+    },
+
 });
 
 (new PolishTest()).run();
