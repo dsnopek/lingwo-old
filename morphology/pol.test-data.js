@@ -1561,4 +1561,220 @@ entries["żołnierz"] = new Lingwo.dictionary.Entry({
     "classes": ["animate", "virile"]
 });
 
+entries["obiad"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "obiad",
+    "pos": "noun"
+});
+
+entries["wiatr"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "wiatr",
+    "pos": "noun"
+});
+
+entries["kosz"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "kosz",
+    "pos": "noun",
+    "forms": {
+        "genitive.singular": "kosza"
+    }
+});
+
+entries["palec"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "palec",
+    "pos": "noun",
+    "forms": {
+        "*stem": "palc",
+        "genitive.singular": "palca"
+    }
+});
+
+entries["kwiatek"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "kwiatek",
+    "pos": "noun",
+    "forms": {
+        "*stem": "kwiatk",
+        "genitive.singular": "kwiatka"
+    }
+});
+
+entries["lampa"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "lampa",
+    "pos": "noun"
+});
+
+entries["łza"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "łza",
+    "pos": "noun"
+});
+
+entries["pamięć"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "pamięć",
+    "pos": "noun",
+    "options": {
+        "gender": "feminine"
+    }
+});
+
+entries["szyja"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "szyja",
+    "pos": "noun"
+});
+
+entries["nadzieja"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "nadzieja",
+    "pos": "noun"
+});
+
+entries["żmija"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "żmija",
+    "pos": "noun"
+});
+
+entries["cebula"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "cebula",
+    "pos": "noun"
+});
+
+entries["krew"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "krew",
+    "pos": "noun",
+    "options": {
+        "gender": "feminine"
+    },
+    "forms": {
+        "*stem": "krw"
+    }
+});
+
+entries["chorągiew"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "chorągiew",
+    "pos": "noun",
+    "options": {
+        "gender": "feminine"
+    },
+    "forms": {
+        "*stem": "chorągw"
+    }
+});
+
+entries["myśl"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "myśl",
+    "pos": "noun",
+    "options": {
+        "gender": "feminine"
+    }
+});
+
+entries["sól"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "sól",
+    "pos": "noun",
+    "options": {
+        "gender": "feminine"
+    },
+    "forms": {
+        "*stem": "sol"
+    }
+});
+
+entries["idea"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "idea",
+    "pos": "noun",
+    "options": {
+        "gender": "feminine"
+    },
+    "forms": {
+        "genitive.singular": "idei"
+    }
+});
+
+entries["statua"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "statua",
+    "pos": "noun",
+    "options": {
+        "gender": "feminine"
+    },
+    "forms": {
+        "genitive.singular": "statui"
+    }
+});
+
+entries["melodia"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "melodia",
+    "pos": "noun"
+});
+
+
+entries["Belgia"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Belgia",
+    "pos": "noun"
+});
+
+entries["Anglia"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Anglia",
+    "pos": "noun"
+});
+
+entries["sympatia"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "sympatia",
+    "pos": "noun"
+});
+
+entries["telewizja"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "telewizja",
+    "pos": "noun"
+});
+
+entries["poezja"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "poezja",
+    "pos": "noun"
+});
+
+entries["Francja"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Francja",
+    "pos": "noun"
+});
+
+entries["stacja"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "stacja",
+    "pos": "noun"
+});
+
+entries["Szkocja"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Szkocja",
+    "pos": "noun"
+});
+
+entries["procesja"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "procesja",
+    "pos": "noun"
+});
+
 

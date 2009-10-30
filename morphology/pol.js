@@ -206,7 +206,18 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
                        stem.append('y');
             }
             else if (gender == 'feminine') {
-                throw('unimplemented: genetive.singular - feminine');
+                if (stem.hasEnding('j')) {
+                    return stem.ending('cj','zj','sj').append('i') ||
+                           stem.ending(1).replace('i');
+                }
+                else if (stem.hasEnding('i')) {
+                    return stem.ending('di','chi','fi','gi','ki','li','ri','ti').append('i') ||
+                           stem;
+                }
+
+                return stem.ending('l','w','k','g').append('i') ||
+                       stem.ending(utils.cls('soft')).result(append_i(stem)) ||
+                       stem.append('y');
             }
             else if (gender == 'masculine') {
                 if (entry.isClass('animate')) {

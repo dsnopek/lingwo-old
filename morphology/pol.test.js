@@ -566,6 +566,89 @@ PolishTest = TestCase.subclass({
             'listonosz': 'listonoszy',
             'żołnierz': 'żołnierzy'
         });
+    },
+
+    testNounMasculineGenitiveSingular: function () {
+        this.checkFormMulti('genitive.singular', {
+            'turysta': 'turysty',
+            'mężczyzna': 'mężczyzny',
+            'kierowca': 'kierowcy',
+            'kolega': 'kolegi',
+            'kaleka': 'kaleki',
+            'obiad': 'obiadu',
+            'bank': 'banku',
+            'sklep': 'sklepu',
+            'dom': 'domu',
+            'pokój': 'pokoju',
+            'wiatr': 'wiatru',
+
+            // irregulars
+            'kosz': 'kosza',
+            'nóż': 'noża',
+            'palec': 'palca',
+            'kwiatek': 'kwiatka',
+            'ząb': 'zęba'
+        });
+    },
+
+    testNounFeminineGenitiveSingular: function () {
+        this.checkFormMulti('genitive.singular', {
+            'lampa': 'lampy',
+            'szkoła': 'szkoły',
+            'kobieta': 'kobiety',
+            'siostra': 'siostry',
+            'łza': 'łzy',
+            'kiełbasa': 'kiełbasy',
+            'noc': 'nocy',
+            'ulica': 'ulicy',
+            'tęcza': 'tęczy',
+            'mysz': 'myszy',
+            'twarz': 'twarzy',
+            'burza': 'burzy',
+            'róża': 'róży',
+            'grusza': 'gruszy',
+            'rzecz': 'rzeczy',
+            'podróż': 'podróży',
+            'matka': 'matki',
+            'córka': 'córki',
+            'droga': 'drogi',
+            'pieśń': 'pieśni',
+            'nić': 'nici',
+            'pamięć': 'pamięci',
+            'gałąź': 'gałęzi',
+            'łódź': 'łodzi',
+            'miłość': 'miłości',
+            'wieś': 'wsi',
+            'jesień': 'jesieni',
+            'opowieść': 'opowieści',
+            'babcia': 'babci',
+            'kuchnia': 'kuchni',
+            'aleja': 'alei',
+            'szyja': 'szyi',
+            'nadzieja': 'nadziei',
+            'kolej': 'kolei',
+            'żmija': 'żmii',
+            'cebula': 'cebuli',
+            'chwila': 'chwili',
+            'chorągiew': 'chorągwi',
+            'krew': 'krwi',
+            'myśl': 'myśli',
+            'sól': 'soli',
+            'idea': 'idei',
+            'statua': 'statui',
+            'melodia': 'melodii',
+            'Belgia': 'Belgii',
+            'Anglia': 'Anglii',
+            'historia': 'historii',
+            'sympatia': 'sympatii',
+            'telewizja': 'telewizji',
+            'lekcja': 'lekcji',
+            'poezja': 'poezji',
+            'Francja': 'Francji',
+            'stacja': 'stacji',
+            'Szkocja': 'Szkocji',
+            'procesja': 'procesji'
+        });
     }
 });
 
