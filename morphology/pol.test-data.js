@@ -1400,4 +1400,10 @@ entries["piękny"] = new Lingwo.dictionary.Entry({
     "pos": "adjective"
 });
 
+entries["wierzyć"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "wierzyć",
+    "pos": "verb"
+});
+
 

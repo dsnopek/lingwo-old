@@ -182,6 +182,7 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
     /*
      * Adjectives
      */
+
     lang.morphology.classes.adjective = {
         'soft': function (entry) {
             var word = entry.getForm();
@@ -277,6 +278,102 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
         'accusative.plural.non_virile': function (entry) {
             return entry.getForm('nominative.plural.non_virile');
         },
+    };
+
+    /*
+     * Verbs
+     */
+
+    lang.morphology.options.verb = {
+        'conjugation': function (entry) {
+            // Here we attempt to guess the conjugation class, which has the highest
+            // likelyhood of being inaccurate.
+            var word = entry.getForm();
+            return word.ending('ować','iwać','awać','ywać').result('first') ||
+                   word.ending('ać','ieć').result('third') ||
+                   word.ending('ić', 'yć', 'eć').result('second') ||
+                   'unknown';
+        }
+    };
+
+    lang.morphology.forms.verb = {
+        '*stem': function (entry) {
+            // Now, we attempt to guess the verb stem using what we know about the conjugation
+            // class.  This has the second highest likelyhood of being a bad guess.
+            var word = entry.getForm(), ending;
+            var conj = entry.getOption('conjugation');
+
+            if ((ending = word.endingOrFalse('ować','iwać','ywać')) && conj != 'third') {
+                // an -ować, -iwać, or -ywać verb where we didn't manually set the conjugation class
+                // to the third.
+                word = ending.replace('u');
+            }
+            else if (ending = word.endingOrFalse('awać')) {
+                word = ending.replace('a');
+            }
+            else if (ending = word.endingOrFalse('ć')) {
+                word = ending.drop();
+            }
+
+            if ((ending = word.endingOrFalse('e')) && conj == 'second') {
+                word = ending.replace('y');
+            }
+
+            if (word.hasEnding(utils.cls('vowel')) && (conj == 'first' || conj == 'third')) {
+                word = word.append('j');
+            }
+
+            return word;
+        },
+
+        'nonpast.singular.1p': function (entry) {
+            var word = entry.getForm('*stem'), ending;
+            if (entry.getOption('conjugation') == 'third') {
+                return word.ending(1).drop().append('m');
+            }
+
+            if (ending = word.endingOrFalse('y')) {
+                word = ending.drop();
+            }
+            
+            return word.append('ę');
+        },
+
+        'nonpast.singular.2p': function (entry) {
+            return entry.getForm('nonpast.singular.3p').append('sz');
+        },
+
+        'nonpast.singular.3p': function (entry) {
+            var stem = entry.getForm('*stem');
+            var conj = entry.getOption('conjugation');
+
+            if (conj == 'first') {
+                return stem.append('e');
+            }
+            else if (conj == 'third') {
+                return stem.ending(1).drop();
+            }
+
+            return stem;
+        },
+
+        'nonpast.plural.1p': function (entry) {
+            return entry.getForm('nonpast.singular.3p').append('my');
+        },
+
+        'nonpast.plural.2p': function (entry) {
+            return entry.getForm('nonpast.singular.3p').append('cie');
+        },
+
+        'nonpast.plural.3p': function (entry) {
+            var word = entry.getForm('*stem'), ending;
+
+            if (ending = word.endingOrFalse('y')) {
+                word = ending.drop();
+            }
+
+            return word.append('ą');
+        }
     };
 });
 

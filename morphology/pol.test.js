@@ -386,7 +386,20 @@ PolishTest = TestCase.subclass({
             'głupi': 'głupią',
             'polski': 'polską'
         });
-    }
+    },
+
+    testVerbSecondConjugation: function () {
+        this.assertEquals(getEntry('wierzyć').getOption('conjugation'), 'second');
+
+        this.checkForms('wierzyć', {
+            'nonpast.singular.1p': 'wierzę',
+            'nonpast.singular.2p': 'wierzysz',
+            'nonpast.singular.3p': 'wierzy',
+            'nonpast.plural.1p': 'wierzymy',
+            'nonpast.plural.2p': 'wierzycie',
+            'nonpast.plural.3p': 'wierzą'
+        });
+    },
 });
 
 (new PolishTest()).run();
