@@ -113,18 +113,18 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
         },
 
         'nominative.plural': function (entry) {
-            var ending;
+            var word = entry.getForm(), ending;
             if (entry.getOption('gender') == 'masculine' && entry.isClass('virile')) {
                 // masculine virile, yo!
                 throw('unimplemented');
             }
-            else if (entry.getOption('gender') == 'feminine' && entry.hasEnding('cz', 'sz')) {
+            else if (entry.getOption('gender') == 'feminine' && word.hasEnding('cz', 'sz')) {
                 // this is a sort of funny case, thats different than you would expect
-                throw('unimplemented');
+                return word.append('y');
             }
-            else if ((ending = entry.getForm().endingOrFalse('ość')) && entry.getOption('gender') == 'feminine') {
+            else if ((ending = word.endingOrFalse('ość')) && entry.getOption('gender') == 'feminine') {
                 // feminine abstract nouns
-                throw('unimplemented');
+                return ending.replace('ości');
             }
             else {
                 // the "standard" cases

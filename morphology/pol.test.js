@@ -176,6 +176,64 @@ PolishTest = TestCase.subclass({
         });
     },
 
+    testNounFemininePlural: function () {
+        this.checkFormMulti('nominative.plural', {
+            // -y group
+            'kobieta': 'kobiety',
+            'szkoła': 'szkoły',
+            'gwiazda': 'gwiazdy',
+            'ryba': 'ryby',
+            'siostra': 'siostry',
+            'kiełbasa': 'kiełbasy',
+            'mysz': 'myszy',
+            'rzecz': 'rzeczy',
+
+            // -i group
+            'matka': 'matki',
+            'córka': 'córki',
+            'droga': 'drogi',
+            'Polka': 'Polki',
+            'figa': 'figi',
+
+            // an exception (in the -e group, not the -i as you would expect)
+            'ręka': 'ręce',
+
+            // -e group
+            'lekcja': 'lekcje',
+            'kolej': 'koleje',
+            'kąpiel': 'kąpiele',
+            'chwila': 'chwile',
+            'aleja': 'aleje',
+            'sala': 'sale',
+            'babcia': 'babcie',
+            'kuchnia': 'kuchnie',
+            'historia': 'historie',
+            'gospodyni': 'gospodynie',
+            'noc': 'noce',
+            'ulica': 'ulice',
+            'tęcza': 'tęcze',
+            'burza': 'burze',
+            'wieża': 'wieże',
+            'podróż': 'podróże',
+            'owca': 'owce',
+            'róża': 'róże',
+            'grusza': 'grusze',
+
+            // -i group (we consider this group an exception because its unpredictable, except for -ość)
+            'miłość': 'miłości',
+            'opowieść': 'opowieści',
+            'nić': 'nici',
+            'pieśń': 'pieśni',
+            'przyjaźń': 'przyjaźni',
+
+            // -ie group
+            'jabłoń': 'jabłonie',
+            'łódź': 'łodzie',
+            'gałąź': 'gałęzie',
+            'wieś': 'wsie'
+        });
+    },
+
     /* TODO: replace with one of the ported unit tests!! */
     test_kobieta: function () {
         var entry = entries['kobieta'];
