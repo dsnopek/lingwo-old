@@ -884,4 +884,62 @@ entries["wieś"] = new Lingwo.dictionary.Entry({
     }
 });
 
+entries["jabłko"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "jabłko",
+    "pos": "noun"
+});
+
+entries["krzesło"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "krzesło",
+    "pos": "noun"
+});
+
+entries["zdjęcie"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "zdjęcie",
+    "pos": "noun"
+});
+
+entries["pole"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "pole",
+    "pos": "noun"
+});
+
+entries["ramię"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "ramię",
+    "pos": "noun"
+});
+
+entries["jagnię"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "jagnię",
+    "pos": "noun",
+    "classes": ["animate"]
+});
+
+entries["prosię"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "prosię",
+    "pos": "noun",
+    "classes": ["animate"]
+});
+
+entries["kurczę"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "kurczę",
+    "pos": "noun",
+    "classes": ["animate"]
+});
+
+entries["dziewczę"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "dziewczę",
+    "pos": "noun",
+    "classes": ["animate"]
+});
+
 

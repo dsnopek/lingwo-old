@@ -234,10 +234,28 @@ PolishTest = TestCase.subclass({
         });
     },
 
-    /* TODO: replace with one of the ported unit tests!! */
-    test_kobieta: function () {
-        var entry = entries['kobieta'];
-        this.assertEquals(entry.getForm('*stem.singular'), 'kobiet')
+    testNounNeuterPlural: function () {
+        this.checkFormMulti('nominative.plural', {
+            // -a group
+            'jabłko': 'jabłka',
+            'morze': 'morza',
+            'krzesło': 'krzesła',
+            'pole': 'pola',
+            'zdjęcie': 'zdjęcia',
+            'muzeum': 'muzea',
+
+            // -iona group
+            'imię': 'imiona',
+            'ramię': 'ramiona',
+
+            // -eta
+            'jagnię': 'jagnięta',
+            'prosię': 'prosięta',
+            'kurczę': 'kurczęta',
+            'zwierzę': 'zwierzęta',
+            'dziewczę': 'dziewczęta',
+            'niemowlę': 'niemowlęta'
+        });
     }
 });
 
