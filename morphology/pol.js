@@ -260,8 +260,35 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
                 return stem.ending('cz','rz','sz','dz','ż').append('y') ||
                        stem.append('ów');
             }
+            else if (word.hasEnding('um')) {
+                return stem.append('ów');
+            }
+            else if (stem.hasEnding('c','cz','sz','rz','ż','nia','ja','j')) {
+                return entry.getForm('genitive.singular');
+            }
             else {
-                throw ('unimplemented genitive.plural');
+                if (stem.hasEnding('i')) {
+                    stem = stem.ending(1).drop();
+                    // soften consonants
+                    stem = stem.ending('n').replace('ń') ||
+                           stem.ending('c').replace('ć') ||
+                           stem.ending('s').replace('ś') ||
+                           stem;
+                }
+
+                // there is a consonant shift in this form
+                if (ending = stem.endingOrFalse('ęt')) {
+                    stem = ending.replace('ąt');
+                }
+
+                // Now!  We attempt to make the consonant clusters pronouncable
+                if ((stem.hasEnding(utils.cls('consonant'), utils.cls('consonant'), utils.cls('consonant')) && !stem.hasEnding('r')) ||
+                    (stem.hasEnding(utils.cls('consonant'), utils.cls('consonant')) && !stem.hasEnding('r','c','sk','zd','rc','st')))
+                {
+                    // TODO: we need a way to insert stuff
+                }
+
+                return stem;
             }
         }
     };

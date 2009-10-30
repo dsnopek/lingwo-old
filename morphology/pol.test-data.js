@@ -1777,4 +1777,97 @@ entries["procesja"] = new Lingwo.dictionary.Entry({
     "pos": "noun"
 });
 
+entries["źrebię"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "źrebię",
+    "pos": "noun"
+});
+
+entries["mieszkanie"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "mieszkanie",
+    "pos": "noun"
+});
+
+entries["koniec"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "koniec",
+    "pos": "noun",
+    "forms": {
+        "*stem": "końc"
+    }
+});
+
+entries["zegarek"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "zegarek",
+    "pos": "noun",
+    "forms": {
+        "*stem": "zegark"
+    }
+});
+
+entries["kapelusz"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "kapelusz",
+    "pos": "noun"
+});
+
+entries["garaż"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "garaż",
+    "pos": "noun"
+});
+
+entries["łabędź"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "łabędź",
+    "pos": "noun"
+});
+
+entries["płaszcz"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "płaszcz",
+    "pos": "noun"
+});
+
+entries["orkiestra"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "orkiestra",
+    "pos": "noun"
+});
+
+entries["żona"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "żona",
+    "pos": "noun"
+});
+
+entries["cegła"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "cegła",
+    "pos": "noun"
+});
+
+entries["ziemia"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "ziemia",
+    "pos": "noun"
+});
+
+entries["ciocia"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "ciocia",
+    "pos": "noun"
+});
+
+entries["głowa"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "głowa",
+    "pos": "noun",
+    "forms": {
+        "genitive.plural": "głów"
+    }
+});
+
 

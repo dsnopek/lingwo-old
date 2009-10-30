@@ -649,6 +649,100 @@ PolishTest = TestCase.subclass({
             'Szkocja': 'Szkocji',
             'procesja': 'procesji'
         });
+    },
+
+    testNounNeuterGenitiveSingular: function () {
+        this.checkFormMulti('genitive.singular', {
+            'okno': 'okna',
+            'jabłko': 'jabłka',
+            'krzesło': 'krzesła',
+            'morze': 'morza',
+            'mieszkanie': 'mieszkania',
+            'imię': 'imienia',
+            'ramię': 'ramienia',
+            'jagnię': 'jagnięcia',
+            'prosię': 'prosięcia',
+            'źrebię': 'źrebięcia',
+            'zwierzę': 'zwierzęcia',
+            'dziewczę': 'dziewczęcia'
+        });
+    },
+
+    testNounMasculineGenitivePlural: function () {
+        this.checkFormMulti('genitive.plural', {
+            'bank': 'banków',
+            'pociąg': 'pociągów',
+            'ptak': 'ptaków',
+            'koniec': 'końców',
+            'chłopiec': 'chłopców',
+            'pies': 'psów',
+            'syn': 'synów',
+            'zegarek': 'zegarków',
+            'ząb': 'zębów',
+            'stół': 'stołów',
+            'miesiąc': 'miesięcy',
+            'tysiąc': 'tysięcy',
+            'pieniądz': 'pieniędzy',
+            'samochód': 'samochodów',
+            'klucz': 'kluczy',
+            'kapelusz': 'kapeluszy',
+            'talerz': 'talerzy',
+            'grosz': 'groszy',
+            'lekarz': 'lekarzy',
+            'nóż': 'noży',
+            'garaż': 'garaży',
+            'płaszcz': 'płaszczy',
+            'kosz': 'koszy',
+            'hotel': 'hoteli',
+            'parasol': 'parasoli',
+            'pokój': 'pokoi',
+            'nauczyciel': 'nauczycieli',
+            'koń': 'koni',
+            'łabędź': 'łabędzi',
+            'liść': 'liści',
+            'gość': 'gości',
+            'ogień': 'ogni',
+            'tydzień': 'tygodni',
+
+            // exception:
+            'kraj': 'krajów'
+        });
+    },
+
+    testNounFeminineGenitivePlural: function () {
+        this.checkFormMulti('genitive.plural', {
+            'gwiazda': 'gwiazd',
+            'ulica': 'ulic',
+            'żona': 'żon',
+            'orkiestra': 'orkiestr',
+            'kobieta': 'kobiet',
+            'chwila': 'chwil',
+            'aleja': 'alei',
+            'nadzieja': 'nadziei',
+
+            'droga': 'dróg',
+            'głowa': 'głów',
+            'szkoła': 'szkół',
+            'siostra': 'siostr',
+            'ręka': 'rąk',
+
+            'córka': 'córek',
+            'cegła': 'cegieł',
+            'łza': 'łez',
+            'gospodyni': 'gospodyń',
+            'ziemia': 'ziem',
+            // TODO: are these right?
+            'ciocia': 'cioć',
+            'babcia': 'babć',
+            
+            'noc': 'nocy',
+            'twarz': 'twarzy',
+            'rzecz': 'rzeczy',
+            'mysz': 'myszy',
+            'podróż': 'podróży',
+            'kuchnia': 'kuchni',
+            'poezja': 'poezji'
+        });
     }
 });
 
