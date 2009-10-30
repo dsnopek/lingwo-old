@@ -1289,4 +1289,100 @@ entries["Rosjanin"] = new Lingwo.dictionary.Entry({
     }
 });
 
+entries["brzydki"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "brzydki",
+    "pos": "adjective"
+});
+
+entries["bliski"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "bliski",
+    "pos": "adjective"
+});
+
+entries["ubogi"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "ubogi",
+    "pos": "adjective"
+});
+
+entries["stary"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "stary",
+    "pos": "adjective"
+});
+
+entries["były"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "były",
+    "pos": "adjective"
+});
+
+entries["biedny"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "biedny",
+    "pos": "adjective"
+});
+
+entries["zadowolony"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "zadowolony",
+    "pos": "adjective"
+});
+
+entries["zmęczony"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "zmęczony",
+    "pos": "adjective"
+});
+
+entries["pierwszy"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "pierwszy",
+    "pos": "adjective"
+});
+
+entries["lepszy"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "lepszy",
+    "pos": "adjective"
+});
+
+entries["gotowy"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "gotowy",
+    "pos": "adjective"
+});
+
+entries["ciekawy"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "ciekawy",
+    "pos": "adjective"
+});
+
+entries["bogaty"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "bogaty",
+    "pos": "adjective"
+});
+
+entries["smutny"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "smutny",
+    "pos": "adjective"
+});
+
+entries["miły"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "miły",
+    "pos": "adjective"
+});
+
+entries["zajęty"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "zajęty",
+    "pos": "adjective"
+});
+
 

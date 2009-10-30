@@ -57,7 +57,7 @@ Lingwo.dictionary = {};
 
     var SubWord = function (word, start, len) {
         this.word = word;
-        this.start = start || -1;
+        this.start = (typeof start == 'undefined') ? -1 : start;
         this.len = len || 0;
     };
     extendPrototype(SubWord, {

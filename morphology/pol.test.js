@@ -324,6 +324,42 @@ PolishTest = TestCase.subclass({
             'Amerykanin': 'Amerykanie',
             'Rosjanin': 'Rosjanie'
         });
+    },
+
+    testAdjectiveNominativePluralVirile: function () {
+        this.checkFormMulti('nominative.plural.virile', {
+            // -y group (hard which remain hard
+            'polski': 'polscy',
+            'wysoki': 'wysocy',
+            'brzydki': 'brzydcy',
+            'bliski': 'bliscy',
+            'drogi': 'drodzy',
+            'ubogi': 'ubodzy',
+            'dobry': 'dobrzy',
+            'stary': 'starzy',
+
+            // -i group (from hard to soft, or just plain soft)
+            'młody': 'młodzi',
+            'miły': 'mili',
+            'mały': 'mali',
+            'zły': 'źli',
+            'były': 'byli',
+            'biedny': 'biedni',
+            'smutny': 'smutni',
+            'zadowolony': 'zadowoleni',
+            'zmęczony': 'zmęczeni',
+            'zajęty': 'zajęci',
+            'bogaty': 'bogaci',
+            'pierwszy': 'pierwsi',
+            'lepszy': 'lepsi',
+            'duży': 'duzi',
+            'gotowy': 'gotowi',
+            'ciekawy': 'ciekawi',
+
+            // soft adjectives don't change in the plural
+            'głupi': 'głupi',
+            'ostatni': 'ostatni'
+        });
     }
 });
 

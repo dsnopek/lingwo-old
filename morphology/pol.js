@@ -200,6 +200,34 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
 
         'nominative.plural.non_virile': function (entry) {
             return entry.getForm('nominative.singular.neuter');
+        },
+
+        'nominative.plural.virile': function (entry) {
+            var stem = entry.getForm('*stem'), ending;
+            
+            if (ending = stem.endingOrFalse('ż')) {
+                // TODO: shouldn't nouns do this transformation too?
+                return ending.replace('zi');
+            }
+            else if (ending = stem.endingOrFalse('sz')) {
+                // TODO: shouldn't nouns do this transformation too?
+                return ending.replace('si');
+            }
+            else if (ending = stem.endingOrFalse('on')) {
+                return ending.replace('eni');
+            }
+            else {
+                stem = stemChange(stem);
+                
+                if (stem.hasEnding('c','dz','rz')) {
+                    return stem.append('y');
+                }
+                else if (!stem.hasEnding('i')) {
+                    return stem.append('i');
+                }
+
+                return stem;
+            }
         }
     };
 });
