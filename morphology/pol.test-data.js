@@ -1385,4 +1385,13 @@ entries["zajęty"] = new Lingwo.dictionary.Entry({
     "pos": "adjective"
 });
 
+entries["twarz"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "twarz",
+    "pos": "noun",
+    "options": {
+        "gender": "feminine"
+    }
+});
+
 

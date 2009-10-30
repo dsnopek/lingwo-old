@@ -164,6 +164,19 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
                        stem.append('y');
             }
         },
+
+        'accusative.singular': function (entry) {
+            var word = entry.getForm();
+
+            if (word.hasEnding('a','i')) {
+                return entry.getForm('*stem.singular').append('ę');
+            }
+            else if (entry.getOption('gender') == 'masculine' && entry.isClass('animate')) {
+                return entry.getForm('genitive.singular');
+            }
+            
+            return word;
+        }
     };
 
     /*
@@ -228,7 +241,13 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
 
                 return stem;
             }
+        },
+
+        /*
+        'accusative.singular.feminine': function () {
+            
         }
+        */
     };
 });
 

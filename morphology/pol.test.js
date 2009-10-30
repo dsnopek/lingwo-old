@@ -360,6 +360,22 @@ PolishTest = TestCase.subclass({
             'głupi': 'głupi',
             'ostatni': 'ostatni'
         });
+    },
+
+    testNounFeminineAccusativeSingular: function () {
+        this.checkFormMulti('accusative.singular', {
+            'matka': 'matkę',
+            'kobieta': 'kobietę',
+            'babcia': 'babcię',
+            'szkoła': 'szkołę',
+            'Polska': 'Polskę',
+            'gospodyni': 'gospodynię',
+            'rzecz': 'rzecz',
+            'podróż': 'podróż',
+            'noc': 'noc',
+            'miłość': 'miłość',
+            'twarz': 'twarz'
+        });
     }
 });
 
