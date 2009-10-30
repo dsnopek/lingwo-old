@@ -18,21 +18,19 @@ PolishTest = TestCase.subclass({
         }
     },
 
-    checkOptionMulti: function (entry_names, option_name, value) {
+    checkOptionMulti: function (option_name, value, entry_names) {
         for (var i = 0; i < entry_names.length; i++) {
             this.assertEquals(getEntry(entry_names[i]).getOption(option_name), value, entry_names[i]);
         }
     },
 
-    checkClassMulti: function (entry_names, class_name, value) {
-        if (typeof value == 'undefined')
-            value = true;
+    checkClassMulti: function (class_name, value, entry_names) {
         for (var i = 0; i < entry_names.length; i++) {
             this.assertEquals(getEntry(entry_names[i]).isClass(class_name), value, entry_names[i]);
         }
     },
 
-    checkFormMulti: function (entry_form_map, form_name) {
+    checkFormMulti: function (form_name, entry_form_map) {
         for (var entry_name in entry_form_map) {
             this.assertEquals(getEntry(entry_name).getForm(form_name), entry_form_map[entry_name]);
         }
@@ -47,37 +45,37 @@ PolishTest = TestCase.subclass({
     },
 
     testNounGenderMasculine: function () {
-        this.checkOptionMulti([
+        this.checkOptionMulti('gender', 'masculine', [
             'stół', 'kot', 'pokój', 'chłopiec', 'kolega', 'dentysta', 'mężczyzna'
-        ], 'gender', 'masculine');
+        ]);
     },
 
     testNounGenderFeminine: function () {
-        this.checkOptionMulti([
+        this.checkOptionMulti('gender', 'feminine', [
             'kobieta', 'ulica', 'Polska', 'gospodyni', 'noc', 'część', 'jesień', 'wieś', 'mysz', 'miłość', 'ciekawość'
-        ], 'gender', 'feminine');
+        ]);
     },
 
     testNounGenderNeuter: function () {
-        this.checkOptionMulti([
+        this.checkOptionMulti('gender', 'neuter', [
             'okno', 'dziecko', 'życie', 'imię', 'szczenię', 'zwierzę', 'niemowlę', 'muzeum', 'gimnazjum'
-        ], 'gender', 'neuter');
+        ]);
     },
 
     testAdjectiveSoft: function () {
         // not soft!
-        this.checkClassMulti([
+        this.checkClassMulti('soft', false, [
             'duży', 'mały', 'dobry', 'zły', 'wysoki', 'niski', 'polski', 'długi', 'drogi', 'drugi'
-        ], 'soft', false);
+        ]);
 
         // soft
-        this.checkClassMulti([
+        this.checkClassMulti('soft', true, [
             'głupi', 'tani', 'trzeci', 'ostatni', 'średni'
-        ], 'soft');
+        ]);
     },
 
     testAdjectiveFormStem: function () {
-        this.checkFormMulti({
+        this.checkFormMulti('*stem', {
             'mały': 'mał',
             'duży': 'duż',
             'dobry': 'dobr',
@@ -93,34 +91,34 @@ PolishTest = TestCase.subclass({
             'trzeci': 'trzec',
             'ostatni': 'ostatn',
             'średni': 'średn'
-        }, '*stem');
+        });
     },
 
     testAdjectiveNominativeSingularMasculine: function () {
-        this.checkFormMulti({
+        this.checkFormMulti('nominative.singular.masculine', {
             'mały': 'mały',
             'wysoki': 'wysoki',
             'drogi': 'drogi',
             'głupi': 'głupi'
-        }, 'nominative.singular.masculine');
+        });
     },
 
     testAdjectiveNominativeSingularFeminine: function () {
-        this.checkFormMulti({
+        this.checkFormMulti('nominative.singular.feminine', {
             'mały': 'mała',
             'wysoki': 'wysoka',
             'drogi': 'droga',
             'głupi': 'głupia'
-        }, 'nominative.singular.feminine');
+        });
     },
 
     testAdjectiveNominativeSingularNeuter: function () {
-        this.checkFormMulti({
+        this.checkFormMulti('nominative.singular.neuter', {
             'mały': 'małe',
             'wysoki': 'wysokie',
             'drogi': 'drogie',
             'głupi': 'głupie'
-        }, 'nominative.singular.neuter');
+        });
     },
 
     testToBeNonPast: function () {
@@ -131,6 +129,50 @@ PolishTest = TestCase.subclass({
             'nonpast.plural.1p': 'jesteśmy',
             'nonpast.plural.2p': 'jesteście',
             'nonpast.plural.3p': 'są'
+        });
+    },
+
+    testNounMasculineNonVirilePlural: function () {
+        this.checkFormMulti('nominative.plural', {
+            // -y group
+            'dom': 'domy',
+            'kot': 'koty',
+            'sklep': 'sklepy',
+            'stół': 'stoły',
+            'ząb': 'zęby',
+            'kościół': 'kościoły',
+            'samochód': 'samochody',
+
+            // -i group
+            'bank': 'banki',
+            'ptak': 'ptaki',
+            'dzwonek': 'dzwonki',
+            'róg': 'rogi',
+            'pociąg': 'pociągi',
+
+            // -e group
+            'kraj': 'kraje',
+            'pokój': 'pokoje',
+            'parasol': 'parasole',
+            'hotel': 'hotele',
+            'szpital': 'szpitale',
+            'pałac': 'pałace',
+            'tysiąc': 'tysiące',
+            'pieniądz': 'pieniądze',
+            'grosz': 'grosze',
+            'nóż': 'noże',
+            'miesiąc': 'miesiące',
+            'talerz': 'talerze',
+            'klucz': 'klucze',
+
+            // -ie group
+            'koń': 'konie',
+            'ogień': 'ognie',
+            'tydzień': 'tygodnie',
+            'liść': 'liście',
+            'niedźwiedź': 'niedźwiedzie',
+            'gołąb': 'gołębie',
+            'karp': 'karpie'
         });
     },
 

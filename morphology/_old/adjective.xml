@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<rules>
+	<rule-set name="entry.adjective.form._stem">
+		<get-dictionary-form/>
+		<remove-letters index="-1,"/>
+	</rule-set>
+
+	<rule-set name="entry.adjective.class.soft">
+		<get-dictionary-form/>
+
+		<if>
+			<and>
+				<ends-in letters="i"/>
+				<not>
+					<ends-in form="_stem" letters="k"/>
+				</not>
+				<not>
+					<ends-in form="_stem" letters="g"/>
+				</not>
+			</and>
+
+			<return boolean="true"/>
+		</if>
+
+		<return boolean="false"/>
+	</rule-set>
+
+	<rule-set name="entry.adjective.form.stem">
+		<get-form name="_stem"/>
+		<if>
+			<entry-class classes="soft"/>
+			<append-letters letters="i"/>
+		</if>
+	</rule-set>
+
+	<!--
+	   Nominative
+	  -->
+	
+	<rule-set name="entry.adjective.form.nominative.singular.masculine">
+		<get-dictionary-form/>
+	</rule-set>
+
+	<rule-set name="entry.adjective.form.nominative.singular.feminine">
+		<get-form name="stem"/>
+		<append-letters letters="a"/>
+	</rule-set>
+
+	<rule-set name="entry.adjective.form.nominative.singular.neuter">
+		<get-form name="stem"/>
+		<call-word-function name="append_e"/>
+	</rule-set>
+
+	<rule-set name="entry.adjective.form.nominative.plural.non_virile">
+		<get-form name="nominative.singular.neuter"/>
+	</rule-set>
+
+	<rule-set name="entry.adjective.form.nominative.plural.virile">
+		<get-form name="stem"/>
+
+		<switch>
+			<case>
+				<ends-in letters="z."/>
+				<replace-letters letters="z,i"/>
+			</case>
+			<case>
+				<ends-in letters="sz"/>
+				<replace-letters letters="s,i"/>
+			</case>
+			<case>
+				<ends-in letters="o,n"/>
+				<replace-letters letters="e,n,i"/>
+			</case>
+			<case>
+				<always/>
+
+				<call-word-function name="stem_change"/>
+				<switch>
+					<case>
+						<or>
+							<ends-in letters="c"/>
+							<ends-in letters="dz"/>
+							<ends-in letters="rz"/>
+						</or>
+
+						<append-letters letters="y"/>
+					</case>
+					<case>
+						<not>
+							<ends-in letters="i"/>
+						</not>
+
+						<append-letters letters="i"/>
+					</case>
+				</switch>
+			</case>
+		</switch>
+	</rule-set>
+
+	<!--
+	   Accusative
+	  -->
+
+	<rule-set name="entry.adjective.form.accusative.singular.feminine">
+		<get-form name="stem"/>
+		<append-letters letters="a_"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.accusative.singular.neuter">
+		<get-form name="nominative.singular.neuter"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.accusative.singular.masculine.animate">
+		<get-form name="genitive.singular.masculine"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.accusative.singular.masculine.inanimate">
+		<get-form name="nominative.singular.masculine"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.accusative.plural.virile">
+		<get-form name="genitive.plural"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.accusative.plural.non_virile">
+		<get-form name="nominative.plural.non_virile"/>
+	</rule-set>
+
+	<!--
+	   Genitive
+	  -->
+
+	<rule-set name="entry.adjective.form.genitive.singular.feminine">
+		<get-form name="stem"/>
+		<call-word-function name="append_e"/>
+		<append-letters letters="j"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.genitive.singular.masculine">
+		<get-form name="stem"/>
+		<call-word-function name="append_e"/>
+		<append-letters letters="g,o"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.genitive.singular.neuter">
+		<get-form name="genitive.singular.masculine"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.genitive.plural">
+		<get-form name="stem"/>
+		<if>
+			<not>
+				<ends-in letters="i"/>
+			</not>
+
+			<call-word-function name="append_y"/>
+		</if>
+		<append-letters letters="ch"/>
+	</rule-set>
+
+	<!--
+	   Dative
+	  -->
+
+	<rule-set name="entry.adjective.form.dative.singular.feminine">
+		<get-form name="stem"/>
+		<call-word-function name="append_e"/>
+		<append-letters letters="j"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.dative.singular.masculine">
+		<get-form name="stem"/>
+		<call-word-function name="append_e"/>
+		<append-letters letters="m,u"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.dative.singular.neuter">
+		<get-form name="dative.singular.masculine"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.dative.plural">
+		<get-form name="stem"/>
+		<if>
+			<not>
+				<ends-in letters="i"/>
+			</not>
+
+			<call-word-function name="append_y"/>
+		</if>
+		<append-letters letters="m"/>
+	</rule-set>
+
+	<!--
+	   Instrumental
+	  -->
+
+	<rule-set name="entry.adjective.form.instrumental.singular.feminine">
+		<get-form name="stem"/>
+		<append-letters letters="a_"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.instrumental.singular.masculine">
+		<get-form name="stem"/>
+		<if>
+			<not>
+				<ends-in letters="i"/>
+			</not>
+
+			<call-word-function name="append_y"/>
+		</if>
+		<append-letters letters="m"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.instrumental.singular.neuter">
+		<get-form name="instrumental.singular.masculine"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.instrumental.plural">
+		<get-form name="stem"/>
+		<if>
+			<not>
+				<ends-in letters="i"/>
+			</not>
+
+			<call-word-function name="append_y"/>
+		</if>
+		<append-letters letters="m,i"/>
+	</rule-set>
+
+	<!--
+	   Locative
+	  -->
+
+	<rule-set name="entry.adjective.form.locative.singular.feminine">
+		<get-form name="stem"/>
+		<call-word-function name="append_e"/>
+		<append-letters letters="j"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.locative.singular.masculine">
+		<get-form name="stem"/>
+		<if>
+			<not>
+				<ends-in letters="i"/>
+			</not>
+
+			<call-word-function name="append_y"/>
+		</if>
+		<append-letters letters="m"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.locative.singular.neuter">
+		<get-form name="locative.singular.masculine"/>
+	</rule-set>
+	<rule-set name="entry.adjective.form.locative.plural">
+		<get-form name="stem"/>
+		<if>
+			<not>
+				<ends-in letters="i"/>
+			</not>
+
+			<call-word-function name="append_y"/>
+		</if>
+		<append-letters letters="ch"/>
+	</rule-set>
+</rules>
+

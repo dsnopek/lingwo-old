@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<rules>
+	<!--
+	  Appends -i to end of word (except after -j and -l), removing the accent from the 
+	  last letter if necessary.
+	  -->
+	<rule-set name="word.function.append_i">
+		<if>
+			<not>
+				<or>
+					<ends-in letters="j"/>
+					<ends-in letters="l"/>
+				</or>
+			</not>
+
+			<switch>
+				<case>
+					<ends-in letters="n'"/>
+					<replace-letters letters="n"/>
+				</case>
+				<case>
+					<ends-in letters="c'"/>
+					<replace-letters letters="c"/>
+				</case>
+				<case>
+					<ends-in letters="z'"/>
+					<replace-letters letters="z"/>
+				</case>
+				<case>
+					<ends-in letters="dz'"/>
+					<replace-letters letters="dz"/>
+				</case>
+				<case>
+					<ends-in letters="s'"/>
+					<replace-letters letters="s"/>
+				</case>
+			</switch>
+
+			<append-letters letters="i"/>
+		</if>
+	</rule-set>
+
+	<!--
+	  Calls the normal append_i function if last letter is soft.
+	  -->
+	<rule-set name="word.function.append_i_on_soft">
+		<if>
+			<ends-in classes="soft"/>
+			<call-word-function name="append_i"/>
+		</if>
+	</rule-set>
+
+
+	<!--
+	  Appends -y to the end of a word, converting to -i if the preceded by 
+	  by a 'k' or 'g'.
+	  -->
+	<rule-set name="word.function.append_y">
+		<switch>
+			<case>
+				<or>
+					<ends-in letters="k"/>
+					<ends-in letters="g"/>
+				</or>
+
+				<append-letters letters="i"/>
+			</case>
+			<case>
+				<always/>
+				<append-letters letters="y"/>
+			</case>
+		</switch>
+	</rule-set>
+
+	<!--
+	  Appends -e to the end of a word, converting to -ie if the preceded by 
+	  by a 'k' or 'g'.
+	  -->
+	<rule-set name="word.function.append_e">
+		<switch>
+			<case>
+				<or>
+					<ends-in letters="k"/>
+					<ends-in letters="g"/>
+				</or>
+
+				<append-letters letters="i,e"/>
+			</case>
+			<case>
+				<always/>
+				<append-letters letters="e"/>
+			</case>
+		</switch>
+	</rule-set>
+
+	<!--
+	  Performs the stem change that happens in masculine nominative plural virile, 
+	  feminine dative, and everything locative.
+	 -->
+	<rule-set name="word.function.stem_change">
+		<switch>
+			<!-- Endings that remain hard -->
+			<case>
+				<ends-in letters="k"/>
+				<replace-letters letters="c"/>
+			</case>
+			<case>
+				<ends-in letters="g"/>
+				<replace-letters letters="dz"/>
+			</case>
+			<case>
+				<ends-in letters="r"/>
+				<replace-letters letters="rz"/>
+			</case>
+
+			<!-- Ending that become soft -->
+			<case>
+				<!-- TODO: this case isn't really any different than the one
+				     below, it simply continues to soften backwards.  Replace when
+				     we have a generic softening scheme. -->
+				<ends-in letters="s,t"/>
+				<replace-letters letters="s',c,i"/>
+			</case>
+			<case>
+				<ends-in letters="t"/>
+				<replace-letters letters="c,i"/>
+			</case>
+			<case>
+				<!-- TODO: softening -->
+				<ends-in letters="s,n"/>
+				<replace-letters letters="s',n,i"/>
+			</case>
+			<case>
+				<!-- TODO: softening -->
+				<ends-in letters="z,n"/>
+				<replace-letters letters="z',n,i"/>
+			</case>
+			<case>
+				<!-- TODO: softening -->
+				<ends-in letters="s,m"/>
+				<replace-letters letters="s',m,i"/>
+			</case>
+			<case>
+				<ends-in letters="ch"/>
+				<replace-letters letters="sz"/>
+			</case>
+			<case>
+				<!-- TODO: softening -->
+				<ends-in letters="z,d"/>
+				<replace-letters letters="z',dz,i"/>
+			</case>
+			<case>
+				<ends-in letters="d"/>
+				<replace-letters letters="dz,i"/>
+			</case>
+			<case>
+				<!-- TODO: softening -->
+				<ends-in letters="s,l/"/>
+				<replace-letters letters="s',l"/>
+			</case>
+			<case>
+				<!-- TODO: softening -->
+				<ends-in letters="z,l/"/>
+				<replace-letters letters="z',l"/>
+			</case>
+			<case>
+				<ends-in letters="l/"/>
+				<replace-letters letters="l"/>
+			</case>
+			<case>
+				<!-- these ends are simply softened with an -i
+				     but with no soft-walk backwards -->
+				<or>
+					<ends-in letters="b"/>
+					<ends-in letters="f"/>
+					<ends-in letters="p"/>
+					<ends-in letters="s"/>
+					<ends-in letters="w"/>
+					<ends-in letters="z"/>
+					<ends-in letters="m"/>
+					<ends-in letters="n"/>
+				</or>
+
+				<append-letters letters="i"/>
+			</case>
+		</switch>
+	</rule-set>
+</rules>
+

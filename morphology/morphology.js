@@ -10,6 +10,13 @@ Lingwo.dictionary = {};
 (function () {
     var lib = Lingwo.dictionary;
 
+    // some exception classes
+    lib.NoSuchMorphologyFunction = function (msg) {
+        this.toString = function () {
+            return msg;
+        };
+    };
+
     // stores all the language definitions
     lib.languages = {};
 
@@ -180,6 +187,13 @@ Lingwo.dictionary = {};
             'hasEnding': function () {
                 return this.ending.apply(this, arguments).bool();
             },
+
+            'endingOrFalse': function () {
+                var ending = this.ending.apply(this, arguments);
+                if (ending.bool())
+                    return ending;
+                return false;
+            },
         }
     );
 
@@ -203,12 +217,12 @@ Lingwo.dictionary = {};
                 pos = entry.like;
 
             if (typeof this.morphology[type] == 'undefined')
-                throw('Invalid morphology function type: '+type);
+                throw new lib.NoSuchMorphologyFunction('Invalid morphology function type: '+type);
 
             if (typeof this.morphology[type][pos] == 'undefined' ||
                 typeof this.morphology[type][pos][which] == 'undefined')
             {
-                throw('No morphology function for "'+pos+'" called "'+which+'"');
+                throw new lib.NoSuchMorphologyFunction('No morphology function for "'+pos+'" called "'+which+'"');
             }
 
             return this.morphology[type][pos][which].apply(this, new Array(entry));
@@ -418,9 +432,21 @@ Lingwo.dictionary = {};
             if (typeof this._cachedClasses[name] != 'undefined')
                 return this._cachedClasses[name];
 
-            // TODO: if no morphology function with this name can be found, we should return false
-            // (AND CACHE THAT!!)
-            var value = this._cachedClasses[name] = this.lang.callMorphologyFunc(this, 'classes', name);
+            var value;
+
+            try {
+                value = this.lang.callMorphologyFunc(this, 'classes', name);
+            }
+            catch (e) {
+                if (e instanceof lib.NoSuchMorphologyFunction) {
+                    value = false;
+                }
+                else {
+                    throw e;
+                }
+            }
+
+            this._cachedClasses[name] = value;
             return value;
         }
     });

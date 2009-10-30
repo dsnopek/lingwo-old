@@ -62,6 +62,18 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
                word;
     };
 
+    var append_i = function (word) {
+        if (word.hasEnding('j', 'l'))
+            return word;
+
+        return word.ending('ń').replace('ni') ||
+               word.ending('ć').replace('ci') ||
+               word.ending('ź').replace('zi') ||
+               word.ending('dź').replace('dzi') ||
+               word.ending('ś').replace('si') ||
+               word.append('i');
+    };
+
     /*
      * Nouns
      */
@@ -98,6 +110,37 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
 
         'nominative.singular': function (entry) {
             return entry.getForm();
+        },
+
+        'nominative.plural': function (entry) {
+            var ending;
+            if (entry.getOption('gender') == 'masculine' && entry.isClass('virile')) {
+                // masculine virile, yo!
+                throw('unimplemented');
+            }
+            else if (entry.getOption('gender') == 'feminine' && entry.hasEnding('cz', 'sz')) {
+                // this is a sort of funny case, thats different than you would expect
+                throw('unimplemented');
+            }
+            else if ((ending = entry.getForm().endingOrFalse('ość')) && entry.getOption('gender') == 'feminine') {
+                // feminine abstract nouns
+                throw('unimplemented');
+            }
+            else {
+                // the "standard" cases
+                var stem = entry.getForm('*stem.plural');
+                
+                if (entry.getOption('gender') == 'neuter')
+                    return stem.append('a');
+
+                if (stem.hasEnding(utils.cls('soft')))
+                    return append_i(stem).append('e');
+
+                return stem.ending('k', 'g').append('i') ||
+                       // l and j, i, and all the hard husher-like things
+                       stem.ending('j', 'l', 'i', 'c', 'cz', 'rz', 'sz', 'dz', 'ż', 'dż').append('e') ||
+                       stem.append('y');
+            }
         },
     };
 

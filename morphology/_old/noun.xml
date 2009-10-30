@@ -1,0 +1,752 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<rules>
+	<rule-set name="entry.noun.option.gender">
+		<get-dictionary-form/>
+		<if>
+			<or>
+				<ends-in letters="o"/>
+				<ends-in letters="e"/>
+				<ends-in letters="e_"/>
+				<ends-in letters="u,m"/>
+			</or>
+			<return value="neuter"/>
+		</if>
+		<if>
+			<ends-in classes="vowel"/>
+			<return value="feminine"/>
+		</if>
+		<return value="masculine"/>
+	</rule-set>
+
+	<rule-set name="entry.noun.form.stem">
+		<get-dictionary-form/>
+
+		<if>
+			<or>
+				<ends-in letters="a"/>
+				<ends-in letters="o"/>
+				<ends-in letters="e"/>
+				<ends-in letters="u,m"/>
+			</or>
+
+			<replace-letters/>
+		</if>
+	</rule-set>
+
+	<rule-set name="entry.noun.form.stem.singular">
+		<get-dictionary-form/>
+
+		<switch>
+			<case>
+				<ends-in letters="m,i,e_"/>
+				<replace-letters letters="m,i,e,n,i"/>
+			</case>
+			<case>
+				<ends-in letters="e_"/>
+				<append-letters letters="c,i"/>
+			</case>
+			<case>
+				<always/>
+				<get-form name="stem"/>
+			</case>
+		</switch>
+	</rule-set>
+
+	<rule-set name="entry.noun.form.stem.plural">
+		<get-dictionary-form/>
+
+		<switch>
+			<case>
+				<ends-in letters="m,i,e_"/>
+				<replace-letters letters="m,i,o,n"/>
+			</case>
+			<case>
+				<ends-in letters="e_"/>
+				<append-letters letters="t"/>
+			</case>
+			<case>
+				<always/>
+				<get-form name="stem"/>
+			</case>
+		</switch>
+	</rule-set>
+
+	<rule-set name="entry.noun.form.nominative.singular">
+		<get-dictionary-form/>
+	</rule-set>
+
+	<rule-set name="entry.noun.form.nominative.plural">
+		<get-dictionary-form/>
+
+		<switch>
+			<!-- masculine virile, yo! -->
+			<case>
+				<and>
+					<entry-option name="gender" value="masculine"/>
+					<entry-class  classes="virile"/>
+				</and>
+
+				<get-form name="stem.plural"/>
+				<switch>
+					<!-- softs and psuedo softs that take -e -->
+					<case>
+						<or>
+							<ends-in letters="rz"/>
+							<ends-in letters="sz"/>
+							<ends-in letters="cz"/>
+							<ends-in letters="l"/>
+							<ends-in letters="j"/>
+						</or>
+
+						<append-letters letters="e"/>
+					</case>
+
+					<case>
+						<ends-in letters="ch"/>
+						<replace-letters letters="s,i"/>
+					</case>
+
+					<case>
+						<always/>
+
+						<call-word-function name="stem_change"/>
+
+						<!-- apply the hard ending if necessary -->
+						<if>
+							<or>
+								<ends-in letters="c"/>
+								<ends-in letters="dz"/>
+								<ends-in letters="rz"/>
+							</or>
+
+							<append-letters letters="y"/>
+						</if>
+					</case>
+				</switch>
+			</case>
+
+			<!-- This is a sort of funny case, thats different than you would expect -->
+			<case>
+				<and>
+					<entry-option name="gender" value="feminine"/>
+					
+					<or>
+						<ends-in letters="cz"/>
+						<ends-in letters="sz"/>
+					</or>
+				</and>
+
+				<append-letters letters="y"/>
+			</case>
+
+			<!-- feminine abstract nouns -->
+			<case>
+				<and>
+					<entry-option name="gender" value="feminine"/>
+					<ends-in letters="o,s',c'"/>
+				</and>
+
+				<replace-letters letters="o,s',c,i"/>
+			</case>
+
+			<!--
+			   Deal with the "standard" cases.
+			  -->
+			<case>
+				<always/>
+
+				<get-form name="stem.plural"/>
+				<switch>
+					<case>
+						<entry-option name="gender" value="neuter"/>
+						<append-letters letters="a"/>
+					</case>
+					<case>
+						<or>
+							<ends-in letters="k"/>
+							<ends-in letters="g"/>
+						</or>
+
+						<append-letters letters="i"/>
+					</case>
+					<case>
+						<or>
+							<!-- l and j -->
+							<ends-in letters="j"/>
+							<ends-in letters="l"/>
+
+							<!-- i -->
+							<ends-in letters="i"/>
+							
+							<!-- and all of the hard husher-like things -->
+							<ends-in letters="c"/>
+							<ends-in letters="cz"/>
+							<ends-in letters="rz"/>
+							<ends-in letters="sz"/>
+							<ends-in letters="dz"/>
+							<ends-in letters="z."/>
+							<ends-in letters="dz."/>
+						</or>
+
+						<append-letters letters="e"/>
+					</case>
+					<case>
+						<ends-in classes="soft"/>
+
+						<call-word-function name="append_i"/>
+						<append-letters letters="e"/>
+					</case>
+					<case>
+						<always/>
+						<append-letters letters="y"/>
+					</case>
+				</switch>
+			</case>
+		</switch>
+	</rule-set>
+
+	<rule-set name="entry.noun.form.accusative.singular">
+		<get-dictionary-form/>
+
+		<switch>
+			<case>
+				<!-- Should catch feminines and psuedo-feminines -->
+				<or>
+					<ends-in letters="a"/>
+					<ends-in letters="i"/>
+				</or>
+
+				<get-form name="stem.singular"/>
+				<append-letters letters="e_"/>
+			</case>
+			<case>
+				<and>
+					<entry-option name="gender" value="masculine"/>
+					<entry-class  classes="animate"/>
+				</and>
+
+				<get-form name="genitive.singular"/>
+			</case>
+		</switch>
+
+		<!-- Everyting else remains the same! -->
+	</rule-set>
+
+	<rule-set name="entry.noun.form.accusative.plural">
+		<switch>
+			<case>
+				<entry-class classes="virile"/>
+				<get-form name="genitive.plural"/>
+			</case>
+			<case>
+				<always/>
+				<get-form name="nominative.plural"/>
+			</case>
+		</switch>
+	</rule-set>
+
+	<rule-set name="entry.noun.form.genitive.singular">
+		<get-dictionary-form/>
+
+		<switch>
+			<case>
+				<and>
+					<entry-option name="gender" value="masculine"/>
+					<ends-in letters="a"/>
+				</and>
+
+				<get-form name="stem.singular"/>
+				
+				<switch>
+					<case>
+						<or>
+							<ends-in letters="g"/>
+							<ends-in letters="k"/>
+						</or>
+
+						<append-letters letters="i"/>
+					</case>
+					<case>
+						<always/>
+						<append-letters letters="y"/>
+					</case>
+				</switch>
+			</case>
+
+			<case>
+				<entry-option name="gender" value="feminine"/>
+
+				<get-form name="stem.singular"/>
+				<switch>
+					<case>
+						<ends-in letters="j"/>
+
+						<switch>
+							<case>
+								<or>
+									<ends-in letters="c,j"/>
+									<ends-in letters="z,j"/>
+									<ends-in letters="s,j"/>
+								</or>
+
+								<!-- if we eliminated the 'j' in these words, the
+								     pronouciation of the c, z, s would soften into
+								     sounds ć, ź, ś.. -->
+								<append-letters letters="i"/>
+							</case>
+							<case>
+								<always/>
+								<replace-letters letters="i"/>
+							</case>
+						</switch>
+					</case>
+					<case>
+						<ends-in letters="i"/>
+
+						<switch>
+							<case>
+								<or>
+									<ends-in letters="d,i"/>
+									<ends-in letters="ch,i"/>
+									<ends-in letters="f,i"/>
+									<ends-in letters="g,i"/>
+									<ends-in letters="k,i"/>
+									<ends-in letters="l,i"/>
+									<ends-in letters="r,i"/>
+									<ends-in letters="t,i"/>
+								</or>
+
+								<append-letters letters="i"/>
+							</case>
+							<case>
+								<always/>
+								<!-- we leave these alone! -->
+								<return/>
+							</case>
+						</switch>
+					</case>
+					<case>
+						<or>
+							<ends-in letters="l"/>
+							<ends-in letters="w"/>
+							<ends-in letters="k"/>
+							<ends-in letters="g"/>
+						</or>
+
+						<append-letters letters="i"/>
+					</case>
+					<case>
+						<ends-in classes="soft"/>
+						<call-word-function name="append_i"/>
+					</case>
+					<case>
+						<always/>
+
+						<!-- default is -y -->
+						<append-letters letters="y"/>
+					</case>
+				</switch>
+			</case>
+
+			<case>
+				<entry-option name="gender" value="masculine"/>
+
+				<get-form name="stem.singular"/>
+				<switch>
+					<case>
+						<entry-class classes="animate"/>
+
+						<switch>
+							<case>
+								<ends-in classes="soft"/>
+
+								<call-word-function name="append_i"/>
+								<append-letters letters="a"/> 
+							</case>
+							<case>
+								<always/>
+								<append-letters letters="a"/>
+							</case>
+						</switch>
+					</case>
+
+					<case>
+						<always/>
+
+						<!-- the default ending for inanimate is 'u' -->
+						<append-letters letters="u"/>
+					</case>
+				</switch>
+			</case>
+
+			<case>
+				<entry-option name="gender" value="neuter"/>
+
+				<get-form name="stem.singular"/>
+				<append-letters letters="a"/>
+			</case>
+		</switch>
+	</rule-set>
+
+	<rule-set name="entry.noun.form.genitive.plural">
+		<get-dictionary-form/>
+
+		<switch>
+			<case>
+				<entry-option name="gender" value="masculine"/>
+				
+				<get-form name="stem.plural"/>
+				<switch>
+					<case>
+						<ends-in letters="n'"/>
+
+						<switch>
+							<case>
+								<entry-class classes="virile"/>
+								<replace-letters letters="n,i,o',w"/>
+							</case>
+							<case>
+								<always/>
+								<replace-letters letters="n,i"/>
+							</case>
+						</switch>
+					</case>
+					<case>
+						<ends-in letters="l"/>
+						<append-letters letters="i"/>
+					</case>
+					<case>
+						<ends-in letters="j"/>
+						<replace-letters letters="i"/>
+					</case>
+					<case>
+						<ends-in classes="soft"/>
+						<call-word-function name="append_i"/>
+					</case>
+					<case>
+						<or>
+							<ends-in letters="cz"/>
+							<ends-in letters="rz"/>
+							<ends-in letters="sz"/>
+							<ends-in letters="dz"/>
+							<ends-in letters="z."/>
+						</or>
+
+						<append-letters letters="y"/>
+					</case>
+					<case>
+						<always/>
+						<append-letters letters="o',w"/>
+					</case>
+				</switch>
+			</case>
+
+			<case>
+				<ends-in letters="u,m"/>
+				<get-form name="stem.plural"/>
+				<append-letters letters="o',w"/>
+			</case>
+
+			<case>
+				<always/>
+
+				<switch>
+					<case>
+						<or>
+							<ends-in letters="c"/>
+							<ends-in letters="cz"/>
+							<ends-in letters="sz"/>
+							<ends-in letters="rz"/>
+							<ends-in letters="z."/>
+							<ends-in letters="n,i,a"/>
+							<ends-in letters="j,a"/>
+							<ends-in letters="j"/>
+						</or>
+
+						<get-form name="genitive.singular"/>
+					</case>
+					<case>
+						<always/>
+
+						<get-form name="stem.plural"/>
+
+						<if>
+							<ends-in letters="i"/>
+							
+							<remove-letters index="-1,"/>
+
+							<!-- soften consonants -->
+							<switch>
+								<case>
+									<ends-in letters="n"/>
+									<replace-letters letters="n'"/>
+								</case>
+								<case>
+									<ends-in letters="c"/>
+									<replace-letters letters="c'"/>
+								</case>
+								<case>
+									<ends-in letters="s"/>
+									<replace-letters letters="s'"/>
+								</case>
+							</switch>
+						</if>
+
+						<!-- There is a consonant switch in this form. -->
+						<if>
+							<ends-in letters="e_,t"/>
+							<replace-letters letters="a_,t"/>
+						</if>
+
+						<!-- Now!  We attempt to make the consonent clusters pronouncable -->
+						<if>
+							<or>
+								<and>
+									<ends-in classes="consonant,consonant,consonant"/>
+									<not>
+										<ends-in letters="r"/>
+									</not>
+								</and>
+
+								<and>
+									<ends-in classes="consonant,consonant"/>
+
+									<not>
+										<or>
+											<!-- these ends are always OK. -->
+											<ends-in letters="r"/>
+											<ends-in letters="c'"/>
+
+											<!-- these endings (so long as they are
+											     preceded by a vowel) are OK. -->
+											<ends-in letters="s,k"/>
+											<ends-in letters="z,d"/>
+											<ends-in letters="r,c"/>
+											<ends-in letters="s,t"/>
+										</or>
+									</not>
+								</and>
+							</or>
+							
+							<switch>
+								<case>
+									<or>
+										<letter index="-2" letter="g"/>
+										<letter index="-2" letter="k"/>
+									</or>
+
+									<insert-letters index="-1" letters="i,e"/>
+								</case>
+								<case>
+									<always/>
+									<insert-letters index="-1" letters="e"/>
+								</case>
+							</switch>
+						</if>
+
+						<!-- Now, we attempt to loop backwards adding an accept to -o- if
+						     its the first vowel found -->
+						<!-- TODO: This simply isn't always correct! -->
+						<!--
+						<for-letters reverse="true">
+							<if>
+								<letter class="vowel"/>
+
+								<switch>
+									<case>
+										<letter letter="o"/>
+										<replace-letters letters="o'"/>
+									</case>
+									<case>
+										<always/>
+										<break/>
+									</case>
+								</switch>
+							</if>
+						</for-letters>
+						-->
+					</case>
+				</switch>
+			</case>
+		</switch>
+	</rule-set>
+
+	<!--
+	   Dative Case
+	  -->
+
+	<rule-set name="entry.noun.form.dative.singular">
+		<get-dictionary-form/>
+
+		<switch>
+			<case>
+				<or>
+					<entry-option name="gender" value="feminine"/>
+					<ends-in letters="a"/>
+				</or>
+
+				<get-form name="stem.singular"/>
+				<switch>
+					<case>
+						<or>
+							<ends-in letters="c"/>
+							<ends-in letters="cz"/>
+						</or>
+						<append-letters letters="y"/>
+					</case>
+					<case>
+						<!-- maybe? -->
+						<ends-in letters="i"/>
+						<get-form name="genitive.singular"/>
+					</case>
+					<case>
+						<always/>
+
+						<call-word-function name="stem_change"/>
+						<append-letters letters="e"/>
+					</case>
+				</switch>
+			</case>
+
+			<case>
+				<entry-option name="gender" value="masculine"/>
+
+				<get-form name="stem.singular"/>
+				<call-word-function name="append_i_on_soft"/>
+				<append-letters letters="o,w,i"/>
+			</case>
+
+			<case>
+				<and>
+					<entry-option name="gender" value="neuter"/>
+					<not>
+						<!-- these remain the same. -->
+						<ends-in letters="u,m"/>
+					</not>
+				</and>
+
+				<get-form name="stem.singular"/>
+				<append-letters letters="u"/>
+			</case>
+		</switch>
+	</rule-set>
+
+	<rule-set name="entry.noun.form.dative.plural">
+		<get-form name="stem.plural"/>
+		<call-word-function name="append_i_on_soft"/>
+		<append-letters letters="o,m"/>
+	</rule-set>
+
+	<!--
+	   Instrumental Case
+	  -->
+
+	<rule-set name="entry.noun.form.instrumental.singular">
+		<get-dictionary-form/>
+
+		<switch>
+			<case>
+				<or>
+					<entry-option name="gender" value="feminine"/>
+					<ends-in letters="a"/>
+				</or>
+
+				<get-form name="stem.singular"/>
+				<call-word-function name="append_i_on_soft"/>
+				<append-letters letters="a_"/>
+			</case>
+
+			<case>
+				<always/>
+
+				<get-form name="stem.singular"/>
+				<call-word-function name="append_i_on_soft"/>
+				<call-word-function name="append_e"/>
+				<append-letters letters="m"/>
+			</case>
+		</switch>
+	</rule-set>
+
+	<rule-set name="entry.noun.form.instrumental.plural">
+		<get-form name="stem.plural"/>
+		<call-word-function name="append_i_on_soft"/>
+		<append-letters letters="a,m,i"/>
+	</rule-set>
+
+	<!--
+	   Locative Case
+	  -->
+
+	<rule-set name="entry.noun.form.locative.singular">
+		<get-dictionary-form/>
+
+		<switch>
+			<case>
+				<or>
+					<entry-option name="gender" value="feminine"/>
+					<ends-in letters="a"/>
+				</or>
+				
+				<get-form name="dative.singular"/>
+			</case>
+
+			<case>
+				<always/>
+
+				<get-form name="stem.singular"/>
+				<switch>
+					<case>
+						<and>
+							<or>
+								<entry-option name="gender" value="masculine"/>
+								<entry-option name="gender" value="neuter"/>
+							</or>
+
+							<or>
+								<!-- hard -->
+								<ends-in letters="k"/>
+								<ends-in letters="g"/>
+								<ends-in letters="ch"/>
+								<ends-in letters="j"/>
+								<ends-in letters="l"/>
+								<ends-in letters="c"/>
+								<ends-in letters="cz"/>
+								<ends-in letters="sz"/>
+								<ends-in letters="rz"/>
+								<ends-in letters="z."/>
+								<ends-in letters="dz."/>
+								
+								<!-- soft -->
+								<ends-in letters="i"/>
+								<ends-in letters="n'"/>
+								<ends-in letters="c'"/>
+								<ends-in letters="z'"/>
+								<ends-in letters="dz'"/>
+							</or>
+						</and>
+
+						<call-word-function name="append_i_on_soft"/>
+						<append-letters letters="u"/>
+					</case>
+
+					<case>
+						<not>
+							<ends-in letters="u,m"/>
+						</not>
+
+						<call-word-function name="stem_change"/>
+						<append-letters letters="e"/>
+					</case>
+				</switch>
+			</case>
+		</switch>
+	</rule-set>
+
+	<rule-set name="entry.noun.form.locative.plural">
+		<get-form name="stem.plural"/>
+		<call-word-function name="append_i_on_soft"/>
+		<append-letters letters="a,ch"/>
+	</rule-set>
+</rules>
+

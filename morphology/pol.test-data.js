@@ -349,4 +349,236 @@ entries["być"] = new Lingwo.dictionary.Entry({
     }
 });
 
+entries["dom"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "dom",
+    "pos": "noun"
+});
+
+entries["sklep"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "sklep",
+    "pos": "noun"
+});
+
+entries["ząb"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "ząb",
+    "pos": "noun",
+    "forms": {
+        "*stem": "zęb",
+        "genitive.singular": "zęba"
+    }
+});
+
+entries["kościół"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "kościół",
+    "pos": "noun",
+    "forms": {
+        "*stem": "kościoł",
+        "genitive.singular": "kościoła"
+    }
+});
+
+entries["samochód"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "samochód",
+    "pos": "noun",
+    "forms": {
+        "*stem": "samochod"
+    }
+});
+
+entries["dzwonek"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "dzwonek",
+    "pos": "noun",
+    "forms": {
+        "nominative.plural": "dzwonki"
+    }
+});
+
+entries["róg"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "róg",
+    "pos": "noun",
+    "forms": {
+        "nominative.plural": "rogi"
+    }
+});
+
+entries["bank"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "bank",
+    "pos": "noun"
+});
+
+entries["ptak"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "ptak",
+    "pos": "noun",
+    "classes": ["animate"]
+});
+
+entries["pociąg"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "pociąg",
+    "pos": "noun"
+});
+
+entries["kraj"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "kraj",
+    "pos": "noun",
+    "forms": {
+        "genitive.plural": "krajów"
+    }
+});
+
+entries["parasol"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "parasol",
+    "pos": "noun"
+});
+
+entries["hotel"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "hotel",
+    "pos": "noun"
+});
+
+entries["szpital"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "szpital",
+    "pos": "noun"
+});
+
+entries["pałac"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "pałac",
+    "pos": "noun"
+});
+
+entries["tysiąc"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "tysiąc",
+    "pos": "noun",
+    "forms": {
+        "genitive.plural": "tysięcy"
+    }
+});
+
+entries["pieniądz"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "pieniądz",
+    "pos": "noun",
+    "forms": {
+        "genitive.plural": "pieniędzy",
+        "instrumental.plural": "pieniędzmi"
+    }
+});
+
+entries["grosz"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "grosz",
+    "pos": "noun"
+});
+
+entries["miesiąc"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "miesiąc",
+    "pos": "noun",
+    "forms": {
+        "genitive.plural": "miesięcy",
+        "genitive.singular": "miesiąca"
+    }
+});
+
+entries["talerz"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "talerz",
+    "pos": "noun"
+});
+
+entries["klucz"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "klucz",
+    "pos": "noun"
+});
+
+entries["nóż"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "nóż",
+    "pos": "noun",
+    "forms": {
+        "genitive.plural": "noży",
+        "locative.singular": "nożu",
+        "genitive.singular": "noża",
+        "nominative.plural": "noże"
+    }
+});
+
+entries["koń"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "koń",
+    "pos": "noun",
+    "classes": ["animate"],
+    "forms": {
+        "instrumental.plural": "końmi"
+    }
+});
+
+entries["liść"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "liść",
+    "pos": "noun",
+    "forms": {
+        "instrumental.plural": "liśćmi"
+    }
+});
+
+entries["niedźwiedź"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "niedźwiedź",
+    "pos": "noun",
+    "classes": ["animate"]
+});
+
+entries["ogień"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "ogień",
+    "pos": "noun",
+    "forms": {
+        "*stem": "ogń"
+    }
+});
+
+entries["tydzień"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "tydzień",
+    "pos": "noun",
+    "forms": {
+        "*stem": "tygodń"
+    }
+});
+
+entries["gołąb"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "gołąb",
+    "pos": "noun",
+    "classes": ["animate"],
+    "forms": {
+        "nominative.plural": "gołębie"
+    }
+});
+
+entries["karp"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "karp",
+    "pos": "noun",
+    "forms": {
+        "nominative.plural": "karpie"
+    }
+});
 
