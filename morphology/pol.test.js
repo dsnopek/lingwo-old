@@ -376,6 +376,16 @@ PolishTest = TestCase.subclass({
             'miłość': 'miłość',
             'twarz': 'twarz'
         });
+    },
+
+    testAdjectiveAccusativeSingularFeminine: function () {
+        this.checkFormMulti('accusative.singular.feminine', {
+            'duży': 'dużą',
+            'piękny': 'piękną',
+            'tani': 'tanią',
+            'głupi': 'głupią',
+            'polski': 'polską'
+        });
     }
 });
 

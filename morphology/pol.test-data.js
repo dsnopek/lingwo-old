@@ -1394,4 +1394,10 @@ entries["twarz"] = new Lingwo.dictionary.Entry({
     }
 });
 
+entries["piękny"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "piękny",
+    "pos": "adjective"
+});
+
 

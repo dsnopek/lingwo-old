@@ -194,6 +194,10 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
             return entry.getForm().ending(1).drop();
         },
 
+        /*
+         * Nominative
+         */
+
         'nominative.singular.masculine': function (entry) {
             return entry.getForm();
         },
@@ -244,10 +248,35 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
         },
 
         /*
-        'accusative.singular.feminine': function () {
-            
-        }
-        */
+         * Accusative.
+         */
+
+        'accusative.singular.feminine': function (entry) {
+            var stem = entry.getForm('*stem');
+            if (entry.isClass('soft'))
+                stem = stem.append('i');
+            return stem.append('ą');
+        },
+
+        'accusative.singular.neuter': function (entry) {
+            return entry.getForm('nominative.singular.neuter');
+        },
+
+        'accusative.singular.masculine.animate': function (entry) {
+            return entry.getForm('genitive.singular.masculine');
+        },
+
+        'accusative.singular.masculine.inanimate': function (entry) {
+            return entry.getForm('nominative.singular.masculine');
+        },
+
+        'accusative.plural.virile': function (entry) {
+            return entry.getForm('genitive.plural');
+        },
+
+        'accusative.plural.non_virile': function (entry) {
+            return entry.getForm('nominative.plural.non_virile');
+        },
     };
 });
 
