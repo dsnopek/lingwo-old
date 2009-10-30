@@ -400,6 +400,124 @@ PolishTest = TestCase.subclass({
             'nonpast.plural.3p': 'wierzą'
         });
     },
+
+    testVerbSecondConjugationEC: function () {
+        this.assertEquals(getEntry('słyszeć').getOption('conjugation'), 'second');
+
+        this.checkForms('słyszeć', {
+            'nonpast.singular.1p': 'słyszę',
+            'nonpast.singular.2p': 'słyszysz',
+            'nonpast.singular.3p': 'słyszy',
+            'nonpast.plural.1p': 'słyszymy',
+            'nonpast.plural.2p': 'słyszycie',
+            'nonpast.plural.3p': 'słyszą'
+        });
+    },
+
+    testVerbSecondConjugationIC: function () {
+        this.assertEquals(getEntry('dzwonić').getOption('conjugation'), 'second');
+
+        this.checkForms('dzwonić', {
+            'nonpast.singular.1p': 'dzwonię',
+            'nonpast.singular.2p': 'dzwonisz',
+            'nonpast.singular.3p': 'dzwoni',
+            'nonpast.plural.1p': 'dzwonimy',
+            'nonpast.plural.2p': 'dzwonicie',
+            'nonpast.plural.3p': 'dzwonią'
+        });
+    },
+
+    testVerbThirdConjugation: function () {
+        this.assertEquals(getEntry('mieszkać').getOption('conjugation'), 'third');
+
+        this.checkForms('mieszkać', {
+            'nonpast.singular.1p': 'mieszkam',
+            'nonpast.singular.2p': 'mieszkasz',
+            'nonpast.singular.3p': 'mieszka',
+            'nonpast.plural.1p': 'mieszkamy',
+            'nonpast.plural.2p': 'mieszkacie',
+            'nonpast.plural.3p': 'mieszkają'
+        });
+    },
+
+    testVerbThirdConjugationIrregularStem: function () {
+        this.assertEquals(getEntry('wiedzieć').getOption('conjugation'), 'third');
+
+        this.checkForms('wiedzieć', {
+            'nonpast.singular.1p': 'wiem',
+            'nonpast.singular.2p': 'wiesz',
+            'nonpast.singular.3p': 'wie',
+            'nonpast.plural.1p': 'wiemy',
+            'nonpast.plural.2p': 'wiecie',
+            'nonpast.plural.3p': 'wiedzą'
+        });
+    },
+
+    testVerbOWAC: function () {
+        this.assertEquals(getEntry('dziękować').getOption('conjugation'), 'first');
+
+        this.checkForms('dziękować', {
+            'nonpast.singular.1p': 'dziękuję',
+            'nonpast.singular.2p': 'dziękujesz',
+            'nonpast.singular.3p': 'dziękuje',
+            'nonpast.plural.1p': 'dziękujemy',
+            'nonpast.plural.2p': 'dziękujecie',
+            'nonpast.plural.3p': 'dziękują'
+        });
+    },
+
+    testVerbYWAC: function () {
+        this.assertEquals(getEntry('obiecywać').getOption('conjugation'), 'first');
+
+        this.checkForms('obiecywać', {
+            'nonpast.singular.1p': 'obiecuję',
+            'nonpast.singular.2p': 'obiecujesz',
+            'nonpast.singular.3p': 'obiecuje',
+            'nonpast.plural.1p': 'obiecujemy',
+            'nonpast.plural.2p': 'obiecujecie',
+            'nonpast.plural.3p': 'obiecują'
+        });
+    },
+
+    testVerbIWAC: function () {
+        this.assertEquals(getEntry('oczekiwać').getOption('conjugation'), 'first');
+
+        this.checkForms('oczekiwać', {
+            'nonpast.singular.1p': 'oczekuję',
+            'nonpast.singular.2p': 'oczekujesz',
+            'nonpast.singular.3p': 'oczekuje',
+            'nonpast.plural.1p': 'oczekujemy',
+            'nonpast.plural.2p': 'oczekujecie',
+            'nonpast.plural.3p': 'oczekują'
+        });
+    },
+
+    testVerbAWAC: function () {
+        this.assertEquals(getEntry('dawać').getOption('conjugation'), 'first');
+
+        this.checkForms('dawać', {
+            'nonpast.singular.1p': 'daję',
+            'nonpast.singular.2p': 'dajesz',
+            'nonpast.singular.3p': 'daje',
+            'nonpast.plural.1p': 'dajemy',
+            'nonpast.plural.2p': 'dajecie',
+            'nonpast.plural.3p': 'dają'
+        });
+    },
+
+    testVerbThirdConjugationYWAC: function () {
+        this.assertEquals(getEntry('nazywać').getOption('conjugation'), 'third');
+
+        this.checkForms('nazywać', {
+            'nonpast.singular.1p': 'nazywam',
+            'nonpast.singular.2p': 'nazywasz',
+            'nonpast.singular.3p': 'nazywa',
+            'nonpast.plural.1p': 'nazywamy',
+            'nonpast.plural.2p': 'nazywacie',
+            'nonpast.plural.3p': 'nazywają'
+        });
+    },
+
 });
 
 (new PolishTest()).run();

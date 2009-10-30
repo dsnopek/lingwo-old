@@ -1406,4 +1406,65 @@ entries["wierzyć"] = new Lingwo.dictionary.Entry({
     "pos": "verb"
 });
 
+entries["słyszeć"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "słyszeć",
+    "pos": "verb"
+});
+
+entries["dzwonić"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "dzwonić",
+    "pos": "verb"
+});
+
+entries["mieszkać"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "mieszkać",
+    "pos": "verb"
+});
+
+entries["wiedzieć"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "wiedzieć",
+    "pos": "verb",
+    "forms": {
+        "*stem": "wiej",
+        "nonpast.plural.3p": "wiedzą"
+    }
+});
+
+entries["dziękować"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "dziękować",
+    "pos": "verb"
+});
+
+entries["obiecywać"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "obiecywać",
+    "pos": "verb"
+});
+
+entries["oczekiwać"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "oczekiwać",
+    "pos": "verb"
+});
+
+entries["dawać"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "dawać",
+    "pos": "verb"
+});
+
+entries["nazywać"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "nazywać",
+    "pos": "verb",
+    "options": {
+        "conjugation": "third"
+    }
+});
+
 
