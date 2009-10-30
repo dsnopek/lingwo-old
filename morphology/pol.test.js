@@ -267,6 +267,63 @@ PolishTest = TestCase.subclass({
             'drogi': 'drogie',
             'głupi': 'głupie'
         });
+    },
+
+    testNounMasculinePluralVirile: function () {
+        this.checkFormMulti('nominative.plural', {
+            // -y group (hard which remains hard)
+            'Polak': 'Polacy',
+            'Chińczyk': 'Chińczycy',
+            'Anglik': 'Anglicy',
+            'kaleka': 'kalecy',
+            'Norweg': 'Norwedzy',
+            'kolega': 'koledzy',
+            'inżynier': 'inżynierzy',
+            'kelner': 'kelnerzy',
+            'doktor': 'doktorzy',
+            'kierowca': 'kierowcy',
+            'chłopiec': 'chłopcy',
+            'sprzedawca': 'sprzedawcy',
+            'Niemiec': 'Niemcy',
+            'mieszkaniec': 'mieszkańcy',
+
+            // -e gorup (soft and psuedo soft)
+            'lekarz': 'lekarze',
+            'złodziej': 'złodzieje',
+            'towarzysz': 'towarzysze',
+            'słuchacz': 'słuchacze',
+            'nauczyciel': 'nauczyciele',
+            'góral': 'górale',
+
+            // -i group (from hard to soft)
+            'Francuz': 'Francuzi',
+            'mężczyzna': 'mężczyźni',
+            'chłop': 'chłopi',
+            'student': 'studenci',
+            'architekt': 'architekci',
+            'poeta': 'poeci',
+            'dentysta': 'dentyści',
+            'specjalista': 'specjaliści',
+            'turysta': 'turyści',
+            'Czech': 'Czesi',
+            'Włoch': 'Włosi',
+            'sąsiad': 'sąsiedzi',
+            'Szwed': 'Szwedzi',
+            'diabeł': 'diabli',
+
+            // -owie (we are treating these as exceptions)
+            'syn': 'synowie',
+            'mąż': 'mężowie',
+            'Belg': 'Belgowie',
+            'professor': 'professorowie',
+            'uczeń': 'uczniowie',
+            'więzień': 'więźniowie',
+
+            // exceptions, pure.
+            'brat': 'bracia',
+            'Amerykanin': 'Amerykanie',
+            'Rosjanin': 'Rosjanie'
+        });
     }
 });
 

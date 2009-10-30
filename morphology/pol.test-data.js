@@ -948,4 +948,345 @@ entries["młody"] = new Lingwo.dictionary.Entry({
     "pos": "adjective"
 });
 
+entries["Polak"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Polak",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["Chińczyk"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Chińczyk",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["Anglik"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Anglik",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["kaleka"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "kaleka",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "options": {
+        "gender": "masculine"
+    },
+    "forms": {
+        "genitive.plural": "kalek"
+    }
+});
+
+entries["Norweg"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Norweg",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["inżynier"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "inżynier",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["kelner"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "kelner",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["doktor"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "doktor",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["kierowca"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "kierowca",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "options": {
+        "gender": "masculine"
+    }
+});
+
+entries["sprzedawca"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "sprzedawca",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "options": {
+        "gender": "masculine"
+    }
+});
+
+entries["Niemiec"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Niemiec",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "*stem": "Niemc"
+    }
+});
+
+entries["mieszkaniec"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "mieszkaniec",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "*stem": "mieszkańc"
+    }
+});
+
+entries["lekarz"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "lekarz",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["złodziej"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "złodziej",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["towarzysz"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "towarzysz",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["słuchacz"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "słuchacz",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["nauczyciel"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "nauczyciel",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["góral"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "góral",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["Francuz"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Francuz",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["chłop"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "chłop",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["architekt"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "architekt",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["poeta"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "poeta",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "options": {
+        "gender": "masculine"
+    }
+});
+
+entries["specjalista"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "specjalista",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "options": {
+        "gender": "masculine"
+    }
+});
+
+entries["turysta"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "turysta",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "options": {
+        "gender": "masculine"
+    }
+});
+
+entries["Czech"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Czech",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["Szwed"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Szwed",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["student"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "student",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["Włoch"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Włoch",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["sąsiad"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "sąsiad",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "nominative.plural": "sąsiedzi"
+    }
+});
+
+entries["diabeł"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "diabeł",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "*stem": 'diabł'
+    }
+});
+
+entries["syn"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "syn",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "nominative.plural": "synowie"
+    }
+});
+
+entries["mąż"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "mąż",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "genitive.plural": "mężów",
+        "*stem": "męż",
+        "nominative.plural": "mężowie"
+    }
+});
+
+entries["Belg"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Belg",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "nominative.plural": "Belgowie"
+    }
+});
+
+entries["professor"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "professor",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "nominative.plural": "professorowie"
+    }
+});
+
+entries["uczeń"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "uczeń",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "*stem": "uczń",
+        "nominative.plural": "uczniowie"
+    }
+});
+
+entries["więzień"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "więzień",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "*stem": "więźń",
+        "nominative.plural": "więźniowie"
+    }
+});
+
+entries["brat"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "brat",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "genitive.plural": "braci",
+        "dative.singular": "bratu",
+        "instrumental.plural": "braćmi",
+        "nominative.plural": "bracia"
+    }
+});
+
+entries["Amerykanin"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Amerykanin",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "*stem": "Amerykan",
+        "nominative.plural": "Amerykanie"
+    }
+});
+
+entries["Rosjanin"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "Rosjanin",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "nominative.plural": "Rosjanie"
+    }
+});
+
 

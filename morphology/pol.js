@@ -59,6 +59,15 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
                word.ending('st').replace('ści') ||
                word.ending('t').replace('ci') ||
                word.ending('sn').replace('śni') ||
+               word.ending('zn').replace('źni') ||
+               word.ending('sm').replace('śmi') ||
+               word.ending('ch').replace('sz') ||
+               word.ending('zd').replace('ździ') ||
+               word.ending('d').replace('dzi') ||
+               word.ending('sł').replace('śli') ||
+               word.ending('zł').replace('źli') ||
+               word.ending('ł').replace('li') ||
+               word.ending('b','f','p','s','w','z','m','n').append('i') ||
                word;
     };
 
@@ -116,7 +125,20 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
             var word = entry.getForm(), ending;
             if (entry.getOption('gender') == 'masculine' && entry.isClass('virile')) {
                 // masculine virile, yo!
-                throw('unimplemented');
+                var stem = entry.getForm('*stem.plural');
+
+                if (ending = stem.endingOrFalse('rz','sz','cz','l','j')) {
+                    // softs and psuedo softs that take -e
+                    return ending.append('e');
+                }
+                else if (ending = stem.endingOrFalse('ch')) {
+                    return ending.replace('si');
+                }
+                else {
+                    stem = stemChange(stem);
+                    // apply the hard ending of necessary
+                    return stem.ending('c','dz','rz').append('y') || stem;
+                }
             }
             else if (entry.getOption('gender') == 'feminine' && word.hasEnding('cz', 'sz')) {
                 // this is a sort of funny case, thats different than you would expect
