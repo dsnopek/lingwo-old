@@ -942,4 +942,10 @@ entries["dziewczę"] = new Lingwo.dictionary.Entry({
     "classes": ["animate"]
 });
 
+entries["młody"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "młody",
+    "pos": "adjective"
+});
+
 

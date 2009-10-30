@@ -256,6 +256,17 @@ PolishTest = TestCase.subclass({
             'dziewczę': 'dziewczęta',
             'niemowlę': 'niemowlęta'
         });
+    },
+
+    testAdjectiveNominativePluralNonVirile: function () {
+        this.checkFormMulti('nominative.plural.non_virile', {
+            'mały': 'małe',
+            'młody': 'młode',
+            'duży': 'duże',
+            'niski': 'niskie',
+            'drogi': 'drogie',
+            'głupi': 'głupie'
+        });
     }
 });
 

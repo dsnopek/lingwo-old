@@ -174,6 +174,10 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
             return stem.append(
                 (stem.hasEnding('k', 'g') || entry.isClass('soft')) ? 'ie': 'e'
             );
+        },
+
+        'nominative.plural.non_virile': function (entry) {
+            return entry.getForm('nominative.singular.neuter');
         }
     };
 });
