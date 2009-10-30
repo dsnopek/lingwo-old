@@ -186,6 +186,13 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
             return word;
         },
 
+        'accusative.plural': function (entry) {
+            if (entry.isClass('virile')) {
+                return entry.getForm('genitive.plural');
+            }
+            return entry.getForm('nominative.plural');
+        },
+
         /*
          * Genetive
          */
@@ -215,6 +222,35 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
             }
             else if (gender == 'neuter') {
                 return stem.append('a');
+            }
+        },
+
+        'genitive.plural': function (entry) {
+            var word = entry.getForm(), stem = entry.getForm('*stem.plural'), ending;
+            var gender = entry.getOption('gender');
+
+            if (gender == 'masculine') {
+                if (ending = stem.endingOrFalse('ń')) {
+                    if (entry.isClass('virile')) {
+                        return ending.replace('niów');
+                    }
+                    return ending.replace('ni');
+                }
+                else if (stem.hasEnding('l')) {
+                    return stem.append('i');
+                }
+                else if (ending = stem.endingOrFalse('j')) {
+                    return ending.replace('i');
+                }
+                else if (stem.hasEnding(utils.cls('soft'))) {
+                    return append_i(stem);
+                }
+
+                return stem.ending('cz','rz','sz','dz','ż').append('y') ||
+                       stem.append('ów');
+            }
+            else {
+                throw ('unimplemented genitive.plural');
             }
         }
     };

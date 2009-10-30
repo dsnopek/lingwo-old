@@ -542,6 +542,31 @@ PolishTest = TestCase.subclass({
         });
     },
 
+    testNounMasculineAccusativePluralVirile: function () {
+        this.checkFormMulti('accusative.plural', {
+            'syn': 'synów',
+            'ojciec': 'ojców',
+            'Polak': 'Polaków',
+            'chłopiec': 'chłopców',
+            'Amerykanin': 'Amerykanów',
+            'kolega': 'kolegów',
+            'dentysta': 'dentystów',
+            'mąż': 'mężów',
+            'brat': 'braci',
+            //'ksiądz': 'księźy',
+            'kaleka': 'kalek',
+            'mężczyzna': 'mężczyzn',
+            'uczeń': 'uczniów',
+            'więzień': 'więźniów',
+            'gość': 'gości',
+            'nauczyciel': 'nauczycieli',
+            'złodziej': 'złodziei',
+            'lekarz': 'lekarzy',
+            'słuchacz': 'słuchaczy',
+            'listonosz': 'listonoszy',
+            'żołnierz': 'żołnierzy'
+        });
+    }
 });
 
 (new PolishTest()).run();

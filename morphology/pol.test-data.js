@@ -1547,4 +1547,18 @@ entries["ojciec"] = new Lingwo.dictionary.Entry({
     }
 });
 
+entries["listonosz"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "listonosz",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
+entries["żołnierz"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "żołnierz",
+    "pos": "noun",
+    "classes": ["animate", "virile"]
+});
+
 
