@@ -83,6 +83,16 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
                word.append('i');
     };
 
+    var append_y = function (word) {
+        return word.ending('k','g').append('i') ||
+               word.append('y');
+    };
+
+    var append_e = function (word) {
+        return word.ending('k','g').append('ie') ||
+               word.append('e');
+    };
+
     /*
      * Nouns
      */
@@ -162,10 +172,9 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
                 if (stem.hasEnding(utils.cls('soft')))
                     return append_i(stem).append('e');
 
-                return stem.ending('k', 'g').append('i') ||
-                       // l and j, i, and all the hard husher-like things
-                       stem.ending('j', 'l', 'i', 'c', 'cz', 'rz', 'sz', 'dz', 'ż', 'dż').append('e') ||
-                       stem.append('y');
+                // l and j, i, and all the hard husher-like things
+                return stem.ending('j', 'l', 'i', 'c', 'cz', 'rz', 'sz', 'dz', 'ż', 'dż').append('e') ||
+                       append_y(stem);
             }
         },
 
@@ -215,9 +224,9 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
                            stem;
                 }
 
-                return stem.ending('l','w','k','g').append('i') ||
+                return stem.ending('l','w').append('i') ||
                        stem.ending(utils.cls('soft')).result(append_i(stem)) ||
-                       stem.append('y');
+                       append_y(stem);
             }
             else if (gender == 'masculine') {
                 if (entry.isClass('animate')) {
@@ -263,7 +272,7 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
             else if (word.hasEnding('um')) {
                 return stem.append('ów');
             }
-            else if (stem.hasEnding('c','cz','sz','rz','ż','nia','ja','j')) {
+            else if (word.hasEnding('c','cz','sz','rz','ż','nia','ja','j')) {
                 return entry.getForm('genitive.singular');
             }
             else {
@@ -282,10 +291,16 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
                 }
 
                 // Now!  We attempt to make the consonant clusters pronouncable
-                if ((stem.hasEnding(utils.cls('consonant'), utils.cls('consonant'), utils.cls('consonant')) && !stem.hasEnding('r')) ||
-                    (stem.hasEnding(utils.cls('consonant'), utils.cls('consonant')) && !stem.hasEnding('r','c','sk','zd','rc','st')))
+                if ((stem.hasEnding([utils.cls('consonant'), utils.cls('consonant'), utils.cls('consonant')]) && !stem.hasEnding('r')) ||
+                    (stem.hasEnding([utils.cls('consonant'), utils.cls('consonant')]) && !stem.hasEnding('r','ć','sk','zd','rc','st')))
                 {
-                    // TODO: we need a way to insert stuff
+                    // take the final consonant off and save it in a word
+                    ending = stem.ending(utils.cls('consonant'));
+                    endWord = ending.toWord();
+                    stem = ending.drop();
+
+                    // put the final consonant back on
+                    stem = append_e(stem).concat(endWord);
                 }
 
                 return stem;
@@ -306,7 +321,8 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
 
     lang.morphology.forms.adjective = {
         '*stem': function (entry) {
-            return entry.getForm().ending(1).drop();
+            var word = entry.getForm();
+            return entry.isClass('soft') ? word : word.ending(1).drop();
         },
 
         /*
@@ -318,16 +334,11 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
         },
 
         'nominative.singular.feminine': function (entry) {
-            return entry.getForm('*stem').append(
-                entry.isClass('soft') ? 'ia' : 'a'
-            );
+            return entry.getForm('*stem').append('a');
         },
 
         'nominative.singular.neuter': function (entry) {
-            var stem = entry.getForm('*stem');
-            return stem.append(
-                (stem.hasEnding('k', 'g') || entry.isClass('soft')) ? 'ie': 'e'
-            );
+            return append_e(entry.getForm('*stem'));
         },
 
         'nominative.plural.non_virile': function (entry) {
@@ -336,6 +347,9 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
 
         'nominative.plural.virile': function (entry) {
             var stem = entry.getForm('*stem'), ending;
+
+            if (entry.isClass('soft'))
+                return stem;
             
             if (ending = stem.endingOrFalse('ż')) {
                 // TODO: shouldn't nouns do this transformation too?
@@ -367,10 +381,7 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
          */
 
         'accusative.singular.feminine': function (entry) {
-            var stem = entry.getForm('*stem');
-            if (entry.isClass('soft'))
-                stem = stem.append('i');
-            return stem.append('ą');
+            return entry.getForm('*stem').append('ą');
         },
 
         'accusative.singular.neuter': function (entry) {
@@ -392,6 +403,27 @@ Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
         'accusative.plural.non_virile': function (entry) {
             return entry.getForm('nominative.plural.non_virile');
         },
+
+        /*
+         * Genitive
+         */
+
+        'genitive.singular.feminine': function (entry) {
+            return append_e(entry.getForm('*stem')).append('j');
+        },
+
+        'genitive.singular.masculine': function (entry) {
+            return append_e(entry.getForm('*stem')).append('go');
+        },
+
+        'genitive.singular.masculine': function (entry) {
+            return entry.getForm('genitive.singular.masculine');
+        },
+
+        'genitive.plural': function (entry) {
+            var stem = entry.getForm('*stem');
+            return entry.isClass('soft') ? stem.append('ch') : append_y(stem).append('ch');
+        }
     };
 
     /*

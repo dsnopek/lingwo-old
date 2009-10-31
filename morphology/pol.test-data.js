@@ -1870,4 +1870,106 @@ entries["głowa"] = new Lingwo.dictionary.Entry({
     }
 });
 
+entries["drzewo"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "drzewo",
+    "pos": "noun"
+});
+
+entries["mieszkanie"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "mieszkanie",
+    "pos": "noun"
+});
+
+entries["pióro"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "pióro",
+    "pos": "noun"
+});
+
+entries["lato"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "lato",
+    "pos": "noun"
+});
+
+entries["serce"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "serce",
+    "pos": "noun"
+});
+
+entries["jezioro"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "jezioro",
+    "pos": "noun"
+});
+
+entries["miasto"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "miasto",
+    "pos": "noun",
+    "forms": {
+        "locative.singular": "mieście"
+    }
+});
+
+entries["słowo"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "słowo",
+    "pos": "noun",
+    "forms": {
+        "genitive.plural": "słów"
+    }
+});
+
+entries["święto"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "święto",
+    "pos": "noun",
+    "forms": {
+        "genitive.plural": "świąt"
+    }
+});
+
+entries["piętro"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "piętro",
+    "pos": "noun",
+    "forms": {
+        "genitive.plural": "pięter"
+    }
+});
+
+entries["śniadanie"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "śniadanie",
+    "pos": "noun"
+});
+
+entries["książę"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "książę",
+    "pos": "noun"
+});
+
+entries["narzędzie"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "narzędzie",
+    "pos": "noun",
+    "forms": {
+        "genitive.plural": "narzędzi"
+    }
+});
+
+entries["wybrzeże"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pol"],
+    "name": "wybrzeże",
+    "pos": "noun",
+    "forms": {
+        "genitive.plural": "wybrzeży"
+    }
+});
+
 

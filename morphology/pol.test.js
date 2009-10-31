@@ -86,11 +86,11 @@ PolishTest = TestCase.subclass({
             'długi': 'dług',
             'drogi': 'drog',
             'drugi': 'drug',
-            'głupi': 'głup',
-            'tani': 'tan',
-            'trzeci': 'trzec',
-            'ostatni': 'ostatn',
-            'średni': 'średn'
+            'głupi': 'głupi',
+            'tani': 'tani',
+            'trzeci': 'trzeci',
+            'ostatni': 'ostatni',
+            'średni': 'średni'
         });
     },
 
@@ -723,7 +723,7 @@ PolishTest = TestCase.subclass({
             'droga': 'dróg',
             'głowa': 'głów',
             'szkoła': 'szkół',
-            'siostra': 'siostr',
+            'siostra': 'sióstr',
             'ręka': 'rąk',
 
             'córka': 'córek',
@@ -731,7 +731,6 @@ PolishTest = TestCase.subclass({
             'łza': 'łez',
             'gospodyni': 'gospodyń',
             'ziemia': 'ziem',
-            // TODO: are these right?
             'ciocia': 'cioć',
             'babcia': 'babć',
             
@@ -742,6 +741,70 @@ PolishTest = TestCase.subclass({
             'podróż': 'podróży',
             'kuchnia': 'kuchni',
             'poezja': 'poezji'
+        });
+    },
+
+    testNounNeuterGenitivePlural: function () {
+        this.checkFormMulti('genitive.plural', {
+            'drzewo': 'drzew',
+            'pióro': 'piór',
+            'jezioro': 'jezior',
+            'miasto': 'miast',
+            'serce': 'serc',
+            'lato': 'lat',
+
+            'morze': 'mórz',
+            'słowo': 'słów',
+            'święto': 'świąt',
+            'okno': 'okien',
+            'jabłko': 'jabłek',
+            'piętro': 'pięter',
+            'krzesło': 'krzeseł',
+            'dziecko': 'dzieci',
+
+            'zdjęcie': 'zdjęć',
+            'mieszkanie': 'mieszkań',
+            'śniadanie': 'śniadań',
+            
+            'imię': 'imion',
+            'ramię': 'ramion',
+
+            'jagnię': 'jagniąt',
+            'źrebię': 'źrebiąt',
+            'prosię': 'prosiąt',
+            'dziewczę': 'dziewcząt',
+            'zwierzę': 'zwierząt',
+            'książę': 'książąt',
+
+            'narzędzie': 'narzędzi',
+            'wybrzeże': 'wybrzeży',
+
+            'muzeum': 'muzeów',
+            'gimnazjum': 'gimnazjów'
+        });
+    },
+
+    testAdjectiveGenitiveSingularFeminine: function () {
+        this.checkFormMulti('genitive.singular.feminine', {
+            'dobry': 'dobrej',
+            'polski': 'polskiej',
+            'ostatni': 'ostatniej'
+        });
+    },
+
+    testAdjectiveGenitiveSingularMasculine: function () {
+        this.checkFormMulti('genitive.singular.masculine', {
+            'dobry': 'dobrego',
+            'polski': 'polskiego',
+            'ostatni': 'ostatniego'
+        });
+    },
+
+    testAdjectiveGenitiveSingularMasculine: function () {
+        this.checkFormMulti('genitive.plural', {
+            'dobry': 'dobrych',
+            'polski': 'polskich',
+            'ostatni': 'ostatnich'
         });
     }
 });

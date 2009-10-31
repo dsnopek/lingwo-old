@@ -57,6 +57,7 @@ Lingwo.dictionary = {};
 
     var SubWord = function (word, start, len) {
         this.word = word;
+        this.wordcls = word.lang.Word;
         this.start = (typeof start == 'undefined') ? -1 : start;
         this.len = len || 0;
     };
@@ -95,6 +96,9 @@ Lingwo.dictionary = {};
         'bool': function () {
             return this.start != -1;
         },
+        'toWord': function () {
+            return new this.wordcls(this.word.letters.slice(this.start, this.start+this.len));
+        }
     });
 
     var makeWordClass = makeClassMaker(
@@ -111,6 +115,10 @@ Lingwo.dictionary = {};
                 var rWord = this.lang.parseWord(text);
                 arrayReplace(newWord.letters, newWord.letters.length, 0, rWord.letters);
                 return newWord;
+            },
+
+            'concat': function (word) {
+                return new this.lang.Word(this.letters.concat(word.letters));
             },
 
             'toString': function () {
