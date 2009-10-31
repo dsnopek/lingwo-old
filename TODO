@@ -1,13 +1,22 @@
 
-== 2009-09-29 ==
+== 2009-10-31 ==
+
+ * Add a tab called "Dictionary Fields" to the "Edit Language" page (admin/sttings/language/edit/%)
+   which will allow us to configure the per-language and per-pos fields that will be provided by
+   the 'lingwo_dictionary_fields' CCK field.  For example, we will say that only 'nouns' get a
+   'gender' option.  We should also include some field for JavaScript (eventually a generic syntax
+   for users with disabled JavaScript) to exclude fields based on code (ie. we need to say only 
+   show the 'virile' class when: "entry.getOption('gender') == 'masculine'".  This data will be
+   saved to a custom table created by our module.
+ 
+ * Add a 'lingwo_dictionary_fields' CCK type, which shows the appropriate fields on the entry
+   edit form.  It should also load the selected languages morphology and recalculate the
+   values as things are changed.
+
+== 2009-10-29 ==
 
  * Port the unit tests in test_polish.js from the first JavaScript implementation of Lingwo.  This
    should cover ALL of the Polish morphology our engine is capable of dealing with.
-
- * Implement classes in an Entry.  This is a tough decision, because we really could use boolean
-   options instead of classes, with the exception that every such option would need to have a 
-   default (via a morphology function) of false.  Since that's alot of overhead for a simple
-   "is this animate?" check, I think classes are a good idea.
 
 == 2009-07-06 ==
 
