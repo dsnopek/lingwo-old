@@ -21,6 +21,24 @@ function lingwo_dictionary_menu() {
     'type' => MENU_NORMAL_ITEM
   );
 
+  // Put a 'Dictionary Fields' tab onto the 'Edit Language' page.
+  $items['admin/settings/language/edit/%/basic_information'] = array(
+    'title' => 'Basic Information',
+    'type'  => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10
+  );
+  $items['admin/settings/language/edit/%/dictionary_fields'] = array(
+    'title' => 'Dictionary Fields',
+    'description' => t('Set the per-language fields that can appear in a "Lingwo Dictionary Fields" control'),
+    'access arguments' => array('administer site configuration'),
+    'page arguments' => array(4),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lingwo_dictionary_language_fields'),
+    'file' => 'lingwo_dictionary.admin.inc',
+    'type' => MENU_LOCAL_TASK
+  );
+
+
   $items['lingwo_dictionary_senses/ahah/%'] = array(
     'title' => 'Lingwo Dictionary AHAH',
     'page callback' => 'lingwo_dictionary_senses_ahah',
@@ -119,6 +137,10 @@ function lingwo_dictionary_theme() {
     ),
     'lingwo_dictionary_senses_translation' => array(
       'arguments' => array('items' => NULL),
+    ),
+    // For our per-language stuff
+    'lingwo_dictionary_tabs' => array(
+      'arguments' => array('form' => NULL),
     ),
   );
 }

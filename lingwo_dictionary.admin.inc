@@ -78,4 +78,64 @@ function lingwo_dictionary_admin_settings() {
   return $form;
 }
 
+/**
+ * Per-Language fields
+ **/
+function lingwo_dictionary_language_fields() {
+  $form = array(
+    // TODO: uncomment to convert the fieldsets below into jQuery UI tabs!
+    //'#theme' => 'lingwo_dictionary_tabs'
+  );
+
+  $pos_terms = taxonomy_get_tree(lingwo_dictionary_pos_vocabulary());
+  foreach ($pos_terms as $term) {
+    $form['pos-'. $term->name] = array(
+      // TODO: Should be the translated name!
+      '#title' => $term->name,
+      '#type' => 'fieldset',
+    );
+
+
+  }
+
+  return $form;
+}
+
+function theme_lingwo_dictionary_tabs($form) {
+  $elements = element_children($form);
+
+  $output .= '<div id="lingwo-dictionary-tabs">';
+
+  // produce the links
+  $output .= '<ul>';
+  foreach ($elements as $key) {
+    $el = $form[$key];
+    if (substr($key, 0, 4) == 'pos-') {
+      $output .= '<li><a href="#lingwo-dictionary-tabs-'. $key .'">'. $el['#title'] .'</li>';
+    }
+  }
+  $output .= '</ul>';
+
+  // produce the tabs
+  foreach ($elements as $key) {
+    $el = $form[$key];
+    if (substr($key, 0, 4) == 'pos-') {
+      $output .= '<div id="lingwo-dictionary-tabs-'. $key .'">';
+      $output .= drupal_render($el);
+      $output .= '</div>';
+    }
+    else {
+      $output .= drupal_render($el);
+    }
+  }
+
+  $output .= '</div>';
+
+  jquery_ui_add(array('ui.tabs'));
+  drupal_add_js("$(document).ready(function() { $('#lingwo-dictionary-tabs > ul').tabs() });", "inline");
+  // TODO: we probably should incorporate this into our theme, rather than use the default one
+  drupal_add_css(drupal_get_path('module', 'jquery_ui').'/jquery.ui/themes/default/ui.all.css');
+
+  return $output;
+}
 
