@@ -81,24 +81,79 @@ function lingwo_dictionary_admin_settings() {
 /**
  * Per-Language fields
  **/
-function lingwo_dictionary_language_fields() {
+function lingwo_dictionary_language_fields($form, $lang) {
   $form = array(
     // TODO: uncomment to convert the fieldsets below into jQuery UI tabs!
-    //'#theme' => 'lingwo_dictionary_tabs'
+    //'#theme' => 'lingwo_dictionary_tabs',
   );
+
+  $form['lang'] = array(
+    '#type' => 'hidden',
+    '#value' => $lang
+  );
+
+  $settings = lingwo_dictionary_language_settings($lang);
+  //print_r($settings);
 
   $pos_terms = taxonomy_get_tree(lingwo_dictionary_pos_vocabulary());
   foreach ($pos_terms as $term) {
-    $form['pos-'. $term->name] = array(
+    $pos_form = array(
       // TODO: Should be the translated name!
       '#title' => $term->name,
       '#type' => 'fieldset',
     );
 
+    $index = 0;
+    //print_r($settings);
+    if (!empty($settings[$term->tid]['options'])) {
+      foreach ($settings[$term->tid]['options'] as $option) {
+        $row = array();
+        $row['value'] = array(
+          '#type' => 'item',
+          '#title' => 'Option Name',
+          '#value' => $option
+        );
+        $row['remove_sense'] = array(
+          '#type' => 'submit',
+          '#value' => t('Remove Option #!num', array('!num' => $index + 1)),
+          '#submit' => array('lingwo_dictionary_language_fields_remove_submit'),
+        );
 
+        $pos_form['options'][$index++] = $row;
+      }
+    }
+
+    $pos_form['options']['add']['value'] = array(
+      '#type' => 'textfield',
+      '#title' => 'Option Name',
+    );
+    $pos_form['options']['add']['add_option'] = array(
+      '#type' => 'submit',
+      '#value' => 'Add Option',
+      '#submit' => array('lingwo_dictionary_language_fields_add_submit'),
+    );
+
+    $form['pos-'. $term->tid] = $pos_form;
   }
 
-  return $form;
+  return array('#tree' => TRUE, 'settings' => $form);
+}
+
+function lingwo_dictionary_language_fields_add_submit($form, &$form_state) {
+  $lang = $form_state['values']['settings']['lang'];
+  $settings = lingwo_dictionary_language_settings($lang);
+
+  $pos_terms = taxonomy_get_tree(lingwo_dictionary_pos_vocabulary());
+  if ($form_state['values']['op'] == 'Add Option') {
+    foreach ($pos_terms as $term) {
+      $value = $form_state['values']['settings']['pos-'. $term->tid]['options']['add']['value'];
+      if (!empty($value)) {
+        $settings[$term->tid]['options'][] = $value;
+      }
+    }
+  }
+
+  lingwo_dictionary_language_settings($lang, $settings);
 }
 
 function theme_lingwo_dictionary_tabs($form) {

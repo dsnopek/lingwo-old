@@ -31,9 +31,8 @@ function lingwo_dictionary_menu() {
     'title' => 'Dictionary Fields',
     'description' => t('Set the per-language fields that can appear in a "Lingwo Dictionary Fields" control'),
     'access arguments' => array('administer site configuration'),
-    'page arguments' => array(4),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('lingwo_dictionary_language_fields'),
+    'page arguments' => array('lingwo_dictionary_language_fields', 4),
     'file' => 'lingwo_dictionary.admin.inc',
     'type' => MENU_LOCAL_TASK
   );
@@ -256,6 +255,16 @@ function lingwo_dictionary_pos_vocabulary($value = NULL) {
     return variable_get('lingwo_dictionary_pos_vocabulary', NULL);
   }
   variable_set('lingwo_dictionary_pos_vocabulary', $value);
+}
+
+/**
+ * Per-language settings array
+ */
+function lingwo_dictionary_language_settings($lang, $value = NULL) {
+  if (is_null($value)) {
+    return variable_get('lingwo_dictionary_'. $lang .'_settings', array());
+  }
+  variable_set('lingwo_dictionary_'. $lang .'_settings', $value);
 }
 
 
