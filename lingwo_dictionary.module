@@ -32,7 +32,7 @@ function lingwo_dictionary_menu() {
     'description' => t('Set the per-language fields that can appear in a "Lingwo Dictionary Fields" control'),
     'access arguments' => array('administer site configuration'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('lingwo_dictionary_language_fields', 4),
+    'page arguments' => array('lingwo_dictionary_language_fields_form', 4),
     'file' => 'lingwo_dictionary.admin.inc',
     'type' => MENU_LOCAL_TASK
   );
@@ -139,6 +139,9 @@ function lingwo_dictionary_theme() {
     ),
     // For our per-language stuff
     'lingwo_dictionary_tabs' => array(
+      'arguments' => array('form' => NULL),
+    ),
+    'lingwo_dictionary_language_fields_subform' => array(
       'arguments' => array('form' => NULL),
     ),
   );
@@ -260,11 +263,45 @@ function lingwo_dictionary_pos_vocabulary($value = NULL) {
 /**
  * Per-language settings array
  */
+// TODO: We're hard-coding this form now.
+$LANG_SETTINGS = array(
+  'pl' => array(
+    'adjective' => array(
+      'classes' => array(
+        array('name' => 'soft'),
+      ),
+      'forms' => array(
+        array('name' => '*stem'),
+        array('name' => 'nominative.singular.masculine'),
+        array('name' => 'nominative.singular.feminine'),
+        array('name' => 'nominative.singular.neuter'),
+        array('name' => 'nominative.plural.non_virile'),
+        array('name' => 'nominative.plural.virile'),
+        array('name' => 'accusative.singular.feminine'),
+        array('name' => 'accusative.singular.neuter'),
+        array('name' => 'accusative.singular.masculine.animate'),
+        array('name' => 'accusative.singular.masculine.inanimate'),
+        array('name' => 'accusative.plural.virile'),
+        array('name' => 'accusative.plural.non_virile'),
+        array('name' => 'genitive.singular.feminine'),
+        array('name' => 'genitive.singular.masculine'),
+        array('name' => 'genitive.plural'),
+      )
+    )
+  )
+);
 function lingwo_dictionary_language_settings($lang, $value = NULL) {
+  /*
   if (is_null($value)) {
     return variable_get('lingwo_dictionary_'. $lang .'_settings', array());
   }
   variable_set('lingwo_dictionary_'. $lang .'_settings', $value);
+  */
+
+  // TODO: really get the value!
+  if (is_null($value)) {
+    return $LANG_SETTINGS[$lang];
+  }
 }
 
 

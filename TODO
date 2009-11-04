@@ -1,4 +1,42 @@
 
+== 2009-11-04 ==
+
+ * New idea for the "language definitions".  Right now I've been hacking on putting
+   "Dictionary Fields" under the "Edit Language" page and saving the data as a dumped Array.
+   But it would be better to store a language definition as a special node and then have
+   something on the "Edit Language" page that selects this language definition as the 
+   canonical one.
+
+   The advantages of this are that anyone could create a 'language definition' node, edit
+   it and test it, then it can be swapped as the canonical language node.  It would also
+   allow for integrated testing, speed, all good things.
+
+   So, I'm thinking we store a PHP Array or JSON Object as the body of the 'language definition'
+   node.  Then we include a special JavaScript'd out editor, which will provide a two paned view
+   (like in an IDE) with a tree of things to edit on the left and an editting area on the right.
+   [For degradability, this could be done as a <ul> on the left and a series of <div>'s with
+   <textareas> on the right, which is magically converted to the JavaScript'd out controls]
+
+   Things that can be edited, would include the list of classes/options/forms for each
+   POS (as taken from the POS taxonomy).  Each of these would contain (possibly) some 
+   UI information (order, description, where they should go) and the possibility of a
+   JavaScript function to be put in the morphology definition.  JavaScript fields would
+   get some slick JS-enabled editor.
+
+   The code for generating the alphabet would also be there, along with a way to view the
+   resulting alphabet and see if it matches what you want.
+
+   All these little bits would be combined to create the morphology definition, which would
+   definitely be cached on disk when its selected as the canonical definition.
+
+   There would be a section that contains test cases.  Test cases can be imported from the
+   existing dictionary and modified or simply created here (they'd be new Entry({ ... })
+   bits stashed in some array and a list of expected outcomes).
+
+ * Create a 'Language' CCK field, which allows you to select a language from either
+   (1) any Drupal language code, or (2) any activated language.  This would allow people to
+   mark things as belonging to a language without changing its translation status in Drupal.
+
 == 2009-10-31 ==
 
  * Add a tab called "Dictionary Fields" to the "Edit Language" page (admin/sttings/language/edit/%)
