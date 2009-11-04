@@ -1,6 +1,25 @@
 
 == 2009-11-04 ==
 
+ * Start building the 'lingwo_dictionary_fields' control to show the required fields
+   on a dictionary entry.
+
+ * Begin implementing the below described idea by first keeping the type of data that
+   would be stored a language definition (besides the morphology) hard-coded and let
+   it be retreived using lingwo_dictionary_language_settings($lang).  Later this function
+   will be converted to a much more sophisticated look-up.
+
+   Phase two will be eventually creating the content-type and just putting raw JavaScript
+   into it.
+
+   Phase three will be implementing the JavaScript IDE with only support for messing with
+   which fields are available and their UI properties.
+
+   Phase four will be packing the morphology definitions into the IDE and the testing stuff
+   (since I won't be able to develop new morphology definitions if I can't do testing).
+
+   Then these can be completely exposed for others to mess with.
+
  * New idea for the "language definitions".  Right now I've been hacking on putting
    "Dictionary Fields" under the "Edit Language" page and saving the data as a dumped Array.
    But it would be better to store a language definition as a special node and then have

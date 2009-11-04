@@ -266,26 +266,28 @@ function lingwo_dictionary_pos_vocabulary($value = NULL) {
 // TODO: We're hard-coding this form now.
 $LANG_SETTINGS = array(
   'pl' => array(
-    'adjective' => array(
-      'classes' => array(
-        array('name' => 'soft'),
-      ),
-      'forms' => array(
-        array('name' => '*stem'),
-        array('name' => 'nominative.singular.masculine'),
-        array('name' => 'nominative.singular.feminine'),
-        array('name' => 'nominative.singular.neuter'),
-        array('name' => 'nominative.plural.non_virile'),
-        array('name' => 'nominative.plural.virile'),
-        array('name' => 'accusative.singular.feminine'),
-        array('name' => 'accusative.singular.neuter'),
-        array('name' => 'accusative.singular.masculine.animate'),
-        array('name' => 'accusative.singular.masculine.inanimate'),
-        array('name' => 'accusative.plural.virile'),
-        array('name' => 'accusative.plural.non_virile'),
-        array('name' => 'genitive.singular.feminine'),
-        array('name' => 'genitive.singular.masculine'),
-        array('name' => 'genitive.plural'),
+    'fields' => array(
+      'adjective' => array(
+        'classes' => array(
+          array('name' => 'soft'),
+        ),
+        'forms' => array(
+          array('name' => '*stem'),
+          array('name' => 'nominative.singular.masculine'),
+          array('name' => 'nominative.singular.feminine'),
+          array('name' => 'nominative.singular.neuter'),
+          array('name' => 'nominative.plural.non_virile'),
+          array('name' => 'nominative.plural.virile'),
+          array('name' => 'accusative.singular.feminine'),
+          array('name' => 'accusative.singular.neuter'),
+          array('name' => 'accusative.singular.masculine.animate'),
+          array('name' => 'accusative.singular.masculine.inanimate'),
+          array('name' => 'accusative.plural.virile'),
+          array('name' => 'accusative.plural.non_virile'),
+          array('name' => 'genitive.singular.feminine'),
+          array('name' => 'genitive.singular.masculine'),
+          array('name' => 'genitive.plural'),
+        )
       )
     )
   )
