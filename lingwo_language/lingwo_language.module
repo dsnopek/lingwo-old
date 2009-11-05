@@ -55,6 +55,22 @@ function lingwo_language_theme() {
 $GLOBALS['LANG_SETTINGS'] = array(
   'pl' => array(
     'fields' => array(
+      'noun' => array(
+        'options' => array(
+          array('name' => 'gender')
+        ),
+        'forms' => array(
+          array('name' => '*stem'),
+          array('name' => '*stem.singular'),
+          array('name' => '*stem.plural'),
+          array('name' => 'nominative.singular'),
+          array('name' => 'nominative.plural'),
+          array('name' => 'accusative.singular'),
+          array('name' => 'accusative.plural'),
+          array('name' => 'genitive.singular'),
+          array('name' => 'genitive.plural'),
+        ),
+      ),
       'adjective' => array(
         'classes' => array(
           array('name' => 'soft'),
@@ -76,7 +92,21 @@ $GLOBALS['LANG_SETTINGS'] = array(
           array('name' => 'genitive.singular.masculine'),
           array('name' => 'genitive.plural'),
         )
-      )
+      ),
+      'verb' => array(
+        'options' => array(
+          array('name' => 'conjugation'),
+        ),
+        'forms' => array(
+          array('name' => '*stem'),
+          array('name' => 'nonpast.singular.1p'),
+          array('name' => 'nonpast.singular.2p'),
+          array('name' => 'nonpast.singular.3p'),
+          array('name' => 'nonpast.plural.1p'),
+          array('name' => 'nonpast.plural.2p'),
+          array('name' => 'nonpast.plural.3p'),
+        ),
+      ),
     )
   )
 );
