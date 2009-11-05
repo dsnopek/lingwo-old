@@ -64,6 +64,7 @@ function lingwo_language_fields_form($form, $lang) {
   );
 
   $settings = lingwo_language_settings($lang);
+  $settings = $settings['fields'];
   $form['settings'] = array(
     '#theme' => 'lingwo_language_tabs',
   );
@@ -78,9 +79,9 @@ function lingwo_language_fields_form($form, $lang) {
       //'#collapsed' => TRUE
     );
 
-    $pos_form['options'] = _ld_language_fields_form('options', t('Option'), t('Options'), $settings[$term->tid]);
-    $pos_form['classes'] = _ld_language_fields_form('classes', t('Class'), t('Classes'), $settings[$term->tid]);
-    $pos_form['forms'] = _ld_language_fields_form('forms', t('Form'), t('Forms'), $settings[$term->tid]);
+    $pos_form['options'] = _ld_language_fields_form('options', t('Option'), t('Options'), $settings[strtolower($term->name)]);
+    $pos_form['classes'] = _ld_language_fields_form('classes', t('Class'), t('Classes'), $settings[strtolower($term->name)]);
+    $pos_form['forms'] = _ld_language_fields_form('forms', t('Form'), t('Forms'), $settings[strtolower($term->name)]);
 
     $form['settings']['pos-'. $term->tid] = $pos_form;
   }

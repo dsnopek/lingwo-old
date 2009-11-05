@@ -52,7 +52,7 @@ function lingwo_language_theme() {
  */
 
 // TODO: We're hard-coding this for now.
-$LANG_SETTINGS = array(
+$GLOBALS['LANG_SETTINGS'] = array(
   'pl' => array(
     'fields' => array(
       'adjective' => array(
@@ -81,18 +81,16 @@ $LANG_SETTINGS = array(
   )
 );
 
-function lingwo_language_settings($lang, $value = NULL) {
-  /*
-  if (is_null($value)) {
-    return variable_get('lingwo_language_'. $lang .'_settings', array());
-  }
-  variable_set('lingwo_language_'. $lang .'_settings', $value);
-  */
-
-  // TODO: really get the value!
-  if (is_null($value)) {
-    return $LANG_SETTINGS[$lang];
-  }
+function lingwo_language_load($lang) {
+  // TODO: loads the node which represents this language.
+  // TODO: We will have one 'canonical' node for each language.  Its id
+  // will be stored in a variable.  This will look up the node id and load
+  // it.
 }
 
+function lingwo_language_settings($lang) {
+  // TODO: we should load the language node, decode its body and return it.
+  global $LANG_SETTINGS;
+  return $LANG_SETTINGS[$lang];
+}
 
