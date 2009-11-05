@@ -21,23 +21,6 @@ function lingwo_dictionary_menu() {
     'type' => MENU_NORMAL_ITEM
   );
 
-  // Put a 'Dictionary Fields' tab onto the 'Edit Language' page.
-  $items['admin/settings/language/edit/%/basic_information'] = array(
-    'title' => 'Basic Information',
-    'type'  => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10
-  );
-  $items['admin/settings/language/edit/%/dictionary_fields'] = array(
-    'title' => 'Dictionary Fields',
-    'description' => t('Set the per-language fields that can appear in a "Lingwo Dictionary Fields" control'),
-    'access arguments' => array('administer site configuration'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('lingwo_dictionary_language_fields_form', 4),
-    'file' => 'lingwo_dictionary.admin.inc',
-    'type' => MENU_LOCAL_TASK
-  );
-
-
   /*
   if ($lookup_path = lingwo_dictionary_lookup_path()) {
     $items[$lookup_path .'/%/%'] = array(
@@ -87,17 +70,15 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
 /**
  * Implementation of hook_theme().
  */
+/*
 function lingwo_dictionary_theme() {
   return array(
-    // For our per-language stuff
-    'lingwo_dictionary_tabs' => array(
-      'arguments' => array('form' => NULL),
-    ),
-    'lingwo_dictionary_language_fields_subform' => array(
+    'lingwo_dictionary_search' => array(
       'arguments' => array('form' => NULL),
     ),
   );
 }
+*/
 
 /*
  * Settings
@@ -132,51 +113,4 @@ function lingwo_dictionary_pos_vocabulary($value = NULL) {
   }
   variable_set('lingwo_dictionary_pos_vocabulary', $value);
 }
-
-/**
- * Per-language settings array
- */
-// TODO: We're hard-coding this form now.
-$LANG_SETTINGS = array(
-  'pl' => array(
-    'fields' => array(
-      'adjective' => array(
-        'classes' => array(
-          array('name' => 'soft'),
-        ),
-        'forms' => array(
-          array('name' => '*stem'),
-          array('name' => 'nominative.singular.masculine'),
-          array('name' => 'nominative.singular.feminine'),
-          array('name' => 'nominative.singular.neuter'),
-          array('name' => 'nominative.plural.non_virile'),
-          array('name' => 'nominative.plural.virile'),
-          array('name' => 'accusative.singular.feminine'),
-          array('name' => 'accusative.singular.neuter'),
-          array('name' => 'accusative.singular.masculine.animate'),
-          array('name' => 'accusative.singular.masculine.inanimate'),
-          array('name' => 'accusative.plural.virile'),
-          array('name' => 'accusative.plural.non_virile'),
-          array('name' => 'genitive.singular.feminine'),
-          array('name' => 'genitive.singular.masculine'),
-          array('name' => 'genitive.plural'),
-        )
-      )
-    )
-  )
-);
-function lingwo_dictionary_language_settings($lang, $value = NULL) {
-  /*
-  if (is_null($value)) {
-    return variable_get('lingwo_dictionary_'. $lang .'_settings', array());
-  }
-  variable_set('lingwo_dictionary_'. $lang .'_settings', $value);
-  */
-
-  // TODO: really get the value!
-  if (is_null($value)) {
-    return $LANG_SETTINGS[$lang];
-  }
-}
-
 
