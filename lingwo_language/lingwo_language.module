@@ -57,7 +57,15 @@ $GLOBALS['LANG_SETTINGS'] = array(
     'fields' => array(
       'noun' => array(
         'options' => array(
-          array('name' => 'gender')
+          array(
+            'name' => 'gender',
+            'values' => array(
+              'masculine',
+              'feminine',
+              'neuter'
+            ),
+            'required' => TRUE
+          )
         ),
         'forms' => array(
           array('name' => '*stem'),
@@ -95,7 +103,14 @@ $GLOBALS['LANG_SETTINGS'] = array(
       ),
       'verb' => array(
         'options' => array(
-          array('name' => 'conjugation'),
+          array(
+            'name' => 'conjugation',
+            'values' => array(
+              'first',
+              'second',
+              'third'
+            )
+          ),
         ),
         'forms' => array(
           array('name' => '*stem'),
@@ -122,5 +137,31 @@ function lingwo_language_settings($lang) {
   // TODO: we should load the language node, decode its body and return it.
   global $LANG_SETTINGS;
   return $LANG_SETTINGS[$lang];
+}
+
+function lingwo_language_fields($lang, $pos) {
+  // TODO: we should have some complex layout stuff so that we can customize
+  // the look of this form, but for now..
+  $settings = lingwo_language_settings($lang);
+  $fields = &$settings['fields'][$pos];
+
+  $result = array();
+  if (!empty($fields['classes'])) {
+    foreach ($fields['classes'] as $field) {
+      $result[] = ($field + array('type' => 'class'));
+    }
+  }
+  if (!empty($fields['options'])) {
+    foreach ($fields['options'] as $field) {
+      $result[] = ($field + array('type' => 'option'));
+    }
+  }
+  if (!empty($fields['forms'])) {
+    foreach ($fields['forms'] as $field) {
+      $result[] = ($field + array('type' => 'form'));
+    }
+  }
+
+  return $result;
 }
 

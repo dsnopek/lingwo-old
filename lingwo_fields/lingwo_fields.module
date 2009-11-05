@@ -70,7 +70,27 @@ function lingwo_fields_field_formatter_info() {
 function lingwo_fields_field_settings($op, $field) {
   switch ($op) {
     case 'database columns':
-      $columns['data'] = array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => FALSE, 'serialize' => TRUE);
+      $columns['type'] = array(
+        'type' => 'varchar',
+        'length' => 10,
+        'not null' => TRUE,
+        'sortable' => TRUE,
+        'views' => TRUE
+      );
+      $columns['name'] = array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'sortable' => TRUE,
+        'views' => TRUE
+      );
+      $columns['value'] = array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'sortable' => TRUE,
+        'views' => TRUE
+      );
       return $columns;
   }
 }
@@ -78,6 +98,7 @@ function lingwo_fields_field_settings($op, $field) {
 /**
  * Implementation of hook_field().
  */
+/*
 function lingwo_fields_field($op, &$node, $field, &$items, $teaser, $page) {
   switch ($op) {
     case 'load':
@@ -99,6 +120,7 @@ function lingwo_fields_field($op, &$node, $field, &$items, $teaser, $page) {
       return $items;
   }
 }
+*/
 
 /**
  * Implementation of hook_content_is_empty().
@@ -111,10 +133,68 @@ function lingwo_fields_content_is_empty($item, $field) {
  * Implementation of hook_widget
  */
 function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) {
-  $element = array(
-    '#type' => 'markup',
-    '#value' => '<p>Lingwo Fields</p>',
-  );
+  $node = $form['#node'];
+
+  if (isset($node->taxonomy)) {
+    $pos_vid = lingwo_dictionary_pos_vocabulary();
+    foreach ($node->taxonomy as $term) {
+      if ($term->vid == $pos_vid) {
+        $pos = $term;
+        break;
+      }
+    }
+  }
+
+  $default_values = array();
+  foreach ($items as $item) {
+    $default_values[$item['type']][$item['name']] = $item['value'];
+  }
+
+  $element = array();
+
+  $index = 0;
+  foreach (lingwo_language_fields($node->language, strtolower($pos->name)) as $field) {
+    $field_form = array();
+    $field_form['name'] = array(
+      '#type' => 'hidden',
+      '#value' => $field['name']
+    );
+    $field_form['type'] = array(
+      '#type' => 'hidden',
+      '#value' => $field['type'],
+    );
+    $field_form['value'] = array(
+      '#title' => $field['name'],
+      '#default_value' => $default_values[$field['type']][$field['name']],
+      // TODO: we need to enforce required with select boxes
+      '#required' => $field['required'] ? TRUE : FALSE
+    );
+    switch ($field['type']) {
+      case 'class':
+        $field_form['value'] += array(
+          '#type' => 'checkbox',
+        );
+        break;;
+      case 'option':
+        $options = array('' => '');
+        foreach ($field['values'] as $opt) {
+          $options[$opt] = $opt;
+        }
+
+        $field_form['value'] += array(
+          '#type' => 'select',
+          '#options' => $options,
+        );
+        break;;
+      case 'form':
+        $field_form['value'] += array(
+          '#type' => 'textfield',
+        );
+        break;;
+    };
+
+    $element[$index++] = $field_form;
+  }
 
   return $element;
 }
