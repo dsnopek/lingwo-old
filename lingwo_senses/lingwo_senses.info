@@ -1,0 +1,5 @@
+; $Id$
+name = Lingwo Dictionary Senses
+description = Implements CCK field for storing translatable dictionary entry senses
+core = 6.x
+

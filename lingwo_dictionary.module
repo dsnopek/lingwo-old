@@ -38,15 +38,6 @@ function lingwo_dictionary_menu() {
   );
 
 
-  $items['lingwo_dictionary_senses/ahah/%'] = array(
-    'title' => 'Lingwo Dictionary AHAH',
-    'page callback' => 'lingwo_dictionary_senses_ahah',
-    'page arguments' => array(2),
-    // TODO: What should this be?
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK
-  );
-
   /*
   if ($lookup_path = lingwo_dictionary_lookup_path()) {
     $items[$lookup_path .'/%/%'] = array(
@@ -60,26 +51,6 @@ function lingwo_dictionary_menu() {
   */
 
   return $items;
-}
-
-// Helper for generating UUIDs
-function _ld_make_uuid() {
-  if (!isset($GLOBALS['uuid'])) {
-    uuid_create(&$GLOBALS['uuid']);
-  }
-
-  uuid_make($GLOBALS['uuid'], UUID_MAKE_V4);
-  uuid_export($GLOBALS['uuid'], UUID_FMT_STR, &$uuidstring);
-
-  return trim($uuidstring);
-}
-
-// Helper for implementing AHAH
-function _ld_disable_validation(&$form) {
-  foreach (element_children($form) as $child) {
-    $form[$child]['#validated'] = TRUE;
-    _ld_disable_validation(&$form[$child]);
-  }
 }
 
 /**
@@ -118,25 +89,6 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
  */
 function lingwo_dictionary_theme() {
   return array(
-    'lingwo_dictionary_senses_widget' => array(
-      'arguments' => array('element' => NULL),
-    ),
-    'lingwo_dictionary_senses_original_form' => array(
-      'arguments' => array('form' => NULL),
-    ),
-    'lingwo_dictionary_senses_translation_form' => array(
-      'arguments' => array('form' => NULL),
-    ),
-    // TODO: should be marked by 'senses'
-    'lingwo_dictionary_formatter_default' => array(
-      'arguments' => array('element' => NULL),
-    ),
-    'lingwo_dictionary_senses_original' => array(
-      'arguments' => array('items' => NULL),
-    ),
-    'lingwo_dictionary_senses_translation' => array(
-      'arguments' => array('items' => NULL),
-    ),
     // For our per-language stuff
     'lingwo_dictionary_tabs' => array(
       'arguments' => array('form' => NULL),
@@ -145,85 +97,6 @@ function lingwo_dictionary_theme() {
       'arguments' => array('form' => NULL),
     ),
   );
-}
-
-/**
- * CCK hooks
- */
-
-// TODO: Is this the right place/way to do this?
-module_load_include('inc', 'lingwo_dictionary', 'fields/senses');
-
-/**
- * Implementation of hook_field_info().
- */
-function lingwo_dictionary_field_info() {
-  return array(
-    'lingwo_dictionary_senses' => array(
-      'label' => t('Lingwo Dictionary Senses'),
-      'description' => t('Store definition senses in the database.'),
-    ),
-  );
-}
-
-/**
- * Implementation of hook_widget_info().
- */
-function lingwo_dictionary_widget_info() {
-  return array(
-    'lingwo_dictionary_senses_widget' => array(
-      'label' => 'Lingwo Dictionary Senses Widget',
-      'field types' => array('lingwo_dictionary_senses'),
-      'multiple values' => CONTENT_HANDLE_MODULE,
-      //'multiple values' => CONTENT_HANDLE_CORE,
-      'description' => t('Widget for editing senses for a dictionary entry .'),
-    ),
-  );
-}
-
-/**
- * Implementation of hook_field_formatter_info().
- */
-function lingwo_dictionary_field_formatter_info() {
-  return array(
-    'default' => array(
-      'label' => t('Lingwo Dictionary Senses Formatter'),
-      'field types' => array('lingwo_dictionary_senses'),
-      'multiple values' => CONTENT_HANDLE_MODULE,
-    ),
-  );
-}
-
-/**
- * Implementation of hook_field_settings().
- */
-function lingwo_dictionary_field_settings($op, $field) {
-  $func = $field['type'] .'_field_settings';
-  return $func($op, $field);
-}
-
-/**
- * Implementation of hook_field().
- */
-function lingwo_dictionary_field($op, &$node, $field, &$items, $teaser, $page) {
-  $func = $field['type'] .'_field';
-  return $func($op, $node, $field, $items, $teaser, $page);
-}
-
-/**
- * Implementation of hook_content_is_empty().
- */
-function lingwo_dictionary_content_is_empty($item, $field) {
-  $func = $field['type'] .'_content_is_empty';
-  return $func($item, $field);
-}
-
-/**
- * Implementation of hook_widget().
- */
-function lingwo_dictionary_widget(&$form, &$form_state, $field, $items, $delta = 0) {
-  $func = $field['type'] .'_widget';
-  return $func($form, $form_state, $field, $items, $delta);
 }
 
 /*
