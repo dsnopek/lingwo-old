@@ -58,7 +58,6 @@ function lingwo_senses_theme() {
     'lingwo_senses_translation_form' => array(
       'arguments' => array('form' => NULL),
     ),
-    // TODO: should be marked by 'senses'
     'lingwo_senses_formatter_default' => array(
       'arguments' => array('element' => NULL),
     ),
@@ -82,7 +81,7 @@ function lingwo_senses_field_info() {
   return array(
     'lingwo_senses' => array(
       'label' => t('Lingwo Dictionary Senses'),
-      'description' => t('Store definition senses in the database.'),
+      'description' => t('Store dictionary senses in the database.'),
     ),
   );
 }

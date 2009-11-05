@@ -1,4 +1,12 @@
 
+== 2009-11-05 ==
+
+ * We need to figure out the best way to store 'fields' so that views can do searches
+   on the individual field values.  We *will* want to be able to create a view that
+   shows only Polish feminine nouns, or all the Polish soft adjectives, etc..  This
+   probably means having (name, value) pairs in the database and *may* require doing
+   views integration manually instead of via default CCK action.
+
 == 2009-11-04 ==
 
  * Start building the 'lingwo_dictionary_fields' control to show the required fields

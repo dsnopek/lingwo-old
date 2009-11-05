@@ -1,0 +1,134 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Implements a CCK field for dictionary entries, which will be different for each language and part of speech
+ */
+
+/**
+ * Implementation of hook_theme().
+ */
+function lingwo_fields_theme() {
+  return array(
+    'lingwo_fields_widget' => array(
+      'arguments' => array('element' => NULL),
+    ),
+    'lingwo_fields_formatter_default' => array(
+      'arguments' => array('element' => NULL),
+    ),
+  );
+}
+
+/**
+ * CCK hooks
+ */
+
+/**
+ * Implementation of hook_field_info().
+ */
+function lingwo_fields_field_info() {
+  return array(
+    'lingwo_fields' => array(
+      'label' => t('Lingwo Dictionary Fields'),
+      'description' => t('Store dictionary fields in the database.'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_widget_info().
+ */
+function lingwo_fields_widget_info() {
+  return array(
+    'lingwo_fields_widget' => array(
+      'label' => 'Lingwo Dictionary Fields Widget',
+      'field types' => array('lingwo_fields'),
+      'multiple values' => CONTENT_HANDLE_MODULE,
+      //'multiple values' => CONTENT_HANDLE_CORE,
+      'description' => t('Widget for editing fields for a dictionary entry .'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_field_formatter_info().
+ */
+function lingwo_fields_field_formatter_info() {
+  return array(
+    'default' => array(
+      'label' => t('Lingwo Dictionary Fields Formatter'),
+      'field types' => array('lingwo_fields'),
+      'multiple values' => CONTENT_HANDLE_MODULE,
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_field_settings().
+ */
+function lingwo_fields_field_settings($op, $field) {
+  switch ($op) {
+    case 'database columns':
+      $columns['data'] = array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => FALSE, 'serialize' => TRUE);
+      return $columns;
+  }
+}
+
+/**
+ * Implementation of hook_field().
+ */
+function lingwo_fields_field($op, &$node, $field, &$items, $teaser, $page) {
+  switch ($op) {
+    case 'load':
+      // Content_storage does serialize each field item's columns (if the 
+      // 'serialize' key for that column is set) upon writing to the db,
+      // but does not unserialize when reading from the db. Hopefully,
+      // this will be fixed in the future, but for now, we have to 
+      // explicitly unserialize.
+      if (is_array($items)) {
+        foreach ($items as &$item) {
+          if (is_string($item['data'])) {
+            $item['data'] = unserialize($item['data']);
+          }
+        }
+        return (array($field['field_name'] => $items));
+      }
+      break;
+    case 'validate':
+      return $items;
+  }
+}
+
+/**
+ * Implementation of hook_content_is_empty().
+ */
+function lingwo_fields_content_is_empty($item, $field) {
+  return FALSE;
+}
+
+/**
+ * Implementation of hook_widget
+ */
+function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+  $element = array(
+    '#type' => 'markup',
+    '#value' => '<p>Lingwo Fields</p>',
+  );
+
+  return $element;
+}
+
+/*
+ * Theming
+ */
+
+function theme_lingwo_fields_widget($form) {
+  // TODO: me!!
+}
+
+function theme_lingwo_fields_formatter_default($element) {
+  // TODO: me!!
+  return '<p>formatter!!</p>';
+}
+
