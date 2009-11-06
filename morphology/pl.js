@@ -3,7 +3,7 @@
  * Defines the morphology of the Polish language.
  */
 
-Lingwo.dictionary.defineLanguage('pol', function (lang, utils) {
+Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
     var generateAlphabet = function (single_letters, diagraphs, class_func) {
         var alphabet = {}, i;
         var makeLetter = function (letter) {

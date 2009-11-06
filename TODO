@@ -1,4 +1,9 @@
 
+== 2009-11-06 ==
+
+ * Create a Lingwo.dictionary.Entry object from the data on the form.  Bind events to 
+   the different controls and update the entry.
+
 == 2009-11-05 ==
 
  * We need to figure out the best way to store 'fields' so that views can do searches

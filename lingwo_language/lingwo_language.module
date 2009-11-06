@@ -59,10 +59,11 @@ $GLOBALS['LANG_SETTINGS'] = array(
         'options' => array(
           array(
             'name' => 'gender',
+            'label' => 'Gender',
             'values' => array(
-              'masculine',
-              'feminine',
-              'neuter'
+              'masculine' => 'Masculine',
+              'feminine' => 'Feminine',
+              'neuter' => 'Neuter'
             ),
             'required' => TRUE
           )
@@ -106,9 +107,9 @@ $GLOBALS['LANG_SETTINGS'] = array(
           array(
             'name' => 'conjugation',
             'values' => array(
-              'first',
-              'second',
-              'third'
+              'first' => 'First',
+              'second' => 'Second',
+              'third' => 'Third'
             )
           ),
         ),

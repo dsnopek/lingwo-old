@@ -1,7 +1,7 @@
 
 load('morphology.js');
-load('pol.js');
-load('pol.test-data.js');
+load('pl.js');
+load('pl.test-data.js');
 load('test.js');
 
 function getEntry(entry_name) {

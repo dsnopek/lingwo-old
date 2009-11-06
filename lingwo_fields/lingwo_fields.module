@@ -229,7 +229,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
       '#value' => $field['type'],
     );
     $field_form['value'] = array(
-      '#title' => $field['name'],
+      '#title' => isset($field['label']) ? $field['label'] : $field['name'],
       '#default_value' => $default_values[$field['type']][$field['name']],
       // TODO: we need to enforce required with select boxes
       '#required' => $field['required'] ? TRUE : FALSE
@@ -241,14 +241,9 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
         );
         break;;
       case 'option':
-        $options = array('' => '');
-        foreach ($field['values'] as $opt) {
-          $options[$opt] = $opt;
-        }
-
         $field_form['value'] += array(
           '#type' => 'select',
-          '#options' => $options,
+          '#options' => $field['values'],
         );
         break;;
       case 'form':
@@ -268,7 +263,21 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     );
   }
 
-  drupal_add_js(array('lingwo_fields' => array('field_name' => $field_name)), 'setting');
+  drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/morphology/morphology.js');
+
+  $language_list = $node->language ?
+    (object)array('enabled' => TRUE, 'language' => $node->language) : language_list();
+  foreach ($language_list as $lang) {
+    $lang_js = drupal_get_path('module', 'lingwo_dictionary') .'/morphology/'. $lang->language .'.js';
+    if ($lang->enabled && file_exists($lang_js)) {
+        drupal_add_js($lang_js);
+    }
+  }
+
+  drupal_add_js(array('lingwo_fields' => array(
+    'field_name' => $field_name,
+    'is_new' => $node->nid == 0)
+  ), 'setting');
   drupal_add_js(drupal_get_path('module', 'lingwo_fields') .'/lingwo_fields.js');
 
   return $element;

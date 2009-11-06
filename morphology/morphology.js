@@ -3,8 +3,9 @@
  * The generic framework for making/using a morphology definition.
  */
 
-if (typeof Lingwo == 'undefined')
+if (typeof Lingwo == 'undefined') {
     Lingwo = {};
+}
 Lingwo.dictionary = {};
 
 (function () {
@@ -376,6 +377,8 @@ Lingwo.dictionary = {};
      * Defines a dictionary entry.
      */
     lib.Entry = function (args) {
+        args = args || {};
+
         this.lang = args.lang;
         this.name = args.name;
         this.pos = args.pos;
