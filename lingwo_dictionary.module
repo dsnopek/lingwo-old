@@ -6,6 +6,37 @@
  * Implements extensions for Lingwo Dictionary
  */
 
+// Helper for generating UUIDs
+function _ld_make_uuid() {
+  if (!isset($GLOBALS['uuid'])) {
+    uuid_create(&$GLOBALS['uuid']);
+  }
+
+  uuid_make($GLOBALS['uuid'], UUID_MAKE_V4);
+  uuid_export($GLOBALS['uuid'], UUID_FMT_STR, &$uuidstring);
+
+  return trim($uuidstring);
+}
+
+// Helper for implementing AHAH
+function _ld_disable_validation(&$form) {
+  foreach (element_children($form) as $child) {
+    $form[$child]['#validated'] = TRUE;
+    _ld_disable_validation(&$form[$child]);
+  }
+}
+
+// Helper for implementing AHAH
+function _ld_form_to_node(&$form, &$form_state) {
+  $form['#submit'] = array('');
+  $node = node_form_submit_build_node($form, $form_state);
+
+  // hack to stop taxonomy from resetting when the form is rebuilt
+  $form_state['node']['taxonomy'] = taxonomy_preview_terms($node);
+
+  return $node;
+}
+
 /**
  * Implementation of hook_menu().
  */

@@ -24,26 +24,6 @@ function lingwo_senses_menu() {
   return $items;
 }
 
-// Helper for generating UUIDs
-function _ld_make_uuid() {
-  if (!isset($GLOBALS['uuid'])) {
-    uuid_create(&$GLOBALS['uuid']);
-  }
-
-  uuid_make($GLOBALS['uuid'], UUID_MAKE_V4);
-  uuid_export($GLOBALS['uuid'], UUID_FMT_STR, &$uuidstring);
-
-  return trim($uuidstring);
-}
-
-// Helper for implementing AHAH
-function _ld_disable_validation(&$form) {
-  foreach (element_children($form) as $child) {
-    $form[$child]['#validated'] = TRUE;
-    _ld_disable_validation(&$form[$child]);
-  }
-}
-
 /**
  * Implementation of hook_theme().
  */
@@ -388,11 +368,8 @@ function lingwo_senses_get_translations($node, $field_name, $items) {
 }
 
 function _lingwo_senses_from_form($form, &$form_state) {
-  $node = node_form_submit_build_node($form, $form_state);
+  $node = _ld_form_to_node($form, $form_state);
   $field_name = $form_state['clicked_button']['#field_name'];
-
-  // hack to stop taxonomy from resetting when the form is rebuilt
-  $form_state['node']['taxonomy'] = taxonomy_preview_terms($node);
 
   $senses = $form_state['values'][$field_name];
   if ($senses) {

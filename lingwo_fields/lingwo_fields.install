@@ -1,0 +1,35 @@
+<?php
+// $Id: $
+
+/**
+ * Implementation of hook_install().
+ */
+function lingwo_fields_install() {
+  drupal_load('module', 'content');
+  content_notify('install', 'lingwo_fields');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function lingwo_fields_uninstall() {
+  drupal_load('module', 'content');
+  content_notify('uninstall', 'lingwo_fields');
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function lingwo_fields_enable() {
+  drupal_load('module', 'content');
+  content_notify('enable', 'lingwo_fields');
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function lingwo_fields_disable() {
+  drupal_load('module', 'content');
+  content_notify('disable', 'lingwo_fields');
+}
+

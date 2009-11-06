@@ -1,0 +1,35 @@
+<?php
+// $Id: $
+
+/**
+ * Implementation of hook_install().
+ */
+function lingwo_senses_install() {
+  drupal_load('module', 'content');
+  content_notify('install', 'lingwo_senses');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function lingwo_senses_uninstall() {
+  drupal_load('module', 'content');
+  content_notify('uninstall', 'lingwo_senses');
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function lingwo_senses_enable() {
+  drupal_load('module', 'content');
+  content_notify('enable', 'lingwo_senses');
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function lingwo_senses_disable() {
+  drupal_load('module', 'content');
+  content_notify('disable', 'lingwo_senses');
+}
+

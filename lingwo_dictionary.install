@@ -46,9 +46,6 @@ function lingwo_dictionary_schema() {
  * Implementation of hook_install().
  */
 function lingwo_dictionary_install() {
-  drupal_load('module', 'content');
-  content_notify('install', 'lingwo_dictionary_senses');
-
   variable_set('lingwo_dictionary_schema_version', 6000);
   drupal_install_schema('lingwo_dictionary');
 
@@ -61,26 +58,7 @@ function lingwo_dictionary_install() {
  * Implementation of hook_uninstall().
  */
 function lingwo_dictionary_uninstall() {
-  drupal_load('module', 'content');
-  content_notify('uninstall', 'lingwo_dictionary_senses');
-
   drupal_uninstall_schema('lingwo_dictionary');
   variable_del('lingwo_dictionary_schema_version');
-}
-
-/**
- * Implementation of hook_enable().
- */
-function lingwo_dictionary_enable() {
-  drupal_load('module', 'content');
-  content_notify('enable', 'lingwo_dictionary_senses');
-}
-
-/**
- * Implementation of hook_disable().
- */
-function lingwo_dictionary_disable() {
-  drupal_load('module', 'content');
-  content_notify('disable', 'lingwo_dictionary_senses');
 }
 
