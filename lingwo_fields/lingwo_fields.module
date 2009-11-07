@@ -362,6 +362,24 @@ function lingwo_fields_change_pos_submit($form, &$form_state) {
 }
 
 /*
+ * Our "API" functions
+ */
+function lingwo_fields_map_items($node, $items) {
+  $fields = array();
+  foreach (lingwo_language_fields($node->language, lingwo_dictionary_get_pos($node)) as $field) {
+    $fields[$field['type'] .':'. $field['name']] = $field;
+  }
+  foreach (element_children($items) as $index) {
+    $item = $items[$index]['#item'];
+    $key = $item['type'] .':'. $item['name'];
+    if (isset($fields[$key])) {
+      $fields[$key] += $item;
+    }
+  }
+  return $fields;
+}
+
+/*
  * Theming
  */
 
@@ -370,7 +388,18 @@ function theme_lingwo_fields_widget($form) {
 }
 
 function theme_lingwo_fields_formatter_default($element) {
-  // TODO: me!!
-  return '<p>formatter!!</p>';
+  $index = 0;
+  foreach (lingwo_fields_map_items($element['#node'], $element) as $name => $item) {
+    $form[$index] = array(
+      '#type' => 'item',
+      '#title' => isset($item['label']) ? $item['label'] : $item['name'],
+      '#value' => $item['value'],
+      '#automatic' => $item['automatic'],
+      '#weight' => $index
+    );
+    $index++;
+  }
+
+  return drupal_render($form);
 }
 

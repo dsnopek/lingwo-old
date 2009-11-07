@@ -37,6 +37,26 @@ function _ld_form_to_node(&$form, &$form_state) {
   return $node;
 }
 
+// Gets the Part of Speech from a node
+function lingwo_dictionary_get_pos($node) {
+  $pos_vid = lingwo_dictionary_pos_vocabulary();
+
+  if (isset($node->taxonomy)) {
+    foreach ($node->taxonomy as $term) {
+      if ($term->vid == $pos_vid) {
+        $pos = $term;
+        break;
+      }
+    }
+  }
+
+  if (isset($pos)) {
+    return strtolower($pos->name);
+  }
+
+  return NULL;
+}
+
 /**
  * Implementation of hook_menu().
  */
