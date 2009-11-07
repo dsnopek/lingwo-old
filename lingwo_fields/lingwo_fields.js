@@ -37,13 +37,18 @@
         // load the settings
         settings = Drupal.settings.lingwo_fields;
 
+        // get the language/pos from settings or the form
+        var lang = settings.lang || $('#edit-language :selected').val();
+        var pos  = settings.pos ||
+            settings.pos_values[$('#edit-taxonomy-'+settings.pos_vid+' :selected').val()];
+
         // this will be run every time the AHAH completes, so we need to rebuild
         // the entry object.
         entry = new Lingwo.dictionary.Entry({
             // NOTE: These don't go on context because we want it always
             name: $('#edit-title').val(),
-            lang: Lingwo.dictionary.languages[$('#edit-language :selected').val()],
-            pos: settings.pos_values[$('#edit-taxonomy-'+settings.pos_vid+' :selected').val()]
+            lang: Lingwo.dictionary.languages[lang],
+            pos: pos
         });
 
         // TODO: if this *ISNT* new, then we rebuild the entry based on what is

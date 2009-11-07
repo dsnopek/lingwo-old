@@ -300,7 +300,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
   drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/morphology/morphology.js');
 
   $language_list = $node->language ?
-    (object)array('enabled' => TRUE, 'language' => $node->language) : language_list();
+    array((object)array('enabled' => TRUE, 'language' => $node->language)) : language_list();
   foreach ($language_list as $lang) {
     $lang_js = drupal_get_path('module', 'lingwo_dictionary') .'/morphology/'. $lang->language .'.js';
     if ($lang->enabled && file_exists($lang_js)) {
@@ -318,6 +318,8 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     'is_new' => $node->nid == 0,
     'pos_vid' => $pos_vid,
     'pos_values' => $pos_values,
+    'lang' => $node->language,
+    'pos' => isset($pos) ? strtolower($pos->name) : ''
   )), 'setting');
   drupal_add_js(drupal_get_path('module', 'lingwo_fields') .'/lingwo_fields.js');
 
