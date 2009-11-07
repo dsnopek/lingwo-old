@@ -66,3 +66,38 @@ Ideas for how our application could work:
          impractical and with network communications that can't be 3rd party sniffed to determine
          the content of the work.
 
+== Integration with an e-book reader ==
+
+Another possibility entirely, is integrating with an existing e-book reader that provides
+its own DRM system, so we don't have to worry about it.
+
+On possibility is the Adobe Reader (which I think has an e-book plugin?) for which our own
+plugin could be developed:
+
+http://www.adobe.com/products/reader/
+
+JavaScript plugins can interact with web-services:
+
+http://www.adobe.com/devnet/acrobat/pdfs/reader_overview.pdf
+
+So..  This integration would be good, whether we planned to sell said e-books or not, since
+it would drive traffic to the site.
+
+Things that prevent us from selling such e-books include: How do we package audio with this?  How do we annotate the text?
+
+== Arguments against DRM for e-books ==
+
+http://www.bradsreader.com/2009/01/jk-rowling-harry-potter-ebooks-and-the-definition-of-irony/
+http://www.usatoday.com/life/books/news/2005-06-14-rowling-refuses-ebooks_x.htm
+http://techdirt.com/articles/20070206/105458.shtml
+http://dearauthor.com/wordpress/2009/01/25/why-epublishing-needs-to-grow-up/
+
+The more I think about this, the more I am convinced that any encryption/DRM scheme is doomed
+to fail and we should simply work with publishers/authors for whom this is not a problem.
+
+== Open eBook Format: EPUB ==
+
+http://en.wikipedia.org/wiki/Epub
+
+Can this format be extended to hold annotations?  It looks like the content is XHTML so that is likely YES!
+
