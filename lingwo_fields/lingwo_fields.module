@@ -217,6 +217,13 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     '#parents' => array($field_name),
   );
 
+  $field_name_enc = str_replace('_', '-', $field_name);
+  $field_map = array(
+    'classes' => array(),
+    'options' => array(),
+    'forms' => array()
+  );
+
   $index = 0;
   foreach (lingwo_language_fields($node->language, strtolower($pos->name)) as $field) {
     $field_form = array();
@@ -232,8 +239,14 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
       '#title' => isset($field['label']) ? $field['label'] : $field['name'],
       '#default_value' => $default_values[$field['type']][$field['name']],
       // TODO: we need to enforce required with select boxes
-      '#required' => $field['required'] ? TRUE : FALSE
+      '#required' => $field['required'] ? TRUE : FALSE,
+      '#attributes' => array(
+        'class' => $field_name_enc .'-control',
+        'data-type' => $field['type'],
+        'data-name' => $field['name']
+      ),
     );
+
     switch ($field['type']) {
       case 'class':
         $field_form['value'] += array(
@@ -241,9 +254,12 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
         );
         break;;
       case 'option':
+        $options = $field['values'];
+        $options = array('' => '-none-') + $options;
+
         $field_form['value'] += array(
           '#type' => 'select',
-          '#options' => $field['values'],
+          '#options' => $options,
         );
         break;;
       case 'form':
@@ -274,10 +290,17 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     }
   }
 
+  $pos_values = array();
+  foreach (taxonomy_get_tree($pos_vid) as $term) {
+    $pos_values[$term->tid] = strtolower($term->name);
+  }
+
   drupal_add_js(array('lingwo_fields' => array(
-    'field_name' => $field_name,
-    'is_new' => $node->nid == 0)
-  ), 'setting');
+    'field_name' => $field_name_enc,
+    'is_new' => $node->nid == 0,
+    'pos_vid' => $pos_vid,
+    'pos_values' => $pos_values,
+  )), 'setting');
   drupal_add_js(drupal_get_path('module', 'lingwo_fields') .'/lingwo_fields.js');
 
   return $element;

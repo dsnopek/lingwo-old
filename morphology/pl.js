@@ -416,7 +416,7 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
             return append_e(entry.getForm('*stem')).append('go');
         },
 
-        'genitive.singular.masculine': function (entry) {
+        'genitive.singular.neuter': function (entry) {
             return entry.getForm('genitive.singular.masculine');
         },
 
