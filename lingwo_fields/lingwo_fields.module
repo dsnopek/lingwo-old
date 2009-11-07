@@ -109,6 +109,13 @@ function lingwo_fields_field_settings($op, $field) {
         'sortable' => TRUE,
         'views' => TRUE
       );
+      $columns['automatic'] = array(
+        'description' => 'Boolean indicating whether this field was generated automatically or not',
+        'type' => 'int',
+        'not null' => TRUE,
+        'views' => TRUE,
+        'default' => 1,
+      );
       return $columns;
   }
 }
@@ -169,7 +176,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
 
   $default_values = array();
   foreach ($items as $item) {
-    $default_values[$item['type']][$item['name']] = $item['value'];
+    $default_values[$item['type']][$item['name']] = $item;
   }
 
   $field_name = $field['field_name'];
@@ -226,6 +233,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
 
   $index = 0;
   foreach (lingwo_language_fields($node->language, strtolower($pos->name)) as $field) {
+    $default = $default_values[$field['type']][$field['name']];
     $field_form = array();
     $field_form['name'] = array(
       '#type' => 'hidden',
@@ -237,7 +245,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     );
     $field_form['value'] = array(
       '#title' => isset($field['label']) ? $field['label'] : $field['name'],
-      '#default_value' => $default_values[$field['type']][$field['name']],
+      '#default_value' => $default['value'],
       // TODO: we need to enforce required with select boxes
       '#required' => $field['required'] ? TRUE : FALSE,
       '#attributes' => array(
@@ -250,7 +258,11 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     switch ($field['type']) {
       case 'class':
         $field_form['value'] += array(
-          '#type' => 'checkbox',
+          '#type' => 'select',
+          '#options' => array(
+            0 => t('False'),
+            1 => t('True'),
+          ),
         );
         break;;
       case 'option':
@@ -268,6 +280,12 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
         );
         break;;
     };
+
+    $field_form['automatic'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Automatic'),
+      '#default_value' => !empty($default) ? $default['automatic'] : TRUE,
+    );
 
     $element['wrapper']['fields'][$index++] = $field_form;
   }

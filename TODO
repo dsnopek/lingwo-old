@@ -1,4 +1,9 @@
 
+== 2009-11-07 ==
+
+ * Refactor all of the switch(type) in lingwo_fields.js to exist only in the control
+   (which should, by the way, have proper constructor and prototype!!)
+
 == 2009-11-06 ==
 
  * Create a Lingwo.dictionary.Entry object from the data on the form.  Bind events to 

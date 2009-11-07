@@ -13,17 +13,21 @@
         var type, name;
         for (type in field_map) {
             for (var name in field_map[type]) {
-                var node = field_map[type][name];
-                switch (type) {
-                    case 'class':
-                        $(node).attr('checked', entry.isClass(name));
-                        break;
-                    case 'option':
-                        $(node).val(entry.getOption(name));
-                        break;
-                    case 'form':
-                        $(node).val(entry.getForm(name));
-                        break;
+                var control = field_map[type][name];
+                if (control.automatic) {
+                    var value;
+                    switch (type) {
+                        case 'class':
+                            value = entry.isClass(name);
+                            break;
+                        case 'option':
+                            value = entry.getOption(name);
+                            break;
+                        case 'form':
+                            value = entry.getForm(name).toString();
+                            break;
+                    }
+                    control.setValue(value);
                 }
             }
         }
@@ -48,7 +52,7 @@
         // remove the Refresh button, AHAH will handle the reloading
         $('#edit-'+settings.field_name+'-refresh', context).remove();
 
-        $('#edit-title', context).bind('change', function (evt) {
+        $('#edit-title', context).bind('keyup', function (evt) {
             entry.name = evt.target.value;
             updateForm();
         });
@@ -62,9 +66,91 @@
             var type = $(this).attr('data-type'),
                 name = $(this).attr('data-name');
 
-            field_map[type][name] = this;
+            var control = {
+                'name': name,
+                'type': type,
 
-            // TODO: attach events for catching changes!
+                'inputNode': this,
+                'valueNode': $('<a href="#"></a>'),
+                'autoNode': $('#'+(''+this.id).replace(/-value$/, '-automatic')).get(),
+
+                // takes the value from the autoNode and toggles the controls
+                'updateAutomatic': function () {
+                    this.automatic = $(this.autoNode).attr('checked') ? true : false;
+                    if (this.automatic) {
+                        $(this.inputNode).hide();
+                        $(this.valueNode).show();
+                        
+                        switch (this.type) {
+                            case 'class':
+                                delete entry.classes[this.name];
+                                break;
+                            case 'option':
+                                delete entry.options[this.name];
+                                break;
+                            case 'form':
+                                delete entry.forms[this.name];
+                                break;
+                        }
+
+                        updateForm();
+                    }
+                    else {
+                        $(this.inputNode).show();
+                        $(this.valueNode).hide();
+                    }
+                },
+
+                // updates the value of the control
+                'setValue': function (value) {
+                    var inputValue = (this.type == 'class') ? (value ? '1' : '0') : value;
+                    $(this.inputNode).val(inputValue);
+                    $(this.valueNode).text(value);
+                }
+            };
+
+            // implement our toggling between automatic/manual
+            $(control.inputNode).parent().append(control.valueNode);
+            $(control.autoNode).bind('click', function (evt) {
+                control.updateAutomatic();
+            });
+            $(control.valueNode).bind('click', function (evt) {
+                if (control.automatic) {
+                    $(control.autoNode).removeAttr('checked');
+                }
+                else {
+                    $(control.autoNode).attr('checked', 'checked');
+                }
+
+                // toggle the class value immediately
+                if (type == 'class' && control.automatic) {
+                    var value = ($(':selected', control.inputNode).val() == '1');
+                    control.setValue(!($(':selected', control.inputNode).val() == '1'));
+                }
+
+                control.updateAutomatic();
+                return false;
+            });
+            control.updateAutomatic();
+
+            // attach events for catching changes and updating the form
+            $(control.inputNode).bind(type == 'form' ? 'keyup' : 'change', function (evt) {
+                switch(type) {
+                    case 'class':
+                        entry.classes[name] = $(':selected', control.inputNode).val() == '1';
+                        break;
+                    case 'option':
+                        entry.options[name] = $(':selected', control.inputNode).val();
+                        break;
+                    case 'form':
+                        entry.forms[name] = $(control.inputNode).val();
+                        break;
+                };
+
+                updateForm();
+            });
+
+            field_map[type][name] = control;
         });
 
         updateForm();
