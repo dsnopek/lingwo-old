@@ -1,4 +1,28 @@
 
+== 2009-11-13 ==
+
+The next big steps as I see them are:
+
+ 1. Refactor and make the fields code nicer.
+
+ 2. Implement per-language per-pos theming and make the Polish language stuff look the way we want it.
+
+ 3. Start working to make a *viable* Polish dictionary, that means:
+
+    * Finishing the morphology definition and gearing it to web entry.
+
+	* Fixing bugs in the Sense entry field.
+
+	* Provide a search/lookup mechanism
+
+ 4. Start working on wikitionary import.  This will probably dictate alot of the decisions for
+    what fields end up on an Entry and maybe force the related entries issue.  This will also
+	include working with services to actually add the entries.  Ideally this should be progressive
+	but in the initial version it doesn't need to be.
+
+After these steps are complete, we can start look to the next big piece of the puzzle and that
+is the annotator.  We can't really have an annotator without a working dictionary.
+
 == 2009-11-07 ==
 
  * Refactor all of the switch(type) in lingwo_fields.js to exist only in the control
@@ -16,11 +40,6 @@
    view for Entry content types.  We will use theming to make the forms and dictionary
    output look the way we want.
 
-== 2009-11-06 ==
-
- * Create a Lingwo.dictionary.Entry object from the data on the form.  Bind events to 
-   the different controls and update the entry.
-
 == 2009-11-05 ==
 
  * We need to figure out the best way to store 'fields' so that views can do searches
@@ -30,9 +49,6 @@
    views integration manually instead of via default CCK action.
 
 == 2009-11-04 ==
-
- * Start building the 'lingwo_dictionary_fields' control to show the required fields
-   on a dictionary entry.
 
  * Begin implementing the below described idea by first keeping the type of data that
    would be stored a language definition (besides the morphology) hard-coded and let
@@ -85,20 +101,6 @@
  * Create a 'Language' CCK field, which allows you to select a language from either
    (1) any Drupal language code, or (2) any activated language.  This would allow people to
    mark things as belonging to a language without changing its translation status in Drupal.
-
-== 2009-10-31 ==
-
- * Add a tab called "Dictionary Fields" to the "Edit Language" page (admin/sttings/language/edit/%)
-   which will allow us to configure the per-language and per-pos fields that will be provided by
-   the 'lingwo_dictionary_fields' CCK field.  For example, we will say that only 'nouns' get a
-   'gender' option.  We should also include some field for JavaScript (eventually a generic syntax
-   for users with disabled JavaScript) to exclude fields based on code (ie. we need to say only 
-   show the 'virile' class when: "entry.getOption('gender') == 'masculine'".  This data will be
-   saved to a custom table created by our module.
- 
- * Add a 'lingwo_dictionary_fields' CCK type, which shows the appropriate fields on the entry
-   edit form.  It should also load the selected languages morphology and recalculate the
-   values as things are changed.
 
 == 2009-10-29 ==
 
