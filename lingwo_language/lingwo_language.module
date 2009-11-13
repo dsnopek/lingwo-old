@@ -97,8 +97,9 @@ $GLOBALS['LANG_SETTINGS'] = array(
           array('name' => 'accusative.singular.masculine.inanimate'),
           array('name' => 'accusative.plural.virile'),
           array('name' => 'accusative.plural.non_virile'),
-          array('name' => 'genitive.singular.feminine'),
           array('name' => 'genitive.singular.masculine'),
+          array('name' => 'genitive.singular.feminine'),
+          array('name' => 'genitive.singular.neuter'),
           array('name' => 'genitive.plural'),
         )
       ),

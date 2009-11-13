@@ -29,8 +29,9 @@ function lingwo_fields_menu() {
  */
 function lingwo_fields_theme() {
   return array(
-    'lingwo_fields_widget' => array(
+    'lingwo_fields_widget_form' => array(
       'arguments' => array('element' => NULL),
+      'pattern' => 'lingwo_fields_widget_form_',
     ),
     'lingwo_fields_formatter_default' => array(
       'arguments' => array('element' => NULL),
@@ -168,7 +169,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
   if (isset($node->taxonomy)) {
     foreach ($node->taxonomy as $term) {
       if ($term->vid == $pos_vid) {
-        $pos = $term;
+        $pos = strtolower($term->name);
         break;
       }
     }
@@ -220,7 +221,12 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     '#suffix' => '</div>',
   );
   $element['wrapper']['fields'] = array(
-    //'#theme' => 'lingwo_fields_widget_form',
+    '#theme' => array(
+      'lingwo_fields_widget_form_'. $node->language .'_'. $pos,
+      'lingwo_fields_widget_form_'. $node->language, 
+      'lingwo_fields_widget_form'
+    ),
+
     '#parents' => array($field_name),
   );
 
@@ -232,7 +238,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
   );
 
   $index = 0;
-  foreach (lingwo_language_fields($node->language, strtolower($pos->name)) as $field) {
+  foreach (lingwo_language_fields($node->language, $pos) as $field) {
     $default = $default_values[$field['type']][$field['name']];
     $field_form = array();
     $field_form['name'] = array(
@@ -385,8 +391,23 @@ function lingwo_fields_map_items($node, $items) {
  * Theming
  */
 
-function theme_lingwo_fields_widget($form) {
-  // TODO: me!!
+function template_preprocess_lingwo_fields_widget_form(&$variables) {
+  $variables['fields'] = array(
+    'forms' => array(),
+    'classes' => array(),
+    'options' => array()
+  );
+
+  foreach (element_children($variables['element']) as $name) {
+    $el = $variables['element'][$name];
+    $type = $el['type']['#value'];
+    $type .= ($type == 'class') ? 'es' : 's';
+    $variables['fields'][$type][$el['name']['#value']] = $el;
+  }
+}
+
+function theme_lingwo_fields_widget_form($element, $fields) {
+  return drupal_render($element);
 }
 
 function theme_lingwo_fields_formatter_default($element) {
