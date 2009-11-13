@@ -413,11 +413,17 @@ Lingwo.dictionary = {};
 
             var word;
             if (this.forms[name]) {
-                word = this._cachedForms[name] = this.lang.parseWord(this.forms[name]);
+                word = this.lang.parseWord(this.forms[name]);
             }
             else {
-                word = this._cachedForms[name] = this.lang.callMorphologyFunc(this, 'forms', name);
+                word = this.lang.callMorphologyFunc(this, 'forms', name);
             }
+
+            if (!word instanceof this.lang.Word) {
+                throw("Value returned from morphology function '"+name+"' is not a Word!");
+            }
+
+            this._cachedForms[name] = word;
 
             return word;
         },
@@ -428,7 +434,8 @@ Lingwo.dictionary = {};
             if (this._cachedOptions[name])
                 return this._cachedOptions[name];
             
-            var option = this._cachedOptions[name] = this.lang.callMorphologyFunc(this, 'options', name);
+            var option = this._cachedOptions[name] =
+                this.lang.callMorphologyFunc(this, 'options', name).toString();
             return option;
         },
 
@@ -456,6 +463,9 @@ Lingwo.dictionary = {};
                     throw e;
                 }
             }
+
+            // super-explicit conversion to boolean
+            value = !!value;
 
             this._cachedClasses[name] = value;
             return value;
