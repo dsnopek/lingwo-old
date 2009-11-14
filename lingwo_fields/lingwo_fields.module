@@ -399,10 +399,10 @@ function template_preprocess_lingwo_fields_widget_form(&$variables) {
   );
 
   foreach (element_children($variables['element']) as $name) {
-    $el = $variables['element'][$name];
+    $el = &$variables['element'][$name];
     $type = $el['type']['#value'];
     $type .= ($type == 'class') ? 'es' : 's';
-    $variables['fields'][$type][$el['name']['#value']] = $el;
+    $variables['fields'][$type][$el['name']['#value']] = &$el;
   }
 }
 
