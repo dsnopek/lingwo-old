@@ -1,4 +1,12 @@
 
+== 2009-11-14 ==
+
+ * lingwo_fields: Do some Javascript magic to compress the 'Automatic' checkbox into something 
+   even smaller and more compact, to make the interface tighter.  Maybe eliminate the label text
+   and move the check box over to the left of the field name (ie. [X] soft: false).
+ 
+ * lingwo_fields: Fix bug where classes don't save to the database!
+
 == 2009-11-13 ==
 
 The next big steps as I see them are:
