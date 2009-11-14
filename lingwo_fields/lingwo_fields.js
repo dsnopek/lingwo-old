@@ -30,8 +30,22 @@
         this.valueNode = $('<a class="lingwo-fields-value" href="#"></a>');
         this.autoNode = $('#'+(''+node.id).replace(/-value$/, '-automatic')).get();
 
+        this._reattachCheckbox();
         this._attachEvents();
         this.updateAutomatic();
+    };
+    // does some swanky magic to re-arrange the checkbox for a tighter UI
+    Control.prototype._reattachCheckbox = function () {
+        // first we want to seperate the label from the check box and hide the label
+        $(this.autoNode).insertBefore($(this.autoNode).parent());
+        $('label', $(this.autoNode).parent()).hide().attr('for', this.autoNode.id);
+
+        // then we want to move the check box to be before the input
+        $(this.autoNode).parent().insertBefore($(this.inputNode).parent()).css({
+            display: 'inline',
+            'float': 'left',
+            'margin': '0'
+        });
     };
     // sets up all the proper event handlers to make this control work
     Control.prototype._attachEvents = function () {
@@ -57,9 +71,9 @@
             }
 
             // toggle the class value immediately
-            if (type == 'class' && control.automatic) {
+            if (control.type == 'class' && control.automatic) {
                 var value = ($(':selected', inputNode).val() == '1');
-                control.setValue(!($(':selected', inputNode).val() == '1'));
+                $(control.inputNode).val(value ? '0' : '1');
             }
 
             control.updateAutomatic();
