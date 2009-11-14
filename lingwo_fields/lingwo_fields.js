@@ -27,7 +27,7 @@
         this.name = $(node).attr('data-name');
 
         this.inputNode = node;
-        this.valueNode = $('<a href="#"></a>');
+        this.valueNode = $('<a class="lingwo-fields-value" href="#"></a>');
         this.autoNode = $('#'+(''+node.id).replace(/-value$/, '-automatic')).get();
 
         this._attachEvents();
