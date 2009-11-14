@@ -406,7 +406,7 @@ function template_preprocess_lingwo_fields_widget_form(&$variables) {
   }
 }
 
-function theme_lingwo_fields_widget_form($element, $fields) {
+function theme_lingwo_fields_widget_form($element) {
   return drupal_render($element);
 }
 
