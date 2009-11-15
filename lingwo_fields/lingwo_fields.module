@@ -124,35 +124,33 @@ function lingwo_fields_field_settings($op, $field) {
 /**
  * Implementation of hook_field().
  */
-/*
 function lingwo_fields_field($op, &$node, $field, &$items, $teaser, $page) {
   switch ($op) {
     case 'load':
-      // Content_storage does serialize each field item's columns (if the 
-      // 'serialize' key for that column is set) upon writing to the db,
-      // but does not unserialize when reading from the db. Hopefully,
-      // this will be fixed in the future, but for now, we have to 
-      // explicitly unserialize.
-      if (is_array($items)) {
-        foreach ($items as &$item) {
-          if (is_string($item['data'])) {
-            $item['data'] = unserialize($item['data']);
-          }
+      foreach ($items as &$item) {
+        if ($item['type'] == 'class') {
+          $item['value'] = intval($item['value']);
         }
-        return (array($field['field_name'] => $items));
+      }
+      break;
+    case 'presave':
+      # remove the phantom refresh button that tries to sneak in here occasionally.
+      if (isset($items['refresh'])) {
+        unset($items['refresh']);
       }
       break;
     case 'validate':
+      # TODO: check for required items!
       return $items;
   }
 }
-*/
+
 
 /**
  * Implementation of hook_content_is_empty().
  */
 function lingwo_fields_content_is_empty($item, $field) {
-  return empty($item['value']);
+  return !isset($item['value']);
 }
 
 /**
@@ -412,11 +410,16 @@ function theme_lingwo_fields_widget_form($element) {
 
 function theme_lingwo_fields_formatter_default($element) {
   $index = 0;
+  # TODO: the lingwo_fields_map_items() call should really happen in a preprocess function!
   foreach (lingwo_fields_map_items($element['#node'], $element) as $name => $item) {
+    $value = $item['value'];
+    if ($item['type'] == 'class') {
+      $value = $item['value'] ? t('true') : t('false');
+    }
     $form[$index] = array(
       '#type' => 'item',
       '#title' => isset($item['label']) ? $item['label'] : $item['name'],
-      '#value' => $item['value'],
+      '#value' => $value,
       '#automatic' => $item['automatic'],
       '#weight' => $index
     );
