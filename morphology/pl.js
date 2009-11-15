@@ -5,6 +5,7 @@
 
 Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
     var generateAlphabet = function (single_letters, diagraphs, class_func) {
+        class_func = class_func || function () { return []; };
         var alphabet = {}, i;
         var makeLetter = function (letter) {
             alphabet[letter] = {
@@ -17,7 +18,7 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
             };
         };
         for (i = 0; i < single_letters.length; i++) {
-            makeLetter(single_letters[i]);
+            makeLetter(single_letters.substr(i,1));
         }
         for (i = 0; i < diagraphs.length; i++) {
             makeLetter(diagraphs[i]);
@@ -246,7 +247,7 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
         },
 
         'genitive.plural': function (entry) {
-            var word = entry.getForm(), stem = entry.getForm('*stem.plural'), ending;
+            var word = entry.getForm(), stem = entry.getForm('*stem.plural'), ending, endWord;
             var gender = entry.getOption('gender');
 
             if (gender == 'masculine') {

@@ -33,11 +33,19 @@ Lingwo.dictionary = {};
             }
             cons.prototype.lang = lang;
 
+            // IE hacks
+            if (props['toString'] != Object.prototype.toString) {
+                cons.prototype.toString = props.toString;
+            }
+            if (props['valueOf'] != Object.prototype.toString) {
+                cons.prototype.valueOf = props.valueOf;
+            }
+
             // used to extend the class
             cons.extend = function (obj) {
                 for (var name in obj) {
                     this.prototype[name] = obj[name];
-                };
+                }
             };
 
             return cons;
@@ -64,16 +72,18 @@ Lingwo.dictionary = {};
     };
     extendPrototype(SubWord, {
         'drop': function () {
-            if (this.start == -1)
+            if (this.start == -1) {
                 return false;
+            }
 
             var newWord = this.word.clone();
             newWord.letters.splice(this.start, this.len);
             return newWord;
         },
         'replace': function (text) {
-            if (this.start == -1)
+            if (this.start == -1) {
                 return false;
+            }
 
             var rWord = this.word.lang.parseWord(text);
             var newWord = this.word.clone();
@@ -81,8 +91,9 @@ Lingwo.dictionary = {};
             return newWord;
         },
         'append': function (text) {
-            if (this.start == -1)
+            if (this.start == -1) {
                 return false;
+            }
 
             var rWord = this.word.lang.parseWord(text);
             var newWord = this.word.clone();
@@ -90,8 +101,9 @@ Lingwo.dictionary = {};
             return newWord;
         },
         'result': function (value) {
-            if (this.start == -1)
+            if (this.start == -1) {
                 return false;
+            }
             return value;
         },
         'bool': function () {
@@ -128,7 +140,7 @@ Lingwo.dictionary = {};
                     var letter = this.letters[i];
                     var letter_def = this.lang.alphabet[letter[0]];
                     chars.push(letter_def.forms[letter[1]]);
-                };
+                }
                 return chars.join('');
             },
 
@@ -139,7 +151,7 @@ Lingwo.dictionary = {};
                     return this.lang.parseWord(spec).letters;
                 }
                 if (typeof spec == 'object') {
-                    if (typeof spec['length'] == 'number') {
+                    if (typeof spec.length == 'number') {
                         // this is an Array, just return it
                         return spec;
                     }
@@ -156,14 +168,15 @@ Lingwo.dictionary = {};
                     case 'cls':
                         var letterDef = this.lang.alphabet[letter[0]];
                         for (var i = 0; i < letterDef.classes.length; i++) {
-                            if (letterDef.classes[i] == letter_spec.value)
+                            if (letterDef.classes[i] == letter_spec.value) {
                                 return true;
+                            }
                         }
                         return false;
                     default:
                         // it is a letter!
                         return letter[0] == letter_spec[0];
-                };
+                }
             },
 
             'ending': function () {
@@ -178,12 +191,14 @@ Lingwo.dictionary = {};
                     checki:
                     for (var i = 0; i < arguments.length; i++) {
                         var testSpec = this._parseSpec(arguments[i]);
-                        if (testSpec.length > this.letters.length)
+                        if (testSpec.length > this.letters.length) {
                             continue checki;
+                        }
 
                         for (var e = 0; e < testSpec.length; e++) {
-                            if (!this._compLetter(this.letters[this.letters.length-e-1], testSpec[testSpec.length-e-1]))
+                            if (!this._compLetter(this.letters[this.letters.length-e-1], testSpec[testSpec.length-e-1])) {
                                 continue checki;
+                            }
                         }
 
                         return new SubWord(this, this.letters.length - testSpec.length, testSpec.length);
@@ -199,10 +214,11 @@ Lingwo.dictionary = {};
 
             'endingOrFalse': function () {
                 var ending = this.ending.apply(this, arguments);
-                if (ending.bool())
+                if (ending.bool()) {
                     return ending;
+                }
                 return false;
-            },
+            }
         }
     );
 
@@ -213,7 +229,7 @@ Lingwo.dictionary = {};
         this.morphology = {
             'options': {},
             'forms': {},
-            'classes': {},
+            'classes': {}
         };
 
     };
@@ -221,12 +237,11 @@ Lingwo.dictionary = {};
         alphabet: null,
 
         callMorphologyFunc: function (entry, type, which) {
-            var pos = entry.pos;
-            if (entry.like)
-                pos = entry.like;
+            var pos = entry.like || entry.pos;
 
-            if (typeof this.morphology[type] == 'undefined')
+            if (typeof this.morphology[type] == 'undefined') {
                 throw new lib.NoSuchMorphologyFunction('Invalid morphology function type: '+type);
+            }
 
             if (typeof this.morphology[type][pos] == 'undefined' ||
                 typeof this.morphology[type][pos][which] == 'undefined')
@@ -242,16 +257,19 @@ Lingwo.dictionary = {};
         // A letter in this implementation is a 2 item array: [letter name, form name]
         //
         parseLetter: function (s) {
-            if (!this.alphabet)
+            if (!this.alphabet) {
                 throw ("Cannot parseLetter() without a defined alphabet");
+            }
 
+            var name, form_name;
             for (name in this.alphabet)
             {
                 var letter_def = this.alphabet[name];
                 for (form_name in letter_def.forms)
                 {
-                    if (letter_def.forms[form_name] == s)
+                    if (letter_def.forms[form_name] == s) {
                         return [name, form_name];
+                    }
                 }
             }
 
@@ -279,8 +297,9 @@ Lingwo.dictionary = {};
             // trailing accents like "o" from "o'".  I imagine, but havent tested, that
             // this would have to be reversed for right-to-left languages.
 
-            if (!this.alphabet)
+            if (!this.alphabet) {
                 throw ("Cannot parseWord() without a defined alphabet");
+            }
 
             var index = 0;
             var end   = s.length;
@@ -295,7 +314,7 @@ Lingwo.dictionary = {};
                     var test = s.substring(index, end);
                     var res  = this.parseLetter(test);
 
-                    if (res != null)
+                    if (res !== null)
                     {
                         letters.push(res);
                         end -= test.length;
@@ -308,7 +327,9 @@ Lingwo.dictionary = {};
                 if (index > end)
                 {
                     // Nothing was found.
-                    print ("nothing was found");
+                    if (console && console.debug) {
+                        console.debug("nothing was found");
+                    }
                     return null;
                 }
             }
@@ -318,7 +339,7 @@ Lingwo.dictionary = {};
 
             // build the word
             return new this.Word(letters);
-        },
+        }
 
         // Makes a word into a string
         // TODO: This is copied from old code, modernize it!  This should really be put into the
@@ -361,7 +382,7 @@ Lingwo.dictionary = {};
     var utils = {
         'cls': function (cls) {
             return {'spec': 'cls', 'value': cls};
-        },
+        }
     };
 
     // the external function used to create new language definitions.
@@ -403,13 +424,15 @@ Lingwo.dictionary = {};
 
         getForm: function (name) {
             if (!name) {
-                if (this._baseForm === null)
+                if (this._baseForm === null) {
                     this._baseForm = this.lang.parseWord(this.name);
+                }
                 return this._baseForm;
             }
 
-            if (this._cachedForms[name])
+            if (this._cachedForms[name]) {
                 return this._cachedForms[name];
+            }
 
             var word;
             if (this.forms[name]) {
@@ -429,10 +452,12 @@ Lingwo.dictionary = {};
         },
 
         getOption: function (name) {
-            if (this.options[name])
+            if (this.options[name]) {
                 return this.options[name];
-            if (this._cachedOptions[name])
+            }
+            if (this._cachedOptions[name]) {
                 return this._cachedOptions[name];
+            }
             
             var option = this._cachedOptions[name] =
                 this.lang.callMorphologyFunc(this, 'options', name).toString();
@@ -440,15 +465,16 @@ Lingwo.dictionary = {};
         },
 
         isClass: function (name) {
-            if (this._cachedClasses == null) {
+            if (this._cachedClasses === null) {
                 this._cachedClasses = {};
                 for (var i = 0; i < this.classes.length; i++) {
                     this._cachedClasses[this.classes[i]] = true;
                 }
             }
 
-            if (typeof this._cachedClasses[name] != 'undefined')
+            if (typeof this._cachedClasses[name] != 'undefined') {
                 return this._cachedClasses[name];
+            }
 
             var value;
 
