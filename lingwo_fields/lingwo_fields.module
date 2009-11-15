@@ -36,6 +36,10 @@ function lingwo_fields_theme() {
     'lingwo_fields_formatter_default' => array(
       'arguments' => array('element' => NULL),
     ),
+    'lingwo_fields_view' => array(
+      'arguments' => array('element' => NULL),
+      'pattern' => 'lingwo_fields_view_',
+    ),
   );
 }
 
@@ -409,14 +413,12 @@ function theme_lingwo_fields_widget_form($element) {
 }
 
 function theme_lingwo_fields_formatter_default($element) {
-  $index = 0;
-  # TODO: the lingwo_fields_map_items() call should really happen in a preprocess function!
   foreach (lingwo_fields_map_items($element['#node'], $element) as $name => $item) {
     $value = $item['value'];
     if ($item['type'] == 'class') {
       $value = $item['value'] ? t('true') : t('false');
     }
-    $form[$index] = array(
+    $form[$name] = array(
       '#type' => 'item',
       '#title' => isset($item['label']) ? $item['label'] : $item['name'],
       '#value' => $value,
@@ -426,6 +428,22 @@ function theme_lingwo_fields_formatter_default($element) {
     $index++;
   }
 
-  return drupal_render($form);
+  // pack the form with some useful data
+  $form['#node'] = $element['#node'];
+
+  // Since CCK forces our theme name, we send to another theme to do the real
+  // theming, with possible specific themes.
+  $node = $element['#node'];
+  $pos = lingwo_dictionary_get_pos($node);
+
+  return theme(array(
+      'lingwo_fields_view_'. $node->language .'_'. $pos,
+      'lingwo_fields_view_'. $node->language, 
+      'lingwo_fields_view'
+  ), $form);
+}
+
+function theme_lingwo_fields_view($element) {
+  return drupal_render($element);
 }
 
