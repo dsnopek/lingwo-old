@@ -1,21 +1,16 @@
 
-== 2009-11-14 ==
+== 2009-11-15 ==
 
- * lingwo_fields: Do some Javascript magic to compress the 'Automatic' checkbox into something 
-   even smaller and more compact, to make the interface tighter.  Maybe eliminate the label text
-   and move the check box over to the left of the field name (ie. [X] soft: false).
- 
- * lingwo_fields: Fix bug where classes don't save to the database!
+ * Make it possible to theme the entry (node output) based on the language and pos.  Might have to
+   be handled entirely in the theme, I'm not sure.
 
 == 2009-11-13 ==
 
 The next big steps as I see them are:
 
- 1. Refactor and make the fields code nicer.
+ 1. Implement per-language per-pos theming and make the Polish language stuff look the way we want it.
 
- 2. Implement per-language per-pos theming and make the Polish language stuff look the way we want it.
-
- 3. Start working to make a *viable* Polish dictionary, that means:
+ 2. Start working to make a *viable* Polish dictionary, that means:
 
     * Finishing the morphology definition and gearing it to web entry.
 
@@ -23,7 +18,7 @@ The next big steps as I see them are:
 
 	* Provide a search/lookup mechanism
 
- 4. Start working on wikitionary import.  This will probably dictate alot of the decisions for
+ 3. Start working on wikitionary import.  This will probably dictate alot of the decisions for
     what fields end up on an Entry and maybe force the related entries issue.  This will also
 	include working with services to actually add the entries.  Ideally this should be progressive
 	but in the initial version it doesn't need to be.
