@@ -382,6 +382,38 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
 
         'instrumental.plural': function (entry) {
             return append_i_on_soft(entry.getForm('*stem.plural')).append('ami');
+        },
+
+        /*
+         * Locative
+         */
+
+        'locative.singular': function (entry) {
+            var word = entry.getForm(),
+                stem = entry.getForm('*stem.singular');
+
+            if (entry.getOption('gender') == 'feminine' || word.hasEnding('a')) {
+                return entry.getForm('dative.singular');
+            }
+
+            if (word.hasEnding('um')) {
+                return word;
+            }
+
+            if (stem.hasEnding(
+                /* hard */
+                'k', 'g', 'ch', 'j', 'l', 'c', 'cz', 'sz', 'rz', 'ż', 'dż',
+                /* soft */
+                'i', 'ń', 'ć', 'ź', 'dź'))
+            {
+                return append_i_on_soft(stem).append('u');
+            }
+
+            return stemChange(stem).append('e');
+        },
+
+        'locative.plural': function (entry) {
+            return append_i_on_soft(entry.getForm('*stem.plural')).append('ach');
         }
     };
 
@@ -544,6 +576,26 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
 
         'instrumental.plural': function (entry) {
             return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('mi');
+        },
+
+        /*
+         * Locative
+         */
+        
+        'locative.singular.masculine': function (entry) {
+            return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
+        },
+
+        'locative.singular.feminine': function (entry) {
+            return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('j');
+        },
+
+        'locative.singular.neuter': function (entry) {
+            return entry.getForm('locative.singular.masculine');
+        },
+
+        'locative.plural': function (entry) {
+            return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('ch');
         }
     };
 
