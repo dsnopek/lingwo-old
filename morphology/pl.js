@@ -518,6 +518,24 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
 
         'dative.plural': function (entry) {
             return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
+        },
+
+        /*
+         * Instrumental
+         */
+
+        'instrumental.singular.feminine': function (entry) {
+            return entry.getForm('*stem').append(
+                entry.isClass('soft') ? 'ią' : 'ą'
+            );
+        },
+
+        'instrumental.singular.masculine': function (entry) {
+            return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
+        },
+
+        'instrumental.singular.neuter': function (entry) {
+            return entry.getForm('instrumental.singular.masculine');
         }
     };
 

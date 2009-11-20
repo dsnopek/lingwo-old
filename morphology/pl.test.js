@@ -997,6 +997,22 @@ PolishTest = TestCase.subclass({
             'zwierzę': 'zwierzęciem',
             'dziewczę': 'dziewczęciem'
         });
+    },
+
+    testAdjectiveInstrumentalSingularFeminine: function () {
+        this.checkFormMulti('instrumental.singular.feminine', {
+            'dobry': 'dobrą',
+            'polski': 'polską',
+            'ostatni': 'ostatnią'
+        });
+    },
+
+    testAdjectiveInstrumentalSingularMasculine: function () {
+        this.checkFormMulti('instrumental.singular.masculine', {
+            'dobry': 'dobrym',
+            'polski': 'polskim',
+            'ostatni': 'ostatnim'
+        });
     }
 });
 
