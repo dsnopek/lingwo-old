@@ -800,11 +800,37 @@ PolishTest = TestCase.subclass({
         });
     },
 
-    testAdjectiveGenitiveSingularMasculine: function () {
+    testAdjectiveGenitivePlural: function () {
         this.checkFormMulti('genitive.plural', {
             'dobry': 'dobrych',
             'polski': 'polskich',
             'ostatni': 'ostatnich'
+        });
+    },
+
+    testNounMasculineDativeSingular: function () {
+        this.checkFormMulti('dative.singular', {
+            'Polak': 'Polakowi',
+            'sąsiad': 'sąsiadowi',
+            'mąż': 'mężowi',
+            'koń': 'koniowi',
+            'gość': 'gościowi',
+            
+            'brat': 'bratu',
+            'świat': 'światu',
+            'kot': 'kotu',
+            'ojciec': 'ojcu',
+            'chłopiec': 'chłopcu',
+            'pies': 'psu',
+            'Bóg': 'Bogu',
+            //'ksiądz': 'księdzu',
+
+            'kierowca': 'kierowcy',
+            'kolega': 'koledze',
+            'kaleka': 'kalece',
+            'poeta': 'poecie',
+            'dentysta': 'dentyście',
+            'mężczyzna': 'mężczyźnie'
         });
     }
 });

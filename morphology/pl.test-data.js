@@ -1972,4 +1972,23 @@ entries["wybrzeże"] = new Lingwo.dictionary.Entry({
     }
 });
 
+entries["świat"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "świat",
+    "pos": "noun",
+    "forms": {
+        "dative.singular": "światu"
+    }
+});
+
+entries["Bóg"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "Bóg",
+    "pos": "noun",
+    "forms": {
+        "*stem": "Bog",
+        "dative.singular": "Bogu"
+    }
+});
+
 

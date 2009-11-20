@@ -84,6 +84,16 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
                word.append('i');
     };
 
+    // Calls the append_i function if last letter is soft.
+    var append_i_on_soft = function (word) {
+        if (word.hasEnding(utils.cls('soft'))) {
+            return append_i(word);
+        }
+        return word;
+    };
+
+    // Appends -y to the end of a word, converting to -i if proceded by
+    // a 'k' or 'g'.
     var append_y = function (word, soft) {
         if (soft) {
             return word.append('i');
@@ -317,6 +327,34 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
                 }
 
                 return stem;
+            }
+        },
+
+        /*
+         * Dative.
+         */
+
+        'dative.singular': function (entry) {
+            var gender = entry.getOption('gender'),
+                word   = entry.getForm(),
+                stem   = entry.getForm('*stem.singular');
+            if (gender == 'feminine' || word.hasEnding('a')) {
+                if (stem.hasEnding('i')) {
+                    // maybe?
+                    return entry.getForm('genitive.singular');
+                }
+
+                return stem.ending('c', 'cz').append('y') ||
+                       stemChange(stem).append('e');
+            }
+            else if (gender == 'masculine') {
+                return append_i_on_soft(stem).append('owi');
+            }
+            else if (gender == 'neuter') {
+                if (word.hasEnding('um')) {
+                    return word;
+                }
+                return stem.append('u');
             }
         }
     };
