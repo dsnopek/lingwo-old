@@ -832,6 +832,48 @@ PolishTest = TestCase.subclass({
             'dentysta': 'dentyście',
             'mężczyzna': 'mężczyźnie'
         });
+    },
+
+    testNounFeminineDativeSingular: function () {
+        this.checkFormMulti('dative.singular', {
+            'szkoła': 'szkole',
+            'sosna': 'sośnie',
+            'kobieta': 'kobiecie',
+            'kapusta': 'kapuście',
+            'lista': 'liście',
+            'gwiazda': 'gwiaździe',
+            'bielizna': 'bieliźnie',
+            'ojczyzna': 'ojczyźnie',
+            'siostra': 'siostrze',
+            'Polska': 'Polsce',
+            'droga': 'drodze',
+            'podłoga': 'podłodze',
+            'mucha': 'musze',
+            'osoba': 'osobie',
+            'prasa': 'prasie',
+            'mama': 'mamie',
+            'koza': 'kozie',
+            'Europa': 'Europie',
+            'babcia': 'babci',
+            'tęcza': 'tęczy',
+            'noc': 'nocy'
+        });
+    },
+
+    testNounNeuterDativeSingular: function () {
+        this.checkFormMulti('dative.singular', {
+            'dziecko': 'dziecku',
+            'pole': 'polu',
+            'życie': 'życiu',
+            'imię': 'imieniu',
+            'ramię': 'ramieniu',
+            'jagnię': 'jagnięciu',
+            'źrebię': 'źrebięciu',
+            'prosię': 'prosięciu',
+            'zwierzę': 'zwierzęciu',
+            'dziewczę': 'dziewczęciu',
+            'niemowlę': 'niemowlęciu'
+        });
     }
 });
 

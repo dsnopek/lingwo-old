@@ -65,9 +65,9 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
                word.ending('ch').replace('sz') ||
                word.ending('zd').replace('ździ') ||
                word.ending('d').replace('dzi') ||
-               word.ending('sł').replace('śli') ||
-               word.ending('zł').replace('źli') ||
-               word.ending('ł').replace('li') ||
+               word.ending('sł').replace('śl') ||
+               word.ending('zł').replace('źl') ||
+               word.ending('ł').replace('l') ||
                word.ending('b','f','p','s','w','z','m','n').append('i') ||
                word;
     };
@@ -174,7 +174,9 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
                 else {
                     stem = stemChange(stem);
                     // apply the hard ending of necessary
-                    return stem.ending('c','dz','rz').append('y') || stem;
+                    return stem.ending('c','dz','rz').append('y') ||
+                           stem.ending('l').append('i')           ||
+                           stem;
                 }
             }
             else if (entry.getOption('gender') == 'feminine' && word.hasEnding('cz', 'sz')) {
