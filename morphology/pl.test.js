@@ -927,6 +927,76 @@ PolishTest = TestCase.subclass({
             'polski': 'polskim',
             'ostatni': 'ostatnim'
         });
+    },
+
+    testNounMasculineInstrumentalSingular: function () {
+        this.checkFormMulti('instrumental.singular', {
+            'syn': 'synem',
+            'brat': 'bratem',
+            'chłopiec': 'chłopcem',
+            'mąż': 'mężem',
+            'pies': 'psem',
+            'pokój': 'pokojem',
+            'las': 'lasem',
+            'ojciec': 'ojcem',
+            'Bóg': 'Bogiem',
+            'pociąg': 'pociągiem',
+            'Polak': 'Polakiem',
+            'Anglik': 'Anglikiem',
+            'koń': 'koniem',
+            'gość': 'gościem',
+            'uczeń': 'uczniem',
+            'gwóźdź': 'gwoździem',
+            'dzień': 'dniem',
+            'tydzień': 'tygodniem',
+            'kolega': 'kolegą',
+            'mężczyzna': 'mężczyzną'
+        });
+    },
+
+    testNounFeminineInstrumentalSingular: function () {
+        this.checkFormMulti('instrumental.singular', {
+            'matka': 'matką',
+            'lekcja': 'lekcją',
+            'droga': 'drogą',
+            'Polska': 'Polską',
+            'sól': 'solą',
+            'twarz': 'twarzą',
+            'podróż': 'podróżą',
+            'kolej': 'koleją',
+            'rzecz': 'rzeczą',
+            'mysz': 'myszą',
+            'noc': 'nocą',
+            'gospodyni': 'gospodynią',
+            'nić': 'nicią',
+            'część': 'częścią',
+            'gałąź': 'gałęzią',
+            'pieśń': 'pieśnią',
+            'jesień': 'jesienią',
+            'wieś': 'wsią'
+        });
+    },
+
+    testNounNeuterInstrumentalSingular: function () {
+        this.checkFormMulti('instrumental.singular', {
+            'pióro': 'piórem',
+            'krzesło': 'krzesłem',
+            'morze': 'morzem',
+            'zboże': 'zbożem',
+            'słońce': 'słońcem',
+            'miasto': 'miastem',
+            'życie': 'życiem',
+            'zdjęcie': 'zdjęciem',
+            'jabłko': 'jabłkiem',
+            'dziecko': 'dzieckiem',
+            'imię': 'imieniem',
+            'ramię': 'ramieniem',
+            'źrebię': 'źrebięciem',
+            'prosię': 'prosięciem',
+            'jagnię': 'jagnięciem',
+            'zwierzę': 'zwierzęciem',
+            'dziewczę': 'dziewczęciem'
+        });
     }
 });
 

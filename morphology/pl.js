@@ -362,6 +362,22 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
 
         'dative.plural': function (entry) {
             return append_i_on_soft(entry.getForm('*stem.plural')).append('om');
+        },
+
+        /*
+         * Instrumental
+         */
+        
+        'instrumental.singular': function (entry) {
+            var gender = entry.getOption('gender'),
+                word   = entry.getForm(),
+                stem   = entry.getForm('*stem.singular');
+            
+            if (gender == 'feminine' || word.hasEnding('a')) {
+                return append_i_on_soft(stem).append('ą');
+            }
+
+            return append_e(append_i_on_soft(stem)).append('m');
         }
     };
 

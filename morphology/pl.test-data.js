@@ -2082,4 +2082,31 @@ entries["wuj"] = new Lingwo.dictionary.Entry({
     }
 });
 
+entries["las"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "las",
+    "pos": "noun"
+});
+
+entries["gwóźdź"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "gwóźdź",
+    "pos": "noun",
+    "forms": {
+        "*stem": "gwoźdź"
+    }
+});
+
+entries["słońce"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "słońce",
+    "pos": "noun"
+});
+
+entries["zboże"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "zboże",
+    "pos": "noun"
+});
+
 
