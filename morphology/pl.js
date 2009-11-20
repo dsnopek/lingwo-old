@@ -478,7 +478,23 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
 
         'genitive.plural': function (entry) {
             return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('ch');
-        }
+        },
+
+        /*
+         * Dative
+         */
+        
+        'dative.singular.feminine': function (entry) {
+            return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('j');
+        },
+
+        'dative.singular.masculine': function (entry) {
+            return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('mu');
+        },
+
+        'dative.singular.neuter': function (entry) {
+            return entry.getForm('dative.singular.masculine');
+        },
     };
 
     /*

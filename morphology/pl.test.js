@@ -874,6 +874,22 @@ PolishTest = TestCase.subclass({
             'dziewczę': 'dziewczęciu',
             'niemowlę': 'niemowlęciu'
         });
+    },
+
+    testAdjectiveDativeSingularFeminine: function () {
+        this.checkFormMulti('dative.singular.feminine', {
+            'dobry': 'dobrej',
+            'polski': 'polskiej',
+            'ostatni': 'ostatniej'
+        });
+    },
+
+    testAdjectiveDativeSingularMasculine: function () {
+        this.checkFormMulti('dative.singular.masculine', {
+            'dobry': 'dobremu',
+            'polski': 'polskiemu',
+            'ostatni': 'ostatniemu'
+        });
     }
 });
 
