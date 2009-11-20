@@ -358,6 +358,10 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
                 }
                 return stem.append('u');
             }
+        },
+
+        'dative.plural': function (entry) {
+            return append_i_on_soft(entry.getForm('*stem.plural')).append('om');
         }
     };
 
@@ -495,6 +499,10 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
         'dative.singular.neuter': function (entry) {
             return entry.getForm('dative.singular.masculine');
         },
+
+        'dative.plural': function (entry) {
+            return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
+        }
     };
 
     /*

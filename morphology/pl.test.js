@@ -890,6 +890,43 @@ PolishTest = TestCase.subclass({
             'polski': 'polskiemu',
             'ostatni': 'ostatniemu'
         });
+    },
+
+    testNounDativePlural: function () {
+        this.checkFormMulti('dative.plural', {
+            'ojciec': 'ojcom',
+            'kolega': 'kolegom',
+            'mąż': 'mężom',
+            'okno': 'oknom',
+            'wuj': 'wujom',
+            'matka': 'matkom',
+            'muzeum': 'muzeom',
+            'koń': 'koniom',
+            'uczeń': 'uczniom',
+            'gałąź': 'gałęziom',
+            'gość': 'gościom',
+            'łódź': 'łodziom',
+            'pieśń': 'pieśniom',
+            'dzień': 'dniom',
+            'zdjęcie': 'zdjęciom',
+            'kuchnia': 'kuchniom',
+            'imię': 'imionom',
+            'ramię': 'ramionom',
+            'zwierzę': 'zwierzętom',
+            'jagnię': 'jagniętom',
+            'źrebię': 'źrebiętom',
+            'prosię': 'prosiętom',
+            'dziewczę': 'dziewczętom',
+            'kurczę': 'kurczętom'
+        });
+    },
+
+    testAdjectiveDativePlural: function () {
+        this.checkFormMulti('dative.plural', {
+            'dobry': 'dobrym',
+            'polski': 'polskim',
+            'ostatni': 'ostatnim'
+        });
     }
 });
 

@@ -2063,4 +2063,23 @@ entries["Europa"] = new Lingwo.dictionary.Entry({
     "pos": "noun"
 });
 
+entries["dzień"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "dzień",
+    "pos": "noun",
+    "forms": {
+        "*stem": "dń"
+    }
+});
+
+entries["wuj"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "wuj",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "nominative.plural": "wujowie"
+    }
+});
+
 
