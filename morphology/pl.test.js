@@ -1072,6 +1072,141 @@ PolishTest = TestCase.subclass({
             'polski': 'polskimi',
             'ostatni': 'ostatnimi'
         });
+    },
+
+    testNounMasculineLocativeSingular: function () {
+        this.checkFormMulti('locative.singular', {
+            'dach': 'dachu',
+            'hotel': 'hotelu',
+            'dziadek': 'dziadku',
+            'Polak': 'Polaku',
+            'Bóg': 'Bogu',
+            'szpital': 'szpitalu',
+            'pokój': 'pokoju',
+            'kraj': 'kraju',
+            'ojciec': 'ojcu',
+            'marzec': 'marcu',
+            'chłopiec': 'chłopcu',
+            'klucz': 'kluczu',
+            'talerz': 'talerzu',
+            'kapelusz': 'kapeluszu',
+            'nóż': 'nożu',
+            'garaż': 'garażu',
+            'cmentarz': 'cmentarzu',
+            'kierowca': 'kierowcy',
+            'sprzedawca': 'sprzedawcy',
+            'stół': 'stole',
+            'pomysł': 'pomyśle',
+            'brat': 'bracie',
+            'wykład': 'wykładzie',
+            'kaleka': 'kalece',
+            'kolega': 'koledze',
+            'Rzym': 'Rzymie',
+            'szef': 'szefie',
+            'wóz': 'wozie'
+        });
+    },
+
+    testNounFeminineLocativeSingular: function () {
+        this.checkFormMulti('locative.singular', {
+            'szkoła': 'szkole',
+            'sosna': 'sośnie',
+            'kobieta': 'kobiecie',
+            'kapusta': 'kapuście',
+            'gwiazda': 'gwiaździe',
+            'ojczyzna': 'ojczyźnie',
+            'siostra': 'siostrze',
+            'podłoga': 'podłodze',
+            'pończocha': 'pończosze',
+            'osoba': 'osobie',
+            'Europa': 'Europie'
+        });
+    },
+
+    testNounNeuterLocativeSingular: function () {
+        this.checkFormMulti('locative.singular', {
+            'jabłko': 'jabłku',
+            'ucho': 'uchu',
+            'jajko': 'jajku',
+            'wojsko': 'wojsku',
+            'echo': 'echu',
+            'pole': 'polu',
+            'serce': 'sercu',
+            'słońce': 'słońcu',
+            'życie': 'życiu',
+            'morze': 'morzu',
+            'zdjęcie': 'zdjęciu',
+            'imię': 'imieniu',
+            'ramię': 'ramieniu',
+            'jagnię': 'jagnięciu',
+            'źrebię': 'źrebięciu',
+            'prosię': 'prosięciu',
+            'zwierzę': 'zwierzęciu',
+            'dziewczę': 'dziewczęciu',
+            'niemowlę': 'niemowlęciu',
+            'mydło': 'mydle',
+            'krzesło': 'krześle',
+            'złoto': 'złocie',
+            'miasto': 'mieście',
+            'stado': 'stadzie',
+            'gniazdo': 'gnieździe',
+            'pióro': 'piórze',
+            'pismo': 'piśmie',
+            'mięso': 'mięsie'
+        });
+    },
+
+    testNounLocativePlural: function () {
+        this.checkFormMulti('locative.plural', {
+            'pies': 'psach',
+            'muzeum': 'muzeach',
+            'pokój': 'pokojach',
+            'matka': 'matkach',
+            'Polak': 'Polakach',
+            'jabłko': 'jabłkach',
+            'lekcja': 'lekcjach',
+            'święto': 'świętach',
+            'oko': 'oczach',
+            'wieś': 'wsiach',
+            'gość': 'gościach',
+            'liść': 'liściach',
+            'koń': 'koniach',
+            'pieśń': 'pieśniach',
+            'gałąź': 'gałęziach',
+            'ciocia': 'ciociach',
+            'imię': 'imionach',
+            'ramię': 'ramionach',
+            'jagnię': 'jagniętach',
+            'źrebię': 'źrebiętach',
+            'prosię': 'prosiętach',
+            'zwierzę': 'zwierzętach',
+            'dziewczę': 'dziewczętach'
+        });
+    },
+
+    testAdjectiveLocativeSingularMasculine: function () {
+       this.checkFormMulti('locative.singular.masculine', {
+          'dobry': 'dobrym',
+          'polski': 'polskim',
+          'ostatni': 'ostatnim'
+       });
+
+    },
+
+    testAdjectiveLocativeSingularFeminine: function () {
+       this.checkFormMulti('locative.singular.feminine', {
+          'dobry': 'dobrej',
+          'polski': 'polskiej',
+          'ostatni': 'ostatniej'
+       });
+    },
+
+    testAdjectiveLocativePlural: function () {
+       this.checkFormMulti('locative.plural', {
+          'dobry': 'dobrych',
+          'polski': 'polskich',
+          'ostatni': 'ostatnich'
+       });
     }
 });
 
