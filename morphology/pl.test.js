@@ -1013,6 +1013,65 @@ PolishTest = TestCase.subclass({
             'polski': 'polskim',
             'ostatni': 'ostatnim'
         });
+    },
+
+    testNounInstrumentalPlural: function () {
+        this.checkFormMulti('instrumental.plural', {
+            // regular, hard
+            'syn': 'synami',
+            'ojciec': 'ojcami',
+            'pies': 'psami',
+            'stół': 'stołami',
+            'lekcja': 'lekcjami',
+            'kolega': 'kolegami',
+            'noc': 'nocami',
+            'córka': 'córkami',
+            'święto': 'świętami',
+            'mąż': 'mężami',
+            'muzeum': 'muzeami',
+
+            // regular, soft
+            'babcia': 'babciami',
+            'zdjęcie': 'zdjęciami',
+            'wieś': 'wsiami',
+            'pieśń': 'pieśniami',
+            'gałąź': 'gałęziami',
+            'uczeń': 'uczniami',
+            'gwóźdź': 'gwoździami',
+            'tydzień': 'tygodniami',
+
+            // irregular, hard
+            'brat': 'braćmi',
+            //'ksiądz': 'księdżmi',
+            'pieniądz': 'pieniędzmi',
+            'dziecko': 'dziećmi',
+            'przyjaciel': 'przyjaciółmi',
+
+            // irregular, soft
+            'gość': 'gośćmi',
+            'kość': 'kośćmi',
+            'liść': 'liśćmi',
+            'nić': 'nićmi',
+            'dłoń': 'dłońmi',
+            'koń': 'końmi',
+
+            // neuters, yo!
+            'imię': 'imionami',
+            'ramię': 'ramionami',
+            'źrebię': 'źrebiętami',
+            'prosię': 'prosiętami',
+            'jagnię': 'jagniętami',
+            'zwierzę': 'zwierzętami',
+            'dziewczę': 'dziewczętami'
+        });
+    },
+
+    testAdjectiveInstrumentalPlural: function () {
+        this.checkFormMulti('instrumental.plural', {
+            'dobry': 'dobrymi',
+            'polski': 'polskimi',
+            'ostatni': 'ostatnimi'
+        });
     }
 });
 

@@ -2109,4 +2109,37 @@ entries["zboże"] = new Lingwo.dictionary.Entry({
     "pos": "noun"
 });
 
+entries["przyjaciel"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "przyjaciel",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "genitive.plural": "przyjaciół",
+        "instrumental.plural": "przyjaciółmi",
+        "*stem.plural": "przyjaciół"
+    }
+});
+
+entries["dłoń"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "dłoń",
+    "pos": "noun",
+    "forms": {
+        "instrumental.plural": "dłońmi"
+    }
+});
+
+entries["kość"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "kość",
+    "pos": "noun",
+    "options": {
+        "gender": "bone"
+    },
+    "forms": {
+        "instrumental.plural": "kośćmi"
+    }
+});
+
 
