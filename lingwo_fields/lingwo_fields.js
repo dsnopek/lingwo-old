@@ -30,6 +30,8 @@
         this.valueNode = $('<a class="lingwo-fields-value" href="#"></a>');
         this.autoNode = $('#'+(''+node.id).replace(/-value$/, '-automatic')).get();
 
+        $(this.inputNode).after(this.valueNode);
+
         this._reattachCheckbox();
         this._attachEvents();
         this.updateAutomatic();
@@ -57,7 +59,6 @@
             autoNode  = this.autoNode;
 
         // implement our toggling between automatic/manual
-        $(inputNode).parent().append(valueNode);
         $(autoNode).bind('click', function (evt) {
             control.updateAutomatic();
             updateForm();

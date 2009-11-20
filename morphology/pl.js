@@ -104,6 +104,12 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
      * Nouns
      */
 
+    lang.morphology.classes.noun = {
+        'animate': function (entry) {
+            return entry.isClass('virile');
+        }
+    };
+
     lang.morphology.options.noun = {
         'gender': function (entry) {
             var word = entry.getForm();

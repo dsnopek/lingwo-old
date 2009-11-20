@@ -261,6 +261,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
         'data-type' => $field['type'],
         'data-name' => $field['name']
       ),
+      '#description' => $field['description'],
     );
 
     switch ($field['type']) {

@@ -1,4 +1,8 @@
 
+== 2009-11-20 ==
+
+ * Fix the spacing with regard to lingwo_fields descriptions.
+
 == 2009-11-15 ==
 
  * Make it possible to theme the entry (node output) based on the language and pos.  Might have to
@@ -8,9 +12,7 @@
 
 The next big steps as I see them are:
 
- 1. Implement per-language per-pos theming and make the Polish language stuff look the way we want it.
-
- 2. Start working to make a *viable* Polish dictionary, that means:
+ 1. Start working to make a *viable* Polish dictionary, that means:
 
     * Finishing the morphology definition and gearing it to web entry.
 
@@ -18,7 +20,7 @@ The next big steps as I see them are:
 
 	* Provide a search/lookup mechanism
 
- 3. Start working on wikitionary import.  This will probably dictate alot of the decisions for
+ 2. Start working on wikitionary import.  This will probably dictate alot of the decisions for
     what fields end up on an Entry and maybe force the related entries issue.  This will also
 	include working with services to actually add the entries.  Ideally this should be progressive
 	but in the initial version it doesn't need to be.
