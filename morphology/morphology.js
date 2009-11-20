@@ -419,7 +419,7 @@ Lingwo.dictionary = {};
                     this.classes[classes[i].substr(1)] = false;
                 }
                 else {
-                    this.classes[classes[i]] = false;
+                    this.classes[classes[i]] = true;
                 }
             }
         }

@@ -800,7 +800,7 @@ PolishTest = TestCase.subclass({
         });
     },
 
-    testAdjectiveGenitiveSingularMasculine: function () {
+    testAdjectiveGenitivePlural: function () {
         this.checkFormMulti('genitive.plural', {
             'dobry': 'dobrych',
             'polski': 'polskich',
