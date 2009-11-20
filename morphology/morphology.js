@@ -409,7 +409,23 @@ Lingwo.dictionary = {};
 
         this.forms = args.forms || {};
         this.options = args.options || {};
-        this.classes = args.classes || [];
+
+        // we can get classes as either an Array of strings or an Object of booleans
+        var classes = args.classes || {};
+        if (classes.length) {
+            this.classes = {};
+            for(var i = 0; i < classes.length; i++) {
+                if (classes[i].substr(0, 1) == '!') {
+                    this.classes[classes[i].substr(1)] = false;
+                }
+                else {
+                    this.classes[classes[i]] = false;
+                }
+            }
+        }
+        else {
+            this.classes = classes;
+        }
 
         this.clearCache();
     };
@@ -419,7 +435,7 @@ Lingwo.dictionary = {};
 
             this._cachedForms = {};
             this._cachedOptions = {};
-            this._cachedClasses = null;
+            this._cachedClasses = {};
         },
 
         getForm: function (name) {
@@ -465,11 +481,8 @@ Lingwo.dictionary = {};
         },
 
         isClass: function (name) {
-            if (this._cachedClasses === null) {
-                this._cachedClasses = {};
-                for (var i = 0; i < this.classes.length; i++) {
-                    this._cachedClasses[this.classes[i]] = true;
-                }
+            if (typeof this.classes[name] != 'undefined') {
+                return this.classes[name];
             }
 
             if (typeof this._cachedClasses[name] != 'undefined') {

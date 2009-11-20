@@ -84,12 +84,18 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
                word.append('i');
     };
 
-    var append_y = function (word) {
+    var append_y = function (word, soft) {
+        if (soft) {
+            return word.append('i');
+        }
         return word.ending('k','g').append('i') ||
                word.append('y');
     };
 
-    var append_e = function (word) {
+    var append_e = function (word, soft) {
+        if (soft) {
+            return word.append('ie');
+        }
         return word.ending('k','g').append('ie') ||
                word.append('e');
     };
@@ -322,8 +328,7 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
 
     lang.morphology.forms.adjective = {
         '*stem': function (entry) {
-            var word = entry.getForm();
-            return entry.isClass('soft') ? word : word.ending(1).drop();
+            return entry.getForm().ending(1).drop();
         },
 
         /*
@@ -331,15 +336,17 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
          */
 
         'nominative.singular.masculine': function (entry) {
-            return entry.getForm();
+            return append_y(entry.getForm('*stem'), entry.isClass('soft'));
         },
 
         'nominative.singular.feminine': function (entry) {
-            return entry.getForm('*stem').append('a');
+            return entry.getForm('*stem').append(
+                entry.isClass('soft') ? 'ia' : 'a'
+            );
         },
 
         'nominative.singular.neuter': function (entry) {
-            return append_e(entry.getForm('*stem'));
+            return append_e(entry.getForm('*stem'), entry.isClass('soft'));
         },
 
         'nominative.plural.non_virile': function (entry) {
@@ -350,7 +357,7 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
             var stem = entry.getForm('*stem'), ending;
 
             if (entry.isClass('soft'))
-                return stem;
+                return stem.append('i');
             
             if (ending = stem.endingOrFalse('ż')) {
                 // TODO: shouldn't nouns do this transformation too?
@@ -382,7 +389,9 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
          */
 
         'accusative.singular.feminine': function (entry) {
-            return entry.getForm('*stem').append('ą');
+            return entry.getForm('*stem').append(
+                entry.isClass('soft') ? 'ią' : 'ą'
+            );
         },
 
         'accusative.singular.neuter': function (entry) {
@@ -410,11 +419,11 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
          */
 
         'genitive.singular.feminine': function (entry) {
-            return append_e(entry.getForm('*stem')).append('j');
+            return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('j');
         },
 
         'genitive.singular.masculine': function (entry) {
-            return append_e(entry.getForm('*stem')).append('go');
+            return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('go');
         },
 
         'genitive.singular.neuter': function (entry) {
@@ -422,8 +431,7 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
         },
 
         'genitive.plural': function (entry) {
-            var stem = entry.getForm('*stem');
-            return entry.isClass('soft') ? stem.append('ch') : append_y(stem).append('ch');
+            return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('ch');
         }
     };
 

@@ -86,11 +86,11 @@ PolishTest = TestCase.subclass({
             'długi': 'dług',
             'drogi': 'drog',
             'drugi': 'drug',
-            'głupi': 'głupi',
-            'tani': 'tani',
-            'trzeci': 'trzeci',
-            'ostatni': 'ostatni',
-            'średni': 'średni'
+            'głupi': 'głup',
+            'tani': 'tan',
+            'trzeci': 'trzec',
+            'ostatni': 'ostatn',
+            'średni': 'średn'
         });
     },
 

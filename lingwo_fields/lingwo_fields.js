@@ -111,6 +111,7 @@
 
             // copy from the form to the entry
             this.toEntry();
+            updateForm();
         }
     };
     // pulls the values for this control from an entry
@@ -140,7 +141,7 @@
     Control.prototype.toEntry = function () {
         switch(this.type) {
             case 'class':
-                entry.classes[this.name] = $(':selected', this.inputNode).val() == '1';
+                entry.classes[this.name] = $(':selected', this.inputNode).val() == 1;
                 break;
             case 'option':
                 entry.options[this.name] = $(':selected', this.inputNode).val();
