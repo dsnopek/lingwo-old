@@ -5,6 +5,7 @@
     var entry = null;
 
     var field_map = {};
+    var timer = null;
 
     // updates the on screen form with values from the entry
     function updateForm() {
@@ -189,7 +190,13 @@
 
         $('#edit-title', context).bind('keyup', function (evt) {
             entry.name = evt.target.value;
-            updateForm();
+            if (timer !== null) {
+                clearTimeout(timer);
+            }
+            timer = setTimeout(function () {
+                updateForm();
+                timer = null;
+            }, 500);
         });
 
         field_map = {
