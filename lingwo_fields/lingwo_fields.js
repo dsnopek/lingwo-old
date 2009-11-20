@@ -27,8 +27,10 @@
         this.name = $(node).attr('data-name');
 
         this.inputNode = node;
+        this.wrapperNode = $(this.inputNode).parent().parent().get(0);
         this.valueNode = $('<a class="lingwo-fields-value" href="#"></a>');
         this.autoNode = $('#'+(''+node.id).replace(/-value$/, '-automatic')).get();
+        this.showFunc = $(this.inputNode).attr('data-show');
 
         $(this.inputNode).after(this.valueNode);
 
@@ -137,6 +139,16 @@
 
         $(this.inputNode).val(inputValue);
         $(this.valueNode).html(value);
+
+        // Run our show function if one exists
+        if (this.showFunc) {
+            if (eval(this.showFunc)) {
+                $(this.wrapperNode).show();
+            }
+            else {
+                $(this.wrapperNode).hide();
+            }
+        }
     };
     // pulls values from the form and pushs them to the entry
     Control.prototype.toEntry = function () {

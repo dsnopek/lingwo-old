@@ -242,7 +242,10 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
   $index = 0;
   foreach (lingwo_language_fields($node->language, $pos) as $field) {
     $default = $default_values[$field['type']][$field['name']];
-    $field_form = array();
+    $field_form = array(
+      '#prefix' => '<div>',
+      '#suffix' => '</div>',
+    );
     $field_form['name'] = array(
       '#type' => 'hidden',
       '#value' => $field['name']
@@ -259,7 +262,8 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
       '#attributes' => array(
         'class' => $field_name_enc .'-control',
         'data-type' => $field['type'],
-        'data-name' => $field['name']
+        'data-name' => $field['name'],
+        'data-show' => $field['show'],
       ),
       '#description' => $field['description'],
     );
@@ -328,7 +332,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     'pos_vid' => $pos_vid,
     'pos_values' => $pos_values,
     'lang' => $node->language,
-    'pos' => isset($pos) ? strtolower($pos->name) : ''
+    'pos' => isset($pos) ? strtolower($pos->name) : '',
   )), 'setting');
   drupal_add_js(drupal_get_path('module', 'lingwo_fields') .'/lingwo_fields.js');
 

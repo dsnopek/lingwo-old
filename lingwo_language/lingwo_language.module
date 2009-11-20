@@ -61,11 +61,13 @@ $GLOBALS['LANG_SETTINGS'] = array(
             'name' => 'virile',
             'label' => 'Virile',
             'description' => 'Only important if the Gender is "masculine"',
+            'show' => 'entry.getOption("gender") == "masculine"',
           ),
           array(
             'name' => 'animate',
             'label' => 'Animate',
             'description' => 'Only important if the Gender is "masculine"',
+            'show' => 'entry.getOption("gender") == "masculine"',
           ),
         ),
         'options' => array(

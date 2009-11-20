@@ -1,8 +1,4 @@
 
-== 2009-11-20 ==
-
- * Fix the spacing with regard to lingwo_fields descriptions.
-
 == 2009-11-15 ==
 
  * Make it possible to theme the entry (node output) based on the language and pos.  Might have to
