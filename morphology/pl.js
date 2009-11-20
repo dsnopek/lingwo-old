@@ -65,9 +65,9 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
                word.ending('ch').replace('sz') ||
                word.ending('zd').replace('ździ') ||
                word.ending('d').replace('dzi') ||
-               word.ending('sł').replace('śli') ||
-               word.ending('zł').replace('źli') ||
-               word.ending('ł').replace('li') ||
+               word.ending('sł').replace('śl') ||
+               word.ending('zł').replace('źl') ||
+               word.ending('ł').replace('l') ||
                word.ending('b','f','p','s','w','z','m','n').append('i') ||
                word;
     };
@@ -174,7 +174,9 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
                 else {
                     stem = stemChange(stem);
                     // apply the hard ending of necessary
-                    return stem.ending('c','dz','rz').append('y') || stem;
+                    return stem.ending('c','dz','rz').append('y') ||
+                           stem.ending('l').append('i')           ||
+                           stem;
                 }
             }
             else if (entry.getOption('gender') == 'feminine' && word.hasEnding('cz', 'sz')) {
@@ -356,6 +358,30 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
                 }
                 return stem.append('u');
             }
+        },
+
+        'dative.plural': function (entry) {
+            return append_i_on_soft(entry.getForm('*stem.plural')).append('om');
+        },
+
+        /*
+         * Instrumental
+         */
+        
+        'instrumental.singular': function (entry) {
+            var gender = entry.getOption('gender'),
+                word   = entry.getForm(),
+                stem   = entry.getForm('*stem.singular');
+            
+            if (gender == 'feminine' || word.hasEnding('a')) {
+                return append_i_on_soft(stem).append('ą');
+            }
+
+            return append_e(append_i_on_soft(stem)).append('m');
+        },
+
+        'instrumental.plural': function (entry) {
+            return append_i_on_soft(entry.getForm('*stem.plural')).append('ami');
         }
     };
 
@@ -476,6 +502,48 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
 
         'genitive.plural': function (entry) {
             return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('ch');
+        },
+
+        /*
+         * Dative
+         */
+        
+        'dative.singular.feminine': function (entry) {
+            return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('j');
+        },
+
+        'dative.singular.masculine': function (entry) {
+            return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('mu');
+        },
+
+        'dative.singular.neuter': function (entry) {
+            return entry.getForm('dative.singular.masculine');
+        },
+
+        'dative.plural': function (entry) {
+            return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
+        },
+
+        /*
+         * Instrumental
+         */
+
+        'instrumental.singular.feminine': function (entry) {
+            return entry.getForm('*stem').append(
+                entry.isClass('soft') ? 'ią' : 'ą'
+            );
+        },
+
+        'instrumental.singular.masculine': function (entry) {
+            return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
+        },
+
+        'instrumental.singular.neuter': function (entry) {
+            return entry.getForm('instrumental.singular.masculine');
+        },
+
+        'instrumental.plural': function (entry) {
+            return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('mi');
         }
     };
 

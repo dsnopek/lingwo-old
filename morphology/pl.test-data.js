@@ -1991,4 +1991,155 @@ entries["Bóg"] = new Lingwo.dictionary.Entry({
     }
 });
 
+entries["sosna"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "sosna",
+    "pos": "noun"
+});
+
+entries["kapusta"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "kapusta",
+    "pos": "noun"
+});
+
+entries["lista"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "lista",
+    "pos": "noun"
+});
+
+entries["bielizna"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "bielizna",
+    "pos": "noun"
+});
+
+entries["ojczyzna"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "ojczyzna",
+    "pos": "noun"
+});
+
+entries["podłoga"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "podłoga",
+    "pos": "noun"
+});
+
+entries["mucha"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "mucha",
+    "pos": "noun"
+});
+
+entries["osoba"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "osoba",
+    "pos": "noun"
+});
+
+entries["prasa"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "prasa",
+    "pos": "noun"
+});
+
+entries["mama"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "mama",
+    "pos": "noun"
+});
+
+entries["koza"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "koza",
+    "pos": "noun"
+});
+
+entries["Europa"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "Europa",
+    "pos": "noun"
+});
+
+entries["dzień"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "dzień",
+    "pos": "noun",
+    "forms": {
+        "*stem": "dń"
+    }
+});
+
+entries["wuj"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "wuj",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "nominative.plural": "wujowie"
+    }
+});
+
+entries["las"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "las",
+    "pos": "noun"
+});
+
+entries["gwóźdź"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "gwóźdź",
+    "pos": "noun",
+    "forms": {
+        "*stem": "gwoźdź"
+    }
+});
+
+entries["słońce"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "słońce",
+    "pos": "noun"
+});
+
+entries["zboże"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "zboże",
+    "pos": "noun"
+});
+
+entries["przyjaciel"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "przyjaciel",
+    "pos": "noun",
+    "classes": ["animate", "virile"],
+    "forms": {
+        "genitive.plural": "przyjaciół",
+        "instrumental.plural": "przyjaciółmi",
+        "*stem.plural": "przyjaciół"
+    }
+});
+
+entries["dłoń"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "dłoń",
+    "pos": "noun",
+    "forms": {
+        "instrumental.plural": "dłońmi"
+    }
+});
+
+entries["kość"] = new Lingwo.dictionary.Entry({
+    "lang": Lingwo.dictionary.languages["pl"],
+    "name": "kość",
+    "pos": "noun",
+    "options": {
+        "gender": "bone"
+    },
+    "forms": {
+        "instrumental.plural": "kośćmi"
+    }
+});
+
 

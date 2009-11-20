@@ -832,6 +832,246 @@ PolishTest = TestCase.subclass({
             'dentysta': 'dentyście',
             'mężczyzna': 'mężczyźnie'
         });
+    },
+
+    testNounFeminineDativeSingular: function () {
+        this.checkFormMulti('dative.singular', {
+            'szkoła': 'szkole',
+            'sosna': 'sośnie',
+            'kobieta': 'kobiecie',
+            'kapusta': 'kapuście',
+            'lista': 'liście',
+            'gwiazda': 'gwiaździe',
+            'bielizna': 'bieliźnie',
+            'ojczyzna': 'ojczyźnie',
+            'siostra': 'siostrze',
+            'Polska': 'Polsce',
+            'droga': 'drodze',
+            'podłoga': 'podłodze',
+            'mucha': 'musze',
+            'osoba': 'osobie',
+            'prasa': 'prasie',
+            'mama': 'mamie',
+            'koza': 'kozie',
+            'Europa': 'Europie',
+            'babcia': 'babci',
+            'tęcza': 'tęczy',
+            'noc': 'nocy'
+        });
+    },
+
+    testNounNeuterDativeSingular: function () {
+        this.checkFormMulti('dative.singular', {
+            'dziecko': 'dziecku',
+            'pole': 'polu',
+            'życie': 'życiu',
+            'imię': 'imieniu',
+            'ramię': 'ramieniu',
+            'jagnię': 'jagnięciu',
+            'źrebię': 'źrebięciu',
+            'prosię': 'prosięciu',
+            'zwierzę': 'zwierzęciu',
+            'dziewczę': 'dziewczęciu',
+            'niemowlę': 'niemowlęciu'
+        });
+    },
+
+    testAdjectiveDativeSingularFeminine: function () {
+        this.checkFormMulti('dative.singular.feminine', {
+            'dobry': 'dobrej',
+            'polski': 'polskiej',
+            'ostatni': 'ostatniej'
+        });
+    },
+
+    testAdjectiveDativeSingularMasculine: function () {
+        this.checkFormMulti('dative.singular.masculine', {
+            'dobry': 'dobremu',
+            'polski': 'polskiemu',
+            'ostatni': 'ostatniemu'
+        });
+    },
+
+    testNounDativePlural: function () {
+        this.checkFormMulti('dative.plural', {
+            'ojciec': 'ojcom',
+            'kolega': 'kolegom',
+            'mąż': 'mężom',
+            'okno': 'oknom',
+            'wuj': 'wujom',
+            'matka': 'matkom',
+            'muzeum': 'muzeom',
+            'koń': 'koniom',
+            'uczeń': 'uczniom',
+            'gałąź': 'gałęziom',
+            'gość': 'gościom',
+            'łódź': 'łodziom',
+            'pieśń': 'pieśniom',
+            'dzień': 'dniom',
+            'zdjęcie': 'zdjęciom',
+            'kuchnia': 'kuchniom',
+            'imię': 'imionom',
+            'ramię': 'ramionom',
+            'zwierzę': 'zwierzętom',
+            'jagnię': 'jagniętom',
+            'źrebię': 'źrebiętom',
+            'prosię': 'prosiętom',
+            'dziewczę': 'dziewczętom',
+            'kurczę': 'kurczętom'
+        });
+    },
+
+    testAdjectiveDativePlural: function () {
+        this.checkFormMulti('dative.plural', {
+            'dobry': 'dobrym',
+            'polski': 'polskim',
+            'ostatni': 'ostatnim'
+        });
+    },
+
+    testNounMasculineInstrumentalSingular: function () {
+        this.checkFormMulti('instrumental.singular', {
+            'syn': 'synem',
+            'brat': 'bratem',
+            'chłopiec': 'chłopcem',
+            'mąż': 'mężem',
+            'pies': 'psem',
+            'pokój': 'pokojem',
+            'las': 'lasem',
+            'ojciec': 'ojcem',
+            'Bóg': 'Bogiem',
+            'pociąg': 'pociągiem',
+            'Polak': 'Polakiem',
+            'Anglik': 'Anglikiem',
+            'koń': 'koniem',
+            'gość': 'gościem',
+            'uczeń': 'uczniem',
+            'gwóźdź': 'gwoździem',
+            'dzień': 'dniem',
+            'tydzień': 'tygodniem',
+            'kolega': 'kolegą',
+            'mężczyzna': 'mężczyzną'
+        });
+    },
+
+    testNounFeminineInstrumentalSingular: function () {
+        this.checkFormMulti('instrumental.singular', {
+            'matka': 'matką',
+            'lekcja': 'lekcją',
+            'droga': 'drogą',
+            'Polska': 'Polską',
+            'sól': 'solą',
+            'twarz': 'twarzą',
+            'podróż': 'podróżą',
+            'kolej': 'koleją',
+            'rzecz': 'rzeczą',
+            'mysz': 'myszą',
+            'noc': 'nocą',
+            'gospodyni': 'gospodynią',
+            'nić': 'nicią',
+            'część': 'częścią',
+            'gałąź': 'gałęzią',
+            'pieśń': 'pieśnią',
+            'jesień': 'jesienią',
+            'wieś': 'wsią'
+        });
+    },
+
+    testNounNeuterInstrumentalSingular: function () {
+        this.checkFormMulti('instrumental.singular', {
+            'pióro': 'piórem',
+            'krzesło': 'krzesłem',
+            'morze': 'morzem',
+            'zboże': 'zbożem',
+            'słońce': 'słońcem',
+            'miasto': 'miastem',
+            'życie': 'życiem',
+            'zdjęcie': 'zdjęciem',
+            'jabłko': 'jabłkiem',
+            'dziecko': 'dzieckiem',
+            'imię': 'imieniem',
+            'ramię': 'ramieniem',
+            'źrebię': 'źrebięciem',
+            'prosię': 'prosięciem',
+            'jagnię': 'jagnięciem',
+            'zwierzę': 'zwierzęciem',
+            'dziewczę': 'dziewczęciem'
+        });
+    },
+
+    testAdjectiveInstrumentalSingularFeminine: function () {
+        this.checkFormMulti('instrumental.singular.feminine', {
+            'dobry': 'dobrą',
+            'polski': 'polską',
+            'ostatni': 'ostatnią'
+        });
+    },
+
+    testAdjectiveInstrumentalSingularMasculine: function () {
+        this.checkFormMulti('instrumental.singular.masculine', {
+            'dobry': 'dobrym',
+            'polski': 'polskim',
+            'ostatni': 'ostatnim'
+        });
+    },
+
+    testNounInstrumentalPlural: function () {
+        this.checkFormMulti('instrumental.plural', {
+            // regular, hard
+            'syn': 'synami',
+            'ojciec': 'ojcami',
+            'pies': 'psami',
+            'stół': 'stołami',
+            'lekcja': 'lekcjami',
+            'kolega': 'kolegami',
+            'noc': 'nocami',
+            'córka': 'córkami',
+            'święto': 'świętami',
+            'mąż': 'mężami',
+            'muzeum': 'muzeami',
+
+            // regular, soft
+            'babcia': 'babciami',
+            'zdjęcie': 'zdjęciami',
+            'wieś': 'wsiami',
+            'pieśń': 'pieśniami',
+            'gałąź': 'gałęziami',
+            'uczeń': 'uczniami',
+            'gwóźdź': 'gwoździami',
+            'tydzień': 'tygodniami',
+
+            // irregular, hard
+            'brat': 'braćmi',
+            //'ksiądz': 'księdżmi',
+            'pieniądz': 'pieniędzmi',
+            'dziecko': 'dziećmi',
+            'przyjaciel': 'przyjaciółmi',
+
+            // irregular, soft
+            'gość': 'gośćmi',
+            'kość': 'kośćmi',
+            'liść': 'liśćmi',
+            'nić': 'nićmi',
+            'dłoń': 'dłońmi',
+            'koń': 'końmi',
+
+            // neuters, yo!
+            'imię': 'imionami',
+            'ramię': 'ramionami',
+            'źrebię': 'źrebiętami',
+            'prosię': 'prosiętami',
+            'jagnię': 'jagniętami',
+            'zwierzę': 'zwierzętami',
+            'dziewczę': 'dziewczętami'
+        });
+    },
+
+    testAdjectiveInstrumentalPlural: function () {
+        this.checkFormMulti('instrumental.plural', {
+            'dobry': 'dobrymi',
+            'polski': 'polskimi',
+            'ostatni': 'ostatnimi'
+        });
     }
 });
 
