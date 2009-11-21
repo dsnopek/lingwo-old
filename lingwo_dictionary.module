@@ -37,6 +37,12 @@ function _ld_form_to_node(&$form, &$form_state) {
   return $node;
 }
 
+// Let's us know if a node is a translation
+function lingwo_dictionary_is_translation($node) {
+  return isset($node->translation_source) ||
+    ($node->nid && $node->tnid != 0 && $node->nid != $node->tnid);
+}
+
 // Gets the Part of Speech from a node
 function lingwo_dictionary_get_pos($node) {
   $pos_vid = lingwo_dictionary_pos_vocabulary();

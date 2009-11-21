@@ -154,7 +154,10 @@ function lingwo_fields_field($op, &$node, $field, &$items, $teaser, $page) {
  * Implementation of hook_content_is_empty().
  */
 function lingwo_fields_content_is_empty($item, $field) {
-  return !isset($item['value']);
+  if (empty($item['value'])) {
+    return TRUE;
+  }
+  return FALSE;
 }
 
 /**
@@ -164,6 +167,10 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
   $node = $form['#node'];
   if (!isset($node)) {
     $node = (object)$form_state['node'];
+  }
+
+  if (lingwo_dictionary_is_translation($node)) {
+    return NULL;
   }
 
   $pos_vid = lingwo_dictionary_pos_vocabulary();

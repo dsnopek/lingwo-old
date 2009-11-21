@@ -140,7 +140,7 @@ function lingwo_senses_content_is_empty($item, $field) {
       return TRUE;
     }
   }
-  else if (empty($item['data']['clue']) && empty($item['data']['translation'])) {
+  else if (empty($item['data']['clue']) && empty($item['data']['trans'])) {
     // for translations
     return TRUE;
   }
@@ -149,8 +149,12 @@ function lingwo_senses_content_is_empty($item, $field) {
 
 function lingwo_senses_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   $node = $form['#node'];
+  if (!isset($node)) {
+    $node = (object)$form_state['node'];
+  }
+
   $func = 'lingwo_senses_widget_'.
-    ((isset($node->translation_source) || ($node->nid && $node->nid != $node->tnid)) ? 'translation' : 'original');
+    (lingwo_dictionary_is_translation($node) ? 'translation' : 'original');
   return $func($form, $form_state, $field, $items, $delta);
 }
 
@@ -246,10 +250,17 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
 
 function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, $delta = 0) {
   $node = $form['#node'];
+  if (!isset($node)) {
+    $node = (object)$form_state['node'];
+  }
+
   $field_name = $field['field_name'];
 
   $senses = lingwo_senses_get_translations($node, $field_name, $items);
   $orig_senses = $node->translation_source->$field_name;
+  if (count($orig_senses) == 1 && empty($orig_senses[0]['data'])) {
+    $orig_senses = array();
+  }
 
   $element = array(
     '#type' => 'fieldset',
@@ -290,7 +301,7 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
         '#default_value' => $sense['data']['clue'],
       );
     }
-    if (!$orig_sense && !($sense['id'] == '*' && count($orig_senses) == 0)) {
+    if (!$orig_sense && ($sense['data']['id'] != '*' && count($orig_senses) == 0)) {
       $sense_form['old_sense_message'] = array(
         '#prefix' => '<div class="lingwo-sense-old-message">* ',
         '#value' => t('This translation is for a sense that has been removed from the entry.'),
@@ -319,16 +330,22 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
 /* Takes an entry and a trans and makes a list of trans senses in the appropriate
  * order, connected to the entry senses if one exists.
  */
-function lingwo_senses_get_translations($node, $field_name, $items) {
+function lingwo_senses_get_translations(&$node, $field_name, $items) {
   if (empty($node->translation_source)) {
     $node->translation_source = node_load($node->tnid);
   }
 
   $orig = $node->translation_source;
   $orig_senses = isset($orig) ? $orig->$field_name : array();
+  if (count($orig_senses) == 1 && empty($orig_senses[0]['data'])) {
+    $orig_senses = array();
+  }
 
   $trans_map = array();
   $trans_senses = $node->nid ? $items : NULL;
+  if (count($trans_senses) == 1 && empty($trans_senses[0]['data'])) {
+    $trans_senses = array();
+  }
   if (!empty($trans_senses)) {
     foreach ($trans_senses as $trans_sense) {
       $trans_map[$trans_sense['data']['id']] = $trans_sense;
@@ -353,14 +370,14 @@ function lingwo_senses_get_translations($node, $field_name, $items) {
       $only_sense = $trans_map['*'];
     }
     else {
-      $only_sense = array('id' => '*');
+      $only_sense = array('data' => array('id' => '*'));
     }
     $senses[] = $only_sense;
     unset($trans_map['*']);
   }
 
   foreach ($trans_map as $id => $trans_sense) {
-    $trans_sense['id'] = $id;
+    $trans_sense['data']['id'] = $id;
     $senses[] = $trans_sense;
   }
 
