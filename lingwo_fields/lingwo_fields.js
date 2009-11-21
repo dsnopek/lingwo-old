@@ -179,7 +179,7 @@
         // this will be run every time the AHAH completes, so we need to rebuild
         // the entry object.
         entry = new Lingwo.dictionary.Entry({
-            // NOTE: These don't go on context because we want it always
+            // NOTE: we don't search for #edit-title on context because we want it always
             name: $('#edit-title').val(),
             lang: Lingwo.dictionary.languages[lang],
             pos: pos

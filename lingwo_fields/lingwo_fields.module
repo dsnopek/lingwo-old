@@ -29,6 +29,9 @@ function lingwo_fields_menu() {
  */
 function lingwo_fields_theme() {
   return array(
+    'lingwo_fields_widget_form_wrapper' => array(
+      'arguments' => array('element' => NULL),
+    ),
     'lingwo_fields_widget_form' => array(
       'arguments' => array('element' => NULL),
       'pattern' => 'lingwo_fields_widget_form_',
@@ -174,15 +177,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
   }
 
   $pos_vid = lingwo_dictionary_pos_vocabulary();
-
-  if (isset($node->taxonomy)) {
-    foreach ($node->taxonomy as $term) {
-      if ($term->vid == $pos_vid) {
-        $pos = strtolower($term->name);
-        break;
-      }
-    }
-  }
+  $pos = lingwo_dictionary_get_pos($node);
 
   $default_values = array();
   foreach ($items as $item) {
@@ -193,7 +188,8 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
 
   $element = array(
     '#type' => 'fieldset',
-    '#title' => $field['field_label']
+    '#title' => $field['field_label'],
+    '#theme' => 'lingwo_fields_widget_form_wrapper'
   );
 
   // If this node is new, then add the AHAH and 'Refresh' button that allows
@@ -317,8 +313,20 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     );
   }
 
+  // for the theme function
+  $element['#node'] = $node;
+  $element['#pos'] = $pos;
+  $element['#field_name_enc'] = $field_name_enc;
+
+  return $element;
+}
+
+function theme_lingwo_fields_widget_form_wrapper($element) {
+  $node = $element['#node'];
+
   drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/morphology/morphology.js');
 
+  // load the required language(s)
   $language_list = $node->language ?
     array((object)array('enabled' => TRUE, 'language' => $node->language)) : language_list();
   foreach ($language_list as $lang) {
@@ -328,22 +336,24 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     }
   }
 
+  // get a map of all the pos values
+  $pos_vid = lingwo_dictionary_pos_vocabulary();
   $pos_values = array();
   foreach (taxonomy_get_tree($pos_vid) as $term) {
     $pos_values[$term->tid] = strtolower($term->name);
   }
 
   drupal_add_js(array('lingwo_fields' => array(
-    'field_name' => $field_name_enc,
+    'field_name' => $element['#field_name_enc'],
     'is_new' => $node->nid == 0,
     'pos_vid' => $pos_vid,
     'pos_values' => $pos_values,
     'lang' => $node->language,
-    'pos' => isset($pos) ? strtolower($pos->name) : '',
+    'pos' => $element['#pos'],
   )), 'setting');
   drupal_add_js(drupal_get_path('module', 'lingwo_fields') .'/lingwo_fields.js');
 
-  return $element;
+  return drupal_render($element); 
 }
 
 function lingwo_fields_ahah($field_name) {
