@@ -92,6 +92,10 @@ $GLOBALS['LANG_SETTINGS'] = array(
           array('name' => 'accusative.plural'),
           array('name' => 'genitive.singular'),
           array('name' => 'genitive.plural'),
+          array('name' => 'instrumental.singular'),
+          array('name' => 'instrumental.plural'),
+          array('name' => 'locative.singular'),
+          array('name' => 'locative.plural'),
         ),
       ),
       'adjective' => array(
@@ -115,6 +119,14 @@ $GLOBALS['LANG_SETTINGS'] = array(
           array('name' => 'genitive.singular.feminine'),
           array('name' => 'genitive.singular.neuter'),
           array('name' => 'genitive.plural'),
+          array('name' => 'instrumental.singular.masculine'),
+          array('name' => 'instrumental.singular.feminine'),
+          array('name' => 'instrumental.singular.neuter'),
+          array('name' => 'instrumental.plural'),
+          array('name' => 'locative.singular.masculine'),
+          array('name' => 'locative.singular.feminine'),
+          array('name' => 'locative.singular.neuter'),
+          array('name' => 'locative.plural'),
         )
       ),
       'verb' => array(
