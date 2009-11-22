@@ -5,6 +5,12 @@
  *
  * The end goal is some kind of server to run morphology definitions, which can be used on the
  * server-side, either for API requests or when the browser doesn't have javascript available.
+ *
+ * Check out this server-side JavaScript stuff:
+ *
+ *  http://narwhaljs.org/
+ *  http://jackjs.org/
+ *
  */
 
 function dir(o) {

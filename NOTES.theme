@@ -30,4 +30,13 @@ Drupal gives for its forms, but allows more "table-like" inline display.  It pro
 couldn't/shouldn't be used directly, but rather learned from and have the same techniques
 reused in our theme.
 
+Fancy Buttons
+=============
+
+This code could *easily* be integrated into a theme to provide much nicer looking buttons
+for the site:
+
+http://www.p51labs.com/simply-buttons-v2/
+
+It would just be theme_button (or whatever creates the submit buttons) and some CSS.
 
