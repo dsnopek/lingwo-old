@@ -2,6 +2,11 @@
 // $Id: $
 
 /**
+ * @file
+ * Install file for lingwo_fields.
+ */
+
+/**
  * Implementation of hook_install().
  */
 function lingwo_fields_install() {

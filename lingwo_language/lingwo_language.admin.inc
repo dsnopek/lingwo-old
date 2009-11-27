@@ -158,7 +158,7 @@ function theme_lingwo_language_tabs($form) {
   jquery_ui_add(array('ui.tabs'));
   drupal_add_js("$(document).ready(function() { $('#lingwo-dictionary-tabs > ul').tabs() });", "inline");
   // TODO: we probably should incorporate this into our theme, rather than use the default one
-  drupal_add_css(drupal_get_path('module', 'jquery_ui').'/jquery.ui/themes/default/ui.all.css');
+  drupal_add_css(drupal_get_path('module', 'jquery_ui') .'/jquery.ui/themes/default/ui.all.css');
 
   return $output;
 }

@@ -2,6 +2,11 @@
 // $Id: $
 
 /**
+ * @file
+ * Install file for lingwo_senses.
+ */
+
+/**
  * Implementation of hook_install().
  */
 function lingwo_senses_install() {

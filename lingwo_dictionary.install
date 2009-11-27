@@ -2,6 +2,11 @@
 // $Id: $
 
 /**
+ * @file
+ * Install file for lingwo_dictionary.
+ */
+
+/**
  * Implementation of hook_schema().
  */
 function lingwo_dictionary_schema() {
@@ -11,23 +16,23 @@ function lingwo_dictionary_schema() {
       'language' => array(
         'description' => 'The {languages}.language of this node.',
         'type' => 'varchar',
-		'length' => 12,
+        'length' => 12,
         'not null' => TRUE,
-		'default' => '',
+        'default' => '',
       ),
       'pos' => array(
         'description' => 'Part of speech',
         'type' => 'varchar',
         'length' => 12,
         'not null' => TRUE,
-		'default' => '',
+        'default' => '',
       ),
       'title' => array(
         'description' => 'The title of this node.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-		'default' => '',
+        'default' => '',
       ),
       'nid' => array(
         'description' => 'The primary identifier for a node.',
