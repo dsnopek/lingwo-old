@@ -296,7 +296,7 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
         );
       }
     }
-    if (count($senses) > 1) {
+    if ($sense['data']['id'] != '*') {
       $sense_form['data']['clue'] = array(
         '#type' => 'textfield',
         '#title' => t('Clue'),
