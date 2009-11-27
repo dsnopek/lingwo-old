@@ -134,6 +134,9 @@ function lingwo_senses_field($op, &$node, $field, &$items, $teaser, $page) {
  * Implementation of hook_content_is_empty().
  */
 function lingwo_senses_content_is_empty($item, $field) {
+  if ($item['retire_sense']) {
+    return TRUE;
+  }
   if (isset($item['data']['difference'])) {
     // for originals
     if (empty($item['data']['difference']) && empty($item['data']['example'])) {
@@ -270,7 +273,7 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
 
   $index = 0;
   foreach ($senses as $sense) {
-    $orig_sense = $sense['data']['orig_sense'];
+    $orig_sense = $sense['orig_sense'];
 
     $sense_form = array();
     $sense_form['data']['id'] = array(
@@ -293,7 +296,7 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
         );
       }
     }
-    if (count($senses) > 1) {
+    if ($sense['data']['id'] != '*') {
       $sense_form['data']['clue'] = array(
         '#type' => 'textfield',
         '#title' => t('Clue'),
@@ -301,7 +304,7 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
         '#default_value' => $sense['data']['clue'],
       );
     }
-    if (!$orig_sense && ($sense['data']['id'] != '*' && count($orig_senses) == 0)) {
+    if (!$orig_sense && !($sense['data']['id'] == '*' && count($orig_senses) == 0)) {
       $sense_form['old_sense_message'] = array(
         '#prefix' => '<div class="lingwo-sense-old-message">* ',
         '#value' => t('This translation is for a sense that has been removed from the entry.'),
@@ -357,7 +360,7 @@ function lingwo_senses_get_translations(&$node, $field_name, $items) {
   if (isset($orig_senses) && count($orig_senses) > 0) {
     foreach ($orig_senses as $sense) {
       $trans_sense = $trans_map[$sense['data']['id']];
-      $trans_sense['data']['orig_sense'] = $sense['data'];
+      $trans_sense['orig_sense'] = $sense['data'];
       $trans_sense['data']['id'] = $sense['data']['id'];
       
       $senses[] = $trans_sense;
@@ -587,8 +590,8 @@ function theme_lingwo_senses_translation($items) {
   $output .= '<ol class="lingwo-sense-list">';
 
   foreach ($items as $sense) {
+    $orig_sense = $sense['orig_sense'];
     $sense = $sense['data'];
-    $orig_senses = $sense['orig_sense'];
     
     $output .= '<li class="lingwo-sense">';
     if ($sense['clue']) {

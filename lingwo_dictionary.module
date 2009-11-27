@@ -43,6 +43,15 @@ function lingwo_dictionary_is_translation($node) {
     ($node->nid && $node->tnid != 0 && $node->nid != $node->tnid);
 }
 
+// Loads and returns a node's translation source
+function lingwo_dictionary_load_translation_source(&$node) {
+  if (lingwo_dictionary_is_translation($node)) {
+    $node->translation_source = node_load($node->tnid);
+  }
+  
+  return $node->translation_source;
+}
+
 // Gets the Part of Speech from a node
 function lingwo_dictionary_get_pos($node) {
   $pos_vid = lingwo_dictionary_pos_vocabulary();
