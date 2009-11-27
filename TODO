@@ -1,14 +1,17 @@
 
 == 2009-11-27 ==
 
+ * Start working with the 'features' module.  As I see it, we have two features we should create:
+
+   (1) A feature for setting up lingwo_dictionary which enables the correct modules, creates
+       the 'entry' content type, etc..
+
+   (2) A feature for setting up the syndictation stuff, which involves making a few content
+       types and wiring them together in the appropriate way.
+
  * Bug: Creating a new Entry with no fields results in the following error:
 
    user warning: Column 'field_fields_type' cannot be null query: content_write_record /* admin : content_write_record */ INSERT INTO content_field_fields (vid, nid, delta, field_fields_type, field_fields_name, field_fields_value, field_fields_automatic) VALUES (213, 148, 0, NULL, NULL, NULL, 1) in /home/dsnopek/www/cck_test/root/sites/all/modules/cck/content.module on line 1213.
-
-== 2009-11-15 ==
-
- * Make it possible to theme the entry (node output) based on the language and pos.  Might have to
-   be handled entirely in the theme, I'm not sure.
 
 == 2009-11-13 ==
 
@@ -17,8 +20,13 @@ The next big steps as I see them are:
  1. Start working to make a *viable* Polish dictionary, that means:
 
     * Finishing the morphology definition and gearing it to web entry.
+	  - We don't have past tense of verbs!!
+	  - Verb conjugation categories are overly simple, copying pl.wiktionary.org's categories
+	    would probably be a good idea.
 
 	* Fixing bugs in the Sense entry field.
+
+	* Ensuring that entries are unique by headword / pos / language.
 
 	* Provide a search/lookup mechanism
 
@@ -30,12 +38,6 @@ The next big steps as I see them are:
 After these steps are complete, we can start look to the next big piece of the puzzle and that
 is the annotator.  We can't really have an annotator without a working dictionary.
 
-== 2009-11-07 ==
-
- * Change 'values' on lingwo_language_settings() to 'options' for option fields.  This
-   makes things nicer when we merged the fields with items and there are both 'value'
-   and 'values' fields.
- 
 == 2009-11-05 ==
 
  * We need to figure out the best way to store 'fields' so that views can do searches
@@ -98,11 +100,6 @@ is the annotator.  We can't really have an annotator without a working dictionar
    (1) any Drupal language code, or (2) any activated language.  This would allow people to
    mark things as belonging to a language without changing its translation status in Drupal.
 
-== 2009-10-29 ==
-
- * Port the unit tests in test_polish.js from the first JavaScript implementation of Lingwo.  This
-   should cover ALL of the Polish morphology our engine is capable of dealing with.
-
 == 2009-07-06 ==
 
  * Remove 'weight' and 'remove_sense' from each sense before it is saved.
@@ -114,9 +111,6 @@ is the annotator.  We can't really have an annotator without a working dictionar
  
  * Restore the links to the pages for translated words.
 
- * Make the "retire this obsolete translation" check box actually work (you could use
-   is_empty!)
- 
  * Fix the bug where new translations have one too many senses listed.
 
  * Try and fix AHAH!  There are so many weird issues with it I'm not sure what to do..

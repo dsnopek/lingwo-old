@@ -282,7 +282,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
         );
         break;;
       case 'option':
-        $options = $field['values'];
+        $options = $field['options'];
         $options = array('' => '-none-') + $options;
 
         $field_form['value'] += array(
