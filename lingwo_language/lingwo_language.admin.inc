@@ -9,7 +9,7 @@
 
 /**
  * Per-Language fields
- **/
+ */
 
 function _ld_language_fields_form($type, $label, $labels, $settings) {
     $form = array(
@@ -79,9 +79,10 @@ function lingwo_language_fields_form($form, $lang) {
       //'#collapsed' => TRUE
     );
 
-    $pos_form['options'] = _ld_language_fields_form('options', t('Option'), t('Options'), $settings[strtolower($term->name)]);
-    $pos_form['classes'] = _ld_language_fields_form('classes', t('Class'), t('Classes'), $settings[strtolower($term->name)]);
-    $pos_form['forms'] = _ld_language_fields_form('forms', t('Form'), t('Forms'), $settings[strtolower($term->name)]);
+    $pos_settings = $settings[drupal_strtolower($term->name)];
+    $pos_form['options'] = _ld_language_fields_form('options', t('Option'), t('Options'), $pos_settings);
+    $pos_form['classes'] = _ld_language_fields_form('classes', t('Class'), t('Classes'), $pos_settings);
+    $pos_form['forms'] = _ld_language_fields_form('forms', t('Form'), t('Forms'), $pos_settings);
 
     $form['settings']['pos-'. $term->tid] = $pos_form;
   }
@@ -134,7 +135,7 @@ function theme_lingwo_language_tabs($form) {
   $output .= '<ul>';
   foreach ($elements as $key) {
     $el = $form[$key];
-    if (substr($key, 0, 4) == 'pos-') {
+    if (drupal_substr($key, 0, 4) == 'pos-') {
       $output .= '<li><a href="#lingwo-dictionary-tabs-'. $key .'">'. $el['#title'] .'</li>';
     }
   }
@@ -143,7 +144,7 @@ function theme_lingwo_language_tabs($form) {
   // produce the tabs
   foreach ($elements as $key) {
     $el = $form[$key];
-    if (substr($key, 0, 4) == 'pos-') {
+    if (drupal_substr($key, 0, 4) == 'pos-') {
       $output .= '<div id="lingwo-dictionary-tabs-'. $key .'">';
       $output .= drupal_render($el);
       $output .= '</div>';

@@ -9,7 +9,7 @@
 
 /**
  * Settings page
- **/
+ */
 function lingwo_dictionary_admin_settings() {
   $form = array();
 
