@@ -402,12 +402,15 @@ function lingwo_fields_map_items($node, $items) {
     $fields[$field['type'] .':'. $field['name']] = $field;
   }
   foreach (element_children($items) as $index) {
-    $item = $items[$index]['#item'];
+    // From the formatter them function we get $items[$index]['#item'] but if we just toss
+    // $node->$field_name in here, we get $items[$index] -- both modes are supported.
+    $item = $items[$index]['#item'] ? $items[$index]['#item'] : $items[$index];
     $key = $item['type'] .':'. $item['name'];
     if (isset($fields[$key])) {
       $fields[$key] += $item;
     }
   }
+
   return $fields;
 }
 
@@ -435,7 +438,18 @@ function theme_lingwo_fields_widget_form($element) {
 }
 
 function theme_lingwo_fields_formatter_default($element) {
-  foreach (lingwo_fields_map_items($element['#node'], $element) as $name => $item) {
+  $node = $element['#node'];
+
+  lingwo_dictionary_load_translation_source($node);
+  if ($node->translation_source) {
+    // display the fields as if this were the source node (with the source nodes
+    // language) and not a member of this language
+    $node = $node->translation_source;
+    $field_name = $element['#field_name'];
+    $element = $node->$field_name;
+  }
+
+  foreach (lingwo_fields_map_items($node, $element) as $name => $item) {
     $value = $item['value'];
     if ($item['type'] == 'class') {
       $value = $item['value'] ? t('true') : t('false');
@@ -451,11 +465,10 @@ function theme_lingwo_fields_formatter_default($element) {
   }
 
   // pack the form with some useful data
-  $form['#node'] = $element['#node'];
+  $form['#node'] = $node;
 
   // Since CCK forces our theme name, we send to another theme to do the real
   // theming, with possible specific themes.
-  $node = $element['#node'];
   $pos = lingwo_dictionary_get_pos($node);
 
   return theme(array(
