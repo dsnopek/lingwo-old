@@ -1,0 +1,8 @@
+; $Id$
+name = Lingwo Dictionary Importer
+description = For importing dictionary data from external sources
+package = Lingwo Dictionary
+core = 6.x
+dependencies[] = lingwo_dictionary
+dependencies[] = services
+
