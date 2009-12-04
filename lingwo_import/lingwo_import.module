@@ -1,0 +1,39 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * For importing dictionary data from external sources
+ */
+
+/*
+ * Implementation of hook_services()
+ */
+function lingwo_import_service() {
+  return array(
+    // lingwo_import.update_entry
+    array(
+      '#method' => 'lingwo_import.update_entry',
+      '#callback' => 'lingwo_import_update_entry',
+      '#args' => array(
+        array(
+          '#name' => 'data',
+          '#type' => 'string',
+          '#description' => 'A JSON string representing an entry.'
+        ),
+      ),
+      '#return' => 'string'
+    ),
+
+
+  );
+}
+
+/*
+ * Updates an entry based on JSON data from the importer.
+ */
+function lingwo_import_update_entry($data) {
+  // TODO: me!
+  return "Do wah!!";
+}
+
