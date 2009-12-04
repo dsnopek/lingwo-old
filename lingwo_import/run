@@ -1,0 +1,4 @@
+#!/bin/sh
+
+java -cp lib/js.jar:lib/xbean.jar:lib/bzip2.jar org.mozilla.javascript.tools.shell.Main $@
+
