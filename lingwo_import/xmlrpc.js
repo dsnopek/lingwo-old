@@ -1,29 +1,117 @@
 
-//
-// Check out this code and port it!!
-//
-//   http://drupal.org/node/632844
-//
+lib = {};
+(function () {
+    function extendPrototype(cons, props) {
+        for(var name in props) {
+            cons.prototype[name] = props[name];
+        }
+    };
 
-var config = new org.apache.xmlrpc.client.XmlRpcClientConfigImpl();
-config.setServerURL(new java.net.URL("http://127.0.0.1:8082/services/xmlrpc"));
-var client = new org.apache.xmlrpc.client.XmlRpcClient();
-client.setConfig(config);
+    var nonce_length = 10;
+    var nonce_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    function getNonce() {
+        var s = '';
+        for(var i = 0; i < nonce_length; i++) {
+            s += nonce_chars[Math.floor(Math.random() * (nonce_chars.length - 1))];
+        }
+        return s;
+    };
 
-var params = java.lang.reflect.Array.newInstance(java.lang.Object, 1);
-params[0] = new java.lang.String('zumma');
+    function getHMAC(key, msg) {
+        var csets, keySpec, mac, hash;
 
-try {
-//var result = client.execute('lingwo_import.update_entry', params);
-var result = client.execute('search.nodes', params);
+        csets = java.nio.charset.Charset.forName('US-ASCII');
+        keySpec = new javax.crypto.spec.SecretKeySpec(csets.encode(key).array(), 'HmacSHA256');
+        mac = javax.crypto.Mac.getInstance('HmacSHA256');
+        mac.init(keySpec);
+        hash = mac.doFinal(csets.encode(msg).array());
+
+        var res = "";
+        for(var i = 0; i < hash.length; i++) {
+            res += java.lang.Integer.toString((hash[i] & 0xff) + 0x100, 16).substring(1);
+        }
+
+        return res;
+    };
+
+    function newObjectArray() {
+        //return java.lang.reflect.Array.newInstance(java.lang.Object, 0);
+        return new java.util.Vector();
+    };
+
+    lib.DrupalXmlRpcService = function (args) {
+        this.domain = args.domain;
+        this.url = args.url;
+        this.key = args.key;
+
+        // setup our service
+        this._initializeService();
+    };
+    extendPrototype(lib.DrupalXmlRpcService, {
+        _client: null,
+        _sessid: "",
+
+        _initializeService: function () {
+            var config = new org.apache.xmlrpc.client.XmlRpcClientConfigImpl();
+            config.setServerURL(new java.net.URL(this.url));
+
+            this._client = new org.apache.xmlrpc.client.XmlRpcClient();
+            this._client.setConfig(config);
+        },
+
+        _getDefaultParams: function (cmd) {
+            var timestamp = ""+(new Date()).getTime();
+            var nonce = getNonce();
+            var hash = "" +
+                timestamp + ";" +
+                this.domain + ";" +
+                nonce + ";" + 
+                cmd;
+            hash = getHMAC(this.key, hash);
+
+            var params = newObjectArray();
+            params.add(hash);
+            params.add(this.domain);
+            params.add(timestamp);
+            params.add(nonce);
+            params.add(this._sessid);
+            return params;
+        },
+
+        connect: function () {
+            // get a session id
+            var res = this._client.execute('system.connect', newObjectArray());
+            if (res) {
+                this._sessid = res.get('sessid');
+                return true;
+            }
+            return false;
+        },
+
+        login: function (username, password) {
+            var params = this._getDefaultParams('user.login');
+            //var params = newObjectArray();
+            params.add(username);
+            params.add(password);
+
+            var res = this._client.execute('user.login', params);
+
+            this._sessid = res.get('sessid');
+
+            return res;
+        }
+    });
+
+})();
+
+var service = new lib.DrupalXmlRpcService({
+    domain: 'localhost',
+    url: 'http://127.0.0.1:8082/services/xmlrpc',
+    key: '028edd447fce610ef46dd685ae186d7f'
+});
+
+if (service.connect()) {
+    var res = service.login('Normal User', 'test');
+    print(res);
 }
-catch (e) {
-    /*
-    for(var n in e) {
-        print(n);
-    }
-    */
-    print(e.message);
-}
-print(result);
 
