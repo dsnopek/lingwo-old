@@ -17,7 +17,7 @@ lib = {};
         return s;
     };
 
-    function GetHMAC(key, msg) {
+    function getHMAC(key, msg) {
         var csets, keySpec, mac, hash;
 
         csets = java.nio.charset.Charset.forName('US-ASCII');
@@ -67,7 +67,7 @@ lib = {};
                 this.domain + ";" +
                 nonce + ";" + 
                 cmd;
-            hash = GetHMAC(this.key, hash);
+            hash = getHMAC(this.key, hash);
 
             var params = newObjectArray();
             params.add(hash);
