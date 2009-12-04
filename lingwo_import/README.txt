@@ -16,3 +16,8 @@ js.jar
 
 http://www.mozilla.org/rhino/
 
+sqlitejdbc-v056.jar
+===================
+
+http://www.zentus.com/sqlitejdbc/
+
