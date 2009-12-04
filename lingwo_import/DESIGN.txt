@@ -1,0 +1,62 @@
+
+Here is some psuedo-code showing my planned import process:
+
+  // Connect to the main site
+  var remote = new RemoteConnection('http://www.lingwo.org/lingwo_import/service');
+  var token = remote.startImport();
+
+  // Initialize the staging database
+  var db = new SQLiteDatabase('staging-' + token);
+  db.setup();
+
+  // Setup a producer.  This one reads from MediaWiki dump files
+  var producer = new MediaWikiProducer('enwiktionary-latest-pages-articles.xml.bz2');
+
+  // Setup a handler.
+  var handler = new WiktionaryHandler(db);
+
+  // Run the handler over the producer (remote is passed in so that we can log errors)
+  var success = producer.run(handler, remote);
+  if (success) {
+    // Send the new entries in the staging database upstream
+    remote.sendData(db);
+  }
+  remote.endImport(success);
+
+== Remote Connection ==
+
+The remote connection would deal with transfering data back to www.lingwo.org.  This
+will include:
+
+ * The fact that a run is in progress.
+ * The status of the run (% done, any errors)
+ * The completed entries
+
+On the server end, entries will definitely be written to a sort of "import entries" table
+but will only update the actual entry nodes if there were some changes detected AND the entry
+node hasn't been updated by a lingwo.org user since the last automated update.
+
+== Staging Database ==
+
+Keeps entries as they are in progress.  This is useful for combining multiple sources into a single
+entry.  You would do this by running two different producer in series, where the second one would
+pull the previously created entry out of the database and update it.
+
+== Producer ==
+
+Walks some kind of importable data, passing each chunk to the handler.  The handler will have to be
+written specifically for whatever the data chunk that producer creates is.  Any errors encountered
+by the producer will be reported to the server via the remote object.  This will include exceptions
+thrown by the handler.
+
+Likely, only a small set of Producers will exist, the only one on the table right now, is a
+MediaWiki dump file producer.
+
+== Handler ==
+
+Takes a chunk of data from the producer and modifies some content in the staging database.  It
+is free to query and save any number of entries in the staging database, giving the handler alot
+of power.  One chunk of data from the producer could equal many changes.  We also get the sequential
+handlers to merge multiple data sources.
+
+I expect lots of these to be written, particularly against the MediaWiki dump file producer.
