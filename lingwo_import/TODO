@@ -1,0 +1,18 @@
+
+== 2009-12-06 ==
+
+ * Implement a DatabaseProducer which walks a database and throws up the individual entries
+   to the handler.
+
+ * Change the Producer.run() interface to take an object of arguments, because we may want to expand
+   this arbitrarily for different producers.  Maybe Handler.process() too.
+ 
+ * Implement the last "full cycle" feature of the importer, which is the remote/service stuff.  We
+   should atleast put the entries into the database as Node's, even if its not done in the way we
+   will do it in the end.
+ 
+ * Get a dump of the Polish wikipedia and atleast split it into a SQLite db of just the Polish
+   entries, so that we can get an idea of the counts.
+ 
+ * Start getting serious about doing some importing!!
+
