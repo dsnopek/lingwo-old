@@ -4,6 +4,7 @@
  */
 
 importPackage(java.io);
+importPackage(java.sql);
 
 if (typeof Lingwo == 'undefined')
     Lingwo = {};
@@ -54,6 +55,9 @@ function declare(props) {
 
             while (true) {
                 line = this._stream.readLine();
+                if (line === null) {
+                    throw "EOF";
+                }
 
                 if (line == '  <page>') {
                     if (!inPage) {
@@ -108,59 +112,129 @@ function declare(props) {
     });
 })();
 
-WikiText = declare({
-    _constructor: function (text) {
-        this.text = text;
-    },
-
-    _makeSep: function (level) {
-        if (typeof level == 'undefined') {
-            level = 1;
+/*
+ * A database object.
+ */
+(function () {
+    Lingwo.importer.Database = declare({
+        _constructor: function (filename) {
+            this.filename = filename;
+            this._initDb();
+        },
+        _initDb: function () {
+            java.lang.Class.forName('org.sqlite.JDBC');
+            var newFile = !(new File(this.filename)).exists();
+            this._conn = DriverManager.getConnection("jdbc:sqlite:"+this.filename);
+            if (newFile) {
+                this.resetDb();
+            }
+            this._prep = this._conn.prepareStatement("REPLACE INTO entry VALUES (?, ?, ?, ?)");
+        },
+        resetDb: function () {
+            var stat = this._conn.createStatement();
+            stat.executeUpdate('DROP TABLE IF EXISTS entry');
+            stat.executeUpdate('CREATE TABLE entry (lang, pos, headword, data)');
+            stat.executeUpdate('CREATE INDEX IF NOT EXISTS entry_index ON entry (lang, pos, headword)');
+        },
+        setEntry: function (lang, pos, headword, data) {
+            var prep = this._prep;
+            prep.setString(1, lang);
+            prep.setString(2, pos);
+            prep.setString(3, headword);
+            prep.setString(4, data);
+            prep.addBatch();
+        },
+        commit: function () {
+            this._conn.setAutoCommit(false);
+            this._prep.executeBatch();
+            this._conn.setAutoCommit(true);
         }
-        var sep = '';
-        for(var i = 0; i < level+1; i++) {
-            sep += '=';
+    });
+})();
+
+/*
+ * Deal with all the media wiki stuff.
+ */
+(function () {
+    Lingwo.importer.WikiText = declare({
+        _constructor: function (text) {
+            this.text = text;
+        },
+
+        _makeSep: function (level) {
+            if (typeof level == 'undefined') {
+                level = 1;
+            }
+            var sep = '';
+            for(var i = 0; i < level+1; i++) {
+                sep += '=';
+            }
+            return sep;
+        },
+
+        hasSection: function (name, level) {
+            var sep = this._makeSep(level);
+            var regex = new RegExp('^'+sep+'\\s*'+name+'\\s*'+sep+'$', 'm');
+            return !!regex.exec(this.text);
+        },
+
+        getSection: function (name, level) {
+            var sep = this._makeSep(level);
+            var regex, match;
+
+            regex = new RegExp(sep+'\\s*'+name+'\\s*'+sep+'\n([\\s\\S])*$');
+            match = regex.exec(this.text);
+            if (!match) {
+                return '';
+            }
+
+            var text = match[0];
+            regex = new RegExp('\n'+sep+'[^=][\\s\\S]*');
+            return text.replace(regex, '');
         }
-        return sep;
-    },
+    });
 
-    hasSection: function (name, level) {
-        var sep = this._makeSep(level);
-        var regex = new RegExp('^'+sep+'\\s*'+name+'\\s*'+sep+'$', 'm');
-        return !!regex.exec(this.text);
-    },
+    Lingwo.importer.WiktionaryENSplitter = declare({
+        _constructor: function (db, lang, code) {
+            this.db = db;
+            this.lang = lang;
+            this.code = code;
+        },
 
-    getSection: function (name, level) {
-        var sep = this._makeSep(level);
-        var regex = new RegExp(sep+'\\s*'+name+'\\s*'+sep+'\n[.\n]*');//, 'g');
-        var match = regex.exec(this.text);
-        if (match) {
-            return match[0];
-        }
-        return '';
-    }
-});
+        posList: ['Noun','Adjective','Verb','Proper noun','Interjection','Conjunction','Preposition','Pronoun','Prefix','Initialism','Phrase','Adverb','Cardinal number','Ordinal number','Suffix','Idiom','Numeral'],
 
-WiktionaryENHandler = declare({
-    _constructor: function (db) {
-        this.db = db;
-    },
+        process: function (page) {
+            var text = new Lingwo.importer.WikiText(page.revision.text);
+            if (text.hasSection(this.lang)) {
+                text.text = text.getSection(this.lang);
+                var found = false;
+                var self = this;
+                this.posList.forEach(function (pos) {
+                    if (text.hasSection(pos, 2)) {
+                        self.db.setEntry(self.code, pos.toLowerCase(), page.title,
+                            '==Polish==\n\n'+text.getSection(pos, 2));
+                        found = true;
+                    }
+                });
+                if (!found) {
+                    self.db.setEntry(self.code, 'unknown', page.title, text.text);
+                    print ('Unknown POS: '+page.title);
+                }
+                else {
+                    this.db.commit();
+                }
+            }
+        },
+    });
 
-    process: function (page) {
-        var text = new WikiText(page.revision.text);
-        if (text.hasSection('Polish')) {
-            print (page.title);
-            print (text.getSection('Polish'));
-        }
-    },
-});
+})();
 
 function main() {
-    var db = null;
+    var db = new Lingwo.importer.Database('staging.db');
     var remote = null;
     var producer = new Lingwo.importer.MediaWikiProducer('/home/dsnopek/dl/enwiktionary-latest-pages-articles.xml.bz2');
-    var handler = new WiktionaryENHandler(db);
-    producer.run(handler, remote, 100);
+    var handler = new Lingwo.importer.WiktionaryENSplitter(db, 'Polish', 'pl');
+    producer.run(handler, remote);//, 100000);
 }
 main();
 
