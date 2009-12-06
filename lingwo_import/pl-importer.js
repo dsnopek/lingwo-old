@@ -128,25 +128,51 @@ function declare(props) {
             if (newFile) {
                 this.resetDb();
             }
-            this._prep = this._conn.prepareStatement("REPLACE INTO entry VALUES (?, ?, ?, ?)");
+            this._insert_stmt = this._conn.prepareStatement("REPLACE INTO entry VALUES (?, ?, ?, ?)");
+            this._select_stmt = this._conn.prepareStatement("SELECT data FROM entry WHERE lang = ? AND pos = ? AND headword = ? LIMIT 1");
         },
         resetDb: function () {
-            var stat = this._conn.createStatement();
-            stat.executeUpdate('DROP TABLE IF EXISTS entry');
-            stat.executeUpdate('CREATE TABLE entry (lang, pos, headword, data)');
-            stat.executeUpdate('CREATE INDEX IF NOT EXISTS entry_index ON entry (lang, pos, headword)');
+            var stmt = this._conn.createStatement();
+            stmt.executeUpdate('DROP TABLE IF EXISTS entry');
+            stmt.executeUpdate('CREATE TABLE entry (lang, pos, headword, data)');
+            stmt.executeUpdate('CREATE INDEX IF NOT EXISTS entry_index ON entry (lang, pos, headword)');
         },
         setEntry: function (lang, pos, headword, data) {
-            var prep = this._prep;
+            var prep = this._insert_stmt;
             prep.setString(1, lang);
             prep.setString(2, pos);
             prep.setString(3, headword);
             prep.setString(4, data);
             prep.addBatch();
         },
+        getEntry: function (lang, pos, headword) {
+            var prep = this._select_stmt;
+            prep.setString(lang);
+            prep.setString(pos);
+            prep.setString(headword);
+            var rs = prep.executeQuery();
+            if (rs.next()) {
+                return rs.getString("data");
+            }
+            return null;
+        },
+        query: function (sql) {
+            var stmt = this._conn.createStatement();
+            var rs = stmt.executeQuery(sql);
+            var meta = rs.getMetaData();
+            var ret = [], obj;
+            while (rs.next()) {
+                obj = {};
+                for(var i = 1; i < meta.getColumnCount()+1; i++) {
+                    obj[meta.getColumnName(i)] = rs.getString(i);
+                }
+                ret.push(obj);
+            }
+            return ret;
+        },
         commit: function () {
             this._conn.setAutoCommit(false);
-            this._prep.executeBatch();
+            this._insert_stmt.executeBatch();
             this._conn.setAutoCommit(true);
         }
     });
@@ -227,14 +253,47 @@ function declare(props) {
         },
     });
 
+    var regexSpecial = ['(',')','{','}','*'];
+    function makeRegexSafe(s) {
+        regexSpecial.forEach(function (c) {
+            var r = new RegExp('\\'+c, 'g');
+            s = s.replace(r, '\\'+c);
+        });
+        return s;
+    }
+
+    Lingwo.importer.WiktionaryPLSplitter = declare({
+        _constructor: function (db, lang, code) {
+            this.db = db;
+            this.lang = lang;
+            this.code = code;
+        },
+
+        process: function (page) {
+            var text = new Lingwo.importer.WikiText(page.revision.text);
+            
+            var sec = makeRegexSafe(page.title + ' ({{'+this.lang+'}})');
+            print (sec);
+            if (text.hasSection(sec)) {
+                print (page.title);
+                this.db.setEntry(this.code, 'unknown', page.title, text.getSection(sec));
+            }
+            this.db.commit();
+        }
+    });
+
 })();
 
 function main() {
     var db = new Lingwo.importer.Database('staging.db');
     var remote = null;
-    var producer = new Lingwo.importer.MediaWikiProducer('/home/dsnopek/dl/enwiktionary-latest-pages-articles.xml.bz2');
-    var handler = new Lingwo.importer.WiktionaryENSplitter(db, 'Polish', 'pl');
-    producer.run(handler, remote);//, 100000);
+
+    //var producer = new Lingwo.importer.MediaWikiProducer('/home/dsnopek/dl/enwiktionary-latest-pages-articles.xml.bz2');
+    //var handler = new Lingwo.importer.WiktionaryENSplitter(db, 'Polish', 'pl');
+
+    var producer = new Lingwo.importer.MediaWikiProducer('/home/dsnopek/dl/plwiktionary-20091202-pages-articles.xml.bz2');
+    var handler = new Lingwo.importer.WiktionaryPLSplitter(db, 'język polski', 'pl');
+    producer.run(handler, remote);
 }
 main();
 
