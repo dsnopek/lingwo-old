@@ -89,6 +89,8 @@ function declare(props) {
 
         _runOne: function (handler, remote) {
             // TODO: handle errors and stuff
+            // TODO: maybe we should re-package this, because we really don't need the whole
+            // XML document, really just the title and the text data...
             var pageXml = new XML(this._readPage());
             handler.process(pageXml);
         },
@@ -109,6 +111,38 @@ function declare(props) {
                 }
             }
         }
+    });
+
+    Lingwo.importer.DatabaseProducer = declare({
+        _constructor: function (db) {
+            this.db = db;
+        },
+
+        run: function (args) {
+            var handler = args.handler;
+            var limit = args.limit || 0;
+            var remote = args.remote;
+            var offset = 0, entry, self = this, _limit = 10;
+
+            while(true) {
+                if (limit != 0) {
+                }
+                var rows = this.db.query('SELECT headword, data FROM entry LIMIT '+_limit+' OFFSET '+offset);
+
+                rows.forEach(function (row) {
+                    // build a fake entry
+                    var entry = {
+                        title: row.headword,
+                        revision: { text: row.data }
+                    };
+                    handler.process(entry);
+                });
+
+                //if (rows.length < 10) {
+                    break;
+                //};
+            }
+        },
     });
 })();
 
@@ -282,6 +316,15 @@ function declare(props) {
         }
     });
 
+    Lingwo.importer.PLWikitionaryPLHandler = declare({
+        _constructor: function (db) {
+            this.db = db;
+        },
+        process: function (page) {
+            print(page.title);
+        },
+    });
+
 })();
 
 function main() {
@@ -291,9 +334,18 @@ function main() {
     //var producer = new Lingwo.importer.MediaWikiProducer('/home/dsnopek/dl/enwiktionary-latest-pages-articles.xml.bz2');
     //var handler = new Lingwo.importer.WiktionaryENSplitter(db, 'Polish', 'pl');
 
-    var producer = new Lingwo.importer.MediaWikiProducer('/home/dsnopek/dl/plwiktionary-20091202-pages-articles.xml.bz2');
-    var handler = new Lingwo.importer.WiktionaryPLSplitter(db, 'język polski', 'pl');
-    producer.run(handler, remote);
+    //var producer = new Lingwo.importer.MediaWikiProducer('/home/dsnopek/dl/plwiktionary-20091202-pages-articles.xml.bz2');
+    //var handler = new Lingwo.importer.WiktionaryPLSplitter(db, 'język polski', 'pl');
+
+    var db2 = new Lingwo.importer.Database('staging-pl.db');
+    var producer = new Lingwo.importer.DatabaseProducer(db2);
+    var handler = new Lingwo.importer.PLWikitionaryPLHandler(db);
+
+    producer.run({
+        handler: handler,
+        remote: remote,
+        limit: 5
+    });
 }
 main();
 
