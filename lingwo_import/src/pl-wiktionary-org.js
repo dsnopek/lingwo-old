@@ -5,8 +5,19 @@ load('src/json2.js');
 (function () {
     var langNames = {
         'pl': 'polski',
-        'en': 'angielski'
+        'en': 'angielski',
+        'be': 'białoruski',
+        'cz': 'czeski',
+        'ru': 'rosyjski',
     };
+
+    var langCodes = (function () {
+        var res = {};
+        for (var name in langNames) {
+            res[langNames[name]] = name;
+        }
+        return res;
+    })();
 
     var sectionTrans = {
         'wymowa': 'pron',
@@ -106,10 +117,10 @@ load('src/json2.js');
         line = line.replace(/\{\{(\S+)\}\}/g, '($1)');
 
         // [[link|link text]] -> link text
-        line = line.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, '$1');
+        line = line.replace(/\[\[(?:[^|\]]+\|)?([^\]]+)\]\]/g, '$1');
 
         // [[link]] -> link
-        line = line.replace(/\[\[([^\]]+)\]\]/g, '$1');
+        //line = line.replace(/\[\[([^\]]+)\]\]/g, '$1');
 
         // Remove <ref></ref> tags
         line = line.replace(/<ref>.*?<\/ref>/g, '');
@@ -147,6 +158,7 @@ load('src/json2.js');
         ['senses', function (entry, sections) {
             var map = {};
             var res = [];
+
             sections['meaning'].slice(1).forEach(function (line) {
                 var name = extractRegex(line, /\((\d\.\d)\)/, 1);
 
@@ -156,7 +168,8 @@ load('src/json2.js');
 
                 // stash the difference
                 var sense = {
-                    difference: line
+                    difference: line,
+                    trans: {}
                 };
                 res.push(sense);
                 map[name] = sense;
@@ -170,6 +183,24 @@ load('src/json2.js');
                 line = removeWikiText(line);
 
                 map[name].example = line;
+            });
+
+            sections['translations'].forEach(function (line) {
+                var lang = extractRegex(line, /^\* ([^:]+):/, 1, langCodes);
+
+                // Remove the language name
+                line = line.replace(/^\* [^:]+:/, '');
+
+                // TODO: This only reads a single sense translation, make this read all of them!!
+                //       Shouldn't be too hard..
+
+                var name = extractRegex(line, /\((\d\.\d(?:-[^\)]+)?)\)/, 1);
+
+                // Remove the sense numbers
+                line = line.replace(/\((\d\.\d(?:-[^\)]+)?)\)/g, '');
+                line = removeWikiText(line);
+
+                map[name].trans[lang] = line.split(/,\s*/);
             });
 
             return res;

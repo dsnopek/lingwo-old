@@ -102,6 +102,12 @@ PLWiktionaryParserTest = TestCase.subclass({
         // senses
         this.assertEquals(entry.senses[0].difference, '(zool) Canis familiaris, zwierzę domowe');
         this.assertEquals(entry.senses[0].example, 'Pies jest najlepszym przyjacielem człowieka.');
+        this.assertEquals(entry.senses[0].trans.en[0], 'dog');
+        this.assertEquals(entry.senses[0].trans.be[0], 'сабака (sabaka)');
+        this.assertEquals(entry.senses[0].trans.cz[0], 'pes (m)');
+        this.assertEquals(entry.senses[0].trans.ru[0], 'собака (f) (sobaka)');
+        this.assertEquals(entry.senses[0].trans.ru[1], 'пёс (m)');
+
         this.assertEquals(entry.senses[1].difference, 'samiec psa');
         this.assertEquals(entry.senses[1].example, 'Czy to jest pies, czy suka?');
         this.assertEquals(entry.senses[2].difference, '(slang) policjant');
