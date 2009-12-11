@@ -32,12 +32,12 @@ setObject('Lingwo.importer.db');
             stmt.executeUpdate('CREATE TABLE entry (lang, pos, headword, data)');
             stmt.executeUpdate('CREATE INDEX IF NOT EXISTS entry_index ON entry (lang, pos, headword)');
         },
-        setEntry: function (lang, pos, headword, data) {
+        setEntry: function (entry) {
             var prep = this._insert_stmt;
-            prep.setString(1, lang);
-            prep.setString(2, pos);
-            prep.setString(3, headword);
-            prep.setString(4, data);
+            prep.setString(1, entry.language);
+            prep.setString(2, entry.pos);
+            prep.setString(3, entry.headword);
+            prep.setString(4, JSON.stringify(entry));
             prep.addBatch();
         },
         getEntry: function (lang, pos, headword) {
@@ -47,7 +47,7 @@ setObject('Lingwo.importer.db');
             prep.setString(3, headword);
             var rs = prep.executeQuery();
             if (rs.next()) {
-                return rs.getString("data");
+                return JSON.parse(rs.getString("data"));
             }
             return null;
         },
