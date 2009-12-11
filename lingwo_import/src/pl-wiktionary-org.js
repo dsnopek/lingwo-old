@@ -1,5 +1,5 @@
 
-load('importer.js');
+load('src/importer.js');
 
 (function () {
     var LangNames = {
@@ -19,8 +19,7 @@ load('importer.js');
         process: function (page) {
             var text = new Lingwo.importer.WikiText(page.revision.text);
             
-            var sec = makeRegexSafe(page.title + ' ({{'+LangNames[this.code]+'}})');
-            print (sec);
+            var sec = page.title + ' ({{'+LangNames[this.code]+'}})';
             if (text.hasSection(sec)) {
                 var entry = {
                     'headword': page.title,
@@ -39,6 +38,6 @@ load('importer.js');
     Lingwo.importer.sources['pl.wiktionary.org'] = function (args) {
         var producer = new Lingwo.importer.mediawiki.Producer({ filename: args.filename });
         producer.run(new Handler(args.handler, 'pl'));
-    });
+    };
 })();
 

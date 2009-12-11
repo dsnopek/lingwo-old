@@ -3,6 +3,10 @@
  * Here we will develop an importer for Polish language.
  */
 
+load('src/importer.js');
+load('src/mediawiki.js');
+load('src/pl-wiktionary-org.js');
+
 function main() {
     var db = new Lingwo.importer.Database('staging.db');
     var remote = null;
