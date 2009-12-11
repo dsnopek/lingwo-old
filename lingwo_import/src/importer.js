@@ -46,6 +46,27 @@ escapeRegex = (function () {
 // sets up our namespace
 setObject('Lingwo.importer.sources', {});
 
+Lingwo.importer.Entry = declare({
+    sources: null,
+
+    _constructor: function () {
+    },
+
+    setSource: function (name, args) {
+        if (this.sources === null) {
+            this.sources = {};
+        }
+        this.sources[name] = args;
+    },
+
+    getSource: function (name) {
+        if (this.sources === null) {
+            return undefined;
+        }
+        return this.sources[name];
+    },
+});
+
 // Runs a particular source
 Lingwo.importer.handleSource = function (srcName, args) {
     var src = Lingwo.importer.sources[srcName];
