@@ -1,29 +1,43 @@
 
-Here is some psuedo-code showing my planned import process:
+===
 
-  // Connect to the main site
-  var remote = new RemoteConnection('http://www.lingwo.org/lingwo_import/service');
-  var token = remote.startImport();
+Some new ideas:
 
-  // Initialize the staging database
-  var db = new SQLiteDatabase('staging-' + token);
-  db.setup();
-
-  // Setup a producer.  This one reads from MediaWiki dump files
-  var producer = new MediaWikiProducer('enwiktionary-latest-pages-articles.xml.bz2');
-
-  // Setup a handler.
-  var handler = new WiktionaryHandler(db);
-
-  // Run the handler over the producer (remote is passed in so that we can log errors)
-  var success = producer.run(handler, remote);
-  if (success) {
-    // Send the new entries in the staging database upstream
-    remote.sendData(db);
-  }
-  remote.endImport(success);
+  // Combine a number of sources into a single source.
+  //
+  // This works by grabbing some code based on the source name, which knows how to break
+  // a particular source into the required language and parse that bit.  The result will
+  // be an Entry() object in the database.
+  //
+  var db = CombineSources({
+  	sources: {
+  		'pl.wiktionary.org': {
+  			filename: 'plwiktionary-latest-pages-articles.xml.bz2',
+  			language: 'pl',
+  			date: new Date()
+  		},
+  		'en.wiktionary.org': {
+  			filename: 'enwiktionary-latest-pages-articles.xml.bz2',
+  			language: 'pl',
+  			date: new Date()
+  		},
+  	},
+  	filename: 'staging-pl.db'
+  });
+  
+  // Combine a number of sources into a single source (using an in-memory SQLite database
+  // by default) and then runs a handler over it using DatabaseHandler.
+  var combined = new CombinedProducer({
+  	sources: { ... },
+  }).run(new PolishHandler({remote: remote}));
 
 == Remote Connection ==
+
+  var remote = new RemoteConnection('http://www.lingwo.org/lingwo_import/service');
+  remote.startImport();
+  remote.setStatus('blah');
+  remote.sendEntry(entry);
+  remote.endImport();
 
 The remote connection would deal with transfering data back to www.lingwo.org.  This
 will include:
@@ -38,11 +52,19 @@ node hasn't been updated by a lingwo.org user since the last automated update.
 
 == Staging Database ==
 
+  var db = new Database('staging.db');
+  var entry = db.getEntry('pl', 'noun', 'stół');
+  db.setEntry(entry);
+  db.commit();
+
 Keeps entries as they are in progress.  This is useful for combining multiple sources into a single
 entry.  You would do this by running two different producer in series, where the second one would
 pull the previously created entry out of the database and update it.
 
 == Producer ==
+
+  var producer = MediaWikiProducer('enwikitionary-latest-pages-articles.xml.bz2');
+  producer.run(handler);
 
 Walks some kind of importable data, passing each chunk to the handler.  The handler will have to be
 written specifically for whatever the data chunk that producer creates is.  Any errors encountered
@@ -53,6 +75,9 @@ Likely, only a small set of Producers will exist, the only one on the table righ
 MediaWiki dump file producer.
 
 == Handler ==
+
+  var handler = new Handler();
+  handler.process(entry);
 
 Takes a chunk of data from the producer and modifies some content in the staging database.  It
 is free to query and save any number of entries in the staging database, giving the handler alot
