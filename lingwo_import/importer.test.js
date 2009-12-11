@@ -90,10 +90,14 @@ PLWiktionaryParserTest = TestCase.subclass({
         var entry = new Lingwo.importer.Entry();
         entry.headword = 'pies';
         entry.language = 'pl';
-        entry.setSource('pl.wiktionary.org', text);
+        entry.setSource('pl.wiktionary.org', {raw: text});
 
         var parser = Lingwo.importer.sources['pl.wiktionary.org'].parsers.pl;
         parser(entry);
+
+        this.assertEquals(entry.pos, 'noun');
+        this.assertEquals(entry.pron, 'pʲɛs');
+        this.assertEquals(entry.fields.gender, 'masculine');
     },
 });
 

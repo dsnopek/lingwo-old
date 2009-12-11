@@ -3,31 +3,10 @@ load('src/importer.js');
 load('src/json2.js');
 
 (function () {
-    var LangNames = {
+    var langNames = {
         'pl': 'polski',
         'en': 'angielski'
     };
-
-    var Handler = declare({
-        _constructor: function (handler, code) {
-            this.handler = handler;
-            this.code = code;
-        },
-
-        process: function (page) {
-            var text = new Lingwo.importer.WikiText(page.revision.text);
-            
-            var sec = page.title + ' ({{język '+LangNames[this.code]+'}})';
-            if (text.hasSection(sec)) {
-                var entry = new Lingwo.importer.Entry();
-                entry.headword = page.title;
-                entry.language = this.code;
-                entry.setSource('pl.wiktionary.org', {raw: text.getSection(sec)});
-                // TODO: run the this.code parser on the entry before passing it to the handler
-                this.handler.process(entry);
-            }
-        }
-    });
 
     var sectionTrans = {
         'wymowa': 'pron',
@@ -84,10 +63,17 @@ load('src/json2.js');
             var name = x[0];
             var f = x[1];
             var v = f(entry, sections);
-            if (typeof v != 'undefined' && v !== null) {
+            if (name && typeof v != 'undefined' && v !== null) {
                 entry[name] = v;
             }
         });
+    };
+
+    var makeStructureExtractor = function (sourceName, structure) {
+        return function (entry) {
+            var sections = splitSections(entry.getSource(sourceName).raw);
+            return extractStructure(entry, sections, structure);
+        };
     };
 
     var extractRegex = function (text, regex, index, trans) {
@@ -130,23 +116,38 @@ load('src/json2.js');
         }],
     ];
 
-    var PolishParser = function (entry) {      
-        var sections = splitSections(entry.getSource('pl.wiktionary.org'));
-
-        extractStructure(entry, sections, polishStructure);
-        
-        delete entry.sources;
-        print (JSON.stringify(entry));
+    var parsers = {
+        pl: makeStructureExtractor('pl.wiktionary.org', polishStructure)
     };
+
+    var Handler = declare({
+        _constructor: function (handler, code) {
+            this.handler = handler;
+            this.code = code;
+        },
+
+        process: function (page) {
+            var text = new Lingwo.importer.WikiText(page.revision.text);
+            
+            var sec = page.title + ' ({{język '+langNames[this.code]+'}})';
+            if (text.hasSection(sec)) {
+                var entry = new Lingwo.importer.Entry();
+                entry.headword = page.title;
+                entry.language = this.code;
+                entry.setSource('pl.wiktionary.org', {raw: text.getSection(sec)});
+
+                // TODO: run the this.code parser on the entry before passing it to the handler
+                this.handler.process(entry);
+            }
+        }
+    });
 
     Lingwo.importer.sources['pl.wiktionary.org'] = {
         process: function (args) {
             var producer = new Lingwo.importer.mediawiki.Producer({ filename: args.filename });
             producer.run(new Handler(args.handler, 'pl'));
         },
-        parsers: {
-            'pl': PolishParser
-        },
+        parsers: parsers,
     };
 
 })();
