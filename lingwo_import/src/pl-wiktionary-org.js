@@ -175,33 +175,37 @@ load('src/json2.js');
                 map[name] = sense;
             });
 
-            sections['examples'].forEach(function (line) {
-                var name = extractRegex(line, /\((\d\.\d)\)/, 1);
+            if (sections['examples']) {
+                sections['examples'].forEach(function (line) {
+                    var name = extractRegex(line, /\((\d\.\d)\)/, 1);
 
-                // Remove the sense numbers
-                line = line.replace(/\(\d\.\d\)/g, '');
-                line = removeWikiText(line);
+                    // Remove the sense numbers
+                    line = line.replace(/\(\d\.\d\)/g, '');
+                    line = removeWikiText(line);
 
-                map[name].example = line;
-            });
+                    map[name].example = line;
+                });
+            }
 
-            sections['translations'].forEach(function (line) {
-                var lang = extractRegex(line, /^\* ([^:]+):/, 1, langCodes);
+            if (sections['translations']) {
+                sections['translations'].forEach(function (line) {
+                    var lang = extractRegex(line, /^\* ([^:]+):/, 1, langCodes);
 
-                // Remove the language name
-                line = line.replace(/^\* [^:]+:/, '');
+                    // Remove the language name
+                    line = line.replace(/^\* [^:]+:/, '');
 
-                // TODO: This only reads a single sense translation, make this read all of them!!
-                //       Shouldn't be too hard..
+                    // TODO: This only reads a single sense translation, make this read all of them!!
+                    //       Shouldn't be too hard..
 
-                var name = extractRegex(line, /\((\d\.\d(?:-[^\)]+)?)\)/, 1);
+                    var name = extractRegex(line, /\((\d\.\d)(?:-[^\)]+)?\)/, 1);
 
-                // Remove the sense numbers
-                line = line.replace(/\((\d\.\d(?:-[^\)]+)?)\)/g, '');
-                line = removeWikiText(line);
+                    // Remove the sense numbers
+                    line = line.replace(/\((\d\.\d)(?:-[^\)]+)?\)/g, '');
+                    line = removeWikiText(line);
 
-                map[name].trans[lang] = line.split(/,\s*/);
-            });
+                    map[name].trans[lang] = line.split(/,\s*/);
+                });
+            }
 
             return res;
         }],
@@ -211,37 +215,33 @@ load('src/json2.js');
         pl: makeStructureExtractor('pl.wiktionary.org', polishStructure)
     };
 
-    var Handler = declare({
-        _constructor: function (handler, code) {
-            this.handler = handler;
-            this.code = code;
-        },
-
-        process: function (page) {
-            var text = new Lingwo.importer.WikiText(page.revision.text);
+    var makeHandlerFunc = function(handler, code) {
+        return function(page) {
+            var text = new Lingwo.importer.mediawiki.WikiText(page.revision.text);
             
-            var sec = page.title + ' ({{język '+langNames[this.code]+'}})';
+            var sec = page.title + ' ({{język '+langNames[code]+'}})';
             if (text.hasSection(sec)) {
                 var entry = new Lingwo.importer.Entry();
                 entry.headword = page.title;
-                entry.language = this.code;
+                entry.language = code;
                 entry.setSource('pl.wiktionary.org', {raw: text.getSection(sec)});
 
                 // Run a language specific parser on the wikitext
-                var parser = parsers[this.code];
+                var parser = parsers[code];
                 if (parser) {
                     parser(entry);
                 }
 
-                this.handler.process(entry);
+                handler(entry);
             }
-        }
-    });
+        };
+    };
 
     Lingwo.importer.sources['pl.wiktionary.org'] = {
         process: function (args) {
-            var producer = new Lingwo.importer.mediawiki.Producer({ filename: args.filename });
-            producer.run(new Handler(args.handler, 'pl'));
+            var producer = new Lingwo.importer.mediawiki.Producer(args.filename);
+            args.handler = makeHandlerFunc(args.handler, 'pl');
+            producer.run(args);
         },
         parsers: parsers,
     };

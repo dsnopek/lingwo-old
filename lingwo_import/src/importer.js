@@ -68,15 +68,12 @@ Lingwo.importer.Entry = declare({
 });
 
 // Runs a particular source
-Lingwo.importer.handleSource = function (srcName, args) {
-    var src = Lingwo.importer.sources[srcName];
+Lingwo.importer.processSource = function (args) {
+    var src = Lingwo.importer.sources[args.type];
     if (typeof src == 'undefined') {
-        throw ("Unknown source: "+srcName);
+        throw ("Unknown source: "+args.type);
     }
 
-    delete args['source'];
-
-    return src(args);
+    return src.process(args);
 };
-
 

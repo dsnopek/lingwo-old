@@ -73,27 +73,27 @@ setObject('Lingwo.importer.mediawiki');
             return buffer;
         },
 
-        _runOne: function (handler, remote) {
+        _runOne: function (args) {
             // TODO: handle errors and stuff
             // TODO: maybe we should re-package this, because we really don't need the whole
             // XML document, really just the title and the text data...
             var pageXml = new XML(this._readPage());
-            handler.process(pageXml);
+            args.handler(pageXml);
         },
 
-        run: function (handler, remote, limit) {
+        run: function (args) {
             this._stream = openStream(this.filename);
 
             var i = 0;
             // TODO: report progress
-            if (typeof limit == 'undefined') {
+            if (typeof args.limit == 'undefined') {
                 while (true) {
-                    this._runOne(handler, remote);
+                    this._runOne(args);
                 }
             }
             else {
-                for (i = 0; i < limit; i++) {
-                    this._runOne(handler, remote);
+                for (i = 0; i < args.limit; i++) {
+                    this._runOne(args);
                 }
             }
         }
