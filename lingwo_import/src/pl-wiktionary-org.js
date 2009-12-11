@@ -95,6 +95,39 @@ load('src/json2.js');
         };
     };
 
+    var removeWikiText = function (line) {
+        // Remove indent
+        line = line.replace(/^:/g, '');
+
+        // remove wikipedia references
+        line = line.replace(/\{\{wikipedia\}\}/g, '');
+
+        // replace the the funky {{template}} things with paren phrases
+        line = line.replace(/\{\{(\S+)\}\}/g, '($1)');
+
+        // [[link|link text]] -> link text
+        line = line.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, '$1');
+
+        // [[link]] -> link
+        line = line.replace(/\[\[([^\]]+)\]\]/g, '$1');
+
+        // Remove <ref></ref> tags
+        line = line.replace(/<ref>.*?<\/ref>/g, '');
+
+        // Remove various text emphasis markup
+        line = line.replace(/'{2,3}/g, '');
+
+        // clean up the whitespace
+        line = line.replace(/^\s+/, '');
+        line = line.replace(/\s+$/, '');
+        line = line.replace(/\s\s+/g, ' ');
+
+        // remove trailing semi-colons
+        line = line.replace(/;+$/g, '');
+
+        return line;
+    };
+
     var polishStructure = [
         ['pron', makeRegexExtractor('pron', /\{\{IPA3\|([^\}]+)\}\}/, 1)],
         ['pos', function (entry, sections) {
@@ -107,12 +140,39 @@ load('src/json2.js');
             if (pos == 'noun') {
                 res.gender = extractRegex(sections['meaning'][0], /^''(?:[^,]+),\s*([^']+)''$/, 1, genderTrans);
             }
+            // TODO: load up the forms!!
 
             return res;
         }],
         ['senses', function (entry, sections) {
-            var raw = sections['senses'];
-            //print (raw);
+            var map = {};
+            var res = [];
+            sections['meaning'].slice(1).forEach(function (line) {
+                var name = extractRegex(line, /\((\d\.\d)\)/, 1);
+
+                // Remove the sense numbers
+                line = line.replace(/\(\d\.\d\)/g, '');
+                line = removeWikiText(line);
+
+                // stash the difference
+                var sense = {
+                    difference: line
+                };
+                res.push(sense);
+                map[name] = sense;
+            });
+
+            sections['examples'].forEach(function (line) {
+                var name = extractRegex(line, /\((\d\.\d)\)/, 1);
+
+                // Remove the sense numbers
+                line = line.replace(/\(\d\.\d\)/g, '');
+                line = removeWikiText(line);
+
+                map[name].example = line;
+            });
+
+            return res;
         }],
     ];
 
@@ -136,7 +196,12 @@ load('src/json2.js');
                 entry.language = this.code;
                 entry.setSource('pl.wiktionary.org', {raw: text.getSection(sec)});
 
-                // TODO: run the this.code parser on the entry before passing it to the handler
+                // Run a language specific parser on the wikitext
+                var parser = parsers[this.code];
+                if (parser) {
+                    parser(entry);
+                }
+
                 this.handler.process(entry);
             }
         }

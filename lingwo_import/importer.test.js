@@ -98,6 +98,16 @@ PLWiktionaryParserTest = TestCase.subclass({
         this.assertEquals(entry.pos, 'noun');
         this.assertEquals(entry.pron, 'pʲɛs');
         this.assertEquals(entry.fields.gender, 'masculine');
+
+        // senses
+        this.assertEquals(entry.senses[0].difference, '(zool) Canis familiaris, zwierzę domowe');
+        this.assertEquals(entry.senses[0].example, 'Pies jest najlepszym przyjacielem człowieka.');
+        this.assertEquals(entry.senses[1].difference, 'samiec psa');
+        this.assertEquals(entry.senses[1].example, 'Czy to jest pies, czy suka?');
+        this.assertEquals(entry.senses[2].difference, '(slang) policjant');
+        this.assertEquals(entry.senses[2].example, 'Psy stoją na patrolu.');
+
+        //print (JSON.stringify(entry.senses));
     },
 });
 
