@@ -6,60 +6,196 @@ load('src/json2.js');
     var langNames = {
         'ab': 'abchaski',
         'af': 'afrykanerski',
+        'aym': 'ajmara',
+        'sq': 'albański',
+        'gsw': 'alemański',
+        'am': 'amharski',
         'en': 'angielski',
         'ar': 'arabski',
+        'arz': 'arabski egipski',
+        'an': 'aragoński',
+        'arc': 'aramejski',
+        'rup': 'arumuński',
+        'as': 'asturyjski',
         'av': 'awarski',
+        'az': 'azerski',
         'bm': 'bambara',
+        // TODO: this shares the code 'jv' with java!
+        'banjumasański': 'banjumasański',
+        'eu': 'baskijski',
+        // TODO: the iso-639-2 code is "gem"
+        'bar': 'bawarski',
+        'bn': 'bengalski',
         'be': 'białoruski',
+        'bik': 'bikolski',
+        // TODO: the iso-639-2 code is "inc"
+        'bpy': 'bisznuprija-manipuri',
         'bs': 'bośniacki',
+        'br': 'bretoński',
         'bg': 'bułgarski',
+        'ceb': 'cebuański',
         'hr': 'chorwacki',
         'zh': 'chiński',
+        // TODO: This should also be 'zh'!
+        'chiński standardowy': 'chiński standardowy',
+        'ce': 'czeczeński',
         'cz': 'czeski',
+        'cv': 'czuwaski',
         'dsb': 'dolnołużycki',
+        'nds': 'dolnosaksoński',
+        // TODO: This should also be 'nds'
+        'dolnosaksoński holenderski': 'dolnosaksoński holenderski',
         'da': 'duński',
         'eo': 'esperanto',
         'et': 'estoński',
+        // TODO: This isn't an iso-639 code!!  Its from SIL.
+        'ext': 'estremadurski',
+        'ee': 'ewe',
+        'fo': 'farerski',
         'fi': 'fiński',
         'fr': 'francuski',
+        // TODO: the iso-639-2 code is "roa"
+        'frp': 'franko-prowansalski',
+        'fur': 'friulski',
+        'fy': 'fryzyjski',
+        // TODO: the iso-639-2 code is "frs"
+        'stq': 'fryzyjski saterlandzki',
+        'gl': 'galicyjski',
+        // TODO: this is also 'zh'!
+        'gan': 'gan',
         'hsb': 'górnołużycki',
         'el': 'grecki',
         'kl': 'grenlandzki',
         'ka': 'gruziński',
+        'gn': 'guarani',
+        'ht': 'haitański',
+        // TODO: this is also 'zh'!
+        'hakka': 'hakka',
+        'ks': 'kaszmirski',
+        'haw': 'hawajski',
         'he': 'hebrajski',
         'hi': 'hindi',
+        'hif': 'hindi fidżyjskie',
         'es': 'hiszpański',
         'nl': 'holenderski',
+        'ig': 'ibo',
         'io': 'ido',
+        'ilo': 'ilokano',
+        'id': 'indonezyjski',
         'ia': 'interlingua',
+        'iu': 'inuktitut',
+        'ga': 'irlandzki',
         'is': 'islandzki',
+        'sah': 'jakucki',
         'ja': 'japoński',
+        'jv': 'jawajski',
         'yi': 'jidysz',
+        // TODO: this is not an ISO-639 code!  Its SIL.
+        'yor': 'joruba',
+        'kab': 'kabylski',
+        'xal': 'kałmucki',
+        'kn': 'kannada',
+        // TODO: this is also 'zh'!
+        'yue': 'kantoński',
         'csb': 'kaszubski',
+        'ca': 'kataloński',
+        'kk': 'kazachski',
+        'qu': 'keczua',
+        'km': 'khmerski',
+        'ky': 'kirgiski',
+        'kv': 'komi',
+        'kg': 'kongo',
         'ko': 'koreański',
+        'kw': 'kornwalijski',
+        'co': 'korsykański',
+        'crn': 'krymskotatarski',
+        'ku': 'kurdyjski',
+        'kj': 'kwanyama',
+        // TODO: the iso-639-2 code is "roa"
+        'lld': 'ladyński',
+        'lij': 'liguryjski',
+        'li': 'limburgijski',
+        'ln': 'lingala',
         'lt': 'litewski',
+        'jbo': 'lojban',
+        'lmo': 'lombardzki',
+        'lg': 'luganda',
+        'lb': 'luksemburski',
         'la': 'łaciński',
         'lv': 'łotewski',
+        'mk': 'macedoński',
+        'ml': 'malajalam',
+        'ms': 'malajski',
+        'dv': 'malediwski',
+        'mg': 'malgaski',
         'mt': 'maltański',
+        'gv': 'manx',
+        'mi': 'maoryski',
+        'mnc': 'mandżurski',
+        'mi': 'maoryski',
+        'mr': 'marathi',
+        'chm': 'maryjski',
+        // TODO: the iso-639-2 code is 'roa'
+        'ruq': 'meglenorumuński',
+        // TODO: the iso-639-2 code is 'zh'
+        'nan': 'minnański',
+        'mwl': 'mirandyjski',
+        'mdf': 'moksza',
+        // TODO: this shares the code 'ro' with Romanian!
+        'mołdawski': 'mołdawski',
+        'mn': 'mongolski',
+        'nah': 'nahuatl',
+        'na': 'nauruański',
+        'nap': 'neapolitański',
+        'ne': 'nepalski',
         'de': 'niemiecki',
+        'pfl': 'niemiecki palatynacki',
+        'sli': 'niemiecki śląski',
+        // TODO: The iso-639-2 code is 'roa'
+        'normandzki': 'normandzki',
         'nb': 'norweski (bokmål)',
+        'nn': 'norweski (nynorsk)',
+        'nov': 'novial',
+        'oc': 'oksytański',
+        'hy': 'ormiański',
+        'os': 'osetyjski',
+        'pam': 'pampango',
+        'pdc': 'pensylwański',
         'fa': 'perski',
+        // TODO: The iso-639-2 code is 'roa'
+        'pms': 'piemoncki',
+        'pcd': 'pikardyjski',
+        'pih': 'pitkern',
+        'pdt': 'plautdietsch',
         'pl': 'polski',
+        // TODO: The iso-639-2 code is 'sla'
+        'pox': 'połabski',
+        'pnt': 'pontyjski',
         'pt': 'portugalski',
+        'se': 'północnolapoński',
+        // TODO: No code to be found!
+        'retoromański': 'retoromański',
+        'rom': 'romski',
         'ru': 'rosyjski',
         'ro': 'rumuński',
+        'ry': 'rusiński',
+        // TODO: The iso-639-2 code is 'gem'
+        'rypuaryjski': 'rypuaryjski',
+        'sm': 'samoański',
+        'sa': 'sanskryt',
         'sc': 'sardyński',
         'sdc': 'sassarski',
         'hbs': 'serbsko-chorwacki',
         'sr': 'serbski',
-        // this isn't a real code!
-        //'art': 'slovio',
+        // TODO: 'art' isn't a real code!
+        'slovio': 'slovio',
         'sk': 'słowacki',
         'slv': 'słoweński',
         'srn': 'sranan tongo',
         'ang': 'staroangielski',
         'cu': 'staro-cerkiewno-słowiański',
         'sw': 'suahili',
+        'scn': 'sycylijski',
         'sco': 'szkocki',
         'gd': 'szkocki gaelicki',
         'sv': 'szwedzki',
@@ -76,13 +212,15 @@ load('src/json2.js');
         'tvl': 'tuvalu',
         'bo': 'tybetański',
         'tr': 'turecki',
+        'tk': 'turkmeński',
         'udm': 'udmurcki',
         'uk': 'ukraiński',
         'ug': 'ujgurski',
+        'ur': 'urdu',
         'uz': 'uzbecki',
         'vo': 'volapük',
         // TODO: this one is also "fiu"!
-        //'': 'võro',
+        'võro': 'võro',
         'cy': 'walijski',
         'war': 'warajski',
         // TODO: in iso-639-2 its "roa"
@@ -94,15 +232,16 @@ load('src/json2.js');
         'it': 'włoski',
         'wo': 'wolof',
         // TODO: also falls under 'zh' (Chinese)
-        //'': 'wu',
+        'wu': 'wu',
         // TODO: no code to be found!
-        //'': 'wysokoislandzki',
+        'wysokoislandzki': 'wysokoislandzki',
         // TODO: no code to be found!
-        //'': 'zachodnioflamandzki',
+        'zachodnioflamandzki': 'zachodnioflamandzki',
         'zza': 'zazaki',
+        'zea': 'zelandzki',
         'zu': 'zuluski',
-        // TODO: in iso-639-3 its "lit"
-        'bat': 'żmudzki',
+        // TODO: It shares the code 'lit' with 'Lithuanian'
+        'żmudzki': 'żmudzki',
     };
 
     var langCodes = (function () {
@@ -136,7 +275,7 @@ load('src/json2.js');
 
     genderTrans = {
         'rodzaj męski': 'masculine',
-        'rodzaj żenski': 'feminine',
+        'rodzaj żeński': 'feminine',
         'rodzaj nijaki': 'neuter'
     };
 
@@ -183,19 +322,24 @@ load('src/json2.js');
         };
     };
 
+    var transValue = function (value, trans) {
+        if (trans && (value in trans)) {
+            return trans[value];
+        }
+        else if (trans) {
+            // DEBUGGING!
+            print ('No trans for: '+value);
+        }
+
+        return value;
+    };
+
     var extractRegex = function (text, regex, index, trans) {
         var match;
         if (match = regex.exec(text)) {
             var value = match[index || 0];
             if (value != '') {
-                if (trans && (value in trans)) {
-                    value = trans[value];
-                }
-                else if (trans) {
-                    // DEBUGGING!
-                    print ('No trans for: '+value);
-                }
-                return value;
+                return transValue(value, trans);
             }
         }
     };
@@ -247,9 +391,10 @@ load('src/json2.js');
         ['fields', function (entry, sections) {
             var pos = entry.pos;
             var res = {};
+            var types = sections['meaning'][0].replace(/''/g, '').split(/,\s*/);
 
             if (pos == 'noun') {
-                res.gender = extractRegex(sections['meaning'][0], /^''(?:[^,]+),\s*([^']+)''$/, 1, genderTrans);
+                res.gender = transValue(types[1], genderTrans);
             }
             // TODO: load up the forms!!
 
