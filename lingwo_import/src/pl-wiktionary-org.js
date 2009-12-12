@@ -439,9 +439,30 @@ load('src/json2.js');
                 map[name] = sense;
             });
 
+            var getName = function (line) {
+                var name = extractRegex(line, /\((\d\.\d?)(?:[^\)]+)?\)/, 1);
+                // For partial sense numbers like "1." we make them into "1.1"
+                if (name && name.length == 2) {
+                    name += '1';
+                }
+                if (!name) {
+                    name = '1.1';
+                }
+                if (!(name in map)) {
+                    print ('Found item for non-existant sense "'+name+'" in: '+line);
+                    name = null;
+                }
+                return name;
+            };
+
             if (sections['examples']) {
                 sections['examples'].forEach(function (line) {
-                    var name = extractRegex(line, /\((\d\.\d)\)/, 1);
+                    //var name = extractRegex(line, /\((\d\.\d)\)/, 1);
+                    var name = getName(line);
+                    if (name === null) {
+                        return;
+                    }
+
 
                     // Remove the sense numbers
                     line = line.replace(/\(\d\.\d\)/g, '');
@@ -461,20 +482,11 @@ load('src/json2.js');
                     // TODO: This only reads a single sense translation, make this read all of them!!
                     //       Shouldn't be too hard..
 
-                    var name = extractRegex(line, /\((\d\.\d?)(?:[^\)]+)?\)/, 1);
-                    // For partial sense numbers like "1." we make them into "1.1"
-                    if (name && name.length == 2) {
-                        name += '1';
-                    }
-                    if (!name) {
-                        name = '1.1';
-                    }
-                    if (!(name in map)) {
-                        print ('Found translation for non-existant sense "'+name+'" in: '+line);
+                    var name = getName(line);
+                    if (name === null) {
                         return;
                     }
 
-                    // Remove the sense numbers
                     line = line.replace(/\((\d\.\d)(?:-[^\)]+)?\)/g, '');
                     line = removeWikiText(line);
 
