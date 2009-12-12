@@ -271,6 +271,8 @@ load('src/json2.js');
         'rzeczownik': 'noun',
         'czasownik przechodni': 'transitive verb',
         'czasownik nieprzechodni': 'intransitive verb',
+        'zaimek wskazujący': 'demonstrative pronoun',
+        'zaimek osobowy': 'personal pronoun',
     };
 
     genderTrans = {
@@ -442,7 +444,11 @@ load('src/json2.js');
                     // TODO: This only reads a single sense translation, make this read all of them!!
                     //       Shouldn't be too hard..
 
-                    var name = extractRegex(line, /\((\d\.\d)(?:-[^\)]+)?\)/, 1);
+                    var name = extractRegex(line, /\((\d\.\d)(?:[^\)]+)?\)/, 1);
+                    if (!(name in map)) {
+                        print ('Found translation for non-existant sense "'+name+'" in: '+line);
+                        return;
+                    }
 
                     // Remove the sense numbers
                     line = line.replace(/\((\d\.\d)(?:-[^\)]+)?\)/g, '');
