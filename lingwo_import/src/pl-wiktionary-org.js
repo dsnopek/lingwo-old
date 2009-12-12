@@ -4,11 +4,105 @@ load('src/json2.js');
 
 (function () {
     var langNames = {
-        'pl': 'polski',
+        'ab': 'abchaski',
+        'af': 'afrykanerski',
         'en': 'angielski',
+        'ar': 'arabski',
+        'av': 'awarski',
+        'bm': 'bambara',
         'be': 'białoruski',
+        'bs': 'bośniacki',
+        'bg': 'bułgarski',
+        'hr': 'chorwacki',
+        'zh': 'chiński',
         'cz': 'czeski',
+        'dsb': 'dolnołużycki',
+        'da': 'duński',
+        'eo': 'esperanto',
+        'et': 'estoński',
+        'fi': 'fiński',
+        'fr': 'francuski',
+        'hsb': 'górnołużycki',
+        'el': 'grecki',
+        'kl': 'grenlandzki',
+        'ka': 'gruziński',
+        'he': 'hebrajski',
+        'hi': 'hindi',
+        'es': 'hiszpański',
+        'nl': 'holenderski',
+        'io': 'ido',
+        'ia': 'interlingua',
+        'is': 'islandzki',
+        'ja': 'japoński',
+        'yi': 'jidysz',
+        'csb': 'kaszubski',
+        'ko': 'koreański',
+        'lt': 'litewski',
+        'la': 'łaciński',
+        'lv': 'łotewski',
+        'mt': 'maltański',
+        'de': 'niemiecki',
+        'nb': 'norweski (bokmål)',
+        'fa': 'perski',
+        'pl': 'polski',
+        'pt': 'portugalski',
         'ru': 'rosyjski',
+        'ro': 'rumuński',
+        'sc': 'sardyński',
+        'sdc': 'sassarski',
+        'hbs': 'serbsko-chorwacki',
+        'sr': 'serbski',
+        // this isn't a real code!
+        //'art': 'slovio',
+        'sk': 'słowacki',
+        'slv': 'słoweński',
+        'srn': 'sranan tongo',
+        'ang': 'staroangielski',
+        'cu': 'staro-cerkiewno-słowiański',
+        'sw': 'suahili',
+        'sco': 'szkocki',
+        'gd': 'szkocki gaelicki',
+        'sv': 'szwedzki',
+        'szl': 'śląski',
+        'enm': 'średnioangielski',
+        'tg': 'tadżycki',
+        'tl': 'tagalski',
+        'th': 'tajski',
+        'ta': 'tamilski',
+        'tt': 'tatarski',
+        'te': 'telugu',
+        'tet': 'tetum',
+        'tpi': 'tok pisin',
+        'tvl': 'tuvalu',
+        'bo': 'tybetański',
+        'tr': 'turecki',
+        'udm': 'udmurcki',
+        'uk': 'ukraiński',
+        'ug': 'ujgurski',
+        'uz': 'uzbecki',
+        'vo': 'volapük',
+        // TODO: this one is also "fiu"!
+        //'': 'võro',
+        'cy': 'walijski',
+        'war': 'warajski',
+        // TODO: in iso-639-2 its "roa"
+        'vec': 'wenecki',
+        'fiu': 'wepski',
+        'hu': 'węgierski',
+        'vi': 'wietnamski',
+        'wym': 'wilamowski',
+        'it': 'włoski',
+        'wo': 'wolof',
+        // TODO: also falls under 'zh' (Chinese)
+        //'': 'wu',
+        // TODO: no code to be found!
+        //'': 'wysokoislandzki',
+        // TODO: no code to be found!
+        //'': 'zachodnioflamandzki',
+        'zza': 'zazaki',
+        'zu': 'zuluski',
+        // TODO: in iso-639-3 its "lit"
+        'bat': 'żmudzki',
     };
 
     var langCodes = (function () {
@@ -35,7 +129,9 @@ load('src/json2.js');
     };
 
     posTrans = {
-        'rzeczownik': 'noun'
+        'rzeczownik': 'noun',
+        'czasownik przechodni': 'transitive verb',
+        'czasownik nieprzechodni': 'intransitive verb',
     };
 
     genderTrans = {
@@ -94,6 +190,10 @@ load('src/json2.js');
             if (value != '') {
                 if (trans && (value in trans)) {
                     value = trans[value];
+                }
+                else if (trans) {
+                    // DEBUGGING!
+                    print ('No trans for: '+value);
                 }
                 return value;
             }
