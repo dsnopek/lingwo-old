@@ -175,6 +175,7 @@ load('src/json2.js');
         'pox': 'połabski',
         'pnt': 'pontyjski',
         'pt': 'portugalski',
+        'prg': 'pruski',
         'se': 'północnolapoński',
         // TODO: No code to be found!
         'retoromański': 'retoromański',
@@ -197,6 +198,7 @@ load('src/json2.js');
         'srn': 'sranan tongo',
         'ang': 'staroangielski',
         'egy': 'staroegipski',
+        'non': 'staronordyjski',
         'cu': 'staro-cerkiewno-słowiański',
         'goh': 'staro-wysoko-niemiecki',
         'sw': 'suahili',
@@ -228,6 +230,8 @@ load('src/json2.js');
         'võro': 'võro',
         'cy': 'walijski',
         'war': 'warajski',
+        // TODO: No ISO code to be found!
+        'Early Modern English': 'wczesny nowoangielski',
         // TODO: in iso-639-2 its "roa"
         'vec': 'wenecki',
         'fiu': 'wepski',
@@ -279,6 +283,7 @@ load('src/json2.js');
         'zaimek wskazujący': 'demonstrative pronoun',
         'zaimek osobowy': 'personal pronoun',
         'przymiotnik': 'adjective',
+        'partykuła': 'particle',
     };
 
     genderTrans = {
@@ -454,6 +459,9 @@ load('src/json2.js');
                     // For partial sense numbers like "1." we make them into "1.1"
                     if (name && name.length == 2) {
                         name += '1';
+                    }
+                    if (!name) {
+                        name = '1.1';
                     }
                     if (!(name in map)) {
                         print ('Found translation for non-existant sense "'+name+'" in: '+line);
