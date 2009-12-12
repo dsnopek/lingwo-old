@@ -63,6 +63,7 @@ load('src/json2.js');
         'gl': 'galicyjski',
         // TODO: this is also 'zh'!
         'gan': 'gan',
+        'got': 'gocki',
         'hsb': 'górnołużycki',
         'el': 'grecki',
         'kl': 'grenlandzki',
@@ -103,6 +104,7 @@ load('src/json2.js');
         'qu': 'keczua',
         'km': 'khmerski',
         'ky': 'kirgiski',
+        'tlh': 'klingoński',
         'kv': 'komi',
         'kg': 'kongo',
         'ko': 'koreański',
@@ -153,6 +155,7 @@ load('src/json2.js');
         'sli': 'niemiecki śląski',
         // TODO: The iso-639-2 code is 'roa'
         'normandzki': 'normandzki',
+        'no': 'norweski',
         'nb': 'norweski (bokmål)',
         'nn': 'norweski (nynorsk)',
         'nov': 'novial',
@@ -193,7 +196,9 @@ load('src/json2.js');
         'slv': 'słoweński',
         'srn': 'sranan tongo',
         'ang': 'staroangielski',
+        'egy': 'staroegipski',
         'cu': 'staro-cerkiewno-słowiański',
+        'goh': 'staro-wysoko-niemiecki',
         'sw': 'suahili',
         'scn': 'sycylijski',
         'sco': 'szkocki',
@@ -273,6 +278,7 @@ load('src/json2.js');
         'czasownik nieprzechodni': 'intransitive verb',
         'zaimek wskazujący': 'demonstrative pronoun',
         'zaimek osobowy': 'personal pronoun',
+        'przymiotnik': 'adjective',
     };
 
     genderTrans = {
@@ -444,7 +450,11 @@ load('src/json2.js');
                     // TODO: This only reads a single sense translation, make this read all of them!!
                     //       Shouldn't be too hard..
 
-                    var name = extractRegex(line, /\((\d\.\d)(?:[^\)]+)?\)/, 1);
+                    var name = extractRegex(line, /\((\d\.\d?)(?:[^\)]+)?\)/, 1);
+                    // For partial sense numbers like "1." we make them into "1.1"
+                    if (name && name.length == 2) {
+                        name += '1';
+                    }
                     if (!(name in map)) {
                         print ('Found translation for non-existant sense "'+name+'" in: '+line);
                         return;
