@@ -30,7 +30,7 @@ setObject('Lingwo.importer.db');
             var stmt = this._conn.createStatement();
             stmt.executeUpdate('DROP TABLE IF EXISTS entry');
             stmt.executeUpdate('CREATE TABLE entry (lang, pos, headword, data)');
-            stmt.executeUpdate('CREATE INDEX IF NOT EXISTS entry_index ON entry (lang, pos, headword)');
+            stmt.executeUpdate('CREATE UNIQUE INDEX IF NOT EXISTS entry_index ON entry (lang, pos, headword)');
         },
         setEntry: function (entry) {
             var prep = this._insert_stmt;

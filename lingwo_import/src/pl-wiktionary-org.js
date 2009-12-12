@@ -46,6 +46,8 @@ load('src/json2.js');
         // TODO: This should also be 'nds'
         'dolnosaksoński holenderski': 'dolnosaksoński holenderski',
         'da': 'duński',
+        // TODO: No ISO code to be found!
+        'ekspreso': 'ekspreso',
         'eo': 'esperanto',
         'et': 'estoński',
         // TODO: This isn't an iso-639 code!!  Its from SIL.
@@ -180,6 +182,7 @@ load('src/json2.js');
         'se': 'północnolapoński',
         // TODO: No code to be found!
         'retoromański': 'retoromański',
+        'roh': 'romansz',
         'rom': 'romski',
         'ru': 'rosyjski',
         'ro': 'rumuński',
@@ -290,6 +293,7 @@ load('src/json2.js');
 
     genderTrans = {
         'rodzaj męski': 'masculine',
+        'męski': 'masculine',
         'rodzaj żeński': 'feminine',
         'rodzaj nijaki': 'neuter'
     };
