@@ -98,6 +98,7 @@ load('src/json2.js');
         'kn': 'kannada',
         // TODO: this is also 'zh'!
         'yue': 'kantoński',
+        'myn': 'kakczikel',
         'csb': 'kaszubski',
         'ca': 'kataloński',
         'kk': 'kazachski',
@@ -280,6 +281,7 @@ load('src/json2.js');
         'rzeczownik': 'noun',
         'czasownik przechodni': 'transitive verb',
         'czasownik nieprzechodni': 'intransitive verb',
+        'czasownik': 'verb',
         'zaimek wskazujący': 'demonstrative pronoun',
         'zaimek osobowy': 'personal pronoun',
         'przymiotnik': 'adjective',
