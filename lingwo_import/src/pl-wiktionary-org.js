@@ -2,7 +2,7 @@
 load('src/importer.js');
 load('src/json2.js');
 
-(function () {
+module('Lingwo.importer.sources.pl-wiktionary-org', function () {
     var langNames = {
         'ab': 'abchaski',
         'af': 'afrykanerski',
@@ -524,7 +524,7 @@ load('src/json2.js');
         };
     };
 
-    Lingwo.importer.sources['pl.wiktionary.org'] = {
+    return {
         process: function (args) {
             var producer = new Lingwo.importer.mediawiki.Producer(args.filename);
             args.handler = makeHandlerFunc(args.handler, 'pl');
@@ -532,6 +532,5 @@ load('src/json2.js');
         },
         parsers: parsers,
     };
-
-})();
+});
 
