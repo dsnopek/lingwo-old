@@ -21,7 +21,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'az': 'azerski',
         'bm': 'bambara',
         // TODO: this shares the code 'jv' with java!
-        'banjumasański': 'banjumasański',
+        'Banyumasan': 'banjumasański',
         'eu': 'baskijski',
         // TODO: the iso-639-2 code is "gem"
         'bar': 'bawarski',
@@ -30,6 +30,8 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'bik': 'bikolski',
         // TODO: the iso-639-2 code is "inc"
         'bpy': 'bisznuprija-manipuri',
+        // TODO: probably should be 'egl' or 'rgn' (Emilian/Romagnol)
+        'Bolognese': 'boloński',
         'bs': 'bośniacki',
         'br': 'bretoński',
         'bg': 'bułgarski',
@@ -37,14 +39,15 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'hr': 'chorwacki',
         'zh': 'chiński',
         // TODO: This should also be 'zh'!
-        'chiński standardowy': 'chiński standardowy',
+        'Standard Mandarin': 'chiński standardowy',
+        'Cockney': 'cockney',
         'ce': 'czeczeński',
         'cz': 'czeski',
         'cv': 'czuwaski',
         'dsb': 'dolnołużycki',
         'nds': 'dolnosaksoński',
         // TODO: This should also be 'nds'
-        'dolnosaksoński holenderski': 'dolnosaksoński holenderski',
+        'Low Saxon Holland Dialect': 'dolnosaksoński holenderski',
         'da': 'duński',
         // TODO: No ISO code to be found!
         'ekspreso': 'ekspreso',
@@ -73,7 +76,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'gn': 'guarani',
         'ht': 'haitański',
         // TODO: this is also 'zh'!
-        'hakka': 'hakka',
+        'Hakka': 'hakka',
         'ks': 'kaszmirski',
         'haw': 'hawajski',
         'he': 'hebrajski',
@@ -118,6 +121,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'kj': 'kwanyama',
         // TODO: the iso-639-2 code is "roa"
         'lld': 'ladyński',
+        'lez': 'lezgiński',
         'lij': 'liguryjski',
         'li': 'limburgijski',
         'ln': 'lingala',
@@ -146,8 +150,12 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'nan': 'minnański',
         'mwl': 'mirandyjski',
         'mdf': 'moksza',
-        // TODO: this shares the code 'ro' with Romanian!
-        'mołdawski': 'mołdawski',
+        // TODO: this shares the code 'ro' with Romanian!  Originally had the code 'mol'
+        //       but it was deprecatedin November 2008:
+        //
+        //       http://www.alvestrand.no/pipermail/ietf-languages/2008-November/008635.html
+        //
+        'moldovan': 'mołdawski',
         'mn': 'mongolski',
         'nah': 'nahuatl',
         'na': 'nauruański',
@@ -156,8 +164,8 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'de': 'niemiecki',
         'pfl': 'niemiecki palatynacki',
         'sli': 'niemiecki śląski',
-        // TODO: The iso-639-2 code is 'roa'
-        'normandzki': 'normandzki',
+        // TODO: The iso-639-2 code is 'roa'!
+        'Norman': 'normandzki',
         'no': 'norweski',
         'nb': 'norweski (bokmål)',
         'nn': 'norweski (nynorsk)',
@@ -165,6 +173,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'oc': 'oksytański',
         'hy': 'ormiański',
         'os': 'osetyjski',
+        'Owambo': 'owambo',
         'pam': 'pampango',
         'pdc': 'pensylwański',
         'fa': 'perski',
@@ -178,17 +187,19 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'pox': 'połabski',
         'pnt': 'pontyjski',
         'pt': 'portugalski',
+        'oci': 'prowansalski',
         'prg': 'pruski',
+        // TODO: This should also include the language 'sami'
         'se': 'północnolapoński',
-        // TODO: No code to be found!
-        'retoromański': 'retoromański',
+        // TODO: No code to be found!  (would probably be 'roa')
+        'Rhaetian': 'retoromański',
         'roh': 'romansz',
         'rom': 'romski',
         'ru': 'rosyjski',
         'ro': 'rumuński',
         'ry': 'rusiński',
         // TODO: The iso-639-2 code is 'gem'
-        'rypuaryjski': 'rypuaryjski',
+        'ripuarian': 'rypuaryjski',
         'sm': 'samoański',
         'sa': 'sanskryt',
         'sc': 'sardyński',
@@ -196,7 +207,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'hbs': 'serbsko-chorwacki',
         'sr': 'serbski',
         // TODO: 'art' isn't a real code!
-        'slovio': 'slovio',
+        'Slovio': 'slovio',
         'sk': 'słowacki',
         'slv': 'słoweński',
         'srn': 'sranan tongo',
@@ -207,6 +218,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'goh': 'staro-wysoko-niemiecki',
         'sw': 'suahili',
         'scn': 'sycylijski',
+        'sin': 'syngaleski',
         'sco': 'szkocki',
         'gd': 'szkocki gaelicki',
         'sv': 'szwedzki',
@@ -222,6 +234,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'tpi': 'tok pisin',
         'tvl': 'tuvalu',
         'bo': 'tybetański',
+        'Tupinambá': 'tupinambá',
         'tr': 'turecki',
         'tk': 'turkmeński',
         'udm': 'udmurcki',
@@ -231,7 +244,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'uz': 'uzbecki',
         'vo': 'volapük',
         // TODO: this one is also "fiu"!
-        'võro': 'võro',
+        'Võro': 'võro',
         'cy': 'walijski',
         'war': 'warajski',
         // TODO: No ISO code to be found!
@@ -247,14 +260,14 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         // TODO: also falls under 'zh' (Chinese)
         'wu': 'wu',
         // TODO: no code to be found!
-        'wysokoislandzki': 'wysokoislandzki',
+        'High Icelandic': 'wysokoislandzki',
         // TODO: no code to be found!
-        'zachodnioflamandzki': 'zachodnioflamandzki',
+        'West Flemish': 'zachodnioflamandzki',
         'zza': 'zazaki',
         'zea': 'zelandzki',
         'zu': 'zuluski',
         // TODO: It shares the code 'lit' with 'Lithuanian'
-        'żmudzki': 'żmudzki',
+        'Samogitian': 'żmudzki',
     };
 
     var langCodes = (function () {
