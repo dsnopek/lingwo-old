@@ -19,10 +19,10 @@ function main() {
 
     // TODO: We really should be combining the two sources
     Lingwo.importer.processSource({
-        type: 'pl.wiktionary.org',
+        type: 'pl-wiktionary-org',
         filename: '/home/dsnopek/dl/plwiktionary-20091202-pages-articles.xml.bz2',
         handler: handler,
-        limit: 400
+        limit: 10000
     });
 
 }

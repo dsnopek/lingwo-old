@@ -2,7 +2,7 @@
 load('src/importer.js');
 load('src/json2.js');
 
-(function () {
+module('Lingwo.importer.sources.pl-wiktionary-org', function () {
     var langNames = {
         'ab': 'abchaski',
         'af': 'afrykanerski',
@@ -21,7 +21,7 @@ load('src/json2.js');
         'az': 'azerski',
         'bm': 'bambara',
         // TODO: this shares the code 'jv' with java!
-        'banjumasański': 'banjumasański',
+        'Banyumasan': 'banjumasański',
         'eu': 'baskijski',
         // TODO: the iso-639-2 code is "gem"
         'bar': 'bawarski',
@@ -30,6 +30,8 @@ load('src/json2.js');
         'bik': 'bikolski',
         // TODO: the iso-639-2 code is "inc"
         'bpy': 'bisznuprija-manipuri',
+        // TODO: probably should be 'egl' or 'rgn' (Emilian/Romagnol)
+        'Bolognese': 'boloński',
         'bs': 'bośniacki',
         'br': 'bretoński',
         'bg': 'bułgarski',
@@ -37,14 +39,15 @@ load('src/json2.js');
         'hr': 'chorwacki',
         'zh': 'chiński',
         // TODO: This should also be 'zh'!
-        'chiński standardowy': 'chiński standardowy',
+        'Standard Mandarin': 'chiński standardowy',
+        'Cockney': 'cockney',
         'ce': 'czeczeński',
         'cz': 'czeski',
         'cv': 'czuwaski',
         'dsb': 'dolnołużycki',
         'nds': 'dolnosaksoński',
         // TODO: This should also be 'nds'
-        'dolnosaksoński holenderski': 'dolnosaksoński holenderski',
+        'Low Saxon Holland Dialect': 'dolnosaksoński holenderski',
         'da': 'duński',
         // TODO: No ISO code to be found!
         'ekspreso': 'ekspreso',
@@ -73,7 +76,7 @@ load('src/json2.js');
         'gn': 'guarani',
         'ht': 'haitański',
         // TODO: this is also 'zh'!
-        'hakka': 'hakka',
+        'Hakka': 'hakka',
         'ks': 'kaszmirski',
         'haw': 'hawajski',
         'he': 'hebrajski',
@@ -118,6 +121,7 @@ load('src/json2.js');
         'kj': 'kwanyama',
         // TODO: the iso-639-2 code is "roa"
         'lld': 'ladyński',
+        'lez': 'lezgiński',
         'lij': 'liguryjski',
         'li': 'limburgijski',
         'ln': 'lingala',
@@ -146,8 +150,12 @@ load('src/json2.js');
         'nan': 'minnański',
         'mwl': 'mirandyjski',
         'mdf': 'moksza',
-        // TODO: this shares the code 'ro' with Romanian!
-        'mołdawski': 'mołdawski',
+        // TODO: this shares the code 'ro' with Romanian!  Originally had the code 'mol'
+        //       but it was deprecatedin November 2008:
+        //
+        //       http://www.alvestrand.no/pipermail/ietf-languages/2008-November/008635.html
+        //
+        'moldovan': 'mołdawski',
         'mn': 'mongolski',
         'nah': 'nahuatl',
         'na': 'nauruański',
@@ -156,8 +164,8 @@ load('src/json2.js');
         'de': 'niemiecki',
         'pfl': 'niemiecki palatynacki',
         'sli': 'niemiecki śląski',
-        // TODO: The iso-639-2 code is 'roa'
-        'normandzki': 'normandzki',
+        // TODO: The iso-639-2 code is 'roa'!
+        'Norman': 'normandzki',
         'no': 'norweski',
         'nb': 'norweski (bokmål)',
         'nn': 'norweski (nynorsk)',
@@ -165,6 +173,7 @@ load('src/json2.js');
         'oc': 'oksytański',
         'hy': 'ormiański',
         'os': 'osetyjski',
+        'Owambo': 'owambo',
         'pam': 'pampango',
         'pdc': 'pensylwański',
         'fa': 'perski',
@@ -178,17 +187,19 @@ load('src/json2.js');
         'pox': 'połabski',
         'pnt': 'pontyjski',
         'pt': 'portugalski',
+        'oci': 'prowansalski',
         'prg': 'pruski',
+        // TODO: This should also include the language 'sami'
         'se': 'północnolapoński',
-        // TODO: No code to be found!
-        'retoromański': 'retoromański',
+        // TODO: No code to be found!  (would probably be 'roa')
+        'Rhaetian': 'retoromański',
         'roh': 'romansz',
         'rom': 'romski',
         'ru': 'rosyjski',
         'ro': 'rumuński',
         'ry': 'rusiński',
         // TODO: The iso-639-2 code is 'gem'
-        'rypuaryjski': 'rypuaryjski',
+        'ripuarian': 'rypuaryjski',
         'sm': 'samoański',
         'sa': 'sanskryt',
         'sc': 'sardyński',
@@ -196,7 +207,7 @@ load('src/json2.js');
         'hbs': 'serbsko-chorwacki',
         'sr': 'serbski',
         // TODO: 'art' isn't a real code!
-        'slovio': 'slovio',
+        'Slovio': 'slovio',
         'sk': 'słowacki',
         'slv': 'słoweński',
         'srn': 'sranan tongo',
@@ -207,6 +218,7 @@ load('src/json2.js');
         'goh': 'staro-wysoko-niemiecki',
         'sw': 'suahili',
         'scn': 'sycylijski',
+        'sin': 'syngaleski',
         'sco': 'szkocki',
         'gd': 'szkocki gaelicki',
         'sv': 'szwedzki',
@@ -222,6 +234,7 @@ load('src/json2.js');
         'tpi': 'tok pisin',
         'tvl': 'tuvalu',
         'bo': 'tybetański',
+        'Tupinambá': 'tupinambá',
         'tr': 'turecki',
         'tk': 'turkmeński',
         'udm': 'udmurcki',
@@ -231,7 +244,7 @@ load('src/json2.js');
         'uz': 'uzbecki',
         'vo': 'volapük',
         // TODO: this one is also "fiu"!
-        'võro': 'võro',
+        'Võro': 'võro',
         'cy': 'walijski',
         'war': 'warajski',
         // TODO: No ISO code to be found!
@@ -247,14 +260,14 @@ load('src/json2.js');
         // TODO: also falls under 'zh' (Chinese)
         'wu': 'wu',
         // TODO: no code to be found!
-        'wysokoislandzki': 'wysokoislandzki',
+        'High Icelandic': 'wysokoislandzki',
         // TODO: no code to be found!
-        'zachodnioflamandzki': 'zachodnioflamandzki',
+        'West Flemish': 'zachodnioflamandzki',
         'zza': 'zazaki',
         'zea': 'zelandzki',
         'zu': 'zuluski',
         // TODO: It shares the code 'lit' with 'Lithuanian'
-        'żmudzki': 'żmudzki',
+        'Samogitian': 'żmudzki',
     };
 
     var langCodes = (function () {
@@ -287,8 +300,21 @@ load('src/json2.js');
         'czasownik': 'verb',
         'zaimek wskazujący': 'demonstrative pronoun',
         'zaimek osobowy': 'personal pronoun',
+        'zaimek zwrotny': 'reflexive pronoun',
+        'zaimek': 'pronoun',
+        // TODO: should this be a noun?
+        'liczebnik ułamkowy': 'fraction',
+        'przedrostek': 'prefix',
+        // TODO: what kind of preposition is this?
+        'przyimek określający': 'proposition',
+        'przyimek': 'proposition',
         'przymiotnik': 'adjective',
+        'przyrostek': 'suffix',
+        'przysłówek': 'adverb',
         'partykuła': 'particle',
+        'skrót': 'abbreviation',
+        'spójnik': 'conjunction',
+        'wykrzyknik': 'exclamation',
     };
 
     genderTrans = {
@@ -324,10 +350,14 @@ load('src/json2.js');
     };
 
     var extractStructure = function (entry, sections, structure) {
+        print ('++ '+entry.headword);
         structure.forEach(function (x) {
             var name = x[0];
-            var f = x[1];
-            var v = f(entry, sections);
+            var f = x[1], v;
+            
+            //print (' |--> '+name);
+
+            v = f(entry, sections);
             if (name && typeof v != 'undefined' && v !== null) {
                 entry[name] = v;
             }
@@ -341,31 +371,36 @@ load('src/json2.js');
         };
     };
 
-    var transValue = function (value, trans) {
+    var transValue = function (value, trans, dbg) {
         if (trans && (value in trans)) {
             return trans[value];
         }
         else if (trans) {
             // DEBUGGING!
-            print ('No trans for: '+value);
+            var s = 'No trans for: '+value;
+            if (dbg) {
+                s = dbg+': '+s;
+            }
+            print (s);
+            //throw (s);
         }
 
         return value;
     };
 
-    var extractRegex = function (text, regex, index, trans) {
+    var extractRegex = function (text, regex, index, trans, dbg) {
         var match;
         if (match = regex.exec(text)) {
             var value = match[index || 0];
             if (value != '') {
-                return transValue(value, trans);
+                return transValue(value, trans, dbg);
             }
         }
     };
 
-    var makeRegexExtractor = function (name, regex, index, trans) {
+    var makeRegexExtractor = function (name, regex, index, trans, dbg) {
         return function (entry, sections) {
-            return extractRegex(sections[name], regex, index, trans);
+            return extractRegex(sections[name], regex, index, trans, dbg);
         };
     };
 
@@ -405,21 +440,51 @@ load('src/json2.js');
     var polishStructure = [
         ['pron', makeRegexExtractor('pron', /\{\{IPA3\|([^\}]+)\}\}/, 1)],
         ['pos', function (entry, sections) {
-            return extractRegex(sections['meaning'][0], /^''([^,'$]+)/, 1, posTrans);
+            if (!sections['meaning']) {
+                return;
+            }
+
+            var s = sections['meaning'][0];
+            // remove periods from pos (strange data inconsistency)
+            s = s.replace(/\./g, '');
+            return extractRegex(s, /^''([^\<,'$]+)/, 1, posTrans, 'posTrans');
         }],
         ['fields', function (entry, sections) {
+            if (!sections['meaning']) {
+                return;
+            }
+
             var pos = entry.pos;
             var res = {};
             var types = sections['meaning'][0].replace(/''/g, '').split(/,\s*/);
 
             if (pos == 'noun') {
-                res.gender = transValue(types[1], genderTrans);
+                if (typeof types[1] == 'undefined') {
+                    // TODO: should this be done with the morphology engine instead??
+                    // we attempt to guess!
+                    if (/a|i$/.exec(entry.headword)) {
+                        res.gender = 'feminine';
+                    }
+                    else if (/e|o$/.exec(entry.headword)) {
+                        res.gender = 'neuter';
+                    }
+                    else {
+                        res.gender = 'masculine';
+                    }
+                }
+                else {
+                    res.gender = transValue(types[1], genderTrans, 'genderTrans');
+                }
             }
             // TODO: load up the forms!!
 
             return res;
         }],
         ['senses', function (entry, sections) {
+            if (!sections['meaning']) {
+                return;
+            }
+
             var map = {};
             var res = [];
 
@@ -474,7 +539,7 @@ load('src/json2.js');
 
             if (sections['translations']) {
                 sections['translations'].forEach(function (line) {
-                    var lang = extractRegex(line, /^\* ([^:]+):/, 1, langCodes);
+                    var lang = extractRegex(line, /^\* ([^:]+):/, 1, langCodes, 'langCodes');
 
                     // Remove the language name
                     line = line.replace(/^\* [^:]+:/, '');
@@ -524,7 +589,7 @@ load('src/json2.js');
         };
     };
 
-    Lingwo.importer.sources['pl.wiktionary.org'] = {
+    return {
         process: function (args) {
             var producer = new Lingwo.importer.mediawiki.Producer(args.filename);
             args.handler = makeHandlerFunc(args.handler, 'pl');
@@ -532,6 +597,5 @@ load('src/json2.js');
         },
         parsers: parsers,
     };
-
-})();
+});
 

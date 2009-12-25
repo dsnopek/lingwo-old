@@ -4,11 +4,10 @@
  */
 
 importPackage(java.sql);
+importPackage(java.io);
 
-setObject('Lingwo.importer.db');
-
-(function () {
-    Lingwo.importer.db.Database = declare({
+module('Lingwo.importer.db', {
+    Database: declare({
         _constructor: function (filename) {
             if (typeof filename == 'undefined') {
                 filename = ':memory:';
@@ -70,9 +69,9 @@ setObject('Lingwo.importer.db');
             this._insert_stmt.executeBatch();
             this._conn.setAutoCommit(true);
         }
-    });
+    }),
 
-    Lingwo.importer.db.DatabaseProducer = declare({
+    DatabaseProducer: declare({
         _constructor: function (db) {
             this.db = db;
         },
@@ -110,6 +109,6 @@ setObject('Lingwo.importer.db');
                 offset += this.PAGE_SIZE;
             }
         },
-    });
-})();
+    })
+});
 

@@ -3,25 +3,6 @@
  * Library functions for the importer.
  */
 
-function setObject(name, value) {
-    if (typeof value == 'undefined') {
-        value = {};
-    }
-
-    var scope = this;
-    var parts = name.split('.');
-    var name = parts.pop();
-
-    parts.forEach(function (part) {
-        if (!(part in scope)) {
-            scope[part] = {};
-        }
-        scope = scope[part];
-    });
-
-    scope[name] = value;
-}
-
 function declare(props) {
     var cons = props['_constructor'];
     delete props['_constructor'];
@@ -43,37 +24,76 @@ escapeRegex = (function () {
     };
 })();
 
-// sets up our namespace
-setObject('Lingwo.importer.sources', {});
+// Provides a very simple gaurd to prevent double loading, with some add syntactical
+// prettiness for the module pattern we commonly use.
+module = (function () {
+    var moduleList = {};
 
-Lingwo.importer.Entry = declare({
-    sources: null,
+    function mixGlobal(name, value) {
+        var scope = this;
+        var parts = name.split('.');
+        var n;
 
-    _constructor: function () {
-    },
+        parts.forEach(function (part) {
+            if (!(part in scope)) {
+                scope[part] = {};
+            }
+            scope = scope[part];
+        });
 
-    setSource: function (name, args) {
-        if (this.sources === null) {
-            this.sources = {};
+        for (n in value) {
+            scope[n] = value[n];
         }
-        this.sources[name] = args;
-    },
-
-    getSource: function (name) {
-        if (this.sources === null) {
-            return undefined;
-        }
-        return this.sources[name];
-    },
-});
-
-// Runs a particular source
-Lingwo.importer.processSource = function (args) {
-    var src = Lingwo.importer.sources[args.type];
-    if (typeof src == 'undefined') {
-        throw ("Unknown source: "+args.type);
     }
 
-    return src.process(args);
-};
+    return function (name, value) {
+        if (name in moduleList) {
+            return;
+        }
+        moduleList[name] = true;
+
+        if (typeof value == 'function') {
+            value = value();
+        }
+        mixGlobal(name, value);
+    };
+})();
+
+// sets up our namespace
+module('Lingwo.importer', {
+    sources: {},
+
+    // TODO: Will hold our entry objects.  Should be relatively light weight,
+    // mostly just a plain object, but a couple functions for integrity sake.
+    Entry: declare({
+        sources: null,
+
+        _constructor: function () {
+        },
+
+        setSource: function (name, args) {
+            if (this.sources === null) {
+                this.sources = {};
+            }
+            this.sources[name] = args;
+        },
+
+        getSource: function (name) {
+            if (this.sources === null) {
+                return undefined;
+            }
+            return this.sources[name];
+        },
+    }),
+
+    // Runs a particular source
+    processSource: function (args) {
+        var src = Lingwo.importer.sources[args.type];
+        if (typeof src == 'undefined') {
+            throw ("Unknown source: "+args.type);
+        }
+
+        return src.process(args);
+    },
+});
 
