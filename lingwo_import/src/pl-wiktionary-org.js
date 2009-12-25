@@ -300,8 +300,21 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'czasownik': 'verb',
         'zaimek wskazujący': 'demonstrative pronoun',
         'zaimek osobowy': 'personal pronoun',
+        'zaimek zwrotny': 'reflexive pronoun',
+        'zaimek': 'pronoun',
+        // TODO: should this be a noun?
+        'liczebnik ułamkowy': 'fraction',
+        'przedrostek': 'prefix',
+        // TODO: what kind of preposition is this?
+        'przyimek określający': 'proposition',
+        'przyimek': 'proposition',
         'przymiotnik': 'adjective',
+        'przyrostek': 'suffix',
+        'przysłówek': 'adverb',
         'partykuła': 'particle',
+        'skrót': 'abbreviation',
+        'spójnik': 'conjunction',
+        'wykrzyknik': 'exclamation',
     };
 
     genderTrans = {
@@ -337,10 +350,14 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
     };
 
     var extractStructure = function (entry, sections, structure) {
+        print ('++ '+entry.headword);
         structure.forEach(function (x) {
             var name = x[0];
-            var f = x[1];
-            var v = f(entry, sections);
+            var f = x[1], v;
+            
+            //print (' |--> '+name);
+
+            v = f(entry, sections);
             if (name && typeof v != 'undefined' && v !== null) {
                 entry[name] = v;
             }
@@ -354,31 +371,36 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         };
     };
 
-    var transValue = function (value, trans) {
+    var transValue = function (value, trans, dbg) {
         if (trans && (value in trans)) {
             return trans[value];
         }
         else if (trans) {
             // DEBUGGING!
-            print ('No trans for: '+value);
+            var s = 'No trans for: '+value;
+            if (dbg) {
+                s = dbg+': '+s;
+            }
+            print (s);
+            //throw (s);
         }
 
         return value;
     };
 
-    var extractRegex = function (text, regex, index, trans) {
+    var extractRegex = function (text, regex, index, trans, dbg) {
         var match;
         if (match = regex.exec(text)) {
             var value = match[index || 0];
             if (value != '') {
-                return transValue(value, trans);
+                return transValue(value, trans, dbg);
             }
         }
     };
 
-    var makeRegexExtractor = function (name, regex, index, trans) {
+    var makeRegexExtractor = function (name, regex, index, trans, dbg) {
         return function (entry, sections) {
-            return extractRegex(sections[name], regex, index, trans);
+            return extractRegex(sections[name], regex, index, trans, dbg);
         };
     };
 
@@ -418,21 +440,51 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
     var polishStructure = [
         ['pron', makeRegexExtractor('pron', /\{\{IPA3\|([^\}]+)\}\}/, 1)],
         ['pos', function (entry, sections) {
-            return extractRegex(sections['meaning'][0], /^''([^,'$]+)/, 1, posTrans);
+            if (!sections['meaning']) {
+                return;
+            }
+
+            var s = sections['meaning'][0];
+            // remove periods from pos (strange data inconsistency)
+            s = s.replace(/\./g, '');
+            return extractRegex(s, /^''([^\<,'$]+)/, 1, posTrans, 'posTrans');
         }],
         ['fields', function (entry, sections) {
+            if (!sections['meaning']) {
+                return;
+            }
+
             var pos = entry.pos;
             var res = {};
             var types = sections['meaning'][0].replace(/''/g, '').split(/,\s*/);
 
             if (pos == 'noun') {
-                res.gender = transValue(types[1], genderTrans);
+                if (typeof types[1] == 'undefined') {
+                    // TODO: should this be done with the morphology engine instead??
+                    // we attempt to guess!
+                    if (/a|i$/.exec(entry.headword)) {
+                        res.gender = 'feminine';
+                    }
+                    else if (/e|o$/.exec(entry.headword)) {
+                        res.gender = 'neuter';
+                    }
+                    else {
+                        res.gender = 'masculine';
+                    }
+                }
+                else {
+                    res.gender = transValue(types[1], genderTrans, 'genderTrans');
+                }
             }
             // TODO: load up the forms!!
 
             return res;
         }],
         ['senses', function (entry, sections) {
+            if (!sections['meaning']) {
+                return;
+            }
+
             var map = {};
             var res = [];
 
@@ -487,7 +539,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
 
             if (sections['translations']) {
                 sections['translations'].forEach(function (line) {
-                    var lang = extractRegex(line, /^\* ([^:]+):/, 1, langCodes);
+                    var lang = extractRegex(line, /^\* ([^:]+):/, 1, langCodes, 'langCodes');
 
                     // Remove the language name
                     line = line.replace(/^\* [^:]+:/, '');
