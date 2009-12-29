@@ -299,6 +299,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'rzeczownik rodzaj żeński': 'noun',
         'rzeczownik własny': 'proper noun',
         'czasownik przechodni': 'transitive verb',
+        'czasownik przechodni (modalny)': 'modal verb',
         'czasownik nieprzechodni': 'intransitive verb',
         'czasownik nieprzechodni lub zwrotny': 'intransitive or reflexive verb',
         'czasownik modalny': 'modal verb',
@@ -312,15 +313,21 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'zaimek przysłowny upowszechniający': 'indefinite pronoun',
         'zaimek przysłowny przeczący': 'negative indefinite pronoun',
         'zaimek nieokreślony': 'indefinite pronoun',
+        'zaimek określony': 'definite pronoun',
+        'zaimek pytający': 'interrogative pronoun',
         'zaimek': 'pronoun',
+        'imiesłów czynny': 'active participle',
+        'imiesłów przymiotnikowy bierny': 'past participle',
         // TODO: should this be a noun?
         'liczebnik ułamkowy': 'fraction',
         'liczebnik główny': 'cardinal number',
+        'liczebnik nieokreślony': 'indefinite number',
+        'liczebnik porządkowy': 'ordinal number',
         'przedrostek': 'prefix',
         // TODO: what kind of prepositions are these?
         'przyimek określający': 'proposition',
         'przyimek opisujący': 'proposition',
-        'przyimek tworzący konstrukcję opisujący': 'proposition',
+        'przyimek tworzący konstrukcję opisującą': 'proposition',
         'przyimek tworzący zwroty wyrażające': 'proposition',
         'przyimek': 'proposition',
         'przymiotnik': 'adjective',
@@ -335,6 +342,8 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'spójnik': 'conjunction',
         'symbol': 'symbol',
         'tytuł': 'title',
+        'wyraz dźwiękonaśladowczy': 'onomatopoeia',
+        'wyrażenie idiomatyczne': 'idiom',
         'wykrzyknik': 'exclamation',
         'związek': 'phrase',
         'związek wyrazowy': 'phrase',
@@ -344,6 +353,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'związek wyrazów w funkcji rzeczownika rodzaju męskoosobowego': 'noun phrase',
         'związek wyrazów w funkcji rzeczownika rodzaju żeńskiego': 'noun phrase',
         'związek wyrazów w funkcji rzeczownika własnego rodzaju żeńskiego': 'noun phrase',
+        'związek wyrazowy w funkcji rzeczownika': 'noun phrase',
     };
 
     // TODO: we have dropped this for a straight regex
