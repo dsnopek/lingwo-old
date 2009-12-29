@@ -22,7 +22,7 @@ function main() {
         type: 'pl-wiktionary-org',
         filename: '/home/dsnopek/dl/plwiktionary-20091202-pages-articles.xml.bz2',
         handler: handler,
-        limit: 10000
+        limit: 15000
     });
 
 }
