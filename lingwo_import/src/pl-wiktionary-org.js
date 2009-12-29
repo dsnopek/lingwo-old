@@ -295,34 +295,76 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
 
     posTrans = {
         'rzeczownik': 'noun',
+        'rzeczownik męski': 'noun',
+        'rzeczownik rodzaj żeński': 'noun',
+        'rzeczownik własny': 'proper noun',
         'czasownik przechodni': 'transitive verb',
+        'czasownik przechodni (modalny)': 'modal verb',
         'czasownik nieprzechodni': 'intransitive verb',
+        'czasownik nieprzechodni lub zwrotny': 'intransitive or reflexive verb',
+        'czasownik modalny': 'modal verb',
+        'czasownik zwrotny': 'reflexive verb',
+        'czasownik zwrotni': 'reflexive verb',
         'czasownik': 'verb',
         'zaimek wskazujący': 'demonstrative pronoun',
         'zaimek osobowy': 'personal pronoun',
         'zaimek zwrotny': 'reflexive pronoun',
+        'zaimek dzierżawczy': 'possesive pronoun',
+        'zaimek przysłowny upowszechniający': 'indefinite pronoun',
+        'zaimek przysłowny przeczący': 'negative indefinite pronoun',
+        'zaimek nieokreślony': 'indefinite pronoun',
+        'zaimek określony': 'definite pronoun',
+        'zaimek pytający': 'interrogative pronoun',
         'zaimek': 'pronoun',
+        'imiesłów czynny': 'active participle',
+        'imiesłów przymiotnikowy bierny': 'past participle',
         // TODO: should this be a noun?
         'liczebnik ułamkowy': 'fraction',
+        'liczebnik główny': 'cardinal number',
+        'liczebnik nieokreślony': 'indefinite number',
+        'liczebnik porządkowy': 'ordinal number',
         'przedrostek': 'prefix',
-        // TODO: what kind of preposition is this?
+        // TODO: what kind of prepositions are these?
         'przyimek określający': 'proposition',
+        'przyimek opisujący': 'proposition',
+        'przyimek tworzący konstrukcję opisującą': 'proposition',
+        'przyimek tworzący zwroty wyrażające': 'proposition',
         'przyimek': 'proposition',
         'przymiotnik': 'adjective',
         'przyrostek': 'suffix',
         'przysłówek': 'adverb',
         'partykuła': 'particle',
         'skrót': 'abbreviation',
+        'skrótowiec': 'abbreviation',
+        // TODO: This is an important point..  Something can be an abbreviation, but it still
+        // has a base part of speech, ie: noun, adj, verb, etc...
+        'skrót/rzeczownik': 'abbreviation',
         'spójnik': 'conjunction',
+        'symbol': 'symbol',
+        'tytuł': 'title',
+        'wyraz dźwiękonaśladowczy': 'onomatopoeia',
+        'wyrażenie idiomatyczne': 'idiom',
         'wykrzyknik': 'exclamation',
+        'związek': 'phrase',
+        'związek wyrazowy': 'phrase',
+        // TODO: This is a phrase, but it represents a noun which is masculine.  How do 
+        // we represent that and similar cases?
+        'związek wyrazowy w funkcji rzeczownika rodzaju męskiego': 'noun phrase',
+        'związek wyrazów w funkcji rzeczownika rodzaju męskoosobowego': 'noun phrase',
+        'związek wyrazów w funkcji rzeczownika rodzaju żeńskiego': 'noun phrase',
+        'związek wyrazów w funkcji rzeczownika własnego rodzaju żeńskiego': 'noun phrase',
+        'związek wyrazowy w funkcji rzeczownika': 'noun phrase',
     };
 
+    // TODO: we have dropped this for a straight regex
+    /*
     genderTrans = {
         'rodzaj męski': 'masculine',
         'męski': 'masculine',
         'rodzaj żeński': 'feminine',
         'rodzaj nijaki': 'neuter'
     };
+    */
 
     var sectionRegex = new RegExp('^\\{\\{(\\S+)\\}\\}(.*)$');
     var splitSections = function (text) {
@@ -459,7 +501,19 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
             var types = sections['meaning'][0].replace(/''/g, '').split(/,\s*/);
 
             if (pos == 'noun') {
-                if (typeof types[1] == 'undefined') {
+                var type = sections['meaning'][0];
+                // TODO: make into a library function
+                if (/męski/.exec(type)) {
+                    res.gender = 'masculine';
+                }
+                else if (/żeński/.exec(type)) {
+                    res.gender = 'feminine';
+                }
+                else if (/nijaki/.exec(type)) {
+                    res.gender = 'neuter';
+                }
+
+                if (!res.gender) {
                     // TODO: should this be done with the morphology engine instead??
                     // we attempt to guess!
                     if (/a|i$/.exec(entry.headword)) {
@@ -471,9 +525,6 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
                     else {
                         res.gender = 'masculine';
                     }
-                }
-                else {
-                    res.gender = transValue(types[1], genderTrans, 'genderTrans');
                 }
             }
             // TODO: load up the forms!!
