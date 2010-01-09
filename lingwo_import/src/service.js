@@ -1,12 +1,5 @@
 
-lib = {};
-(function () {
-    function extendPrototype(cons, props) {
-        for(var name in props) {
-            cons.prototype[name] = props[name];
-        }
-    };
-
+module('Lingwo.importer.Service', function () {
     var nonce_length = 10;
     var nonce_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     function getNonce() {
@@ -39,17 +32,18 @@ lib = {};
         return new java.util.Vector();
     };
 
-    lib.DrupalXmlRpcService = function (args) {
-        this.domain = args.domain;
-        this.url = args.url;
-        this.key = args.key;
-
-        // setup our service
-        this._initializeService();
-    };
-    extendPrototype(lib.DrupalXmlRpcService, {
+    return declare({
         _client: null,
         _sessid: "",
+
+        _constructor: function (args) {
+            this.domain = args.domain;
+            this.url = args.url;
+            this.key = args.key;
+
+            // setup our service
+            this._initializeService();
+        },
 
         _initializeService: function () {
             var config = new org.apache.xmlrpc.client.XmlRpcClientConfigImpl();
@@ -90,7 +84,6 @@ lib = {};
 
         login: function (username, password) {
             var params = this._getDefaultParams('user.login');
-            //var params = newObjectArray();
             params.add(username);
             params.add(password);
 
@@ -99,19 +92,14 @@ lib = {};
             this._sessid = res.get('sessid');
 
             return res;
+        },
+
+        update_entry: function (entry) {
+            var params = this._getDefaultParams('lingwo_import.update_entry');
+            params.add(JSON.stringify(entry));
+            return this._client.execute('lingwo_import.update_entry', params);
         }
     });
-
-})();
-
-var service = new lib.DrupalXmlRpcService({
-    domain: 'localhost',
-    url: 'http://127.0.0.1:8082/services/xmlrpc',
-    key: '028edd447fce610ef46dd685ae186d7f'
 });
 
-if (service.connect()) {
-    var res = service.login('Normal User', 'test');
-    print(res);
-}
 

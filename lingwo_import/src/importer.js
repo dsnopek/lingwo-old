@@ -32,17 +32,25 @@ module = (function () {
     function mixGlobal(name, value) {
         var scope = this;
         var parts = name.split('.');
-        var n;
+        var last = parts[parts.length-1], n;
 
-        parts.forEach(function (part) {
+        parts.forEach(function (part, i) {
             if (!(part in scope)) {
                 scope[part] = {};
             }
-            scope = scope[part];
+            if (i < parts.length - 1) {
+                scope = scope[part];
+            }
         });
 
-        for (n in value) {
-            scope[n] = value[n];
+        if (typeof value == 'object') {
+            scope = scope[last];
+            for (n in value) {
+                scope[n] = value[n];
+            }
+        }
+        else {
+            scope[last] = value;
         }
     }
 
@@ -83,7 +91,7 @@ module('Lingwo.importer', {
                 return undefined;
             }
             return this.sources[name];
-        },
+        }
     }),
 
     // Runs a particular source

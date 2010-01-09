@@ -33,7 +33,7 @@ function lingwo_import_service() {
  * Updates an entry based on JSON data from the importer.
  */
 function lingwo_import_update_entry($data) {
-  // TODO: me!
-  return "Do wah!!";
+  $entry = json_decode($data);
+  return "Adding ". $entry->headword;
 }
 
