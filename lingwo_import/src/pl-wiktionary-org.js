@@ -625,7 +625,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
             var sec = page.title + ' ({{język '+langNames[code]+'}})';
             if (text.hasSection(sec)) {
                 var entry = new Lingwo.importer.Entry();
-                entry.headword = page.title;
+                entry.headword = page.title.toString();
                 entry.language = code;
                 entry.setSource('pl.wiktionary.org', {raw: text.getSection(sec)});
 
