@@ -1,43 +1,33 @@
 
+== 2010-01-09 ==
+
+ * Fix loading entries from database -- currently, it just returns plain objects instead of Entry's.
+ 
+ * Get lingwo_import creating actual nodes on the Drupal side.
+
+ * Integrate the morphology code, and get all the fields filled in.
+
+ * Create a Producer and some import code for the open-dictionaries.com pl-usa.txt file.
+
 == 2009-12-11 ==
 
- * Rearrange the code:
+ * Create a CombineSources function, that will load up all the sources and run a handler over
+   them which stashes the Entries in the database as follows:
 
-   - We need an Entry object, to hold the entry in progress.  This is what will eventually be passed
-     to the remote server.
+     {
+       // Minimal top-level entry stuff
+       language: '...',
+       pos: '...',
+       headword: '...',
 
-   - Each source (ie. pl.wiktionary.org) will get its own file.  Here it will declare a handler that
-     will split out the required language, run a language specific parser over it, and pass the resulting
-     entry on to another handler.
-
-   - We will have a CombineSources function, that will load up all the sources and run a handler over
-     them which stashes the Entries in the database as follows:
-
-       {
-         // Minimal top-level entry stuff
-         language: '...',
-         pos: '...',
-         headword: '...',
-
-         // Here we will stash the info from the different sources/parsers
-         sources: {
-           'pl.wiktionary.org': {
-             'raw': '...', // The original wikitext data
-             'parsed': '...', // The entry from the parser, but w/o the 'sources' data
-             'date': new Date(), // A date object representing when the data was dumped
-           },
-           'en.wikitionary.org': { ... }
-         }
+       // Here we will stash the info from the different sources/parsers
+       sources: {
+         'pl.wiktionary.org': {
+           'raw': '...', // The original wikitext data
+           'parsed': '...', // The entry from the parser, but w/o the 'sources' data
+           'date': new Date(), // A date object representing when the data was dumped
+         },
+         'en.wikitionary.org': { ... }
        }
-
-   - Then we would run over this database using the ultimate "PolishHandler" that will combine the data
-     from both sources and pass the result to the server over remote.
-
-== 2009-12-06 ==
-
- * Implement the last "full cycle" feature of the importer, which is the remote/service stuff.  We
-   should atleast put the entries into the database as Node's, even if its not done in the way we
-   will do it in the end.
- 
- * Start getting serious about doing some importing!!
+     }
 
