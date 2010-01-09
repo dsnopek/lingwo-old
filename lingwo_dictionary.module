@@ -53,10 +53,18 @@ function lingwo_dictionary_load_translation_source(&$node) {
 }
 
 // Gets the Part of Speech from a node
+// TODO: I think we should rename this to *_entry_get_pos(), so that we can have
+// a whole family of *_entry_* functions.
 function lingwo_dictionary_get_pos($node) {
   $pos_vid = lingwo_dictionary_pos_vocabulary();
 
   if (isset($node->taxonomy)) {
+    if (is_int($node->taxonomy[$pos_vid])) {
+      // This means the term object's haven't been loaded yet because we are
+      // coming directly off the node form.  So load 'em!
+      $node->taxonomy = taxonomy_preview_terms($node);
+    }
+
     foreach ($node->taxonomy as $term) {
       if ($term->vid == $pos_vid) {
         $pos = $term;
@@ -130,6 +138,39 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
       // make the "Part of Speech" taxonomy uneditable
       $form['taxonomy'][lingwo_dictionary_pos_vocabulary()]['#disabled'] = TRUE;
     }
+  }
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
+  if ($node->type != lingwo_dictionary_entry_content_type())
+    return NULL;
+
+  switch ($op) {
+    case 'validate':
+      if (isset($node->delete))
+        return NULL;
+
+      $result = db_query("SELECT nid FROM {lingwo_dictionary_entry} WHERE language = '%s' AND pos = '%s' AND title = '%s'", $node->language, lingwo_dictionary_get_pos($node), $node->title);
+
+      if ($existing = db_fetch_object($result)) {
+        form_set_error('title', 'Entry with this language, part of speech and headword combination already exists: '. l($node->title, 'node/'.$existing->nid));
+      }
+      break;
+    case 'insert':
+      $object = (object)array(
+        'language' => $node->language,
+        'pos' => lingwo_dictionary_get_pos($node),
+        'title' => $node->title,
+        'nid' => $node->nid,
+      );
+      drupal_write_record('lingwo_dictionary_entry', $object);
+      break;
+    case 'delete':
+      db_query("DELETE FROM {lingwo_dictionary_entry} WHERE nid = %s", $node->nid);
+      break;
   }
 }
 

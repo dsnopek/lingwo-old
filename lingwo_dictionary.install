@@ -35,13 +35,16 @@ function lingwo_dictionary_schema() {
         'default' => '',
       ),
       'nid' => array(
-        'description' => 'The primary identifier for a node.',
+        'description' => 'The primary identifier for the entry node.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE
       ),
     ),
     'primary key' => array('language', 'pos', 'title'),
+    'unique keys' => array(
+      'node' => array('nid'),
+    )
   );
 
   return $schema;
