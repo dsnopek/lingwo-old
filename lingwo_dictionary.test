@@ -1,0 +1,48 @@
+<?php
+
+class LingwoDictionaryTestCase extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'lingwo_dictionary',
+      'description' => 'Testing the web functionality provided by lingwo_dictionary.',
+      'group' => 'Lingwo Dictionary',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp('lingwo_dictionary');
+
+    # create an appropriate user
+    $this->drupalLogin(
+      $this->drupalCreateUser(array('administer content types')));
+
+    // create the entry content type
+    $edit = array(
+      'name' => 'Entry',
+      'type' => 'entry',
+    );
+    $this->drupalPost('admin/content/types/add', $edit, 'Save content type');
+    lingwo_dictionary_entry_content_type('entry');
+
+    # create an appropriate user
+    /*
+    $this->drupalLogin(
+      $this->drupalCreateUser(array('create entry content')));
+    */
+
+    // TODO: more stuff is necessary!
+  }
+
+  public function testUniquePairs() {
+    $langcode = FIELD_LANGUAGE_NONE;
+    $body_key = "body[$langcode][0][value]";
+
+    $edit = array(
+      'title'   => $this->randomName(8),
+      $body_key => $this->randomName(16),
+    );
+
+    $this->drupalPost('node/add/entry', $edit, 'Save');
+  }
+}
+

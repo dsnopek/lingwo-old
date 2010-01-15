@@ -1,4 +1,9 @@
 
+== 2010-01-09 ==
+
+ * Create a series of lingwo_dictionary_entry_* functions and put them into lingwo_dictionary.entry.inc
+   so we can keep these conceptually seperate.
+
 == 2009-11-27 ==
 
  * Start working with the 'features' module.  As I see it, we have two features we should create:
