@@ -17,32 +17,25 @@ class LingwoDictionaryTestCase extends DrupalWebTestCase {
       $this->drupalCreateUser(array('administer content types')));
 
     // create the entry content type
-    $edit = array(
-      'name' => 'Entry',
-      'type' => 'entry',
-    );
-    $this->drupalPost('admin/content/types/add', $edit, 'Save content type');
-    lingwo_dictionary_entry_content_type('entry');
+    $entry_type = $this->drupalCreateContentType();
+    lingwo_dictionary_entry_content_type($entry_type->type);
 
     # create an appropriate user
-    /*
     $this->drupalLogin(
-      $this->drupalCreateUser(array('create entry content')));
-    */
+      $this->drupalCreateUser(array('create '. $entry_type->type .' content')));
 
     // TODO: more stuff is necessary!
+    // TODO: set-up the POS taxonomy.
   }
 
   public function testUniquePairs() {
-    $langcode = FIELD_LANGUAGE_NONE;
-    $body_key = "body[$langcode][0][value]";
-
     $edit = array(
-      'title'   => $this->randomName(8),
-      $body_key => $this->randomName(16),
+      'title' => $this->randomName(8),
+      'body'  => $this->randomName(16),
     );
 
-    $this->drupalPost('node/add/entry', $edit, 'Save');
+    $entry_type = lingwo_dictionary_entry_content_type();
+    $this->drupalPost("node/add/$entry_type", $edit, 'Save');
   }
 }
 
