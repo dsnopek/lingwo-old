@@ -1,0 +1,25 @@
+<?php
+
+require_once(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.test.inc');
+
+class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
+  private $pos_terms;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'lingwo_senses',
+      'description' => 'Testing the web functionality provided by lingwo_senses.',
+      'group' => 'Lingwo Dictionary',
+    );
+  }
+
+  public function setUp() {
+	// TODO: put any extra dependancies here.
+    parent::setUp('lingwo_senses');
+  }
+
+  public function testOne() {
+    // TODO: build out with cases from senses-use-cases.rst
+  }
+}
+
