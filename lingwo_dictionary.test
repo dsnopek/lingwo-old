@@ -14,7 +14,7 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function setUp() {
-	// TODO: put any extra dependancies here.
+    // TODO: put any extra dependancies here.
     parent::setUp();
   }
 

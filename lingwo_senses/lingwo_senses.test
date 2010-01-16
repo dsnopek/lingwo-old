@@ -14,12 +14,43 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function setUp() {
-	// TODO: put any extra dependancies here.
     parent::setUp('lingwo_senses');
+
+    $entry_type = lingwo_dictionary_entry_content_type();
+    // TODO: add the lingwo_senses CCK field to the entry content type
   }
 
-  public function testOne() {
-    // TODO: build out with cases from senses-use-cases.rst
+  // TODO: build out with cases from senses-use-cases.rst
+  public function testSingleSense() {
+    $entry_type = lingwo_dictionary_entry_content_type();
+
+    // create the entry
+    $this->createEntry(array(
+      'headword' => 'czerwony',
+      'language' => 'pl',
+      'pos' => 'Adjective'
+    ));
+    $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
+
+    // get the node id from the URL
+    // TODO: we should use the {lingwo_dictionary_entry} table to get this information
+    if (!preg_match('/node\/(\d+)/', $this->url, $matches)) {
+      $this->fail("Couldn't get the node ID from the URL: ". $this->url);
+      return;
+    }
+    $nid = $matches[1];
+
+    // add a translation
+    // TODO: set some data in the translation
+    $trans = array(
+    );
+    $this->drupalPost('node/add/'. $entry_type, $trans, 'Save', array(
+      'query' => array(
+        'translation' => $nid,
+        'language' => 'en'
+      )
+    ));
+    $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
   }
 }
 

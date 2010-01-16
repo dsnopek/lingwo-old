@@ -4,8 +4,9 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
   private $pos_terms;
 
   public function setUp() {
-	$modules = array('lingwo_dictionary', 'locale') + func_get_args();
-	call_user_func_array(array('parent', 'setUp'), $modules);
+    $modules = array('lingwo_dictionary', 'locale', 'translation', 'i18n', 'i18ntaxonomy')
+      + func_get_args();
+    call_user_func_array(array('parent', 'setUp'), $modules);
 
     # create an appropriate user
     $this->drupalLogin(
@@ -17,16 +18,20 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       'body_label' => '',
     ));
     variable_set('language_content_type_'. $entry_type->type, TRANSLATION_ENABLED);
-    variable_set('i18n_node_entry'. $entry_type->type, LANGUAGE_SUPPORT_NORMAL);
+    variable_set('i18n_node_'. $entry_type->type, LANGUAGE_SUPPORT_NORMAL);
     lingwo_dictionary_entry_content_type($entry_type->type);
 
     # create an appropriate user
     $this->drupalLogin(
-      $this->drupalCreateUser(array('create '. $entry_type->type .' content')));
+      $this->drupalCreateUser(array(
+        'create '. $entry_type->type .' content',
+        'translate content',
+      ))
+    );
 
     // Add POS vocabulary
     $voc = array(
-      'name' => 'POS',
+      'name' => 'Part Of Speech',
       'relations' => TRUE,
       'hierarchy' => FALSE,
       'multiple' => FALSE,
