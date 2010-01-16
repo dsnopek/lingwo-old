@@ -55,11 +55,12 @@ function lingwo_dictionary_load_translation_source(&$node) {
 // Gets the Part of Speech from a node
 // TODO: I think we should rename this to *_entry_get_pos(), so that we can have
 // a whole family of *_entry_* functions.
-function lingwo_dictionary_get_pos($node) {
+function lingwo_dictionary_get_pos($node, $is_new = FALSE) {
   $pos_vid = lingwo_dictionary_pos_vocabulary();
 
   if (isset($node->taxonomy)) {
-    if (is_int($node->taxonomy[$pos_vid])) {
+    //if (is_int($node->taxonomy[$pos_vid])) {
+    if (!$node->nid || $is_new) {
       // This means the term object's haven't been loaded yet because we are
       // coming directly off the node form.  So load 'em!
       $node->taxonomy = taxonomy_preview_terms($node);
@@ -162,7 +163,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
     case 'insert':
       $object = (object)array(
         'language' => $node->language,
-        'pos' => lingwo_dictionary_get_pos($node),
+        'pos' => lingwo_dictionary_get_pos($node, TRUE),
         'title' => $node->title,
         'nid' => $node->nid,
       );
