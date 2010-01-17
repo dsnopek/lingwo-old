@@ -71,7 +71,7 @@ function lingwo_senses_field_info() {
  */
 function lingwo_senses_widget_info() {
   return array(
-    'lingwo_senses_senses_widget' => array(
+    'lingwo_senses_widget' => array(
       'label' => 'Lingwo Dictionary Senses Widget',
       'field types' => array('lingwo_senses'),
       'multiple values' => CONTENT_HANDLE_MODULE,

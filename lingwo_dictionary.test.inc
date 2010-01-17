@@ -4,8 +4,16 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
   private $pos_terms;
 
   public function setUp() {
-    $modules = array('lingwo_dictionary', 'locale', 'translation', 'i18n', 'i18ntaxonomy')
-      + func_get_args();
+    $modules = array(
+      'lingwo_dictionary',
+      'locale',
+      'translation',
+      'i18n',
+      'i18ntaxonomy',
+      'content',
+    );
+    $args = func_get_args();
+    $modules = array_merge($modules, $args);
     call_user_func_array(array('parent', 'setUp'), $modules);
 
     # create an appropriate user
@@ -26,6 +34,7 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       $this->drupalCreateUser(array(
         'create '. $entry_type->type .' content',
         'translate content',
+        'administer content types',
       ))
     );
 

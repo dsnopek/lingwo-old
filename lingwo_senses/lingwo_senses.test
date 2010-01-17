@@ -17,7 +17,16 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
     parent::setUp('lingwo_senses');
 
     $entry_type = lingwo_dictionary_entry_content_type();
-    // TODO: add the lingwo_senses CCK field to the entry content type
+
+    // add the lingwo_senses CCK field to the entry content type
+    $edit = array(
+      '_add_new_field[label]'       => 'Senses',
+      '_add_new_field[field_name]'  => 'senses',
+      '_add_new_field[type]'        => 'lingwo_senses',
+      '_add_new_field[widget_type]' => 'lingwo_senses_widget',
+    );
+    $this->drupalPost('admin/content/node-type/'. $entry_type .'/fields', $edit, 'Save');
+    $this->drupalPost(NULL, array('multiple' => 1), 'Save field settings');
   }
 
   // TODO: build out with cases from senses-use-cases.rst

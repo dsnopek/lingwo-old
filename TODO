@@ -1,4 +1,10 @@
 
+== 2010-01-17 ==
+
+ * I think that lingwo_dictionary should be dependent on i18ntaxonomy, because without it, the
+   Part Of Speech isn't copied over in translations.  Although, you could say that lingwo_dictionary
+   could maybe be useful without translations..  Not sure yet.
+
 == 2010-01-09 ==
 
  * Create a series of lingwo_dictionary_entry_* functions and put them into lingwo_dictionary.entry.inc
