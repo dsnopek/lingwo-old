@@ -29,7 +29,6 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
     $this->drupalPost(NULL, array('multiple' => 1), 'Save field settings');
   }
 
-  // TODO: build out with cases from senses-use-cases.rst
   public function doSingleSense() {
     $entry_type = lingwo_dictionary_entry_content_type();
 

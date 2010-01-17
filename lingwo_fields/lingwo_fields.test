@@ -1,0 +1,38 @@
+<?php
+
+require_once(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.test.inc');
+
+class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
+  private $pos_terms;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'lingwo_fields',
+      'description' => 'Testing the web functionality provided by lingwo_fields.',
+      'group' => 'Lingwo Dictionary',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp('lingwo_language', 'lingwo_fields');
+
+    $entry_type = lingwo_dictionary_entry_content_type();
+
+    // add the lingwo_senses CCK field to the entry content type
+    $edit = array(
+      '_add_new_field[label]'       => 'Fields',
+      '_add_new_field[field_name]'  => 'fields',
+      '_add_new_field[type]'        => 'lingwo_fields',
+      '_add_new_field[widget_type]' => 'lingwo_fields_widget',
+    );
+    $this->drupalPost('admin/content/node-type/'. $entry_type .'/fields', $edit, 'Save');
+    $this->drupalPost(NULL, array('multiple' => 1), 'Save field settings');
+  }
+
+  public function testOne() {
+    $entry_type = lingwo_dictionary_entry_content_type();
+
+    $this->drupalGet('node/add/'. $entry_type);
+  }
+}
+
