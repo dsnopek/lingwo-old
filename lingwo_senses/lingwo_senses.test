@@ -30,7 +30,7 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
   }
 
   // TODO: build out with cases from senses-use-cases.rst
-  public function testSingleSense() {
+  public function doSingleSense() {
     $entry_type = lingwo_dictionary_entry_content_type();
 
     // create the entry
@@ -41,17 +41,16 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
     ));
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
 
-    // get the node id from the URL
-    // TODO: we should use the {lingwo_dictionary_entry} table to get this information
-    if (!preg_match('/node\/(\d+)/', $this->url, $matches)) {
-      $this->fail("Couldn't get the node ID from the URL: ". $this->url);
+    // get the node id for this entry
+    $nid = lingwo_dictionary_find_entry('czerwony', 'pl', 'adjective');
+    if (!$nid) {
+      $this->fail("Couldn't get the node ID for the entry");
       return;
     }
-    $nid = $matches[1];
 
     // add a translation
-    // TODO: set some data in the translation
     $trans = array(
+      'field_senses[0][data][trans][0]' => $this->randomName(12),
     );
     $this->drupalPost('node/add/'. $entry_type, $trans, 'Save', array(
       'query' => array(
@@ -60,6 +59,118 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
       )
     ));
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
+    $this->assertText($trans['field_senses[0][data][trans][0]']);
+
+    // get the nid of the translation
+    $trans_nodes = translation_node_get_translations($nid);
+    $tnid = $trans_nodes['en']->nid;
+
+    return array($nid, $tnid, $trans['field_senses[0][data][trans][0]']);
+  }
+
+  public function doSingleToMultipleSenses($nid, $tnid, $orig_trans) {
+    $this->drupalPost("node/$nid/edit", array(), 'Setup multiple senses');
+
+    $diffs = array();
+    $trans = array();
+    for($i = 0; $i < 3; $i++) {
+      $diffs[$i] = $this->randomName(12);
+      $trans[$i] = $this->randomName(12);
+    }
+
+    // add two of the senses and then add a third
+    $this->drupalPost(NULL, array(
+      'field_senses[0][data][difference]' => $diffs[0],
+      'field_senses[1][data][difference]' => $diffs[1]
+    ), 'Add Another Sense');
+
+    // fill in the last sense
+    $this->drupalPost(NULL, array(
+      'field_senses[2][data][difference]' => $diffs[2]
+    ), 'Save');
+
+    // check that they are all on there
+    foreach ($diffs as $diff) {
+      $this->assertText($diff);
+    }
+
+    // Check that the UI is right for editing the translation:
+    $this->drupalGet("node/$tnid/edit");
+    //   (1a) Original translation should be last,
+    $this->assertFieldByName('field_senses[3][data][id]', '*');
+    //   (1b) and should have the obsolete checkbox.
+    $this->assertFieldByName('field_senses[3][retire_sense]');
+    //   (2a) New senses are displayed first (empty trans),
+    // TODO: Not sure how to check this simply.
+    //   (2b) and don't have the obsolete checkbox.
+    $this->assertNoFieldByName('field_senses[0][retire_sense]');
+    $this->assertNoFieldByName('field_senses[1][retire_sense]');
+    $this->assertNoFieldByName('field_senses[2][retire_sense]');
+
+    // Entry clue and translation data for the three new senses
+    $edit = array();
+    for($i = 0; $i < 3; $i++) {
+      $edit["field_senses[$i][data][clue]"] = $i;
+      $edit["field_senses[$i][data][trans][0]"] = $trans[$i];
+    }
+    $this->drupalPost(NULL, $edit, 'Save');
+    // both old and new senses should be there
+    $this->assertText($orig_trans);
+    foreach($trans as $t) {
+      $this->assertText($t);
+    }
+
+    // Mark the original sense for removal
+    $this->drupalPost("node/$tnid/edit", array('field_senses[3][retire_sense]' => TRUE), 'Save');
+    // now the old one should be gone, and the new ones remain
+    $this->assertNoText($orig_trans);
+    foreach($trans as $t) {
+      $this->assertText($t);
+    }
+
+    return array($diffs, $trans);
+  }
+
+  public function doMultipleSensesRemoveOne($nid, $tnid, $diffs, $trans) {
+    // remove the middle sense
+    $this->drupalPost("node/$nid/edit", array(), 'Remove Sense #2');
+    $this->drupalPost(NULL, array(), 'Save');
+    // see that the first and last are still there, but not the middle
+    $this->assertText($diffs[0]);
+    $this->assertNoText($diffs[1]);
+    $this->assertText($diffs[2]);
+
+    // Check that the UI is right for editing the translation:
+    $this->drupalGet("node/$tnid/edit");
+    //   (1a) Removed translation should be last,
+    $this->assertFieldByName('field_senses[2][data][clue]', '1');
+    //   (1b) and should have the obsolete checkbox.
+    $this->assertFieldByName('field_senses[2][retire_sense]');
+    //   (2a) Remaining senses are displayed first,
+    $this->assertFieldByName('field_senses[0][data][clue]', '0');
+    $this->assertFieldByName('field_senses[1][data][clue]', '2');
+    // TODO: Not sure how to check this simply.
+    //   (2b) and don't have the obsolete checkbox.
+    $this->assertNoFieldByName('field_senses[0][data][retire_sense]');
+    $this->assertNoFieldByName('field_senses[1][data][retire_sense]');
+
+    // Mark the original sense for removal
+    $this->drupalPost("node/$tnid/edit", array('field_senses[2][retire_sense]' => TRUE), 'Save');
+    // now the old one should be gone, and the new ones remain
+    $this->assertText($trans[0]);
+    $this->assertNoText($trans[1]);
+    $this->assertText($trans[2]);
+
+    unset($diffs[1]);
+    unset($trans[1]);
+
+    return array($diffs, $trans);
+  }
+
+  public function testWorkflow() {
+    list($nid, $tnid, $orig_trans) = $this->doSingleSense();
+    list($diffs, $trans) = $this->doSingleToMultipleSenses($nid, $tnid, $orig_trans);
+    list($diffs, $trans) = $this->doMultipleSensesRemoveOne($nid, $tnid, $diffs, $trans);
   }
 }
 

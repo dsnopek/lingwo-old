@@ -81,6 +81,17 @@ function lingwo_dictionary_get_pos($node, $is_new = FALSE) {
   return NULL;
 }
 
+function lingwo_dictionary_find_entry($headword, $language, $pos) {
+  $res = db_query("SELECT nid FROM {lingwo_dictionary_entry} WHERE title = '%s' AND language = '%s' AND pos = '%s'", $headword, $language, $pos);
+
+  $obj = db_fetch_object($res);
+  if ($obj) {
+    return $obj->nid;
+  }
+  
+  return NULL;
+}
+
 /**
  * Implementation of hook_menu().
  */
@@ -147,6 +158,9 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
  */
 function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
   if ($node->type != lingwo_dictionary_entry_content_type())
+    return NULL;
+
+  if (lingwo_dictionary_is_translation($node))
     return NULL;
 
   switch ($op) {

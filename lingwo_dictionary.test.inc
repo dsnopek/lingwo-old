@@ -33,6 +33,7 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
     $this->drupalLogin(
       $this->drupalCreateUser(array(
         'create '. $entry_type->type .' content',
+        'edit own '. $entry_type->type .' content',
         'translate content',
         'administer content types',
       ))
@@ -70,8 +71,6 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
     // Add a language
     include_once './includes/locale.inc';
     locale_add_language('pl', 'Polish', 'Polski');
-
-    // TODO: more stuff is necessary!
   }
 
   protected function createEntry($values) {
