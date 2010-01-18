@@ -68,13 +68,13 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       $this->pos_terms[$name] = $term['tid'];
     }
 
-    // Add a language
+    // Add some languages
     include_once './includes/locale.inc';
     locale_add_language('pl', 'Polish', 'Polski');
+    locale_add_language('zzz', 'TestEmpty', 'TestEmpty');
   }
 
-  protected function createEntry($values) {
-    $entry_type = lingwo_dictionary_entry_content_type();
+  protected function getEntryEdit($values) {
     $pos_vid = lingwo_dictionary_pos_vocabulary();
 
     if (!isset($values['headword'])) {
@@ -87,6 +87,12 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       "taxonomy[$pos_vid]" => $this->pos_terms[$values['pos']],
     );
 
+	return $edit;
+  }
+
+  protected function createEntry($values) {
+    $entry_type = lingwo_dictionary_entry_content_type();
+    $edit = $this->getEntryEdit($values);
     $this->drupalPost("node/add/$entry_type", $edit, 'Save');
   }
 }

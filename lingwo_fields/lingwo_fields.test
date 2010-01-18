@@ -29,6 +29,10 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
     $this->drupalPost(NULL, array('multiple' => 1), 'Save field settings');
   }
 
+  # Checks that we can load the fields for a language/pos and save them normally.
+  # Also checks for the presense of two bugs that existed in early implementations:
+  #  (1) One caused taxonomy to do strange things (not appear on the form, throw warnings)
+  #  (2) CCK would attempt to save empty fields causing database errors.
   public function testCreate() {
     $entry_type = lingwo_dictionary_entry_content_type();
     $pos_vid = lingwo_dictionary_pos_vocabulary();
@@ -37,26 +41,55 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
     $this->drupalGet('node/add/'. $entry_type);
     $this->assertFieldByName("taxonomy[$pos_vid]");
 
-    // create an Entry
-    $entry = array(
-      'headword' => 'czerwony',
-      'language' => 'pl',
-      'pos' => 'Adjective',
-    );
-    $this->createEntry($entry);
+    // set the language and pos, then refresh the fields
+    $edit = $this->getEntryEdit(array(
+        'headword' => 'czerwony',
+        'language' => 'pl',
+        'pos' => 'Adjective',
+    ));
+    $this->drupalPost(NULL, $edit, 'Refresh');
+    // check that the fields have appeared
+    $this->assertFieldByName('field_fields[1][name]', '*stem');
+    $this->assertFieldByName('field_fields[1][type]', 'form');
+    $this->assertFieldByName('field_fields[1][automatic]', TRUE);
+    $this->assertFieldByName('field_fields[1][value]');
+
+    // set the stem
+    $edit['field_fields[1][value]'] = 'czerwonXYZ';
+    $edit['field_fields[1][automatic]'] = FALSE;
+    $this->drupalPost(NULL, $edit, 'Save');
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
+    // check for the field!!!
+    $this->assertText("*stem: \n czerwonXYZ");
     // taxonomy related bug!
     $this->assertNoText('Illegal offset');
-    // CCK empty-ness bug
-    $this->assertNoRaw('Column &amp;#039;field_fields_type&amp;#039; cannot be null');
 
     // go to the edit page again
     $nid = lingwo_dictionary_find_entry('czerwony', 'pl', 'adjective');
-    $this->drupalGet("node/$nid/edit"); //, array('XDEBUG_SESSION_START' => 'default'));
+    $this->drupalGet("node/$nid/edit");
     // taxonomy field should be there
     $this->assertFieldByName("taxonomy[$pos_vid]");
     // taxonomy related bug!
     $this->assertNoText('Illegal offset');
+  }
+
+  public function testCreateEmpty() {
+    $entry_type = lingwo_dictionary_entry_content_type();
+    $pos_vid = lingwo_dictionary_pos_vocabulary();
+
+    // get that the create page is all good
+    $this->drupalGet('node/add/'. $entry_type);
+
+    // create an Entry
+    $entry = array(
+      'headword' => 'test',
+      'language' => 'zzz',
+      'pos' => 'Adjective',
+    );
+    $this->createEntry($entry);
+    $this->assertText(t('@type test has been created.', array('@type' => $entry_type)));
+    // CCK empty-ness bug
+    $this->assertNoRaw('Column &amp;#039;field_fields_type&amp;#039; cannot be null');
   }
 
   // This is basically the same test from lingwo_dictionary.test again, but there are problems
