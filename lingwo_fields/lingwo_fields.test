@@ -67,6 +67,8 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
     // go to the edit page again
     $nid = lingwo_dictionary_find_entry('czerwony', 'pl', 'adjective');
     $this->drupalGet("node/$nid/edit");
+    $this->assertFieldByName('field_fields[1][value]', 'czerwonXYZ');
+    $this->assertFieldByName('field_fields[1][automatic]', FALSE);
     // taxonomy field should be there
     $this->assertFieldByName("taxonomy[$pos_vid]");
     // taxonomy related bug!

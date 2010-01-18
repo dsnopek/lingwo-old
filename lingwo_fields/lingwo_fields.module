@@ -99,30 +99,26 @@ function lingwo_fields_field_settings($op, $field) {
       $columns['type'] = array(
         'type' => 'varchar',
         'length' => 10,
-        'not null' => TRUE,
         'sortable' => TRUE,
-        'views' => TRUE
+        'views' => TRUE,
       );
       $columns['name'] = array(
         'type' => 'varchar',
         'length' => 255,
-        'not null' => TRUE,
         'sortable' => TRUE,
         'views' => TRUE
       );
       $columns['value'] = array(
         'type' => 'varchar',
         'length' => 255,
-        'not null' => TRUE,
         'sortable' => TRUE,
         'views' => TRUE
       );
       $columns['automatic'] = array(
         'description' => 'Boolean indicating whether this field was generated automatically or not',
         'type' => 'int',
-        'not null' => TRUE,
-        'views' => TRUE,
         'default' => 1,
+        'views' => TRUE,
       );
       return $columns;
   }
