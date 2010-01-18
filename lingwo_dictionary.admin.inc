@@ -16,7 +16,7 @@ function lingwo_dictionary_admin_settings() {
   $form['lingwo_dictionary_lookup_path'] = array(
     '#type' => 'textfield',
     '#title' => t('Lookup path'),
-    '#default_value' => lingwo_dictionary_lookup_path(),
+    '#default_value' => lingwo_dictionary_settings('lookup_path'),
     '#description' => t('The drupal path for dictionary lookup. Do not include a trailing slash. Leave empty to disable the lookup path.'),
     '#field_prefix' => url(NULL, array('absolute' => FALSE)) . (variable_get('clean_url', 0) ? '' : '?q=')
   );
@@ -28,7 +28,7 @@ function lingwo_dictionary_admin_settings() {
   $form['lingwo_dictionary_entry_content_type'] = array(
     '#type' => 'select',
     '#title' => t('Entry Content Type'),
-    '#default_value' => lingwo_dictionary_entry_content_type(),
+    '#default_value' => lingwo_dictionary_settings('entry_content_type'),
     '#options' => $type_options,
     '#description' => t('The content type to use as a dictionary entry.'),
     '#required' => TRUE,
@@ -41,7 +41,7 @@ function lingwo_dictionary_admin_settings() {
   $form['lingwo_dictionary_pos_vocabulary'] = array(
     '#type' => 'select',
     '#title' => t('Part of Speech Vocabulary'),
-    '#default_value' => lingwo_dictionary_pos_vocabulary(),
+    '#default_value' => lingwo_dictionary_settings('pos_vocabulary'),
     '#options' => $pos_options,
     '#description' => t('The taxonomy vocabulary used to denote part of speech (pos), ie: verb, noun, adjective, etc.'),
     '#required' => TRUE,

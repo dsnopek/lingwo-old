@@ -13,13 +13,8 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
     );
   }
 
-  public function setUp() {
-    // TODO: put any extra dependancies here.
-    parent::setUp();
-  }
-
   public function testUniqueEntries() {
-    $entry_type = lingwo_dictionary_entry_content_type();
+    $entry_type = lingwo_dictionary_settings('entry_content_type');
 
     $entry = array(
       'headword' => 'czerwony',
@@ -44,6 +39,63 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
     $entry['pos'] = 'Noun';
     $this->createEntry($entry);
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
+  }
+}
+
+class LingwoDictionarySettingsTestCase extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'lingwo_dictionary_settings',
+      'description' => 'Testing the lingwo_dictionary_settings() function.',
+      'group' => 'Lingwo Dictionary',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp('lingwo_dictionary');
+  }
+
+  public function testSettingsWithDefault() {
+    $value = lingwo_dictionary_settings('lookup_path');
+    $this->assertEqual($value, 'lookup');
+
+    lingwo_dictionary_settings('lookup_path', 'new_path');
+    $value = lingwo_dictionary_settings('lookup_path');
+    $this->pass($value);
+    $this->assertEqual($value, 'new_path');
+  }
+
+  public function testSettingsNoDefault() {
+    $value = lingwo_dictionary_settings('entry_content_type');
+    $this->assertNull($value);
+
+    lingwo_dictionary_settings('entry_content_type', 'entry');
+    $value = lingwo_dictionary_settings('entry_content_type');
+    $this->assertEqual($value, 'entry');
+  }
+
+  // TODO: find some way to intercept the error/exception!
+  /*
+  public function testNonExistant() {
+    $value = lingwo_dictionary_settings('blah');
+    $this->assertNull($value);
+  }
+  */
+
+  // TODO: we can't seem to test the message!!
+  public function testCheck() {
+    $check = lingwo_dictionary_check_settings();
+    $this->assertFalse($check, t('lingwo_dictionary_check_settings() == FALSE'));
+    $this->drupalGet('node');
+    //$this->assertText('Lingwo Dictionary will not work correctly until it is configured');
+
+    lingwo_dictionary_settings('entry_content_type', 'entry');
+    lingwo_dictionary_settings('pos_vocabulary', 6);
+
+    $check = lingwo_dictionary_check_settings();
+    $this->assertTrue($check, t('lingwo_dictionary_check_settings() == TRUE'));
+    $this->drupalGet('node');
+    //$this->assertNoText('Lingwo Dictionary will not work correctly until it is configured');
   }
 }
 

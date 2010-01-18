@@ -175,7 +175,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
 
   ahah_helper_register($form, $form_state);
 
-  $pos_vid = lingwo_dictionary_pos_vocabulary();
+  $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
   $pos = lingwo_dictionary_get_pos($node);
 
   $default_values = array();
@@ -338,7 +338,7 @@ function theme_lingwo_fields_widget_form_wrapper($element) {
   }
 
   // get a map of all the pos values
-  $pos_vid = lingwo_dictionary_pos_vocabulary();
+  $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
   $pos_values = array();
   foreach (taxonomy_get_tree($pos_vid) as $term) {
     $pos_values[$term->tid] = strtolower($term->name);

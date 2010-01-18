@@ -58,7 +58,7 @@ function lingwo_dictionary_load_translation_source(&$node) {
 // TODO: I think we should rename this to *_entry_get_pos(), so that we can have
 // a whole family of *_entry_* functions.
 function lingwo_dictionary_get_pos($node, $is_new = FALSE) {
-  $pos_vid = lingwo_dictionary_pos_vocabulary();
+  $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
 
   if (isset($node->taxonomy)) {
     //if (is_int($node->taxonomy[$pos_vid])) {
@@ -118,7 +118,7 @@ function lingwo_dictionary_menu() {
   );
 
   /*
-  if ($lookup_path = lingwo_dictionary_lookup_path()) {
+  if ($lookup_path = lingwo_dictionary_settings('lookup_path')) {
     $items[$lookup_path .'/%/%'] = array(
       'page callback' => 'lingwo_dictionary_lookup_page',
       'page arguments' => array(1, 2),
@@ -136,7 +136,7 @@ function lingwo_dictionary_menu() {
  * Implementation of hook_form_alter().
  */
 function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
-  if ($form_id == (lingwo_dictionary_entry_content_type() .'_node_form')) {
+  if ($form_id == (lingwo_dictionary_settings('entry_content_type') .'_node_form')) {
     $node = $form['#node'];
 
     // remove language neutral and set language as required (for asthetic purposes)
@@ -158,7 +158,7 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
       $form['language']['#disabled'] = TRUE;
 
       // make the "Part of Speech" taxonomy uneditable
-      $form['taxonomy'][lingwo_dictionary_pos_vocabulary()]['#disabled'] = TRUE;
+      $form['taxonomy'][lingwo_dictionary_settings('pos_vocabulary')]['#disabled'] = TRUE;
     }
   }
 }
@@ -167,7 +167,7 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
  * Implementation of hook_nodeapi().
  */
 function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
-  if ($node->type != lingwo_dictionary_entry_content_type())
+  if ($node->type != lingwo_dictionary_settings('entry_content_type'))
     return NULL;
 
   if (lingwo_dictionary_is_translation($node))
@@ -219,32 +219,48 @@ function lingwo_dictionary_theme() {
  */
 
 /**
- * Drupal path for dictionary lookup.
+ * Used to access settings.
  */
-function lingwo_dictionary_lookup_path($value = NULL) {
-  if (is_null($value)) {
-    return variable_get('lingwo_dictionary_lookup_path', 'lookup');
+function lingwo_dictionary_settings($name, $value = NULL) {
+  static $_settings = array(
+    'lookup_path' => 'lookup',
+    'entry_content_type' => NULL,
+    'pos_vocabulary' => NULL,
+  );
+
+  if (is_null($name)) {
+    return $_settings;
   }
-  variable_set('lingwo_dictionary_lookup_path', $value);
+
+  if (!array_key_exists($name, $_settings)) {
+    trigger_error(t('No such lingwo_dictionary_setting: @name', array('@name' => $name)), E_USER_ERROR);
+    return NULL;
+  }
+
+  if (is_null($value)) {
+    return variable_get('lingwo_dictionary_'. $name, $_settings[$name]);
+  }
+
+  variable_set('lingwo_dictionary_'. $name, $value);
 }
 
 /**
- * Content type to use for a dictionary entry.
+ * Checks if lingwo_dictionary is configured.
  */
-function lingwo_dictionary_entry_content_type($value = NULL) {
-  if (is_null($value)) {
-    return variable_get('lingwo_dictionary_entry_content_type', NULL);
-  }
-  variable_set('lingwo_dictionary_entry_content_type', $value);
-}
+function lingwo_dictionary_check_settings($message = TRUE) {
+  $_settings = lingwo_dictionary_settings(NULL);
 
-/**
- * Vocabulary used for denoting part of speech.
- */
-function lingwo_dictionary_pos_vocabulary($value = NULL) {
-  if (is_null($value)) {
-    return variable_get('lingwo_dictionary_pos_vocabulary', NULL);
+  // look for settings that aren't configured
+  foreach ($_settings as $name => $default) {
+    if (is_null($default) && is_null(variable_get('lingwo_dictionary_'. $name, NULL))) {
+      if ($message) {
+        drupal_set_message(t('Functionality provided by Lingwo Dictionary will not work correctly until it is configured'));
+      }
+
+      return FALSE;
+    }
   }
-  variable_set('lingwo_dictionary_pos_vocabulary', $value);
+
+  return TRUE;
 }
 

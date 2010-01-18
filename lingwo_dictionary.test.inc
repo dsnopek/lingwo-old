@@ -27,7 +27,7 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
     ));
     variable_set('language_content_type_'. $entry_type->type, TRANSLATION_ENABLED);
     variable_set('i18n_node_'. $entry_type->type, LANGUAGE_SUPPORT_NORMAL);
-    lingwo_dictionary_entry_content_type($entry_type->type);
+    lingwo_dictionary_settings('entry_content_type', $entry_type->type);
 
     # create an appropriate user
     $this->drupalLogin(
@@ -53,7 +53,7 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       )
     );
     taxonomy_save_vocabulary($voc);
-    lingwo_dictionary_pos_vocabulary($voc['vid']);
+    lingwo_dictionary_settings('pos_vocabulary', $voc['vid']);
 
     // Add POS terms
     foreach (array('Noun','Verb','Adjective') as $name) {
@@ -75,7 +75,7 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
   }
 
   protected function getEntryEdit($values) {
-    $pos_vid = lingwo_dictionary_pos_vocabulary();
+    $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
 
     if (!isset($values['headword'])) {
       $values['headword'] = $this->randomName(8);
@@ -91,7 +91,7 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
   }
 
   protected function createEntry($values) {
-    $entry_type = lingwo_dictionary_entry_content_type();
+    $entry_type = lingwo_dictionary_settings('entry_content_type');
     $edit = $this->getEntryEdit($values);
     $this->drupalPost("node/add/$entry_type", $edit, 'Save');
   }

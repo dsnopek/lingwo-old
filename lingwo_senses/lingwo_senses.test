@@ -16,7 +16,7 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
   public function setUp() {
     parent::setUp('lingwo_senses');
 
-    $entry_type = lingwo_dictionary_entry_content_type();
+    $entry_type = lingwo_dictionary_settings('entry_content_type');
 
     // add the lingwo_senses CCK field to the entry content type
     $edit = array(
@@ -30,7 +30,7 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function doSingleSense() {
-    $entry_type = lingwo_dictionary_entry_content_type();
+    $entry_type = lingwo_dictionary_settings('entry_content_type');
 
     // create the entry
     $this->createEntry(array(

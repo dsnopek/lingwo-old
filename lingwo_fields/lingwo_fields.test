@@ -16,7 +16,7 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
   public function setUp() {
     parent::setUp('ahah_helper', 'lingwo_language', 'lingwo_fields');
 
-    $entry_type = lingwo_dictionary_entry_content_type();
+    $entry_type = lingwo_dictionary_settings('entry_content_type');
 
     // add the lingwo_senses CCK field to the entry content type
     $edit = array(
@@ -34,8 +34,8 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
   #  (1) One caused taxonomy to do strange things (not appear on the form, throw warnings)
   #  (2) CCK would attempt to save empty fields causing database errors.
   public function testCreate() {
-    $entry_type = lingwo_dictionary_entry_content_type();
-    $pos_vid = lingwo_dictionary_pos_vocabulary();
+    $entry_type = lingwo_dictionary_settings('entry_content_type');
+    $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
 
     // get that the create page is all good
     $this->drupalGet('node/add/'. $entry_type);
@@ -76,8 +76,8 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function testCreateEmpty() {
-    $entry_type = lingwo_dictionary_entry_content_type();
-    $pos_vid = lingwo_dictionary_pos_vocabulary();
+    $entry_type = lingwo_dictionary_settings('entry_content_type');
+    $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
 
     // get that the create page is all good
     $this->drupalGet('node/add/'. $entry_type);
@@ -99,7 +99,7 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
   // TODO: We have to call the AHAH submit handler to get this problem to happen.
   /*
   public function testValidationConflict() {
-    $entry_type = lingwo_dictionary_entry_content_type();
+    $entry_type = lingwo_dictionary_settings('entry_content_type');
 
     $entry = array(
       'headword' => 'czerwony',
