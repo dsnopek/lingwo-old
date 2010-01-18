@@ -169,14 +169,14 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     $node = (object)$form_state['node'];
   }
 
-  if (lingwo_dictionary_is_translation($node)) {
+  if (lingwo_dictionary_entry_is_translation($node)) {
     return NULL;
   }
 
   ahah_helper_register($form, $form_state);
 
   $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
-  $pos = lingwo_dictionary_get_pos($node);
+  $pos = lingwo_dictionary_entry_get_pos($node);
 
   $default_values = array();
   foreach ($items as $item) {
@@ -398,7 +398,7 @@ function lingwo_fields_change_pos_submit($form, &$form_state) {
  */
 function lingwo_fields_map_items($node, $items) {
   $fields = array();
-  foreach (lingwo_language_fields($node->language, lingwo_dictionary_get_pos($node)) as $field) {
+  foreach (lingwo_language_fields($node->language, lingwo_dictionary_entry_get_pos($node)) as $field) {
     $fields[$field['type'] .':'. $field['name']] = $field;
   }
   foreach (element_children($items) as $index) {
@@ -440,7 +440,7 @@ function theme_lingwo_fields_widget_form($element) {
 function theme_lingwo_fields_formatter_default($element) {
   $node = $element['#node'];
 
-  lingwo_dictionary_load_translation_source($node);
+  lingwo_dictionary_entry_load_translation_source($node);
   if ($node->translation_source) {
     // display the fields as if this were the source node (with the source nodes
     // language) and not a member of this language
@@ -469,7 +469,7 @@ function theme_lingwo_fields_formatter_default($element) {
 
   // Since CCK forces our theme name, we send to another theme to do the real
   // theming, with possible specific themes.
-  $pos = lingwo_dictionary_get_pos($node);
+  $pos = lingwo_dictionary_entry_get_pos($node);
 
   return theme(array(
       'lingwo_fields_view_'. $node->language .'_'. $pos,

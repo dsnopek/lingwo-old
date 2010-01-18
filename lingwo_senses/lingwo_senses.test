@@ -41,7 +41,7 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
 
     // get the node id for this entry
-    $nid = lingwo_dictionary_find_entry('czerwony', 'pl', 'adjective');
+    $nid = lingwo_dictionary_entry_find('czerwony', 'pl', 'adjective');
     if (!$nid) {
       $this->fail("Couldn't get the node ID for the entry");
       return;

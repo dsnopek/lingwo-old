@@ -6,6 +6,9 @@
  * Implements extensions for Lingwo Dictionary
  */
 
+// get our API functions for dealing with entries
+module_load_include('inc', 'lingwo_dictionary', 'lingwo_dictionary.entry-api');
+
 // Helper for generating UUIDs
 function _ld_make_uuid() {
   if (!isset($GLOBALS['uuid'])) {
@@ -37,69 +40,6 @@ function _ld_form_to_node(&$form, &$form_state) {
   $form_state['node']['taxonomy'] = taxonomy_preview_terms($node);
 
   return $node;
-}
-
-// Let's us know if a node is a translation
-function lingwo_dictionary_is_translation($node) {
-  return isset($node->translation_source) ||
-    ($node->nid && $node->tnid != 0 && $node->nid != $node->tnid);
-}
-
-// Loads and returns a node's translation source
-function lingwo_dictionary_load_translation_source(&$node) {
-  if (lingwo_dictionary_is_translation($node)) {
-    $node->translation_source = node_load($node->tnid);
-  }
-  
-  return $node->translation_source;
-}
-
-// Gets the Part of Speech from a node
-// TODO: I think we should rename this to *_entry_get_pos(), so that we can have
-// a whole family of *_entry_* functions.
-function lingwo_dictionary_get_pos($node, $is_new = FALSE) {
-  $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
-
-  if (isset($node->taxonomy)) {
-    //if (is_int($node->taxonomy[$pos_vid])) {
-    //if (!$node->nid || $is_new) {
-    /*
-    $a = array_values($node->taxonomy);
-    if (0+$a[0] != 0) {
-    */
-    if (is_numeric($node->taxonomy[$pos_vid])) {
-      // This means the term object's haven't been loaded yet because we are
-      // coming directly off the node form.  So load 'em!
-      $taxonomy = taxonomy_preview_terms($node);
-    }
-    else {
-      $taxonomy = $node->taxonomy;
-    }
-
-    foreach ($taxonomy as $term) {
-      if ($term->vid == $pos_vid) {
-        $pos = $term;
-        break;
-      }
-    }
-  }
-
-  if (isset($pos)) {
-    return drupal_strtolower($pos->name);
-  }
-
-  return NULL;
-}
-
-function lingwo_dictionary_find_entry($headword, $language, $pos) {
-  $res = db_query("SELECT nid FROM {lingwo_dictionary_entry} WHERE title = '%s' AND language = '%s' AND pos = '%s'", $headword, $language, $pos);
-
-  $obj = db_fetch_object($res);
-  if ($obj) {
-    return $obj->nid;
-  }
-  
-  return NULL;
 }
 
 /**
@@ -170,7 +110,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
   if ($node->type != lingwo_dictionary_settings('entry_content_type'))
     return NULL;
 
-  if (lingwo_dictionary_is_translation($node))
+  if (lingwo_dictionary_entry_is_translation($node))
     return NULL;
 
   switch ($op) {
@@ -178,18 +118,17 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       if (isset($node->delete))
         return NULL;
 
-      $result = db_query("SELECT nid FROM {lingwo_dictionary_entry} WHERE language = '%s' AND pos = '%s' AND title = '%s'", $node->language, lingwo_dictionary_get_pos($node), $node->title);
+      $existing = lingwo_dictionary_entry_find($node->title, $node->language,
+        lingwo_dictionary_entry_get_pos($node));
 
-      if ($existing = db_fetch_object($result)) {
-        if ($existing->nid != $node->nid) {
-          form_set_error('title', 'Entry with this language, part of speech and headword combination already exists: '. l($node->title, 'node/'.$existing->nid));
-        }
+      if ($existing && $existing != $node->nid) {
+        form_set_error('title', 'Entry with this language, part of speech and headword combination already exists: '. l($node->title, 'node/'.$existing->nid));
       }
       break;
     case 'insert':
       $object = (object)array(
         'language' => $node->language,
-        'pos' => lingwo_dictionary_get_pos($node, TRUE),
+        'pos' => lingwo_dictionary_entry_get_pos($node, TRUE),
         'title' => $node->title,
         'nid' => $node->nid,
       );

@@ -157,7 +157,7 @@ function lingwo_senses_widget(&$form, &$form_state, $field, $items, $delta = 0) 
   }
 
   $func = 'lingwo_senses_widget_'.
-    (lingwo_dictionary_is_translation($node) ? 'translation' : 'original');
+    (lingwo_dictionary_entry_is_translation($node) ? 'translation' : 'original');
   return $func($form, $form_state, $field, $items, $delta);
 }
 
