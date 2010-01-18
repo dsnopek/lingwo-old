@@ -36,37 +36,19 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
         'edit own '. $entry_type->type .' content',
         'translate content',
         'administer content types',
+        'administer site configuration',
       ))
     );
 
     // Add POS vocabulary
-    $voc = array(
+    $voc = $this->createVocabulary(array(
       'name' => 'Part Of Speech',
-      'relations' => TRUE,
-      'hierarchy' => FALSE,
-      'multiple' => FALSE,
-      'required' => TRUE,
-      'tags' => 0,
-      'language' => '',
       'nodes' => array(
         $entry_type->type => TRUE
-      )
-    );
-    taxonomy_save_vocabulary($voc);
-    lingwo_dictionary_settings('pos_vocabulary', $voc['vid']);
-
-    // Add POS terms
-    foreach (array('Noun','Verb','Adjective') as $name) {
-      $term = array(
-        'vid' => $voc['vid'],
-        'name' => $name,
-        'language' => ''
-      );
-      taxonomy_save_term($term);
-
-      // save for later use!
-      $this->pos_terms[$name] = $term['tid'];
-    }
+      ),
+      'terms' => array('Noun', 'Verb', 'Adjective'),
+    ));
+    lingwo_dictionary_settings('pos_vocabulary', $voc->vid);
 
     // Add some languages
     include_once './includes/locale.inc';
@@ -81,13 +63,49 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       $values['headword'] = $this->randomName(8);
     }
 
+    // make a map from pos term names to tid
+    $pos_terms = array();
+    foreach (taxonomy_get_tree($pos_vid) as $term) {
+      $pos_terms[$term->name] = $term->tid;
+    }
+
     $edit = array(
       'title'    => $values['headword'],
       'language' => $values['language'],
-      "taxonomy[$pos_vid]" => $this->pos_terms[$values['pos']],
+      "taxonomy[$pos_vid]" => $pos_terms[$values['pos']],
     );
 
-	return $edit;
+	  return $edit;
+  }
+
+  protected function createVocabulary($voc = array()) {
+    if (!isset($voc['name'])) {
+      $voc['name'] = $this->randomName(12);
+    }
+    $voc += array(
+      'relations' => TRUE,
+      'hierarchy' => FALSE,
+      'multiple' => FALSE,
+      'required' => TRUE,
+      'tags' => 0,
+      'language' => '',
+      'terms' => array(),
+    );
+    taxonomy_save_vocabulary($voc);
+
+    $newTerms = array();
+    foreach ($voc['terms'] as $name) {
+      $term = array(
+        'vid' => $voc['vid'],
+        'name' => $name,
+        'language' => ''
+      );
+      taxonomy_save_term($term);
+      $newTerms[] = $term;
+    }
+    $voc['terms'] = $newTerms;
+
+    return (object)$voc;
   }
 
   protected function createEntry($values) {

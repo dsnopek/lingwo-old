@@ -26,11 +26,6 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
     $this->createEntry($entry);
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
 
-    // DEBUG
-    $res = db_query('SELECT * FROM {lingwo_dictionary_entry}');
-    $o = db_fetch_object($res);
-    $this->pass(print_r($o, TRUE));
-
     // Try to create a second time (and get a duplicate!)
     $this->createEntry($entry);
     $this->assertText(t('Entry with this language, part of speech and headword combination already exists: @name', array('@name' => $entry['name'])));
@@ -39,6 +34,32 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
     $entry['pos'] = 'Noun';
     $this->createEntry($entry);
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
+  }
+
+  public function testAdminSettings() {
+    // create a new content type
+    $new_type = $this->drupalCreateContentType();
+
+    // create a new taxonomy vocabulary
+    $new_voc = $this->createVocabulary();
+
+    // load page, verify the current settings
+    $this->drupalGet('admin/settings/lingwo_dictionary');
+    $this->assertFieldByName('lingwo_dictionary_lookup_path', lingwo_dictionary_settings('lookup_path'));
+    $this->assertFieldByName('lingwo_dictionary_entry_content_type', lingwo_dictionary_settings('entry_content_type'));
+    $this->assertFieldByName('lingwo_dictionary_pos_vocabulary', lingwo_dictionary_settings('pos_vocabulary'));
+
+    // save new settings.
+    $this->drupalPost(NULL, array(
+      'lingwo_dictionary_lookup_path' => 'test',
+      'lingwo_dictionary_entry_content_type' => $new_type->type,
+      'lingwo_dictionary_pos_vocabulary' => $new_voc->vid,
+    ), 'Save configuration');
+    $this->assertText('The configuration options have been saved');
+    // verify that they took
+    $this->assertFieldByName('lingwo_dictionary_lookup_path', 'test');
+    $this->assertFieldByName('lingwo_dictionary_entry_content_type', $new_type->type);
+    $this->assertFieldByName('lingwo_dictionary_pos_vocabulary', $new_voc->vid);
   }
 }
 
