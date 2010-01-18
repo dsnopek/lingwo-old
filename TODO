@@ -1,16 +1,4 @@
 
-== 2010-01-18 ==
-
- * Bug: When saving a new entry, if it is stopped for validation reasons (ie. duplicate entry)
-   then fixed and submitted, for some reason the AHAH submit handler is run -- not the Save one --
-   and we see a JSON object.
-   -- Cause discovered: AHAH causes the form to be rebuilt and cached, but changing the
-   $form['#action'] to be /lingwo_fields/ahah instead of /node/add.
-
-   -- It looks like ahah_helper has some code to work around this:
-   http://drupal.org/node/578252
-
-
 == 2010-01-17 ==
 
  * I think that lingwo_dictionary should be dependent on i18ntaxonomy, because without it, the
@@ -31,10 +19,6 @@
 
    (2) A feature for setting up the syndictation stuff, which involves making a few content
        types and wiring them together in the appropriate way.
-
- * Bug: Creating a new Entry with no fields results in the following error:
-
-   user warning: Column 'field_fields_type' cannot be null query: content_write_record /* admin : content_write_record */ INSERT INTO content_field_fields (vid, nid, delta, field_fields_type, field_fields_name, field_fields_value, field_fields_automatic) VALUES (213, 148, 0, NULL, NULL, NULL, 1) in /home/dsnopek/www/cck_test/root/sites/all/modules/cck/content.module on line 1213.
 
 == 2009-11-13 ==
 

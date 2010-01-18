@@ -12,6 +12,7 @@
 function lingwo_fields_menu() {
   $items = array();
 
+  // TODO: now that we are using ahah_helper, this should be removed
   $items['lingwo_fields/ahah/%'] = array(
     'title' => 'Lingwo Dictionary Fields AHAH',
     'page callback' => 'lingwo_fields_ahah',
@@ -356,6 +357,7 @@ function theme_lingwo_fields_widget_form_wrapper($element) {
   return drupal_render($element); 
 }
 
+// TODO: now that we are using ahah_helper, this should be removed
 function lingwo_fields_ahah($field_name) {
   module_load_include('inc', 'node', 'node.pages');
   $form_state = array('storage' => NULL, 'submitted' => FALSE);

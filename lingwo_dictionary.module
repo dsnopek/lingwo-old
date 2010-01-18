@@ -19,6 +19,7 @@ function _ld_make_uuid() {
 }
 
 // Helper for implementing AHAH
+// TODO: now that we are using ahah_helper, this should be removed
 function _ld_disable_validation(&$form) {
   foreach (element_children($form) as $child) {
     $form[$child]['#validated'] = TRUE;
@@ -27,6 +28,7 @@ function _ld_disable_validation(&$form) {
 }
 
 // Helper for implementing AHAH
+// TODO: now that we are using ahah_helper, this should be removed
 function _ld_form_to_node(&$form, &$form_state) {
   $form['#submit'] = array('');
   $node = node_form_submit_build_node($form, $form_state);
