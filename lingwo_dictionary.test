@@ -16,24 +16,73 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
   public function testUniqueEntries() {
     $entry_type = lingwo_dictionary_settings('entry_content_type');
 
-    $entry = array(
+    $edit = array(
       'headword' => 'czerwony',
       'language' => 'pl',
       'pos' => 'Adjective',
     );
 
     // Create the first time
-    $this->createEntry($entry);
+    $this->createEntry($edit);
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
 
     // Try to create a second time (and get a duplicate!)
-    $this->createEntry($entry);
+    $this->createEntry($edit);
     $this->assertText(t('Entry with this language, part of speech and headword combination already exists: @name', array('@name' => $entry['name'])));
 
     // Modifying the part of speech should be enough to allow it to be created
-    $entry['pos'] = 'Noun';
-    $this->createEntry($entry);
+    $edit['pos'] = 'Noun';
+    $this->createEntry($edit);
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
+  }
+
+  public function testEntryAPI() {
+    $entry_type = lingwo_dictionary_settings('entry_content_type');
+
+    // Create the source
+    $edit = array(
+      'headword' => 'czerwony',
+      'language' => 'pl',
+      'pos' => 'Adjective',
+    );
+    $this->createEntry($edit);
+    $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
+
+    // get the node id for this entry
+    $nid = lingwo_dictionary_entry_find('czerwony', 'pl', 'adjective');
+    if (!$nid) {
+      $this->fail("Couldn't get the node ID for the entry");
+      return;
+    }
+
+    // add a translation
+    $this->drupalPost('node/add/'. $entry_type, array(), 'Save', array(
+      'query' => array(
+        'translation' => $nid,
+        'language' => 'en'
+      )
+    ));
+    $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
+
+    // get the nid of the translation
+    $trans_nodes = translation_node_get_translations($nid);
+    $tnid = $trans_nodes['en']->nid;
+
+    // test API functions on the source node
+    $node = node_load($nid);
+    $this->assertFalse(lingwo_dictionary_entry_is_translation($node));
+    $this->assertNull(lingwo_dictionary_entry_load_translation_source($node));
+    $this->assertEqual(lingwo_dictionary_entry_get_pos($node), 'adjective');
+
+    // test API functions on the translation node
+    $tnode = node_load($tnid);
+    $this->assertTrue(lingwo_dictionary_entry_is_translation($tnode));
+    $this->assertNotNull(lingwo_dictionary_entry_load_translation_source($tnode));
+    $this->assertEqual($node->nid, $tnode->translation_source->nid);
+    $this->assertEqual(lingwo_dictionary_entry_get_pos($node), 'adjective');
+
+    // TODO: test some of the 'fringe' conditions with the above APIs (ie. when not 
+    // coming from node_load(), but like the objects are coming in from the node-form.
   }
 
   public function testAdminSettings() {

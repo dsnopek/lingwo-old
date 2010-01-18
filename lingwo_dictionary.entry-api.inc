@@ -14,7 +14,7 @@ function lingwo_dictionary_entry_is_translation($node) {
 
 // Loads and returns a node's translation source
 function lingwo_dictionary_entry_load_translation_source(&$node) {
-  if (lingwo_dictionary_entry_is_translation($node)) {
+  if (lingwo_dictionary_entry_is_translation($node) && !isset($node->translation_source)) {
     $node->translation_source = node_load($node->tnid);
   }
   
@@ -22,8 +22,6 @@ function lingwo_dictionary_entry_load_translation_source(&$node) {
 }
 
 // Gets the Part of Speech from a node
-// TODO: I think we should rename this to *_entry_get_pos(), so that we can have
-// a whole family of *_entry_* functions.
 function lingwo_dictionary_entry_get_pos($node, $is_new = FALSE) {
   $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
 
@@ -58,6 +56,7 @@ function lingwo_dictionary_entry_get_pos($node, $is_new = FALSE) {
   return NULL;
 }
 
+// Lookup an entry based on its headword, language and pos
 function lingwo_dictionary_entry_find($headword, $language, $pos) {
   $res = db_query("SELECT nid FROM {lingwo_dictionary_entry} WHERE title = '%s' AND language = '%s' AND pos = '%s'", $headword, $language, $pos);
 
