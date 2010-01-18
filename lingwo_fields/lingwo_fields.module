@@ -389,8 +389,6 @@ function lingwo_fields_ahah($field_name) {
 function lingwo_fields_change_pos_submit($form, &$form_state) {
   $node = _ld_form_to_node($form, $form_state);
   $field_name = $form_state['clicked_button']['#field_name'];
-
-  //$form_state[$field_name]['senses'] = $senses;
 }
 
 /*
