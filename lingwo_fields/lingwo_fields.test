@@ -33,6 +33,7 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
     $entry_type = lingwo_dictionary_entry_content_type();
     $pos_vid = lingwo_dictionary_pos_vocabulary();
 
+    // get that the create page is all good
     $this->drupalGet('node/add/'. $entry_type);
     $this->assertFieldByName("taxonomy[$pos_vid]");
 
@@ -49,6 +50,7 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
     // CCK empty-ness bug
     $this->assertNoRaw('Column &amp;#039;field_fields_type&amp;#039; cannot be null');
 
+    // go to the edit page again
     $nid = lingwo_dictionary_find_entry('czerwony', 'pl', 'adjective');
     $this->drupalGet("node/$nid/edit"); //, array('XDEBUG_SESSION_START' => 'default'));
     // taxonomy field should be there

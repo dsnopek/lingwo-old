@@ -1,4 +1,10 @@
 
+== 2010-01-18 ==
+
+ * Bug: When saving a new entry, if it is stopped for validation reasons (ie. duplicate entry)
+   then fixed and submitted, for some reason the AHAH submit handler is run -- not the Save one --
+   and we see a JSON object.
+
 == 2010-01-17 ==
 
  * I think that lingwo_dictionary should be dependent on i18ntaxonomy, because without it, the
