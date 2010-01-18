@@ -47,7 +47,7 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       'multiple' => FALSE,
       'required' => TRUE,
       'tags' => 0,
-      'language' => 'en',
+      'language' => '',
       'nodes' => array(
         $entry_type->type => TRUE
       )
@@ -60,7 +60,7 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       $term = array(
         'vid' => $voc['vid'],
         'name' => $name,
-        'languaeg' => 'en'
+        'language' => ''
       );
       taxonomy_save_term($term);
 

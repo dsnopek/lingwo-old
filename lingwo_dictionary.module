@@ -179,7 +179,9 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       $result = db_query("SELECT nid FROM {lingwo_dictionary_entry} WHERE language = '%s' AND pos = '%s' AND title = '%s'", $node->language, lingwo_dictionary_get_pos($node), $node->title);
 
       if ($existing = db_fetch_object($result)) {
-        form_set_error('title', 'Entry with this language, part of speech and headword combination already exists: '. l($node->title, 'node/'.$existing->nid));
+        if ($existing->nid != $node->nid) {
+          form_set_error('title', 'Entry with this language, part of speech and headword combination already exists: '. l($node->title, 'node/'.$existing->nid));
+        }
       }
       break;
     case 'insert':

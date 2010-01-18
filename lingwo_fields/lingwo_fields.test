@@ -14,7 +14,7 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function setUp() {
-    parent::setUp('lingwo_language', 'lingwo_fields');
+    parent::setUp('ahah_helper', 'lingwo_language', 'lingwo_fields');
 
     $entry_type = lingwo_dictionary_entry_content_type();
 
@@ -58,5 +58,33 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
     // taxonomy related bug!
     $this->assertNoText('Illegal offset');
   }
+
+  // This is basically the same test from lingwo_dictionary.test again, but there are problems
+  // with it when lingwo_fields is enabled.
+  // TODO: We have to call the AHAH submit handler to get this problem to happen.
+  /*
+  public function testValidationConflict() {
+    $entry_type = lingwo_dictionary_entry_content_type();
+
+    $entry = array(
+      'headword' => 'czerwony',
+      'language' => 'pl',
+      'pos' => 'Adjective',
+    );
+
+    // Create the first time
+    $this->createEntry($entry);
+    $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
+
+    // Try to create a second time (and get a duplicate!)
+    $this->createEntry($entry);
+    $this->assertText(t('Entry with this language, part of speech and headword combination already exists: @name', array('@name' => $entry['name'])));
+
+    // Modifying the part of speech should be enough to allow it to be created
+    $entry['pos'] = 'Noun';
+    $this->createEntry($entry);
+    $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
+  }
+  */
 }
 

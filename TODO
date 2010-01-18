@@ -4,6 +4,12 @@
  * Bug: When saving a new entry, if it is stopped for validation reasons (ie. duplicate entry)
    then fixed and submitted, for some reason the AHAH submit handler is run -- not the Save one --
    and we see a JSON object.
+   -- Cause discovered: AHAH causes the form to be rebuilt and cached, but changing the
+   $form['#action'] to be /lingwo_fields/ahah instead of /node/add.
+
+   -- It looks like ahah_helper has some code to work around this:
+   http://drupal.org/node/578252
+
 
 == 2010-01-17 ==
 

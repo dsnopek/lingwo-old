@@ -176,6 +176,8 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     return NULL;
   }
 
+  ahah_helper_register($form, $form_state);
+
   $pos_vid = lingwo_dictionary_pos_vocabulary();
   $pos = lingwo_dictionary_get_pos($node);
 
@@ -197,7 +199,8 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
   if (!$node->nid) {
     $ahah = array(
       //'event' => 'change',
-      'path' => 'lingwo_fields/ahah/'. $field_name,
+      'path' => ahah_helper_path(array($field_name, 'wrapper')),
+      //'path' => 'lingwo_fields/ahah/'. $field_name,
       'wrapper' => $field_name .'-wrapper',
       'effect' => 'fade',
     );
@@ -244,6 +247,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
 
   $index = 0;
   foreach (lingwo_language_fields($node->language, $pos) as $field) {
+    // TODO: use $form_state['storage'] to get the interim default values!
     $default = $default_values[$field['type']][$field['name']];
     $field_form = array(
       '#prefix' => '<div>',
