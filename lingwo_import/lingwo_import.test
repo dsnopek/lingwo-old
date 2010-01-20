@@ -18,15 +18,15 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
         // TODO: this isn't the correct copyright, figure out what it is..
         'copyright' => 'Copyright 2009 WikiMedia Foundation',
         'license' => 'CC-BY-SA-3.0',
-        'url' => 'http://pl.wikitionary.org/wiki/czytać',
+        'url' => 'http://pl.wiktionary.org/wiki/czytać',
         'timestamp' => '2009-12-02T00:33:20Z',
       ),
       // here to test multiples!!
-      'en.wikitionary.org' => array(
+      'en.wiktionary.org' => array(
         'raw' => "==Polish==\n===Verb===\n",
         'copyright' => 'Copyright 2009 WikiMedia Foundation',
         'license' => 'CC-BY-SA-3.0',
-        'url' => 'http://en.wikitionary.org/wiki/czytać',
+        'url' => 'http://en.wiktionary.org/wiki/czytać',
         'timestamp' => '2009-11-02T14:48:20Z',
       ),
     ),
@@ -105,8 +105,13 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
       if (preg_match('/^source_/', $fn)) {
         $edit['parent'] = 'group_sources';
       }
+      /*
       else {
         $edit['multiple'] = 1;
+      }
+      */
+      if ($fn == 'source_raw') {
+        $edit['widget_type'] = 'text_textarea';
       }
 
       $this->createField($edit);
@@ -119,6 +124,7 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
 
     // send the entry to the service
     $_nid = lingwo_import_service_update_entry($data);
+    //$this->pass(print_r($_nid, TRUE));
     $this->drupalGet("node/$_nid/edit");
     $this->assertFieldByName('title', 'czytać');
     $this->assertFieldByName('language', 'pl');
@@ -130,7 +136,23 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
     $this->assertEqual($nid, $_nid);
 
     $node = node_load($nid);
+
+    // verify pron
     $this->assertEqual($node->field_pron[0]['value'], '\ˈʧɨtaʨ');
+
+    // verify sources
+    $this->assertEqual($node->field_source_name[0]['value'], "pl.wiktionary.org");
+    $this->assertEqual($node->field_source_raw[0]['value'], "== czytać ({{język polski}}) ==\n");
+    $this->assertEqual($node->field_source_copyright[0]['value'], 'Copyright 2009 WikiMedia Foundation');
+    $this->assertEqual($node->field_source_license[0]['value'], 'CC-BY-SA-3.0');
+    $this->assertEqual($node->field_source_url[0]['value'], 'http://pl.wiktionary.org/wiki/czytać');
+    $this->assertEqual($node->field_source_timestamp[0]['value'], '2009-12-02T00:33:20Z');
+    $this->assertEqual($node->field_source_name[1]['value'], "en.wiktionary.org");
+    $this->assertEqual($node->field_source_raw[1]['value'], "==Polish==\n===Verb===\n");
+    $this->assertEqual($node->field_source_copyright[1]['value'], 'Copyright 2009 WikiMedia Foundation');
+    $this->assertEqual($node->field_source_license[1]['value'], 'CC-BY-SA-3.0');
+    $this->assertEqual($node->field_source_url[1]['value'], 'http://en.wiktionary.org/wiki/czytać');
+    $this->assertEqual($node->field_source_timestamp[1]['value'], '2009-11-02T14:48:20Z');
   }
 }
 

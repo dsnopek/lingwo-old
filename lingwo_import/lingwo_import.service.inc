@@ -22,6 +22,41 @@ function lingwo_import_service_update_entry_access($data) {
 }
 */
 
+// TODO: a function to pull the field from node
+function _lingwo_import_get_field($node, $field_name) {
+}
+
+function _lingwo_import_set_field(&$node, $field_alias, $value) {
+  $field_name = lingwo_import_settings('field_'. $field_alias);
+  if (empty($field_name)) {
+    return;
+  }
+
+  // clear original value
+  // TODO: is this the right thing to do always?
+  $node->$field_name = array();
+
+  if (!is_array($value)) {
+    $value = array($value);
+  }
+  foreach ($value as $x) {
+    // TODO: what about fields that don't use 'value'?
+    array_push($node->$field_name, array('value' => $x));
+  }
+}
+
+function _lingwo_import_set_multigroup(&$node, $values) {
+  $flatten = array();
+  foreach ($values as $value) {
+    foreach ($value as $name => $x) {
+      $flatten[$name][] = $x;
+    }
+  }
+  foreach ($flatten as $name => $x) {
+    _lingwo_import_set_field($node, $name, $x);
+  }
+}
+
 // NOTE: originally copied from services/service/node_services.inc
 function _lingwo_import_node_save($node) {
   // Load the required includes for drupal_execute
@@ -103,17 +138,24 @@ function lingwo_import_service_update_entry($data) {
   }
 
   // map pron
-  if ($field_pron = lingwo_import_settings('field_pron')) {
-    $node->$field_pron = array(
-      array( 'value' => $entry->pron )
-    );
-  }
+  _lingwo_import_set_field($node, 'pron', $entry->pron);
 
-
-  // TODO: deal with sources
-  if (!empty($entry->sources)) {
-    foreach ($entry->sources as $source) {
+  // map sources
+  if (!empty($entry->sources)) { //&& !empty(lingwo_import_settings('group_sources'))) {
+    // put sources into the format we need
+    $sources = array();
+    foreach ($entry->sources as $source_name => $source) {
+      $sources[] = array(
+        'source_name'      => $source_name,
+        'source_url'       => $source->url,
+        'source_copyright' => $source->copyright,
+        'source_license'   => $source->license,
+        'source_raw'       => $source->raw,
+        'source_timestamp' => $source->timestamp,
+      );
     }
+
+    _lingwo_import_set_multigroup($node, $sources);
   }
 
   // TODO: deal with senses
