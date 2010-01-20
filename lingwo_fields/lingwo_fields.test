@@ -3,8 +3,6 @@
 require_once(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.test.inc');
 
 class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
-  private $pos_terms;
-
   public static function getInfo() {
     return array(
       'name' => 'lingwo_fields',
@@ -65,7 +63,7 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
     $this->assertNoText('Illegal offset');
 
     // go to the edit page again
-    $nid = lingwo_dictionary_entry_find('czerwony', 'pl', 'adjective');
+    $nid = lingwo_dictionary_entry_lookup('czerwony', 'pl', 'adjective');
     $this->drupalGet("node/$nid/edit");
     $this->assertFieldByName('field_fields[1][value]', 'czerwonXYZ');
     $this->assertFieldByName('field_fields[1][automatic]', FALSE);

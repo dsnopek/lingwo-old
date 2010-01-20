@@ -118,7 +118,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       if (isset($node->delete))
         return NULL;
 
-      $existing = lingwo_dictionary_entry_find($node->title, $node->language,
+      $existing = lingwo_dictionary_entry_lookup($node->title, $node->language,
         lingwo_dictionary_entry_get_pos($node));
 
       if ($existing && $existing != $node->nid) {

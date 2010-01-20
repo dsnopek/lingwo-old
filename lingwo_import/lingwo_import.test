@@ -1,0 +1,22 @@
+<?php
+
+require_once(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.test.inc');
+
+class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'lingwo_import',
+      'description' => 'Testing the web functionality provided by lingwo_fields.',
+      'group' => 'Lingwo Import',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp('lingwo_import');
+  }
+
+  public function testCreate() {
+    // TODO: test!
+  }
+}
+

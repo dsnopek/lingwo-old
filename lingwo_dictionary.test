@@ -3,8 +3,6 @@
 require_once(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.test.inc');
 
 class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
-  private $pos_terms;
-
   public static function getInfo() {
     return array(
       'name' => 'lingwo_dictionary',
@@ -49,7 +47,7 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
 
     // get the node id for this entry
-    $nid = lingwo_dictionary_entry_find('czerwony', 'pl', 'adjective');
+    $nid = lingwo_dictionary_entry_lookup('czerwony', 'pl', 'adjective');
     if (!$nid) {
       $this->fail("Couldn't get the node ID for the entry");
       return;

@@ -57,7 +57,7 @@ function lingwo_dictionary_entry_get_pos($node, $is_new = FALSE) {
 }
 
 // Lookup an entry based on its headword, language and pos
-function lingwo_dictionary_entry_find($headword, $language, $pos) {
+function lingwo_dictionary_entry_lookup($headword, $language, $pos) {
   $res = db_query("SELECT nid FROM {lingwo_dictionary_entry} WHERE title = '%s' AND language = '%s' AND pos = '%s'", $headword, $language, $pos);
 
   $obj = db_fetch_object($res);
