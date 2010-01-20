@@ -57,28 +57,6 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
     locale_add_language('zzz', 'TestEmpty', 'TestEmpty');
   }
 
-  protected function getEntryEdit($values) {
-    $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
-
-    if (!isset($values['headword'])) {
-      $values['headword'] = $this->randomName(8);
-    }
-
-    // make a map from pos term names to tid
-    $pos_terms = array();
-    foreach (taxonomy_get_tree($pos_vid) as $term) {
-      $pos_terms[$term->name] = $term->tid;
-    }
-
-    $edit = array(
-      'title'    => $values['headword'],
-      'language' => $values['language'],
-      "taxonomy[$pos_vid]" => $pos_terms[$values['pos']],
-    );
-
-	  return $edit;
-  }
-
   protected function createVocabulary($voc = array()) {
     if (!isset($voc['name'])) {
       $voc['name'] = $this->randomName(12);
@@ -109,10 +87,61 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
     return (object)$voc;
   }
 
+  protected function getEntryEdit($values) {
+    $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
+
+    if (!isset($values['headword'])) {
+      $values['headword'] = $this->randomName(8);
+    }
+
+    // make a map from pos term names to tid
+    $pos_terms = array();
+    foreach (taxonomy_get_tree($pos_vid) as $term) {
+      $pos_terms[$term->name] = $term->tid;
+    }
+
+    $edit = array(
+      'title'    => $values['headword'],
+      'language' => $values['language'],
+      "taxonomy[$pos_vid]" => $pos_terms[$values['pos']],
+    );
+    
+    // remove the ones we have used
+    unset($values['headword']);
+    unset($values['language']);
+    unset($values['pos']);
+
+	  return $edit + $values;
+  }
+
   protected function createEntry($values) {
     $entry_type = lingwo_dictionary_settings('entry_content_type');
     $edit = $this->getEntryEdit($values);
     $this->drupalPost("node/add/$entry_type", $edit, 'Save');
+  }
+
+  protected function createField($values) {
+    $entry_type = lingwo_dictionary_settings('entry_content_type');
+
+    $edit1 = array();
+    $edit2 = array();
+
+    // split up the values for the two pages of the field creation form
+    $first = array('label', 'field_name', 'type', 'widget_type');
+    foreach ($values as $name => $value) {
+      if (in_array($name, $first)) {
+        $edit1["_add_new_field[$name]"] = $value;
+      }
+      else {
+        $edit2[$name] = $value;
+      }
+    }
+
+    $this->drupalPost('admin/content/node-type/'. $entry_type .'/fields', $edit1, 'Save');
+    $this->drupalPost(NULL, $edit2, 'Save field settings');
+    
+    // clear cache!!
+    content_clear_type_cache(TRUE);
   }
 }
 

@@ -14,12 +14,21 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
     'sources' => array(
       'pl.wiktionary.org' => array(
         // and so on ...
-        'raw' => '== czytać ({{język polski}}) ==\n',
+        'raw' => "== czytać ({{język polski}}) ==\n",
+        // TODO: this isn't the correct copyright, figure out what it is..
+        'copyright' => 'Copyright 2009 WikiMedia Foundation',
         'license' => 'CC-BY-SA-3.0',
-        'license-url' => 'http://creativecommons.org/licenses/by-sa/3.0/',
         'url' => 'http://pl.wikitionary.org/wiki/czytać',
         'timestamp' => '2009-12-02T00:33:20Z',
-      )
+      ),
+      // here to test multiples!!
+      'en.wikitionary.org' => array(
+        'raw' => "==Polish==\n===Verb===\n",
+        'copyright' => 'Copyright 2009 WikiMedia Foundation',
+        'license' => 'CC-BY-SA-3.0',
+        'url' => 'http://en.wikitionary.org/wiki/czytać',
+        'timestamp' => '2009-11-02T14:48:20Z',
+      ),
     ),
 
     'pron' => '\ˈʧɨtaʨ',
@@ -61,7 +70,28 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function setUp() {
-    parent::setUp('lingwo_import');
+    parent::setUp('lingwo_import','text');
+
+    // create a CCK fields to save pron and source
+    $field_names = array(
+      'pron',
+      'source_name',
+      'source_url',
+      'source_copyright',
+      'source_license',
+      'source_raw',
+      'source_timestamp',
+    );
+    foreach ($field_names as $fn) {
+      $this->createField(array(
+        'label'       => $fn,
+        'field_name'  => $fn,
+        'type'        => 'text',
+        'widget_type' => 'text_textfield',
+        'multiple'    => 1
+      ));
+      lingwo_import_settings("field_$fn", "field_$fn");
+    }
   }
 
   public function testServiceUpdateEntry() {
@@ -80,6 +110,7 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
     $this->assertEqual($nid, $_nid);
 
     $node = node_load($nid);
+    $this->assertEqual($node->field_pron[0]['value'], '\ˈʧɨtaʨ');
   }
 }
 

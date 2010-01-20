@@ -97,14 +97,27 @@ function lingwo_import_service_update_entry($data) {
       'taxonomy' => $taxonomy,
     );
 
-    // TODO: deal with senses
-    // TODO: deal with field
   }
   else {
     $node = node_load($nid);
-
-    # TODO: update the node object..
   }
+
+  // map pron
+  if ($field_pron = lingwo_import_settings('field_pron')) {
+    $node->$field_pron = array(
+      array( 'value' => $entry->pron )
+    );
+  }
+
+
+  // TODO: deal with sources
+  if (!empty($entry->sources)) {
+    foreach ($entry->sources as $source) {
+    }
+  }
+
+  // TODO: deal with senses
+  // TODO: deal with field
 
   return _lingwo_import_node_save($node);
 }

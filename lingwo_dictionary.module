@@ -56,6 +56,11 @@ function lingwo_dictionary_menu() {
     'file' => 'lingwo_dictionary.admin.inc',
     'type' => MENU_NORMAL_ITEM
   );
+  $items['admin/settings/lingwo_dictionary/general'] = array(
+    'title' => 'General',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
 
   /*
   if ($lookup_path = lingwo_dictionary_settings('lookup_path')) {

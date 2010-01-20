@@ -14,17 +14,13 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
   public function setUp() {
     parent::setUp('ahah_helper', 'lingwo_language', 'lingwo_fields');
 
-    $entry_type = lingwo_dictionary_settings('entry_content_type');
-
-    // add the lingwo_senses CCK field to the entry content type
-    $edit = array(
-      '_add_new_field[label]'       => 'Fields',
-      '_add_new_field[field_name]'  => 'fields',
-      '_add_new_field[type]'        => 'lingwo_fields',
-      '_add_new_field[widget_type]' => 'lingwo_fields_widget',
-    );
-    $this->drupalPost('admin/content/node-type/'. $entry_type .'/fields', $edit, 'Save');
-    $this->drupalPost(NULL, array('multiple' => 1), 'Save field settings');
+    $this->createField(array(
+      'label'       => 'Fields',
+      'field_name'  => 'fields',
+      'type'        => 'lingwo_fields',
+      'widget_type' => 'lingwo_fields_widget',
+      'multiple'    => 1
+    ));
   }
 
   # Checks that we can load the fields for a language/pos and save them normally.

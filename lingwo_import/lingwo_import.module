@@ -6,6 +6,24 @@
  * For importing dictionary data from external sources
  */
 
+/**
+ * Implementation of hook_menu().
+ */
+function lingwo_import_menu() {
+  $items = array();
+  $items['admin/settings/lingwo_dictionary/import'] = array(
+    'title' => 'Import',
+    'description' => 'Settings for Lingwo Import module.',
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lingwo_import_admin_settings'),
+    'file' => 'lingwo_import.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
 /*
  * Implementation of hook_services()
  */
@@ -33,4 +51,39 @@ function lingwo_import_service() {
   );
 }
 
+/*
+ * Settings
+ */
+
+/**
+ * Used to access settings.
+ */
+function lingwo_import_settings($name, $value = NULL) {
+  static $_settings = array(
+    'field_senses'           => NULL,
+    'field_fields'           => NULL,
+    'field_pron'             => NULL,
+    'field_source_name'      => NULL,
+    'field_source_url'       => NULL,
+    'field_source_copyright' => NULL,
+    'field_source_license'   => NULL,
+    'field_source_raw'       => NULL,
+    'field_source_timestamp' => NULL,
+  );
+
+  if (is_null($name)) {
+    return $_settings;
+  }
+
+  if (!array_key_exists($name, $_settings)) {
+    trigger_error(t('No such lingwo_import_setting: @name', array('@name' => $name)), E_USER_ERROR);
+    return NULL;
+  }
+
+  if (is_null($value)) {
+    return variable_get('lingwo_import_'. $name, $_settings[$name]);
+  }
+
+  variable_set('lingwo_import_'. $name, $value);
+}
 
