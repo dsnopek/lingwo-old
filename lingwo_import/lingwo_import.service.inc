@@ -141,7 +141,7 @@ function lingwo_import_service_update_entry($data) {
   _lingwo_import_set_field($node, 'pron', $entry->pron);
 
   // map sources
-  if (!empty($entry->sources)) { //&& !empty(lingwo_import_settings('group_sources'))) {
+  if (!empty($entry->sources)) {
     // put sources into the format we need
     $sources = array();
     foreach ($entry->sources as $source_name => $source) {
@@ -158,7 +158,30 @@ function lingwo_import_service_update_entry($data) {
     _lingwo_import_set_multigroup($node, $sources);
   }
 
-  // TODO: deal with senses
+  // map senses
+  if (module_exists('lingwo_senses') && lingwo_import_settings('field_senses')) {
+    $senses = array();
+
+    // strip down to the acceptable fields
+    foreach ($entry->senses as $sense) {
+      $senses[] = array(
+        'difference' => $sense->difference,
+        'example'    => $sense->example,
+      );
+    }
+
+    // TODO: we can't use this because it assumes 'value' and senses uses 'data'
+    // TODO: FWIW, I think senses should use 'value' like everyone else...
+    //_lingwo_import_set_field($node, 'senses', $senses);
+    $field_senses = lingwo_import_settings('field_senses');
+    if (!empty($field_senses)) {
+      $node->$field_senses = array();
+      foreach ($senses as $sense) {
+        array_push($node->$field_senses, array('data' => $sense));
+      }
+    }
+  }
+
   // TODO: deal with field
 
   return _lingwo_import_node_save($node);

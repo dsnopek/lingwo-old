@@ -38,7 +38,8 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
 
     'senses' => array(
       array(
-        'difference' => 'przebiegać wzrokiem lub dotykiem tekst w postaci liter lub ideogramów oraz znaków pisarskich i rozumieć treść przezeń przekazywaną',
+        //'difference' => 'przebiegać wzrokiem lub dotykiem tekst w postaci liter lub ideogramów oraz znaków pisarskich i rozumieć treść przezeń przekazywaną',
+        'difference' => 'przebiegać wzrokiem lub dotykiem tekst w postaci liter lub ideogramów oraz znaków pisarskich i rozumieć treść przezeń',
         'trans' => array(
           'en' => array('read'),
           'be' => array('чытаць'),
@@ -70,7 +71,41 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function setUp() {
-    parent::setUp('lingwo_import','text','fieldgroup','content_multigroup');
+    parent::setUp(
+      // just new deps for these tests
+      'lingwo_import',
+      'text',
+      'fieldgroup',
+      'content_multigroup',
+
+      // deps for lingwo_fields
+      'ahah_helper',
+      'lingwo_language',
+      'lingwo_fields',
+
+      // deps for lingwo_senses
+      'lingwo_senses'
+    );
+
+    // create senses field
+    $this->createField(array(
+      'label'       => 'Senses',
+      'field_name'  => 'senses',
+      'type'        => 'lingwo_senses',
+      'widget_type' => 'lingwo_senses_widget',
+      'multiple'    => 1
+    ));
+    lingwo_import_settings('field_senses', 'field_senses');
+
+    // create senses field
+    $this->createField(array(
+      'label'       => 'Fields',
+      'field_name'  => 'fields',
+      'type'        => 'lingwo_fields',
+      'widget_type' => 'lingwo_fields_widget',
+      'multiple'    => 1
+    ));
+    lingwo_import_settings('field_fields', 'field_fields');
 
     // create field group for source elements
     $this->createFieldGroup(array(
@@ -136,23 +171,34 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
     $this->assertEqual($nid, $_nid);
 
     $node = node_load($nid);
+    //$this->pass(print_r($node, TRUE));
 
     // verify pron
     $this->assertEqual($node->field_pron[0]['value'], '\ˈʧɨtaʨ');
 
-    // verify sources
+    // verify first source
     $this->assertEqual($node->field_source_name[0]['value'], "pl.wiktionary.org");
     $this->assertEqual($node->field_source_raw[0]['value'], "== czytać ({{język polski}}) ==\n");
     $this->assertEqual($node->field_source_copyright[0]['value'], 'Copyright 2009 WikiMedia Foundation');
     $this->assertEqual($node->field_source_license[0]['value'], 'CC-BY-SA-3.0');
     $this->assertEqual($node->field_source_url[0]['value'], 'http://pl.wiktionary.org/wiki/czytać');
     $this->assertEqual($node->field_source_timestamp[0]['value'], '2009-12-02T00:33:20Z');
+
+    // verify second source
     $this->assertEqual($node->field_source_name[1]['value'], "en.wiktionary.org");
     $this->assertEqual($node->field_source_raw[1]['value'], "==Polish==\n===Verb===\n");
     $this->assertEqual($node->field_source_copyright[1]['value'], 'Copyright 2009 WikiMedia Foundation');
     $this->assertEqual($node->field_source_license[1]['value'], 'CC-BY-SA-3.0');
     $this->assertEqual($node->field_source_url[1]['value'], 'http://en.wiktionary.org/wiki/czytać');
     $this->assertEqual($node->field_source_timestamp[1]['value'], '2009-11-02T14:48:20Z');
+
+    // verify senses
+    $this->assertEqual($node->field_senses[0]['data']['difference'], 'przebiegać wzrokiem lub dotykiem tekst w postaci liter lub ideogramów oraz znaków pisarskich i rozumieć treść przezeń');
+    $this->assertEqual($node->field_senses[0]['data']['example'], 'Codziennie rano czytam gazetę.');
+    $this->assertEqual($node->field_senses[1]['data']['difference'], 'mieć umiejętność rozumienia treści zawartych w rysunkach technicznych, schematach, mapach');
+    $this->assertEqual($node->field_senses[1]['data']['example'], 'Nie zabłądzimy, on umie czytać mapy i ma kompas.');
+    $this->assertEqual($node->field_senses[2]['data']['difference'], 'funkcja urządzenia technicznego polegająca na odkodowywaniu informacji');
+    $this->assertEqual($node->field_senses[2]['data']['example'], 'Przeczytać taką dyskietkę może tylko bardzo archaiczny komputer.');
   }
 }
 
