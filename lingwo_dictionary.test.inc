@@ -127,7 +127,8 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
     $edit2 = array();
 
     // split up the values for the two pages of the field creation form
-    $first = array('label', 'field_name', 'type', 'widget_type');
+    // NOTE: 'parent' is the fieldgroup
+    $first = array('label', 'field_name', 'type', 'widget_type', 'parent');
     foreach ($values as $name => $value) {
       if (in_array($name, $first)) {
         $edit1["_add_new_field[$name]"] = $value;
@@ -142,6 +143,24 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
     
     // clear cache!!
     content_clear_type_cache(TRUE);
+  }
+
+  protected function createFieldGroup($values) {
+    $entry_type = lingwo_dictionary_settings('entry_content_type');
+
+    // TODO: we could do this via the web-browser, but since I want to learn how to do these
+    // programmatically anyway (for embedding in our feature) that's how I'll do it for now.
+    if (empty($values['settings'])) {
+      $values['settings'] = array();
+    }
+    if (empty($values['type_name'])) {
+      $values['type_name'] = $entry_type;
+    }
+    $values['settings'] += field_group_default_settings($values['group_type']);
+    fieldgroup_save_group($values['type_name'], $values);
+
+    // reset the cache
+    fieldgroup_groups('', FALSE, TRUE);
   }
 }
 

@@ -70,7 +70,20 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function setUp() {
-    parent::setUp('lingwo_import','text');
+    parent::setUp('lingwo_import','text','fieldgroup','content_multigroup');
+
+    // create field group for source elements
+    $this->createFieldGroup(array(
+      'group_type' => 'multigroup',
+      'group_name' => 'group_sources',
+      'label'      => 'Sources',
+      'settings'   => array(
+        'multigroup' => array(
+          'required' => FALSE,
+          'multiple' => 1,
+        )
+      )
+    ));
 
     // create a CCK fields to save pron and source
     $field_names = array(
@@ -83,13 +96,20 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
       'source_timestamp',
     );
     foreach ($field_names as $fn) {
-      $this->createField(array(
+      $edit = array(
         'label'       => $fn,
         'field_name'  => $fn,
         'type'        => 'text',
         'widget_type' => 'text_textfield',
-        'multiple'    => 1
-      ));
+      );
+      if (preg_match('/^source_/', $fn)) {
+        $edit['parent'] = 'group_sources';
+      }
+      else {
+        $edit['multiple'] = 1;
+      }
+
+      $this->createField($edit);
       lingwo_import_settings("field_$fn", "field_$fn");
     }
   }
