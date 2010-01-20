@@ -34,6 +34,7 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       $this->drupalCreateUser(array(
         'create '. $entry_type->type .' content',
         'edit own '. $entry_type->type .' content',
+        'edit any '. $entry_type->type .' content',
         'translate content',
         'administer content types',
         'administer site configuration',

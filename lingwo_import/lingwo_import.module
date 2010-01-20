@@ -14,26 +14,23 @@ function lingwo_import_service() {
     // lingwo_import.update_entry
     array(
       '#method' => 'lingwo_import.update_entry',
-      '#callback' => 'lingwo_import_update_entry',
+      '#callback' => 'lingwo_import_service_update_entry',
+      // TODO: access is a difficult problem..  Work it out later.
+      //'#access callback' => 'lingwo_import_service_update_entry_access',
+      '#file' => array('file' => 'service.inc', 'module' => 'lingwo_import'),
       '#args' => array(
         array(
           '#name' => 'data',
           '#type' => 'string',
-          '#description' => 'A JSON string representing an entry.'
+          '#description' => t('A JSON string representing an entry.')
         ),
       ),
-      '#return' => 'string'
+      '#return' => 'string',
+      '#help' => t('Update an entry in the database.'),
     ),
 
 
   );
 }
 
-/*
- * Updates an entry based on JSON data from the importer.
- */
-function lingwo_import_update_entry($data) {
-  $entry = json_decode($data);
-  return "Adding ". $entry->headword;
-}
 

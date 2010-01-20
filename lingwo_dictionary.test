@@ -1,6 +1,6 @@
 <?php
 
-require_once(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.test.inc');
+module_load_include('inc', 'lingwo_dictionary', 'lingwo_dictionary.test');
 
 class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
   public static function getInfo() {

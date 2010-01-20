@@ -1,13 +1,62 @@
 <?php
 
-require_once(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.test.inc');
+module_load_include('inc', 'lingwo_dictionary', 'lingwo_dictionary.test');
+module_load_include('inc', 'lingwo_import', 'lingwo_import.service');
 
 class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
+  public static $TestEntry = array(
+    'headword' => 'czytać',
+    'language' => 'pl',
+    // TODO: how to deal with this?  POS heirarchy?  Reduction to simpler terms?
+    //'pos' => 'transitive verb',
+    'pos' => 'verb',
+
+    'sources' => array(
+      'pl.wiktionary.org' => array(
+        // and so on ...
+        'raw' => '== czytać ({{język polski}}) ==\n',
+        'license' => 'CC-BY-SA-3.0',
+        'license-url' => 'http://creativecommons.org/licenses/by-sa/3.0/',
+        'url' => 'http://pl.wikitionary.org/wiki/czytać',
+        'timestamp' => '2009-12-02T00:33:20Z',
+      )
+    ),
+
+    'pron' => '\ˈʧɨtaʨ',
+    // TODO: fill 'er up!
+    'fields' => array(
+    ),
+
+    'senses' => array(
+      array(
+        'difference' => 'przebiegać wzrokiem lub dotykiem tekst w postaci liter lub ideogramów oraz znaków pisarskich i rozumieć treść przezeń przekazywaną',
+        'trans' => array(
+          'en' => array('read'),
+          'be' => array('чытаць'),
+          'hr' => array('čitati'),
+        ),
+        'example' => 'Codziennie rano czytam gazetę.'
+      ),
+
+      array(
+        'difference' => 'mieć umiejętność rozumienia treści zawartych w rysunkach technicznych, schematach, mapach',
+        'trans' => array(),
+        'example' => 'Nie zabłądzimy, on umie czytać mapy i ma kompas.',
+      ),
+
+      array(
+        'difference' => 'funkcja urządzenia technicznego polegająca na odkodowywaniu informacji',
+        'trans' => array(),
+        'example' => 'Przeczytać taką dyskietkę może tylko bardzo archaiczny komputer.'
+      )
+    ),
+  );
+
   public static function getInfo() {
     return array(
       'name' => 'lingwo_import',
       'description' => 'Testing the web functionality provided by lingwo_fields.',
-      'group' => 'Lingwo Import',
+      'group' => 'Lingwo Dictionary',
     );
   }
 
@@ -15,8 +64,22 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
     parent::setUp('lingwo_import');
   }
 
-  public function testCreate() {
-    // TODO: test!
+  public function testServiceUpdateEntry() {
+    $data = json_encode(self::$TestEntry);
+
+    // send the entry to the service
+    $_nid = lingwo_import_service_update_entry($data);
+    $this->drupalGet("node/$_nid/edit");
+    $this->assertFieldByName('title', 'czytać');
+    $this->assertFieldByName('language', 'pl');
+    // TODO: we need a helper function to do this one up
+    //$this->assertFieldByName("taxonomy[$entry_type]", XX);
+
+    $nid = lingwo_dictionary_entry_lookup('czytać', 'pl', 'verb');
+    $this->assertNotNull($nid);
+    $this->assertEqual($nid, $_nid);
+
+    $node = node_load($nid);
   }
 }
 

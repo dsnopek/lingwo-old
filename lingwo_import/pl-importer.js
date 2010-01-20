@@ -29,6 +29,8 @@ function main() {
     function handler(entry) {
         db.setEntry(entry);
         db.commit();
+        // TODO: remove this hack!!
+        //entry.pos = 'verb';
         print(service.update_entry(entry));
     }
 
