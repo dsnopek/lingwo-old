@@ -3,14 +3,14 @@
 /*
  * Implementation of hook_enable()
  */
-function lingwo_import_enable() {
+function lingwo_data_enable() {
   cache_clear_all('services:methods', 'cache');
 }
 
 /*
  * Implementation of hook_disable()
  */
-function lingwo_import_disable() {
+function lingwo_data_disable() {
   cache_clear_all('services:methods', 'cache');
 }
 

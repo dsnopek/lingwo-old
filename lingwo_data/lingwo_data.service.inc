@@ -7,7 +7,7 @@
 
 // TODO: access is a hard problem..  Come back to this.
 /*
-function lingwo_import_service_update_entry_access($data) {
+function lingwo_data_service_update_entry_access($data) {
   $data = json_decode($data);
   $nid = lingwo_dictionary_entry_lookup($data->headword, $data->language, $data->pos);
 
@@ -23,11 +23,11 @@ function lingwo_import_service_update_entry_access($data) {
 */
 
 // TODO: a function to pull the field from node
-function _lingwo_import_get_field($node, $field_name) {
+function _lingwo_data_get_field($node, $field_name) {
 }
 
-function _lingwo_import_set_field(&$node, $field_alias, $value, $column_name='value') {
-  $field_name = lingwo_import_settings('field_'. $field_alias);
+function _lingwo_data_set_field(&$node, $field_alias, $value, $column_name='value') {
+  $field_name = lingwo_data_settings('field_'. $field_alias);
   if (empty($field_name)) {
     return;
   }
@@ -44,7 +44,7 @@ function _lingwo_import_set_field(&$node, $field_alias, $value, $column_name='va
   }
 }
 
-function _lingwo_import_set_multigroup(&$node, $values) {
+function _lingwo_data_set_multigroup(&$node, $values) {
   $flatten = array();
   foreach ($values as $value) {
     foreach ($value as $name => $x) {
@@ -52,12 +52,12 @@ function _lingwo_import_set_multigroup(&$node, $values) {
     }
   }
   foreach ($flatten as $name => $x) {
-    _lingwo_import_set_field($node, $name, $x);
+    _lingwo_data_set_field($node, $name, $x);
   }
 }
 
 // NOTE: originally copied from services/service/node_services.inc
-function _lingwo_import_node_save($node) {
+function _lingwo_data_node_save($node) {
   // Load the required includes for drupal_execute
   module_load_include('inc', 'node', 'node.pages');
 
@@ -99,7 +99,7 @@ function _lingwo_import_node_save($node) {
 /*
  * Updates an entry based on JSON data from the importer.
  */
-function lingwo_import_service_update_entry($data) {
+function lingwo_data_service_update_entry($data) {
   $entry = json_decode($data, TRUE);
 
   // get a list of the enabled languages
@@ -150,7 +150,7 @@ function lingwo_import_service_update_entry($data) {
   }
 
   // map pron
-  _lingwo_import_set_field($node, 'pron', $entry['pron']);
+  _lingwo_data_set_field($node, 'pron', $entry['pron']);
 
   // map sources
   if (!empty($entry['sources'])) {
@@ -167,12 +167,12 @@ function lingwo_import_service_update_entry($data) {
       );
     }
 
-    _lingwo_import_set_multigroup($node, $sources);
+    _lingwo_data_set_multigroup($node, $sources);
   }
 
   // map fields
-  if (module_exists('lingwo_fields') && lingwo_import_settings('field_fields')) {
-    $field_fields = lingwo_import_settings('field_fields');
+  if (module_exists('lingwo_fields') && lingwo_data_settings('field_fields')) {
+    $field_fields = lingwo_data_settings('field_fields');
 
     // clear existing fields
     $node->$field_fields = array();
@@ -190,20 +190,20 @@ function lingwo_import_service_update_entry($data) {
   }
 
   // map senses (but only if we have more than 1 sense!!)
-  if (module_exists('lingwo_senses') && lingwo_import_settings('field_senses') && count($entry['senses']) > 1) {
+  if (module_exists('lingwo_senses') && lingwo_data_settings('field_senses') && count($entry['senses']) > 1) {
     // TODO: FWIW, I think senses should use 'value' like everyone else...
-    _lingwo_import_set_field($node, 'senses', $entry['senses'], 'data');
+    _lingwo_data_set_field($node, 'senses', $entry['senses'], 'data');
   }
 
   // save the source node
-  $nid = _lingwo_import_node_save($node);
+  $nid = _lingwo_data_node_save($node);
   if (!is_numeric($nid)) {
     // its a list of error messages!
     return $nid;
   }
 
   // create/update translation nodes
-  if (module_exists('lingwo_senses') && lingwo_import_settings('field_senses')) {
+  if (module_exists('lingwo_senses') && lingwo_data_settings('field_senses')) {
     // TODO: translation_node_get_translations() does some dangerous caching..  Dangerous because
     // I'm not aware of how to clear it!!
     $tnid_list = $is_new ? array() : translation_node_get_translations($nid);
@@ -227,10 +227,10 @@ function lingwo_import_service_update_entry($data) {
       }
 
       // TODO: FWIW, I think senses should use 'value' like everyone else...
-      _lingwo_import_set_field($tnode, 'senses', $trans, 'data');
+      _lingwo_data_set_field($tnode, 'senses', $trans, 'data');
 
       // save the translation node
-      $res = _lingwo_import_node_save($tnode);
+      $res = _lingwo_data_node_save($tnode);
       if (!is_numeric($res)) {
         // its a list of error messages!
         return $res;

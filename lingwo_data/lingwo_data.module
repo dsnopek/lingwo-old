@@ -9,15 +9,15 @@
 /**
  * Implementation of hook_menu().
  */
-function lingwo_import_menu() {
+function lingwo_data_menu() {
   $items = array();
   $items['admin/settings/lingwo_dictionary/import'] = array(
     'title' => 'Import',
     'description' => 'Settings for Lingwo Import module.',
     'access arguments' => array('administer site configuration'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('lingwo_import_admin_settings'),
-    'file' => 'lingwo_import.admin.inc',
+    'page arguments' => array('lingwo_data_admin_settings'),
+    'file' => 'lingwo_data.admin.inc',
     'type' => MENU_LOCAL_TASK,
   );
 
@@ -27,15 +27,15 @@ function lingwo_import_menu() {
 /*
  * Implementation of hook_services()
  */
-function lingwo_import_service() {
+function lingwo_data_service() {
   return array(
-    // lingwo_import.update_entry
+    // lingwo_data.update_entry
     array(
-      '#method' => 'lingwo_import.update_entry',
-      '#callback' => 'lingwo_import_service_update_entry',
+      '#method' => 'lingwo_data.update_entry',
+      '#callback' => 'lingwo_data_service_update_entry',
       // TODO: access is a difficult problem..  Work it out later.
-      //'#access callback' => 'lingwo_import_service_update_entry_access',
-      '#file' => array('file' => 'service.inc', 'module' => 'lingwo_import'),
+      //'#access callback' => 'lingwo_data_service_update_entry_access',
+      '#file' => array('file' => 'service.inc', 'module' => 'lingwo_data'),
       '#args' => array(
         array(
           '#name' => 'data',
@@ -58,7 +58,7 @@ function lingwo_import_service() {
 /**
  * Used to access settings.
  */
-function lingwo_import_settings($name, $value = NULL) {
+function lingwo_data_settings($name, $value = NULL) {
   static $_settings = array(
     'field_senses'           => NULL,
     'field_fields'           => NULL,
@@ -76,14 +76,14 @@ function lingwo_import_settings($name, $value = NULL) {
   }
 
   if (!array_key_exists($name, $_settings)) {
-    trigger_error(t('No such lingwo_import_setting: @name', array('@name' => $name)), E_USER_ERROR);
+    trigger_error(t('No such lingwo_data_setting: @name', array('@name' => $name)), E_USER_ERROR);
     return NULL;
   }
 
   if (is_null($value)) {
-    return variable_get('lingwo_import_'. $name, $_settings[$name]);
+    return variable_get('lingwo_data_'. $name, $_settings[$name]);
   }
 
-  variable_set('lingwo_import_'. $name, $value);
+  variable_set('lingwo_data_'. $name, $value);
 }
 

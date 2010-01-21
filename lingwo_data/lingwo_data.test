@@ -1,9 +1,9 @@
 <?php
 
 module_load_include('inc', 'lingwo_dictionary', 'lingwo_dictionary.test');
-module_load_include('inc', 'lingwo_import', 'lingwo_import.service');
+module_load_include('inc', 'lingwo_data', 'lingwo_data.service');
 
-class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
+class LingwoDataImportTestCase extends LingwoDictionaryWebTestCase {
   public static $TestEntry = array(
     'headword' => 'czytać',
     'language' => 'pl',
@@ -98,8 +98,8 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => 'lingwo_import',
-      'description' => 'Testing the web functionality provided by lingwo_fields.',
+      'name' => 'lingwo_data - Import',
+      'description' => "Test lingwo_data's import abilities",
       'group' => 'Lingwo Dictionary',
     );
   }
@@ -107,7 +107,7 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
   public function setUp() {
     parent::setUp(
       // just new deps for these tests
-      'lingwo_import',
+      'lingwo_data',
       'text',
       'fieldgroup',
       'content_multigroup',
@@ -129,7 +129,7 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
       'widget_type' => 'lingwo_senses_widget',
       'multiple'    => 1
     ));
-    lingwo_import_settings('field_senses', 'field_senses');
+    lingwo_data_settings('field_senses', 'field_senses');
 
     // create senses field
     $this->createField(array(
@@ -139,7 +139,7 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
       'widget_type' => 'lingwo_fields_widget',
       'multiple'    => 1
     ));
-    lingwo_import_settings('field_fields', 'field_fields');
+    lingwo_data_settings('field_fields', 'field_fields');
 
     // create field group for source elements
     $this->createFieldGroup(array(
@@ -184,7 +184,7 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
       }
 
       $this->createField($edit);
-      lingwo_import_settings("field_$fn", "field_$fn");
+      lingwo_data_settings("field_$fn", "field_$fn");
     }
   }
 
@@ -192,7 +192,7 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
     $data = json_encode(self::$TestEntry);
 
     // send the entry to the service
-    $_nid = lingwo_import_service_update_entry($data);
+    $_nid = lingwo_data_service_update_entry($data);
     //$this->fail(print_r($_nid, TRUE));
     $this->drupalGet("node/$_nid/edit");
     $this->assertFieldByName('title', 'czytać');
