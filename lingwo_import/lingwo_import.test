@@ -226,6 +226,7 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
 
     // verify translations
     $tnid_list = translation_node_get_translations($nid);
+	$tnode = node_load($tnid_list['en']->nid);
     $this->assertEqual($tnode->field_senses[0]['data']['trans'][0], 'read');
   }
 }
