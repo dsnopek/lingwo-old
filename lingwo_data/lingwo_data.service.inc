@@ -136,6 +136,12 @@ function _lingwo_data_field_has_changed($node1, $node2, $field_alias, $key_names
 }
 
 function _lingwo_data_entry_has_changed($node) {
+  // TODO: For now we are punting on this.  I don't have a clever way to figure it out
+  // right now, and a better testing environment (mock functions!!) would make this
+  // waaay easier.
+  return TRUE;
+
+  /*
   // since we haven't saved yet, the current 'nid' and 'vid' are for
   // the previous revision.
   $old_node = node_load($node->nid, $node->vid);
@@ -150,6 +156,7 @@ function _lingwo_data_entry_has_changed($node) {
            array('difference', 'example', 'trans', 'clue'), 'data') ||
          _lingwo_data_field_has_changed($node, $old_node, 'fields',
            array('name', 'type', 'value', 'automatic'));
+  */
 }
 
 /*
@@ -242,11 +249,15 @@ function lingwo_data_service_update_entry($data) {
     // we have to add the fields in the same order as the form
     foreach (lingwo_language_fields($entry['language'], $entry['pos']) as $field) {
       $field_name = $field['name'];
+      $auto = $entry['fields'][$field_name]['automatic'];
+      if (!isset($auto)) {
+        $auto = TRUE;
+      }
       array_push($node->$field_fields, array(
         'name'      => $field_name,
         'type'      => $field['type'],
         'value'     => $entry['fields'][$field_name]['value'],
-        'automatic' => $entry['fields'][$field_name]['automatic'],
+        'automatic' => $auto,
       ));
     }
   }

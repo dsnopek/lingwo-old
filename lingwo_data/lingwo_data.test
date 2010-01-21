@@ -256,6 +256,11 @@ class LingwoDataImportTestCase extends LingwoDictionaryWebTestCase {
     $this->assertEqual($tnode->field_senses[1]['data']['clue'], '');
     $this->assertEqual($tnode->field_senses[2]['data']['trans'], array('read','decode','load'));
     $this->assertEqual($tnode->field_senses[2]['data']['clue'], 'when a computer "reads" something');
+
+    // attempt to update the entry again and check that it doesn't take (because it hasn't changed)
+    node_load(0, NULL, TRUE);
+    lingwo_data_service_update_entry($data);
+    $this->assertEqual(node_load($nid)->vid, $node->vid);
   }
 }
 
