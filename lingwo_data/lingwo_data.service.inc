@@ -159,6 +159,16 @@ function _lingwo_data_entry_has_changed($node) {
   */
 }
 
+// TODO: use this for sorting the JSON before stashing it on the database.
+function _lingwo_data_recursive_ksort(&$entry) {
+  ksort($entry);
+  foreach ($entry as $key => &$value) {
+    if (is_array($value)) {
+      _lingwo_data_recursive_ksort($value);
+    }
+  }
+}
+
 /*
  * Updates an entry based on JSON data from the importer.
  */
