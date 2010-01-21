@@ -1,5 +1,46 @@
 <?php
 
+/**
+ * @file
+ * Install file for lingwo_data.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function lingwo_data_schema() {
+  $schema['lingwo_data_node_imported'] = array(
+    'description' => 'Used to store a flag saying whether a node is imported or not.',
+    'fields' => array(
+      'vid' => array(
+        'description' => 'The current {node_revisions}.vid version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'nid' => array(
+        'description' => 'The primary identifier for the entry node.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'imported' => array(
+        'description' => 'Boolean indicating whether this entry was imported automatically',
+        'type' => 'int',
+        'default' => 0,
+        'not null' => TRUE
+      ),
+    ),
+    'primary key' => array('vid'),
+    'indexes' => array(
+      'nid' => array('nid'),
+    )
+  );
+
+  return $schema;
+}
+
 /*
  * Implementation of hook_enable()
  */
@@ -14,4 +55,19 @@ function lingwo_data_disable() {
   cache_clear_all('services:methods', 'cache');
 }
 
+/**
+ * Implementation of hook_install().
+ */
+function lingwo_data_install() {
+  variable_set('lingwo_data_schema_version', 6000);
+  drupal_install_schema('lingwo_data');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function lingwo_data_uninstall() {
+  drupal_uninstall_schema('lingwo_data');
+  variable_del('lingwo_data_schema_version');
+}
 

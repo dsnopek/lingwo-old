@@ -11,7 +11,7 @@ function lingwo_data_admin_settings()
     '#title' => t('Map Fields'),
     '#type' => 'fieldset',
     '#tree' => FALSE,
-    '#description' => t('Here we map fields that come from import feeds and map them to CCK fields on <i>@type</i>, our entry content type', array('@type' => lingwo_dictionary_settings('entry_content_type')))
+    '#description' => t('Here we map fields that may be used in import or export feed to CCK fields on <i>@type</i>, our entry content type.', array('@type' => lingwo_dictionary_settings('entry_content_type')))
   );
 
   // get information from CCK about our type

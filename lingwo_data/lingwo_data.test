@@ -206,6 +206,7 @@ class LingwoDataImportTestCase extends LingwoDictionaryWebTestCase {
 
     $node = node_load($nid);
     //$this->pass(print_r($node, TRUE));
+    $this->assertEqual($node->imported, TRUE);
 
     // verify pron
     $this->assertEqual($node->field_pron[0]['value'], '\ˈʧɨtaʨ');
@@ -248,6 +249,7 @@ class LingwoDataImportTestCase extends LingwoDictionaryWebTestCase {
     // verify translations
     $tnid_list = translation_node_get_translations($nid);
     $tnode = node_load($tnid_list['en']->nid);
+    $this->assertEqual($tnode->imported, TRUE);
     $this->assertEqual($tnode->field_senses[0]['data']['trans'], array('read', '', ''));
     $this->assertEqual($tnode->field_senses[0]['data']['clue'], 'you know, reading books, maps and stuff');
     $this->assertEqual($tnode->field_senses[1]['data']['trans'], array('', '', ''));

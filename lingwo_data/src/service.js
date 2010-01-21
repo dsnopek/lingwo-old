@@ -95,9 +95,9 @@ module('Lingwo.importer.Service', function () {
         },
 
         update_entry: function (entry) {
-            var params = this._getDefaultParams('lingwo_import.update_entry');
+            var params = this._getDefaultParams('lingwo_data.update_entry');
             params.add(JSON.stringify(entry));
-            return this._client.execute('lingwo_import.update_entry', params);
+            return this._client.execute('lingwo_data.update_entry', params);
         }
     });
 });

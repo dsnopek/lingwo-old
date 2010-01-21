@@ -143,11 +143,17 @@ function lingwo_data_service_update_entry($data) {
       'language' => $entry['language'],
       'taxonomy' => $taxonomy,
     );
-
   }
   else {
     $node = node_load($nid);
+
+    if (!$node->imported) {
+      // TODO: what we should really do is stash the data we got and save it for later.
+      return services_error(t('Existing entry was created by humans, cant overwrite'), 400);
+    };
   }
+  // gets this marked as imported
+  $node->imported = -1;
 
   // map pron
   _lingwo_data_set_field($node, 'pron', $entry['pron']);
@@ -214,6 +220,10 @@ function lingwo_data_service_update_entry($data) {
 
       if ($tnid_list[$lang]) {
         $tnode = node_load($tnid_list[$lang]);
+        // if this translation wasn't created via translation, we won't overwrite it.
+        if (!$tnode->imported) {
+          continue;
+        }
       }
       else {
         $tnode = (object)array(
@@ -225,6 +235,8 @@ function lingwo_data_service_update_entry($data) {
           'translation_source' => node_load($nid),
         );
       }
+      // gets this marked as imported
+      $tnode->imported = -1;
 
       // TODO: FWIW, I think senses should use 'value' like everyone else...
       _lingwo_data_set_field($tnode, 'senses', $trans, 'data');
