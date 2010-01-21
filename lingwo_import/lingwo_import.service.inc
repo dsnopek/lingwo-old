@@ -103,10 +103,23 @@ function _lingwo_import_node_save($node) {
 function lingwo_import_service_update_entry($data) {
   $entry = json_decode($data);
 
-  // TODO: check that language is valid/enabled
+  // get a list of the enabled languages
+  // TODO: there has to be a more functional way to do this?!
+  $languages = array();
+  foreach (language_list() as $lang) {
+    if ($lang->enabled) {
+      $languages[$lang->language] = TRUE;
+    }
+  }
+  // make sure this entry is for an enabled language
+  if (!$languages[$entry->language]) {
+    return services_error(t('The language of this entry <i>@lang</i> is not enabled on this site', 
+      array('@lang' => $entry->language)), 400);
+  }
 
   // try to find if the entry exists
   $nid = lingwo_dictionary_entry_lookup($entry->headword, $entry->language, $entry->pos);
+  $is_new = $nid ? FALSE : TRUE;
 
   // TODO: check that pos is valid, and actually look it up!!
   $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
@@ -166,7 +179,6 @@ function lingwo_import_service_update_entry($data) {
     $node->$field_fields = array();
 
     // we have to add the fields in the same order as the form
-    //foreach ($entry->fields as $name => $value) {
     foreach (lingwo_language_fields($entry->language, $entry->pos) as $field) {
       $field_name = $field['name'];
       array_push($node->$field_fields, array(
@@ -202,8 +214,80 @@ function lingwo_import_service_update_entry($data) {
     }
   }
 
-  // TODO: do translations!!
+  // save the source node
+  $nid = _lingwo_import_node_save($node);
+  if (!is_numeric($nid)) {
+    // its a list of error messages!
+    return $nid;
+  }
 
-  return _lingwo_import_node_save($node);
+  // create/update translation nodes
+  if (module_exists('lingwo_senses') && lingwo_import_settings('field_senses')) {
+    $field_senses = lingwo_import_settings('field_senses');
+
+    $translations = array();
+    for($i = 0; $i < count($node->$field_senses); $i++) {
+      foreach ($entry->senses[$i]->trans as $lang => $trans) {
+        if ($languages[$lang]) {
+          // TODO: we need to take into account 'clue'!!
+          $translations[$lang][$i] = array(
+            'trans' => $trans
+          );
+        }
+      }
+    }
+
+    // pad the beginning and end of each translations sense list.  We have to do this because there
+    // doesn't need to be a translation for every language for every sense.  If there is only a
+    // translation for the middle of three senses, then the first and third need to be padded out.
+    foreach ($translations as $lang => $trans) {
+      $newTrans = array();
+      for($i = 0; $i < count($node->$field_senses); $i++) {
+        if (isset($translations[$lang][$i])) {
+          $newTrans[] = $translations[$lang][$i];
+        }
+        else {
+          $newTrans[] = array();
+        }
+      }
+      $translations[$lang] = $newTrans;
+    }
+
+    // TODO: translation_node_get_translations() does some dangerous caching..  Dangerous because
+    // I'm not aware of how to clear it!!
+    $tnid_list = $is_new ? array() : translation_node_get_translations($nid);
+    foreach ($translations as $lang => $trans) {
+      if ($tnid_list[$lang]) {
+        $tnode = node_load($tnid_list[$lang]);
+      }
+      else {
+        $tnode = (object)array(
+          'type'     => lingwo_dictionary_settings('entry_content_type'),
+          'title'    => $entry->headword,
+          'language' => $lang,
+          'taxonomy' => $taxonomy,
+          // link it to its source node!
+          'translation_source' => node_load($nid),
+        );
+      }
+
+      // TODO: we can't use this because it assumes 'value' and senses uses 'data'
+      // TODO: FWIW, I think senses should use 'value' like everyone else...
+      //_lingwo_import_set_field($tnode, 'senses', $senses);
+      $tnode->$field_senses = array();
+      foreach ($trans as $sense) {
+        array_push($tnode->$field_senses, array('data' => $sense));
+      }
+
+      // save the translation node
+      $res = _lingwo_import_node_save($tnode);
+      if (!is_numeric($res)) {
+        // its a list of error messages!
+        return $res;
+      }
+    }
+  }
+
+  return $nid;
 }
 

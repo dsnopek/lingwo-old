@@ -47,6 +47,8 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
       ),
     ),
 
+    // TODO: how does this format deal with entries with a single sense, but that has translations?
+    // TODO: how does this format deal with translation clues?
     'senses' => array(
       array(
         //'difference' => 'przebiegać wzrokiem lub dotykiem tekst w postaci liter lub ideogramów oraz znaków pisarskich i rozumieć treść przezeń przekazywaną',
@@ -221,6 +223,10 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
     $this->assertEqual($node->field_senses[1]['data']['example'], 'Nie zabłądzimy, on umie czytać mapy i ma kompas.');
     $this->assertEqual($node->field_senses[2]['data']['difference'], 'funkcja urządzenia technicznego polegająca na odkodowywaniu informacji');
     $this->assertEqual($node->field_senses[2]['data']['example'], 'Przeczytać taką dyskietkę może tylko bardzo archaiczny komputer.');
+
+    // verify translations
+    $tnid_list = translation_node_get_translations($nid);
+    $this->assertEqual($tnode->field_senses[0]['data']['trans'][0], 'read');
   }
 }
 
