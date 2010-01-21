@@ -125,6 +125,16 @@ function lingwo_senses_field($op, &$node, $field, &$items, $teaser, $page) {
         return (array($field['field_name'] => $items));
       }
       break;
+
+    case 'presave':
+      // remove some cruft that sneaks into the data
+      foreach ($items as &$item) {
+        unset($item['data']['remove_sense']);
+        unset($item['data']['weight']);
+      }
+      unset($items['wrapper']);
+      break;
+
     case 'validate':
       return $items;
   }

@@ -10,7 +10,7 @@
  */
 function lingwo_data_schema() {
   $schema['lingwo_data_node_imported'] = array(
-    'description' => 'Used to store a flag saying whether a node is imported or not.',
+    'description' => 'Used to store a flag saying whether a node revision was imported or not.',
     'fields' => array(
       'vid' => array(
         'description' => 'The current {node_revisions}.vid version identifier.',
