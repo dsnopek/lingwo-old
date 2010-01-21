@@ -223,40 +223,14 @@ function lingwo_import_service_update_entry($data) {
 
   // create/update translation nodes
   if (module_exists('lingwo_senses') && lingwo_import_settings('field_senses')) {
-    $field_senses = lingwo_import_settings('field_senses');
-
-    $translations = array();
-    for($i = 0; $i < count($node->$field_senses); $i++) {
-      foreach ($entry->senses[$i]->trans as $lang => $trans) {
-        if ($languages[$lang]) {
-          // TODO: we need to take into account 'clue'!!
-          $translations[$lang][$i] = array(
-            'trans' => $trans
-          );
-        }
-      }
-    }
-
-    // pad the beginning and end of each translations sense list.  We have to do this because there
-    // doesn't need to be a translation for every language for every sense.  If there is only a
-    // translation for the middle of three senses, then the first and third need to be padded out.
-    foreach ($translations as $lang => $trans) {
-      $newTrans = array();
-      for($i = 0; $i < count($node->$field_senses); $i++) {
-        if (isset($translations[$lang][$i])) {
-          $newTrans[] = $translations[$lang][$i];
-        }
-        else {
-          $newTrans[] = array();
-        }
-      }
-      $translations[$lang] = $newTrans;
-    }
-
     // TODO: translation_node_get_translations() does some dangerous caching..  Dangerous because
     // I'm not aware of how to clear it!!
     $tnid_list = $is_new ? array() : translation_node_get_translations($nid);
-    foreach ($translations as $lang => $trans) {
+    foreach ($entry->translations as $lang => $trans) {
+      if (!$languages[$lang]) {
+        continue;
+      }
+
       if ($tnid_list[$lang]) {
         $tnode = node_load($tnid_list[$lang]);
       }
@@ -274,9 +248,16 @@ function lingwo_import_service_update_entry($data) {
       // TODO: we can't use this because it assumes 'value' and senses uses 'data'
       // TODO: FWIW, I think senses should use 'value' like everyone else...
       //_lingwo_import_set_field($tnode, 'senses', $senses);
+      $field_senses = lingwo_import_settings('field_senses');
       $tnode->$field_senses = array();
       foreach ($trans as $sense) {
-        array_push($tnode->$field_senses, array('data' => $sense));
+        // TODO: eventually, deal with 'same_as'
+        array_push($tnode->$field_senses, array(
+          'data' => array(
+            'trans' => $sense->values,
+            'clue'  => $sense->clue,
+          )
+        ));
       }
 
       // save the translation node

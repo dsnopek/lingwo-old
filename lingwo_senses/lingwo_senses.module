@@ -201,11 +201,13 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
         '#title' => 'Difference',
         '#type' => 'textfield',
         '#default_value' => $sense['difference'],
+        '#maxlength' => 255,
       );
       $row['example'] = array(
         '#title' => 'Example',
         '#type' => 'textfield',
         '#default_value' => $sense['example'],
+        '#maxlength' => 255,
       );
       $row['weight'] = array(
         '#type' => 'weight',
@@ -302,6 +304,7 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
         '#title' => t('Clue'),
         '#description' => t('A couple words that will clue the reader to how this sense is different.'),
         '#default_value' => $sense['data']['clue'],
+        '#maxlength' => 255,
       );
     }
     if (!$orig_sense && !($sense['data']['id'] == '*' && count($orig_senses) == 0)) {

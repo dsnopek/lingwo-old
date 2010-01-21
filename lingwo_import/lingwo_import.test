@@ -51,27 +51,48 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
     // TODO: how does this format deal with translation clues?
     'senses' => array(
       array(
-        //'difference' => 'przebiegać wzrokiem lub dotykiem tekst w postaci liter lub ideogramów oraz znaków pisarskich i rozumieć treść przezeń przekazywaną',
-        'difference' => 'przebiegać wzrokiem lub dotykiem tekst w postaci liter lub ideogramów oraz znaków pisarskich i rozumieć treść przezeń',
-        'trans' => array(
-          'en' => array('read'),
-          'be' => array('чытаць'),
-          'hr' => array('čitati'),
-        ),
+        'difference' => 'przebiegać wzrokiem lub dotykiem tekst w postaci liter lub ideogramów oraz znaków pisarskich i rozumieć treść przezeń przekazywaną',
+        //'difference' => 'przebiegać wzrokiem lub dotykiem tekst w postaci liter lub ideogramów oraz znaków pisarskich i rozumieć treść przezeń',
         'example' => 'Codziennie rano czytam gazetę.'
       ),
 
       array(
         'difference' => 'mieć umiejętność rozumienia treści zawartych w rysunkach technicznych, schematach, mapach',
-        'trans' => array(),
         'example' => 'Nie zabłądzimy, on umie czytać mapy i ma kompas.',
       ),
 
       array(
         'difference' => 'funkcja urządzenia technicznego polegająca na odkodowywaniu informacji',
-        'trans' => array(),
         'example' => 'Przeczytać taką dyskietkę może tylko bardzo archaiczny komputer.'
       )
+    ),
+
+    'translations' => array(
+      'en' => array(
+        array(
+          'values' => array('read'),
+          'clue'   => 'you know, reading books, maps and stuff',
+        ),
+        array('same_as' => 0),
+        array(
+          'values' => array('read','decode','load'),
+          'clue'   => 'when a computer "reads" something',
+        )
+      ),
+      'be' => array(
+        array(
+          'values' => array('чытаць')
+        ),
+        array(),
+        array(),
+      ),
+      'hr' => array(
+        array(
+          'values' => array('čitati')
+        ),
+        array(),
+        array(),
+      ),
     ),
   );
 
@@ -172,7 +193,7 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
 
     // send the entry to the service
     $_nid = lingwo_import_service_update_entry($data);
-    //$this->pass(print_r($_nid, TRUE));
+    //$this->fail(print_r($_nid, TRUE));
     $this->drupalGet("node/$_nid/edit");
     $this->assertFieldByName('title', 'czytać');
     $this->assertFieldByName('language', 'pl');
@@ -217,7 +238,7 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
     $this->assertEqual($node->field_fields[1]['automatic'], TRUE);
 
     // verify senses
-    $this->assertEqual($node->field_senses[0]['data']['difference'], 'przebiegać wzrokiem lub dotykiem tekst w postaci liter lub ideogramów oraz znaków pisarskich i rozumieć treść przezeń');
+    $this->assertEqual($node->field_senses[0]['data']['difference'], 'przebiegać wzrokiem lub dotykiem tekst w postaci liter lub ideogramów oraz znaków pisarskich i rozumieć treść przezeń przekazywaną');
     $this->assertEqual($node->field_senses[0]['data']['example'], 'Codziennie rano czytam gazetę.');
     $this->assertEqual($node->field_senses[1]['data']['difference'], 'mieć umiejętność rozumienia treści zawartych w rysunkach technicznych, schematach, mapach');
     $this->assertEqual($node->field_senses[1]['data']['example'], 'Nie zabłądzimy, on umie czytać mapy i ma kompas.');
@@ -226,8 +247,13 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
 
     // verify translations
     $tnid_list = translation_node_get_translations($nid);
-	$tnode = node_load($tnid_list['en']->nid);
-    $this->assertEqual($tnode->field_senses[0]['data']['trans'][0], 'read');
+    $tnode = node_load($tnid_list['en']->nid);
+    $this->assertEqual($tnode->field_senses[0]['data']['trans'], array('read', '', ''));
+    $this->assertEqual($tnode->field_senses[0]['data']['clue'], 'you know, reading books, maps and stuff');
+    $this->assertEqual($tnode->field_senses[1]['data']['trans'], array('', '', ''));
+    $this->assertEqual($tnode->field_senses[1]['data']['clue'], '');
+    $this->assertEqual($tnode->field_senses[2]['data']['trans'], array('read','decode','load'));
+    $this->assertEqual($tnode->field_senses[2]['data']['clue'], 'when a computer "reads" something');
   }
 }
 
