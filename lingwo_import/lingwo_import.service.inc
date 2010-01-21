@@ -26,7 +26,7 @@ function lingwo_import_service_update_entry_access($data) {
 function _lingwo_import_get_field($node, $field_name) {
 }
 
-function _lingwo_import_set_field(&$node, $field_alias, $value) {
+function _lingwo_import_set_field(&$node, $field_alias, $value, $column_name='value') {
   $field_name = lingwo_import_settings('field_'. $field_alias);
   if (empty($field_name)) {
     return;
@@ -40,8 +40,7 @@ function _lingwo_import_set_field(&$node, $field_alias, $value) {
     $value = array($value);
   }
   foreach ($value as $x) {
-    // TODO: what about fields that don't use 'value'?
-    array_push($node->$field_name, array('value' => $x));
+    array_push($node->$field_name, array($column_name => $x));
   }
 }
 
@@ -101,7 +100,7 @@ function _lingwo_import_node_save($node) {
  * Updates an entry based on JSON data from the importer.
  */
 function lingwo_import_service_update_entry($data) {
-  $entry = json_decode($data);
+  $entry = json_decode($data, TRUE);
 
   // get a list of the enabled languages
   // TODO: there has to be a more functional way to do this?!
@@ -112,20 +111,20 @@ function lingwo_import_service_update_entry($data) {
     }
   }
   // make sure this entry is for an enabled language
-  if (!$languages[$entry->language]) {
+  if (!$languages[$entry['language']]) {
     return services_error(t('The language of this entry <i>@lang</i> is not enabled on this site', 
-      array('@lang' => $entry->language)), 400);
+      array('@lang' => $entry['language'])), 400);
   }
 
   // try to find if the entry exists
-  $nid = lingwo_dictionary_entry_lookup($entry->headword, $entry->language, $entry->pos);
+  $nid = lingwo_dictionary_entry_lookup($entry['headword'], $entry['language'], $entry['pos']);
   $is_new = $nid ? FALSE : TRUE;
 
   // TODO: check that pos is valid, and actually look it up!!
   $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
   $taxonomy = NULL;
   foreach (taxonomy_get_tree($pos_vid) as $term) {
-    if (drupal_strtolower($term->name) == $entry->pos) {
+    if (drupal_strtolower($term->name) == $entry['pos']) {
       // we set it up like on a new entry form, because it will only really
       // be used to create an entry since POS can't be changed.
       $taxonomy = array($pos_vid => $term->tid);
@@ -140,8 +139,8 @@ function lingwo_import_service_update_entry($data) {
   if (is_null($nid)) {
     $node = (object)array(
       'type' => lingwo_dictionary_settings('entry_content_type'),
-      'title' => $entry->headword,
-      'language' => $entry->language,
+      'title' => $entry['headword'],
+      'language' => $entry['language'],
       'taxonomy' => $taxonomy,
     );
 
@@ -151,20 +150,20 @@ function lingwo_import_service_update_entry($data) {
   }
 
   // map pron
-  _lingwo_import_set_field($node, 'pron', $entry->pron);
+  _lingwo_import_set_field($node, 'pron', $entry['pron']);
 
   // map sources
-  if (!empty($entry->sources)) {
+  if (!empty($entry['sources'])) {
     // put sources into the format we need
     $sources = array();
-    foreach ($entry->sources as $source_name => $source) {
+    foreach ($entry['sources'] as $source_name => $source) {
       $sources[] = array(
         'source_name'      => $source_name,
-        'source_url'       => $source->url,
-        'source_copyright' => $source->copyright,
-        'source_license'   => $source->license,
-        'source_raw'       => $source->raw,
-        'source_timestamp' => $source->timestamp,
+        'source_url'       => $source['url'],
+        'source_copyright' => $source['copyright'],
+        'source_license'   => $source['license'],
+        'source_raw'       => $source['raw'],
+        'source_timestamp' => $source['timestamp'],
       );
     }
 
@@ -179,39 +178,21 @@ function lingwo_import_service_update_entry($data) {
     $node->$field_fields = array();
 
     // we have to add the fields in the same order as the form
-    foreach (lingwo_language_fields($entry->language, $entry->pos) as $field) {
+    foreach (lingwo_language_fields($entry['language'], $entry['pos']) as $field) {
       $field_name = $field['name'];
       array_push($node->$field_fields, array(
         'name'      => $field_name,
         'type'      => $field['type'],
-        'value'     => $entry->fields->$field_name->value,
-        'automatic' => $entry->fields->$field_name->automatic,
+        'value'     => $entry['fields'][$field_name]['value'],
+        'automatic' => $entry['fields'][$field_name]['automatic'],
       ));
     }
   }
 
-  // map senses
-  if (module_exists('lingwo_senses') && lingwo_import_settings('field_senses')) {
-    $senses = array();
-
-    // strip down to the acceptable fields
-    foreach ($entry->senses as $sense) {
-      $senses[] = array(
-        'difference' => $sense->difference,
-        'example'    => $sense->example,
-      );
-    }
-
-    // TODO: we can't use this because it assumes 'value' and senses uses 'data'
+  // map senses (but only if we have more than 1 sense!!)
+  if (module_exists('lingwo_senses') && lingwo_import_settings('field_senses') && count($entry['senses']) > 1) {
     // TODO: FWIW, I think senses should use 'value' like everyone else...
-    //_lingwo_import_set_field($node, 'senses', $senses);
-    $field_senses = lingwo_import_settings('field_senses');
-    if (!empty($field_senses)) {
-      $node->$field_senses = array();
-      foreach ($senses as $sense) {
-        array_push($node->$field_senses, array('data' => $sense));
-      }
-    }
+    _lingwo_import_set_field($node, 'senses', $entry['senses'], 'data');
   }
 
   // save the source node
@@ -226,7 +207,7 @@ function lingwo_import_service_update_entry($data) {
     // TODO: translation_node_get_translations() does some dangerous caching..  Dangerous because
     // I'm not aware of how to clear it!!
     $tnid_list = $is_new ? array() : translation_node_get_translations($nid);
-    foreach ($entry->translations as $lang => $trans) {
+    foreach ($entry['translations'] as $lang => $trans) {
       if (!$languages[$lang]) {
         continue;
       }
@@ -237,7 +218,7 @@ function lingwo_import_service_update_entry($data) {
       else {
         $tnode = (object)array(
           'type'     => lingwo_dictionary_settings('entry_content_type'),
-          'title'    => $entry->headword,
+          'title'    => $entry['headword'],
           'language' => $lang,
           'taxonomy' => $taxonomy,
           // link it to its source node!
@@ -245,20 +226,8 @@ function lingwo_import_service_update_entry($data) {
         );
       }
 
-      // TODO: we can't use this because it assumes 'value' and senses uses 'data'
       // TODO: FWIW, I think senses should use 'value' like everyone else...
-      //_lingwo_import_set_field($tnode, 'senses', $senses);
-      $field_senses = lingwo_import_settings('field_senses');
-      $tnode->$field_senses = array();
-      foreach ($trans as $sense) {
-        // TODO: eventually, deal with 'same_as'
-        array_push($tnode->$field_senses, array(
-          'data' => array(
-            'trans' => $sense->values,
-            'clue'  => $sense->clue,
-          )
-        ));
-      }
+      _lingwo_import_set_field($tnode, 'senses', $trans, 'data');
 
       // save the translation node
       $res = _lingwo_import_node_save($tnode);

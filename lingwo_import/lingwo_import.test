@@ -70,25 +70,25 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
     'translations' => array(
       'en' => array(
         array(
-          'values' => array('read'),
+          'trans' => array('read'),
           'clue'   => 'you know, reading books, maps and stuff',
         ),
         array('same_as' => 0),
         array(
-          'values' => array('read','decode','load'),
+          'trans' => array('read','decode','load'),
           'clue'   => 'when a computer "reads" something',
         )
       ),
       'be' => array(
         array(
-          'values' => array('чытаць')
+          'trans' => array('чытаць')
         ),
         array(),
         array(),
       ),
       'hr' => array(
         array(
-          'values' => array('čitati')
+          'trans' => array('čitati')
         ),
         array(),
         array(),
