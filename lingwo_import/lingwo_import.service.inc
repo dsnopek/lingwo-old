@@ -158,6 +158,26 @@ function lingwo_import_service_update_entry($data) {
     _lingwo_import_set_multigroup($node, $sources);
   }
 
+  // map fields
+  if (module_exists('lingwo_fields') && lingwo_import_settings('field_fields')) {
+    $field_fields = lingwo_import_settings('field_fields');
+
+    // clear existing fields
+    $node->$field_fields = array();
+
+    // we have to add the fields in the same order as the form
+    //foreach ($entry->fields as $name => $value) {
+    foreach (lingwo_language_fields($entry->language, $entry->pos) as $field) {
+      $field_name = $field['name'];
+      array_push($node->$field_fields, array(
+        'name'      => $field_name,
+        'type'      => $field['type'],
+        'value'     => $entry->fields->$field_name->value,
+        'automatic' => $entry->fields->$field_name->automatic,
+      ));
+    }
+  }
+
   // map senses
   if (module_exists('lingwo_senses') && lingwo_import_settings('field_senses')) {
     $senses = array();
@@ -182,7 +202,7 @@ function lingwo_import_service_update_entry($data) {
     }
   }
 
-  // TODO: deal with field
+  // TODO: do translations!!
 
   return _lingwo_import_node_save($node);
 }

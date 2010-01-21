@@ -32,8 +32,19 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
     ),
 
     'pron' => '\ˈʧɨtaʨ',
-    // TODO: fill 'er up!
+
     'fields' => array(
+      // we keep these in reverse order, so that we can see that our code re-arranges them.
+      '*stem' => array(
+        'type' => 'form',
+        'value' => 'czytaj',
+        'automatic' => TRUE
+      ),
+      'conjugation' => array(
+        'type' => 'option',
+        'value' => 'third',
+        'automatic' => FALSE
+      ),
     ),
 
     'senses' => array(
@@ -191,6 +202,17 @@ class LingwoImportTestCase extends LingwoDictionaryWebTestCase {
     $this->assertEqual($node->field_source_license[1]['value'], 'CC-BY-SA-3.0');
     $this->assertEqual($node->field_source_url[1]['value'], 'http://en.wiktionary.org/wiki/czytać');
     $this->assertEqual($node->field_source_timestamp[1]['value'], '2009-11-02T14:48:20Z');
+
+    // verify fields (1)
+    $this->assertEqual($node->field_fields[0]['name'], 'conjugation');
+    $this->assertEqual($node->field_fields[0]['type'], 'option');
+    $this->assertEqual($node->field_fields[0]['value'], 'third');
+    $this->assertEqual($node->field_fields[0]['automatic'], FALSE);
+    // verify fields (2)
+    $this->assertEqual($node->field_fields[1]['name'], '*stem');
+    $this->assertEqual($node->field_fields[1]['type'], 'form');
+    $this->assertEqual($node->field_fields[1]['value'], 'czytaj');
+    $this->assertEqual($node->field_fields[1]['automatic'], TRUE);
 
     // verify senses
     $this->assertEqual($node->field_senses[0]['data']['difference'], 'przebiegać wzrokiem lub dotykiem tekst w postaci liter lub ideogramów oraz znaków pisarskich i rozumieć treść przezeń');
