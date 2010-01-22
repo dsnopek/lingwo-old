@@ -169,6 +169,56 @@ function _lingwo_data_recursive_ksort(&$entry) {
   }
 }
 
+function _lingwo_data_import_process_simple_field($entry, $field_name, $key_name = 'value') {
+  $value = $entry[$field_name];
+  if (!is_array($value)) {
+    $value = array($value);
+  }
+  $res = array();
+  foreach ($value as $x) {
+    $res[] = array(
+      $key_name => $x
+    );
+  }
+  return $res;
+}
+
+function _lingwo_data_import_process_source($entry) {
+  $res = array();
+
+  if (!empty($entry['pron']) && lingwo_data_settings('field_pron')) {
+    $res['pron'] = _lingwo_data_import_process_simple_field($entry, 'pron');
+  }
+  $res['senses'] = _lingwo_data_import_process_simple_field($entry, 'senses', 'data');
+
+  // process fields
+  /*
+  if (module_exists('lingwo_fields') && lingwo_data_settings('field_fields')) {
+    $field_fields = lingwo_data_settings('field_fields');
+
+    // clear existing fields
+    $node->$field_fields = array();
+
+    // we have to add the fields in the same order as the form
+    foreach (lingwo_language_fields($entry['language'], $entry['pos']) as $field) {
+      $field_name = $field['name'];
+      $auto = $entry['fields'][$field_name]['automatic'];
+      if (!isset($auto)) {
+        $auto = TRUE;
+      }
+      array_push($node->$field_fields, array(
+        'name'      => $field_name,
+        'type'      => $field['type'],
+        'value'     => $entry['fields'][$field_name]['value'],
+        'automatic' => $auto,
+      ));
+    }
+  }
+  */
+
+  return $res;
+}
+
 /*
  * Updates an entry based on JSON data from the importer.
  */
@@ -208,6 +258,8 @@ function lingwo_data_service_update_entry($data) {
     return services_error(t('Couldn\'t find the given pos in our list: @pos', 
         array('@pos' => $entry['pos'])), 400);
   }
+
+  $source_entry = _lingwo_dictionary_import_process_source($entry);
 
   // create the original entry/update the original entry
   if (is_null($nid)) {
