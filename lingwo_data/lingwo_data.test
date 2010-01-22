@@ -73,29 +73,35 @@ class LingwoDataImportWebTestCase extends LingwoDictionaryWebTestCase {
 
     'translations' => array(
       'en' => array(
-        array(
-          'trans' => array('read'),
-          'clue'   => 'you know, reading books, maps and stuff',
-        ),
-        array('same_as' => 0),
-        array(
-          'trans' => array('read','decode','load'),
-          'clue'   => 'when a computer "reads" something',
+        'senses' => array(
+          array(
+            'trans' => array('read'),
+            'clue'   => 'you know, reading books, maps and stuff',
+          ),
+          array('same_as' => 0),
+          array(
+            'trans' => array('read','decode','load'),
+            'clue'   => 'when a computer "reads" something',
+          )
         )
       ),
       'be' => array(
-        array(
-          'trans' => array('чытаць')
-        ),
-        array(),
-        array(),
+        'senses' => array(
+          array(
+            'trans' => array('чытаць')
+          ),
+          array(),
+          array(),
+        )
       ),
       'hr' => array(
-        array(
-          'trans' => array('čitati')
-        ),
-        array(),
-        array(),
+        'senses' => array(
+          array(
+            'trans' => array('čitati')
+          ),
+          array(),
+          array(),
+        )
       ),
     ),
   );
@@ -192,6 +198,13 @@ class LingwoDataImportWebTestCase extends LingwoDictionaryWebTestCase {
     }
   }
 
+  private function outputWatchdog() {
+    $res = db_query("SELECT * FROM {watchdog} ORDER BY timestamp DESC LIMIT 10");
+    while($o = db_fetch_object($res)) {
+      $this->fail(print_r($o, TRUE));
+    }
+  }
+
   public function testServiceUpdateEntry() {
     $data = json_encode(self::$TestEntry);
 
@@ -207,6 +220,9 @@ class LingwoDataImportWebTestCase extends LingwoDictionaryWebTestCase {
     $nid = lingwo_dictionary_entry_lookup('czytać', 'pl', 'verb');
     $this->assertNotNull($nid);
     $this->assertEqual($nid, $_nid);
+
+    $this->drupalGet('node/add/'. lingwo_dictionary_settings('entry_content_type'));
+    //$this->outputWatchdog();
 
     $node = node_load($nid);
     //$this->pass(print_r($node, TRUE));
@@ -413,6 +429,59 @@ class LingwoDataImportUnitTestCase extends DrupalUnitTestCase {
         'name' => 'second',
         'value' => 'thinger',
         'automatic' => FALSE
+      )
+    ));
+  }
+
+  public function testSetFields() {
+    $lingwo_data_settings = PHPMockFunction::mock('lingwo_data_settings');
+    $lingwo_data_settings->expects(InvocationRestriction::once())
+      ->with('field_pron')
+      ->will(WillAction::returnValue('field_pron'));
+    
+    $node = (object)array();
+    _lingwo_data_import_set_fields($node, array(
+      'pron' => array(
+        array('value' => 'blah')
+      )
+    ));
+
+    $this->assertEqual((array)$node, array(
+      'field_pron' => array(
+        array('value' => 'blah')
+      )
+    ));
+  }
+
+  public function testSetFieldsMultigroup() {
+    $lingwo_data_settings = PHPMockFunction::mock('lingwo_data_settings');
+    $lingwo_data_settings->expects(InvocationRestriction::once())
+      ->with('field_source_url')
+      ->will(WillAction::returnValue('field_source_url'));
+    $lingwo_data_settings->expects(InvocationRestriction::once())
+      ->with('field_source_name')
+      ->will(WillAction::returnValue('field_source_name'));
+    
+    $node = (object)array();
+    _lingwo_data_import_set_fields_multigroup($node, array(
+      array(
+        'source_url' => array('value' => 'url1'),
+        'source_name' => array('value' => 'name1')
+      ),
+      array(
+        'source_url' => array('value' => 'url2'),
+        'source_name' => array('value' => 'name2')
+      )
+    ));
+
+    $this->assertEqual((array)$node, array(
+      'field_source_url' => array(
+        array('value' => 'url1'),
+        array('value' => 'url2'),
+      ),
+      'field_source_name' => array(
+        array('value' => 'name1'),
+        array('value' => 'name2'),
       )
     ));
   }

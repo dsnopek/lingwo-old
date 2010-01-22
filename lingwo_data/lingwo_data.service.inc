@@ -26,36 +26,6 @@ function lingwo_data_service_update_entry_access($data) {
 function _lingwo_data_get_field($node, $field_name) {
 }
 
-function _lingwo_data_set_field(&$node, $field_alias, $value, $column_name='value') {
-  $field_name = lingwo_data_settings('field_'. $field_alias);
-  if (empty($field_name)) {
-    return;
-  }
-
-  // clear original value
-  // TODO: is this the right thing to do always?
-  $node->$field_name = array();
-
-  if (!is_array($value)) {
-    $value = array($value);
-  }
-  foreach ($value as $x) {
-    array_push($node->$field_name, array($column_name => $x));
-  }
-}
-
-function _lingwo_data_set_multigroup(&$node, $values) {
-  $flatten = array();
-  foreach ($values as $value) {
-    foreach ($value as $name => $x) {
-      $flatten[$name][] = $x;
-    }
-  }
-  foreach ($flatten as $name => $x) {
-    _lingwo_data_set_field($node, $name, $x);
-  }
-}
-
 // NOTE: originally copied from services/service/node_services.inc
 function _lingwo_data_node_save($node) {
   // Load the required includes for drupal_execute
@@ -228,13 +198,17 @@ function _lingwo_data_import_process_sources($entry) {
   if (!empty($entry['sources'])) {
     // put sources into the format we need
     foreach ($entry['sources'] as $source_name => $source) {
+      // TODO: what to do about fields that don't use value?
+      // TODO: this should probably use _lingwo_data_import_process_simple_field, which
+      // given the current situation, needs to be made aware of CCK..  Hmmm, probably not
+      // a good design!
       $res[] = array(
-        'source_name'      => $source_name,
-        'source_url'       => $source['url'],
-        'source_copyright' => $source['copyright'],
-        'source_license'   => $source['license'],
-        'source_raw'       => $source['raw'],
-        'source_timestamp' => $source['timestamp'],
+        'source_name'      => array('value' => $source_name),
+        'source_url'       => array('value' => $source['url']),
+        'source_copyright' => array('value' => $source['copyright']),
+        'source_license'   => array('value' => $source['license']),
+        'source_raw'       => array('value' => $source['raw']),
+        'source_timestamp' => array('value' => $source['timestamp']),
       );
     }
   }
@@ -281,14 +255,28 @@ function _lingwo_data_import_process_original($entry) {
   return $res;
 }
 
-function _lingwo_dictionary_import_setup_node($nid, $entry, $extras=array()) {
+function _lingwo_data_import_process_translation($entry) {
+  $res = array();
+
+  // process senses
+  if (!empty($entry['senses']) && lingwo_data_settings('field_senses') &&
+      module_exists('lingwo_senses')) {
+
+    $res['senses'] = _lingwo_data_import_process_simple_field($entry, 'senses', 'data');
+  }
+
+  return $res;
+}
+
+function _lingwo_data_import_setup_node($nid, $entry, $newExtras=array()) {
   // create the original entry/update the original entry
   if (is_null($nid)) {
-    $node = (object)array(
+    $node = array(
       'type' => lingwo_dictionary_settings('entry_content_type'),
       'title' => $entry['headword'],
       'language' => $entry['language'],
     );
+    $node = (object)array_merge_recursive($node, $newExtras);
   }
   else {
     $node = node_load($nid);
@@ -302,7 +290,43 @@ function _lingwo_dictionary_import_setup_node($nid, $entry, $extras=array()) {
   // gets this marked as imported
   $node->imported = -1;
 
-  return array_merge_recursive($extras, $node);
+  return $node;
+}
+
+function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
+  $field_name = lingwo_data_settings('field_'. $field_alias);
+  if (empty($field_name)) {
+    return;
+  }
+
+  if (!isset($node->$field_name)) {
+    $node->$field_name = array();
+  }
+  // TODO: we really should merge these, not just overwrite them!
+  $field = &$node->$field_name;
+  for($i = 0; $i < count($values); $i++) {
+    $field[$i] = $values[$i];
+  }
+}
+
+function _lingwo_data_import_set_fields(&$node, $fields) {
+  foreach ($fields as $field_alias => $values) {
+    _lingwo_data_import_set_field($node, $field_alias, $values);
+  }
+}
+
+function _lingwo_data_import_set_fields_multigroup(&$node, $values) {
+  $flatten = array();
+  foreach ($values as $value) {
+    foreach ($value as $name => $x) {
+      $flatten[$name][] = $x;
+    }
+  }
+  foreach ($flatten as $name => $x) {
+    // TODO: what about fields that take something other than value?
+    // TODO: should the array(value => ) part be done here, or in *_process_source()?
+    _lingwo_data_import_set_field($node, $name, $x);
+  }
 }
 
 /*
@@ -339,7 +363,7 @@ function lingwo_data_service_update_entry($data) {
   $entry_original = _lingwo_data_import_process_original($entry);
 
   // only bother with the rest if this node is new or has changed since its last revision
-  if ($is_new || _lingwo_data_entry_has_changed($node, $entry_original)) {
+  if (empty($node->nid) || _lingwo_data_entry_has_changed($node, $entry_original)) {
     _lingwo_data_import_set_fields($node, $entry_original);
 
     if ($sources) {
@@ -355,46 +379,30 @@ function lingwo_data_service_update_entry($data) {
   }
 
   // create/update translation nodes
-  if (module_exists('lingwo_senses') && lingwo_data_settings('field_senses')) {
-    // TODO: translation_node_get_translations() does some dangerous caching..  Dangerous because
-    // I'm not aware of how to clear it!!
-    $tnid_list = $is_new ? array() : translation_node_get_translations($nid);
-    foreach ($entry['translations'] as $lang => $trans) {
-      if (!$languages[$lang]) {
-        continue;
-      }
+  // TODO: translation_node_get_translations() does some dangerous caching..  Dangerous because
+  // I'm not aware of how to clear it!!
+  $tnid_list = $is_new ? array() : translation_node_get_translations($nid);
+  foreach ($entry['translations'] as $lang => $trans) {
+    if (!$languages[$lang]) {
+      continue;
+    }
 
-      if ($tnid_list[$lang]) {
-        $tnode = node_load($tnid_list[$lang]);
-        // if this translation wasn't created via translation, we won't overwrite it.
-        if (!$tnode->imported) {
-          continue;
-        }
-      }
-      else {
-        $tnode = (object)array(
-          'type'     => lingwo_dictionary_settings('entry_content_type'),
-          'title'    => $entry['headword'],
-          'language' => $lang,
-          'taxonomy' => $taxonomy,
-          // link it to its source node!
-          'translation_source' => node_load($nid),
-        );
-      }
-      // gets this marked as imported
-      $tnode->imported = -1;
+    $tnode = _lingwo_data_import_setup_node($tnid_list[$lang], $entry,
+      array('language' => $lang, 'taxonomy' => $taxonomy));
+    $tnode->language = $lang;
+    if (empty($tnode->nid)) {
+      $tnode->translation_source = node_load($nid);
+    }
 
-      // TODO: FWIW, I think senses should use 'value' like everyone else...
-      _lingwo_data_set_field($tnode, 'senses', $trans, 'data');
-      //return json_encode($tnode);
+    $entry_translation = _lingwo_data_import_process_translation($trans);
+    if (empty($tnode->nid) || _lingwo_data_entry_has_changed($tnode, $entry_translation)) {
+      _lingwo_data_import_set_fields($tnode, $entry_translation);
 
-      if (empty($tnode->nid) || _lingwo_data_entry_has_changed($tnode)) {
-        // save the translation node
-        $res = _lingwo_data_node_save($tnode);
-        if (!is_numeric($res)) {
-          // its a list of error messages!
-          return $res;
-        }
+      // save the translation node
+      $res = _lingwo_data_node_save($tnode);
+      if (!is_numeric($res)) {
+        // its a list of error messages!
+        return $res;
       }
     }
   }
