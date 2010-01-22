@@ -169,6 +169,45 @@ function _lingwo_data_recursive_ksort(&$entry) {
   }
 }
 
+function _lingwo_data_import_process_language($entry) {
+  // get a list of the enabled languages
+  // TODO: there has to be a more functional way to do this?!
+  $languages = array();
+  foreach (language_list() as $lang) {
+    if ($lang->enabled) {
+      $languages[$lang->language] = TRUE;
+    }
+  }
+  // make sure this entry is for an enabled language
+  if (!$languages[$entry['language']]) {
+    services_error(t('The language of this entry <i>@lang</i> is not enabled on this site', 
+      array('@lang' => $entry['language'])), 400);
+    return NULL;
+  }
+
+  return $languages;
+}
+
+function _lingwo_data_import_process_taxonomy($entry) {
+  // check that pos is valid and build a taxonomy array to put
+  // on to the node object
+  $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
+  $taxonomy = NULL;
+  foreach (taxonomy_get_tree($pos_vid) as $term) {
+    if (drupal_strtolower($term->name) == $entry['pos']) {
+      // we set it up like on a new entry form, because it will only really
+      // be used to create an entry since POS can't be changed.
+      $taxonomy = array($pos_vid => $term->tid);
+      break;
+    }
+  }
+  if (is_null($taxonomy)) {
+    services_error(t('Couldn\'t find the given pos in our list: @pos', 
+        array('@pos' => $entry['pos'])), 400);
+  }
+  return $taxonomy;
+}
+
 function _lingwo_data_import_process_simple_field($entry, $field_name, $key_name = 'value') {
   $value = $entry[$field_name];
   if (!is_array($value)) {
@@ -183,13 +222,35 @@ function _lingwo_data_import_process_simple_field($entry, $field_name, $key_name
   return $res;
 }
 
-function _lingwo_data_import_process_source($entry) {
+function _lingwo_data_import_process_sources($entry) {
+  $res = NULL;
+
+  if (!empty($entry['sources'])) {
+    // put sources into the format we need
+    foreach ($entry['sources'] as $source_name => $source) {
+      $res[] = array(
+        'source_name'      => $source_name,
+        'source_url'       => $source['url'],
+        'source_copyright' => $source['copyright'],
+        'source_license'   => $source['license'],
+        'source_raw'       => $source['raw'],
+        'source_timestamp' => $source['timestamp'],
+      );
+    }
+  }
+
+  return $res;
+}
+
+function _lingwo_data_import_process_original($entry) {
   $res = array();
 
+  // process pron
   if (!empty($entry['pron']) && lingwo_data_settings('field_pron')) {
     $res['pron'] = _lingwo_data_import_process_simple_field($entry, 'pron');
   }
 
+  // process senses
   if (!empty($entry['senses']) && lingwo_data_settings('field_senses') &&
       module_exists('lingwo_senses')) {
 
@@ -220,55 +281,13 @@ function _lingwo_data_import_process_source($entry) {
   return $res;
 }
 
-/*
- * Updates an entry based on JSON data from the importer.
- */
-function lingwo_data_service_update_entry($data) {
-  $entry = json_decode($data, TRUE);
-
-  // get a list of the enabled languages
-  // TODO: there has to be a more functional way to do this?!
-  $languages = array();
-  foreach (language_list() as $lang) {
-    if ($lang->enabled) {
-      $languages[$lang->language] = TRUE;
-    }
-  }
-  // make sure this entry is for an enabled language
-  if (!$languages[$entry['language']]) {
-    return services_error(t('The language of this entry <i>@lang</i> is not enabled on this site', 
-      array('@lang' => $entry['language'])), 400);
-  }
-
-  // try to find if the entry exists
-  $nid = lingwo_dictionary_entry_lookup($entry['headword'], $entry['language'], $entry['pos']);
-  $is_new = $nid ? FALSE : TRUE;
-
-  // TODO: check that pos is valid, and actually look it up!!
-  $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
-  $taxonomy = NULL;
-  foreach (taxonomy_get_tree($pos_vid) as $term) {
-    if (drupal_strtolower($term->name) == $entry['pos']) {
-      // we set it up like on a new entry form, because it will only really
-      // be used to create an entry since POS can't be changed.
-      $taxonomy = array($pos_vid => $term->tid);
-      break;
-    }
-  }
-  if (is_null($taxonomy)) {
-    return services_error(t('Couldn\'t find the given pos in our list: @pos', 
-        array('@pos' => $entry['pos'])), 400);
-  }
-
-  $source_entry = _lingwo_dictionary_import_process_source($entry);
-
+function _lingwo_dictionary_import_setup_node($nid, $entry, $extras=array()) {
   // create the original entry/update the original entry
   if (is_null($nid)) {
     $node = (object)array(
       'type' => lingwo_dictionary_settings('entry_content_type'),
       'title' => $entry['headword'],
       'language' => $entry['language'],
-      'taxonomy' => $taxonomy,
     );
   }
   else {
@@ -276,78 +295,57 @@ function lingwo_data_service_update_entry($data) {
 
     if (!$node->imported) {
       // TODO: what we should really do is stash the data we got and save it for later.
-      return services_error(t('Existing entry was created by humans, cant overwrite'), 400);
+      services_error(t('Existing entry was created by humans, cant overwrite'), 400);
+      return NULL;
     };
   }
   // gets this marked as imported
   $node->imported = -1;
 
-  // map pron
-  _lingwo_data_set_field($node, 'pron', $entry['pron']);
+  return array_merge_recursive($extras, $node);
+}
 
-  // map sources
-  // TODO: we need to attach the sources to both source nodes and translation nodes
-  if (!empty($entry['sources'])) {
-    // put sources into the format we need
-    $sources = array();
-    foreach ($entry['sources'] as $source_name => $source) {
-      $sources[] = array(
-        'source_name'      => $source_name,
-        'source_url'       => $source['url'],
-        'source_copyright' => $source['copyright'],
-        'source_license'   => $source['license'],
-        'source_raw'       => $source['raw'],
-        'source_timestamp' => $source['timestamp'],
-      );
-    }
+/*
+ * Updates an entry based on JSON data from the importer.
+ */
+function lingwo_data_service_update_entry($data) {
+  $entry = json_decode($data, TRUE);
 
-    _lingwo_data_set_multigroup($node, $sources);
+  $languages = _lingwo_data_import_process_language($entry);
+  // TODO: instead of all these is_null()'s we should throw exceptions, catch them here
+  // and then pass the value to services_error()
+  if (is_null($languages)) {
+    return;
   }
 
-  // map fields
-  if (module_exists('lingwo_fields') && lingwo_data_settings('field_fields')) {
-    $field_fields = lingwo_data_settings('field_fields');
-
-    // clear existing fields
-    $node->$field_fields = array();
-
-    // we have to add the fields in the same order as the form
-    foreach (lingwo_language_fields($entry['language'], $entry['pos']) as $field) {
-      $field_name = $field['name'];
-      $auto = $entry['fields'][$field_name]['automatic'];
-      if (!isset($auto)) {
-        $auto = TRUE;
-      }
-      array_push($node->$field_fields, array(
-        'name'      => $field_name,
-        'type'      => $field['type'],
-        'value'     => $entry['fields'][$field_name]['value'],
-        'automatic' => $auto,
-      ));
-    }
+  $taxonomy = _lingwo_data_import_process_taxonomy($entry);
+  if (is_null($taxonomy)) {
+    return;
   }
 
-  // map senses (but only if we have more than 1 sense!!)
-  if (module_exists('lingwo_senses') && lingwo_data_settings('field_senses') && count($entry['senses']) > 1) {
-    // TODO: we need to write the senses *over* the existing ones, so that we
-    // get the sense IDs!!
-    /*
-    $field_senses = lingwo_data_settings('field_senses');
-    if ($is_new) {
-        $node->$field_senses = array();
-    }
-    for($i = 0; $i < count($entry['senses']); $i++) {
-        if (is_array($node->$field_senses[$i])) {
-            $entry['senses'] += $node->$field_senses[$i]['data'];
-        }
-        $node->$field_senses[$i] = array('data' => $entry['senses']);
-    }
-    */
-    // TODO: FWIW, I think senses should use 'value' like everyone else...
-    _lingwo_data_set_field($node, 'senses', $entry['senses'], 'data');
+  // try to find if the entry exists
+  $nid = lingwo_dictionary_entry_lookup($entry['headword'], $entry['language'], $entry['pos']);
+  $is_new = $nid ? FALSE : TRUE;
+
+  $sources = _lingwo_data_import_process_sources($entry);
+
+  // get a node object to hold the original
+  $node = _lingwo_data_import_setup_node($nid, $entry, 
+    array('taxonomy' => $taxonomy));
+  if (is_null($node)) {
+    return;
   }
 
-  if (empty($node->nid) || _lingwo_data_entry_has_changed($node)) {
+  $entry_original = _lingwo_data_import_process_original($entry);
+
+  // only bother with the rest if this node is new or has changed since its last revision
+  if ($is_new || _lingwo_data_entry_has_changed($node, $entry_original)) {
+    _lingwo_data_import_set_fields($node, $entry_original);
+
+    if ($sources) {
+      _lingwo_data_import_set_fields_multigroup($node, $sources);
+    }
+
     // save the source node
     $nid = _lingwo_data_node_save($node);
     if (!is_numeric($nid)) {

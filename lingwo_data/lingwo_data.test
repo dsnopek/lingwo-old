@@ -288,8 +288,58 @@ class LingwoDataImportUnitTestCase extends DrupalUnitTestCase {
     PHPMockFunction::deactivateAll();
   }
 
-  public function testProcessSource() {
-    // set up our mock functions!
+  public function testProcessLanguage() {
+    $language_list = PHPMockFunction::mock('language_list');
+    $language_list->expects(InvocationRestriction::once())
+      ->with()
+      ->will(WillAction::returnValue(array(
+        (object)array(
+          'language' => 'en',
+          'enabled'  => FALSE,
+        ),
+        (object)array(
+          'language' => 'zzz',
+          'enabled'  => TRUE
+        )
+    )));
+
+    $languages = _lingwo_data_import_process_language(array(
+      'language' => 'zzz'
+    ));
+
+    $this->assertEqual($languages, array('zzz' => TRUE));
+  }
+
+  public function testProcessTaxonomy() {
+    $pos_vid = 27;
+
+    $lingwo_dictionary_settings = PHPMockFunction::mock('lingwo_dictionary_settings');
+    $lingwo_dictionary_settings->expects(InvocationRestriction::once())
+      ->with('pos_vocabulary')
+      ->will(WillAction::returnValue($pos_vid));
+
+    $taxonomy_get_tree = PHPMockFunction::mock('taxonomy_get_tree');
+    $taxonomy_get_tree->expects(InvocationRestriction::once())
+      ->with($pos_vid)
+      ->will(WillAction::returnValue(array(
+        (object)array(
+          'name' => 'Verb',
+          'tid'  => 1
+        ),
+        (object)array(
+          'name' => 'Noun',
+          'tid'  => 2
+        )
+    )));
+
+    $taxonomy = _lingwo_data_import_process_taxonomy(array(
+      'pos' => 'noun',
+    ));
+
+    $this->assertEqual($taxonomy, array($pos_vid => 2));
+  }
+
+  public function testProcessOriginal() {
     $lingwo_data_settings = PHPMockFunction::mock('lingwo_data_settings');
     $lingwo_data_settings->expects(InvocationRestriction::once())
       ->with('field_pron')
@@ -315,7 +365,7 @@ class LingwoDataImportUnitTestCase extends DrupalUnitTestCase {
         )
     )));
 
-    $res = _lingwo_data_import_process_source(array(
+    $res = _lingwo_data_import_process_original(array(
       'language' => 'zzz',
       'pos'      => 'noun',
       'pron' => 'pron',
