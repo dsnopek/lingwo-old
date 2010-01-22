@@ -22,8 +22,9 @@ function lingwo_data_service_update_entry_access($data) {
 }
 */
 
-// TODO: a function to pull the field from node
-function _lingwo_data_get_field($node, $field_name) {
+class LingwoDataServiceException extends Exception {
+  public $message;
+  public $code;
 }
 
 // NOTE: originally copied from services/service/node_services.inc
@@ -61,7 +62,7 @@ function _lingwo_data_node_save($node) {
     $nid = $form_state['nid'];
   }
   if ($errors = form_get_errors()) {
-    return services_error(implode("\n", $errors), 401);
+    throw new LingwoDataServiceException(implode("\n", $errors), 401);
   }
   return $nid;
 }
@@ -106,6 +107,10 @@ function _lingwo_data_field_has_changed($node1, $node2, $field_alias, $key_names
 }
 
 function _lingwo_data_entry_has_changed($node) {
+  // If this is a new node, then it has changed!
+  if (empty($node->nid))
+    return TRUE;
+
   // TODO: For now we are punting on this.  I don't have a clever way to figure it out
   // right now, and a better testing environment (mock functions!!) would make this
   // waaay easier.
@@ -150,9 +155,9 @@ function _lingwo_data_import_process_language($entry) {
   }
   // make sure this entry is for an enabled language
   if (!$languages[$entry['language']]) {
-    services_error(t('The language of this entry <i>@lang</i> is not enabled on this site', 
+    throw new LingwoDataServiceException(
+      t('The language of this entry <i>@lang</i> is not enabled on this site', 
       array('@lang' => $entry['language'])), 400);
-    return NULL;
   }
 
   return $languages;
@@ -172,8 +177,9 @@ function _lingwo_data_import_process_taxonomy($entry) {
     }
   }
   if (is_null($taxonomy)) {
-    services_error(t('Couldn\'t find the given pos in our list: @pos', 
-        array('@pos' => $entry['pos'])), 400);
+    throw new LingwoDataServiceException(
+      t('Couldn\'t find the given pos in our list: @pos', 
+      array('@pos' => $entry['pos'])), 400);
   }
   return $taxonomy;
 }
@@ -261,20 +267,33 @@ function _lingwo_data_import_process_translation($entry) {
 function _lingwo_data_import_setup_node($nid, $entry, $newExtras=array()) {
   // create the original entry/update the original entry
   if (is_null($nid)) {
-    $node = array(
+    $node = (object)array(
       'type' => lingwo_dictionary_settings('entry_content_type'),
       'title' => $entry['headword'],
       'language' => $entry['language'],
     );
-    $node = (object)array_merge_recursive($node, $newExtras);
+    //$node = (object)array_merge_recursive($node, $newExtras);
+    // We implement a custom 2-level merge, because array_merge_recursive() doesn't do
+    // what we want.
+    foreach ($newExtras as $n1 => $v1) {
+      if (is_array($v1)) {
+        foreach ($v1 as $n2 => $v2) {
+          $f = &$node->$n1;
+          $f[$n2] = $v2;
+        }
+      }
+      else {
+        $node->$n1 = $v1;
+      }
+    }
   }
   else {
     $node = node_load($nid);
 
     if (!$node->imported) {
       // TODO: what we should really do is stash the data we got and save it for later.
-      services_error(t('Existing entry was created by humans, cant overwrite'), 400);
-      return NULL;
+      throw new LingwoDataServiceException(
+        t('Existing entry was created by humans, cant overwrite'), 400);
     };
   }
   // gets this marked as imported
@@ -345,76 +364,78 @@ function _lingwo_data_import_set_fields_multigroup(&$node, $values) {
 function lingwo_data_service_update_entry($data) {
   $entry = json_decode($data, TRUE);
 
-  $languages = _lingwo_data_import_process_language($entry);
-  // TODO: instead of all these is_null()'s we should throw exceptions, catch them here
-  // and then pass the value to services_error()
-  if (is_null($languages)) {
-    return;
-  }
+  try {
+    // Get the list of available languages and check the language given in $entry is on it.
+    $languages = _lingwo_data_import_process_language($entry);
+    // From the $entry, look-up the pos (checking that its valid) and make an array suitable
+    // for setting $node->taxonomy on a new node.
+    $taxonomy = _lingwo_data_import_process_taxonomy($entry);
 
-  $taxonomy = _lingwo_data_import_process_taxonomy($entry);
-  if (is_null($taxonomy)) {
-    return;
-  }
+    // Try to find if the already entry exists.
+    $nid = lingwo_dictionary_entry_lookup($entry['headword'], $entry['language'], $entry['pos']);
+    $is_new = $nid ? FALSE : TRUE;
 
-  // try to find if the entry exists
-  $nid = lingwo_dictionary_entry_lookup($entry['headword'], $entry['language'], $entry['pos']);
-  $is_new = $nid ? FALSE : TRUE;
+    // Process the list of sources given by the $entry.
+    $sources = _lingwo_data_import_process_sources($entry);
 
-  $sources = _lingwo_data_import_process_sources($entry);
+    // Setup a $node to hold the original (not translated) entry
+    $node = _lingwo_data_import_setup_node($nid, $entry, 
+      array('taxonomy' => $taxonomy));
 
-  // get a node object to hold the original
-  $node = _lingwo_data_import_setup_node($nid, $entry, 
-    array('taxonomy' => $taxonomy));
-  if (is_null($node)) {
-    return;
-  }
+    // Process the $entry creating an array holding the data which will be put on our node
+    $entry_original = _lingwo_data_import_process_original($entry);
 
-  $entry_original = _lingwo_data_import_process_original($entry);
+    // Only bother filling the node and saving it if it has changed.
+    if (_lingwo_data_entry_has_changed($node, $entry_original)) {
+      // Copy fields onto $node.
+      _lingwo_data_import_set_fields($node, $entry_original);
 
-  // only bother with the rest if this node is new or has changed since its last revision
-  if (empty($node->nid) || _lingwo_data_entry_has_changed($node, $entry_original)) {
-    _lingwo_data_import_set_fields($node, $entry_original);
+      // Copy sources data onto $node.
+      if ($sources) {
+        _lingwo_data_import_set_fields_multigroup($node, $sources);
+      }
 
-    if ($sources) {
-      _lingwo_data_import_set_fields_multigroup($node, $sources);
+      // Save the source node.
+      $nid = _lingwo_data_node_save($node);
     }
 
-    // save the source node
-    $nid = _lingwo_data_node_save($node);
-    if (!is_numeric($nid)) {
-      // its a list of error messages!
-      return $nid;
-    }
-  }
+    // create/update translation nodes
+    // TODO: translation_node_get_translations() does some dangerous caching..  Dangerous because
+    // I'm not aware of how to clear it!!
+    $tnid_list = $is_new ? array() : translation_node_get_translations($nid);
+    foreach ($entry['translations'] as $lang => $trans) {
+      // Skip this translation if its not on our list of enabled languages.
+      if (!$languages[$lang]) {
+        continue;
+      }
 
-  // create/update translation nodes
-  // TODO: translation_node_get_translations() does some dangerous caching..  Dangerous because
-  // I'm not aware of how to clear it!!
-  $tnid_list = $is_new ? array() : translation_node_get_translations($nid);
-  foreach ($entry['translations'] as $lang => $trans) {
-    if (!$languages[$lang]) {
-      continue;
-    }
+      // Setup a $tnode to hold the translated node
+      $tnode = _lingwo_data_import_setup_node($tnid_list[$lang]->nid, $entry,
+        array('language' => $lang, 'taxonomy' => $taxonomy));
+      if (empty($tnode->nid)) {
+        $tnode->translation_source = node_load($nid);
+      }
 
-    $tnode = _lingwo_data_import_setup_node($tnid_list[$lang], $entry,
-      array('language' => $lang, 'taxonomy' => $taxonomy));
-    $tnode->language = $lang;
-    if (empty($tnode->nid)) {
-      $tnode->translation_source = node_load($nid);
-    }
+      // Process $trans creating an array holding the data which will be put on our node
+      $entry_translation = _lingwo_data_import_process_translation($trans);
 
-    $entry_translation = _lingwo_data_import_process_translation($trans);
-    if (empty($tnode->nid) || _lingwo_data_entry_has_changed($tnode, $entry_translation)) {
-      _lingwo_data_import_set_fields($tnode, $entry_translation);
+      // Only bother filling the node and saving it if it has changed.
+      if (_lingwo_data_entry_has_changed($tnode, $entry_translation)) {
+        // Copy fields onto $tnode.
+        _lingwo_data_import_set_fields($tnode, $entry_translation);
 
-      // save the translation node
-      $res = _lingwo_data_node_save($tnode);
-      if (!is_numeric($res)) {
-        // its a list of error messages!
-        return $res;
+        // Copy sources data onto $tnode.
+        if ($sources) {
+          _lingwo_data_import_set_fields_multigroup($node, $sources);
+        }
+
+        // Save the translation node.
+        _lingwo_data_node_save($tnode);
       }
     }
+  }
+  catch (LingwoDataServiceException $e) {
+    return services_error($e->message, $e->code);
   }
 
   return $nid;
