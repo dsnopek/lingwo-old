@@ -401,6 +401,7 @@ Lingwo.dictionary = {};
         args = args || {};
 
         this.lang = args.lang;
+        // TODO: should we call this 'headword' to fit with everything else?
         this.name = args.name;
         this.pos = args.pos;
         // TODO: Not filling in any of the above should probobaly be an exception?
