@@ -362,7 +362,7 @@ function lingwo_data_service_update_entry($data) {
 
         // Copy sources data onto $tnode.
         if ($sources) {
-          _lingwo_data_import_set_fields_multigroup($node, $sources);
+          _lingwo_data_import_set_fields_multigroup($tnode, $sources);
         }
 
         // Save the translation node.
