@@ -1,0 +1,14 @@
+Index: php_apd.c
+===================================================================
+--- php_apd.c	(wersja 293849)
++++ php_apd.c	(kopia robocza)
+@@ -701,6 +701,9 @@
+ 					   Z_STRVAL_P(z_new_fname));
+ 			RETURN_FALSE;
+ 		}
++	if (func->type == ZEND_USER_FUNCTION) {
++		function_add_ref(func);
++	}
+ 	if(zend_hash_del(EG(function_table), Z_STRVAL_P(z_orig_fname),
+ 					 Z_STRLEN_P(z_orig_fname) + 1) == FAILURE)
+ 		{

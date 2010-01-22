@@ -3,7 +3,9 @@
 module_load_include('inc', 'lingwo_dictionary', 'lingwo_dictionary.test');
 module_load_include('inc', 'lingwo_data', 'lingwo_data.service');
 
-class LingwoDataImportTestCase extends LingwoDictionaryWebTestCase {
+require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/PHPMockFunction/PHPMockFunction.php');
+
+class LingwoDataImportWebTestCase extends LingwoDictionaryWebTestCase {
   public static $TestEntry = array(
     'headword' => 'czytać',
     'language' => 'pl',
@@ -36,6 +38,8 @@ class LingwoDataImportTestCase extends LingwoDictionaryWebTestCase {
     'fields' => array(
       // we keep these in reverse order, so that we can see that our code re-arranges them.
       '*stem' => array(
+        // TODO: we don't really need to specify type since, we can't create any fields that
+        // don't exist anyway, and all the fields exist in the same namespace.
         'type' => 'form',
         'value' => 'czytaj',
         'automatic' => TRUE
@@ -69,37 +73,43 @@ class LingwoDataImportTestCase extends LingwoDictionaryWebTestCase {
 
     'translations' => array(
       'en' => array(
-        array(
-          'trans' => array('read'),
-          'clue'   => 'you know, reading books, maps and stuff',
-        ),
-        array('same_as' => 0),
-        array(
-          'trans' => array('read','decode','load'),
-          'clue'   => 'when a computer "reads" something',
+        'senses' => array(
+          array(
+            'trans' => array('read'),
+            'clue'   => 'you know, reading books, maps and stuff',
+          ),
+          array('same_as' => 0),
+          array(
+            'trans' => array('read','decode','load'),
+            'clue'   => 'when a computer "reads" something',
+          )
         )
       ),
       'be' => array(
-        array(
-          'trans' => array('чытаць')
-        ),
-        array(),
-        array(),
+        'senses' => array(
+          array(
+            'trans' => array('чытаць')
+          ),
+          array(),
+          array(),
+        )
       ),
       'hr' => array(
-        array(
-          'trans' => array('čitati')
-        ),
-        array(),
-        array(),
+        'senses' => array(
+          array(
+            'trans' => array('čitati')
+          ),
+          array(),
+          array(),
+        )
       ),
     ),
   );
 
   public static function getInfo() {
     return array(
-      'name' => 'lingwo_data - Import',
-      'description' => "Test lingwo_data's import abilities",
+      'name' => 'lingwo_data - Import Web Tests',
+      'description' => "Test lingwo_data's import functionality (Web Tests)",
       'group' => 'Lingwo Dictionary',
     );
   }
@@ -188,6 +198,13 @@ class LingwoDataImportTestCase extends LingwoDictionaryWebTestCase {
     }
   }
 
+  private function outputWatchdog() {
+    $res = db_query("SELECT * FROM {watchdog} ORDER BY timestamp DESC LIMIT 10");
+    while($o = db_fetch_object($res)) {
+      $this->fail(print_r($o, TRUE));
+    }
+  }
+
   public function testServiceUpdateEntry() {
     $data = json_encode(self::$TestEntry);
 
@@ -203,6 +220,9 @@ class LingwoDataImportTestCase extends LingwoDictionaryWebTestCase {
     $nid = lingwo_dictionary_entry_lookup('czytać', 'pl', 'verb');
     $this->assertNotNull($nid);
     $this->assertEqual($nid, $_nid);
+
+    $this->drupalGet('node/add/'. lingwo_dictionary_settings('entry_content_type'));
+    //$this->outputWatchdog();
 
     $node = node_load($nid);
     //$this->pass(print_r($node, TRUE));
@@ -261,6 +281,258 @@ class LingwoDataImportTestCase extends LingwoDictionaryWebTestCase {
     node_load(0, NULL, TRUE);
     lingwo_data_service_update_entry($data);
     $this->assertEqual(node_load($nid)->vid, $node->vid);
+  }
+}
+
+class LingwoDataImportUnitTestCase extends DrupalUnitTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'lingwo_data - Import',
+      'description' => "Test lingwo_data import functionality",
+      'group' => 'Lingwo Dictionary',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp('lingwo_data', 'lingwo_senses', 'lingwo_fields', 'lingwo_language');
+    
+  }
+
+  public function tearDown() {
+    parent::tearDown();
+
+    PHPMockFunction::deactivateAll();
+  }
+
+  public function testProcessLanguage() {
+    $language_list = PHPMockFunction::mock('language_list');
+    $language_list->expects(InvocationRestriction::once())
+      ->with()
+      ->will(WillAction::returnValue(array(
+        (object)array(
+          'language' => 'en',
+          'enabled'  => FALSE,
+        ),
+        (object)array(
+          'language' => 'zzz',
+          'enabled'  => TRUE
+        )
+    )));
+
+    $languages = _lingwo_data_import_process_language(array(
+      'language' => 'zzz'
+    ));
+
+    $this->assertEqual($languages, array('zzz' => TRUE));
+  }
+
+  public function testProcessTaxonomy() {
+    $pos_vid = 27;
+
+    $lingwo_dictionary_settings = PHPMockFunction::mock('lingwo_dictionary_settings');
+    $lingwo_dictionary_settings->expects(InvocationRestriction::once())
+      ->with('pos_vocabulary')
+      ->will(WillAction::returnValue($pos_vid));
+
+    $taxonomy_get_tree = PHPMockFunction::mock('taxonomy_get_tree');
+    $taxonomy_get_tree->expects(InvocationRestriction::once())
+      ->with($pos_vid)
+      ->will(WillAction::returnValue(array(
+        (object)array(
+          'name' => 'Verb',
+          'tid'  => 1
+        ),
+        (object)array(
+          'name' => 'Noun',
+          'tid'  => 2
+        )
+    )));
+
+    $taxonomy = _lingwo_data_import_process_taxonomy(array(
+      'pos' => 'noun',
+    ));
+
+    $this->assertEqual($taxonomy, array($pos_vid => 2));
+  }
+
+  public function testProcessSources() {
+    $sources = _lingwo_data_import_process_sources(array(
+      'sources' => array(
+        'pl.wiktionary.org' => array(
+          'url' => 'http://pl.wiktionary.org',
+          'license' => 'CC-BY-SA-3.0',
+        ),
+        'www.Open-Dictionaries.com' => array(
+          'copyright' => 'Copyright 2010 Jerzy Kazojć',
+          'timestamp' => '2010-01-20T00:00:00Z',
+        )
+      )
+    ));
+
+    $this->assertEqual($sources[0], array(
+      'source_name'      => 'pl.wiktionary.org',
+      'source_url'       => 'http://pl.wiktionary.org',
+      'source_copyright' => NULL,
+      'source_license'   => 'CC-BY-SA-3.0',
+      'source_raw'       => NULL,
+      'source_timestamp' => NULL,
+    ));
+    $this->assertEqual($sources[1], array(
+      'source_name'      => 'www.Open-Dictionaries.com',
+      'source_url'       => NULL,
+      'source_copyright' => 'Copyright 2010 Jerzy Kazojć',
+      'source_license'   => NULL,
+      'source_raw'       => NULL,
+      'source_timestamp' => '2010-01-20T00:00:00Z',
+    ));
+  }
+
+  public function testProcessOriginal() {
+    $lingwo_data_settings = PHPMockFunction::mock('lingwo_data_settings');
+    $lingwo_data_settings->expects(InvocationRestriction::once())
+      ->with('field_pron')
+      ->will(WillAction::returnValue('field_pron'));
+    $lingwo_data_settings->expects(InvocationRestriction::once())
+      ->with('field_senses')
+      ->will(WillAction::returnValue('field_senses'));
+    $lingwo_data_settings->expects(InvocationRestriction::once())
+      ->with('field_fields')
+      ->will(WillAction::returnValue('field_fields'));
+
+    $lingwo_language_fields = PHPMockFunction::mock('lingwo_language_fields');
+    $lingwo_language_fields->expects(InvocationRestriction::once())
+      ->with('zzz', 'noun')
+      ->will(WillAction::returnValue(array(
+        array(
+          'type' => 'option',
+          'name' => 'first',
+        ),
+        array(
+          'type' => 'form',
+          'name' => 'second',
+        )
+    )));
+
+    $res = _lingwo_data_import_process_original(array(
+      'language' => 'zzz',
+      'pos' => 'noun',
+      'pron' => 'pron',
+      'senses' => array(
+        array(
+          'difference' => 'diff1',
+          'example' => 'example'
+        ),
+        array(
+          'difference' => 'diff2'
+        )
+      ),
+      'fields' => array(
+        'second' => array(
+          'value' => 'thinger',
+          'automatic' => FALSE,
+        )
+      )
+    ));
+
+    // verify each part
+    $this->assertEqual($res['pron'], array('pron'));
+    $this->assertEqual($res['senses'], array(
+      array(
+        'difference' => 'diff1',
+        'example'    => 'example',
+      ),
+      array(
+        'difference' => 'diff2',
+      )
+    ));
+    $this->assertEqual($res['fields'], array(
+      array(
+        'type' => 'option',
+        'name' => 'first',
+        'value' => NULL,
+        'automatic' => TRUE
+      ),
+      array(
+        'type' => 'form',
+        'name' => 'second',
+        'value' => 'thinger',
+        'automatic' => FALSE
+      )
+    ));
+  }
+
+  public function testSetFields() {
+    $lingwo_data_settings = PHPMockFunction::mock('lingwo_data_settings');
+    $lingwo_data_settings->expects(InvocationRestriction::once())
+      ->with('field_pron')
+      ->will(WillAction::returnValue('field_pron'));
+    
+    $lingwo_dictionary_settings = PHPMockFunction::mock('lingwo_dictionary_settings');
+    $lingwo_dictionary_settings->expects(InvocationRestriction::once())
+      ->with('entry_content_type')
+      ->will(WillAction::returnValue('entry'));
+
+    $content_fields = PHPMockFunction::mock('content_fields');
+    $content_fields->expects(InvocationRestriction::once())
+      ->with('field_pron', 'entry')
+      ->will(WillAction::returnValue(array('type' => 'text')));
+
+    $node = (object)array();
+    _lingwo_data_import_set_fields($node, array(
+      'pron' => array('blah')
+    ));
+
+    $this->assertEqual((array)$node, array(
+      'field_pron' => array(
+        array('value' => 'blah')
+      )
+    ));
+  }
+
+  public function testSetFieldsMultigroup() {
+    $lingwo_data_settings = PHPMockFunction::mock('lingwo_data_settings');
+    $lingwo_data_settings->expects(InvocationRestriction::once())
+      ->with('field_source_url')
+      ->will(WillAction::returnValue('field_source_url'));
+    $lingwo_data_settings->expects(InvocationRestriction::once())
+      ->with('field_source_name')
+      ->will(WillAction::returnValue('field_source_name'));
+
+    $lingwo_dictionary_settings = PHPMockFunction::mock('lingwo_dictionary_settings');
+    $lingwo_dictionary_settings->expects(InvocationRestriction::exactly(2))
+      ->with('entry_content_type')
+      ->will(WillAction::returnValue('entry'));
+
+    $content_fields = PHPMockFunction::mock('content_fields');
+    $content_fields->expects(InvocationRestriction::once())
+      ->with('field_source_url', 'entry')
+      ->will(WillAction::returnValue(array('type' => 'text')));
+    $content_fields->expects(InvocationRestriction::once())
+      ->with('field_source_name', 'entry')
+      ->will(WillAction::returnValue(array('type' => 'text')));
+    
+    $node = (object)array();
+    _lingwo_data_import_set_fields_multigroup($node, array(
+      array(
+        'source_url' => 'url1',
+        'source_name' => 'name1'
+      ),
+      array(
+        'source_url' => 'url2',
+        'source_name' => 'name2'
+      )
+    ));
+
+    $this->assertEqual((array)$node, array(
+      'field_source_url' => array(
+        array('value' => 'url1'),
+        array('value' => 'url2'),
+      ),
+      'field_source_name' => array(
+        array('value' => 'name1'),
+        array('value' => 'name2'),
+      )
+    ));
   }
 }
 
