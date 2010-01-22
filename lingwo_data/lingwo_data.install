@@ -31,14 +31,12 @@ function lingwo_data_schema() {
         'default' => 0,
         'not null' => TRUE
       ),
-      /*
       'imported_data' => array(
-        'description' => 'Holds a sanitized version of the JSON object that was used to import this revision.',
+        'description' => 'Holds a serialized object of the data that was imported',
         'type' => 'text',
         'size' => 'big',
         'not null' => TRUE
       ),
-      */
     ),
     'primary key' => array('vid'),
     'indexes' => array(

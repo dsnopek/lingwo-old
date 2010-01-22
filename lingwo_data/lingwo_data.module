@@ -61,7 +61,7 @@ function lingwo_data_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 
   switch ($op) {
     case 'load':
-      $res = db_query("SELECT imported FROM {lingwo_data_node_imported} WHERE vid = %d",
+      $res = db_query("SELECT imported, imported_data FROM {lingwo_data_node_imported} WHERE vid = %d",
         $node->vid);
 
       $fields = db_fetch_array($res);
@@ -104,6 +104,11 @@ function lingwo_data_form_alter(&$form, $form_state, $form_id) {
       '#type' => 'hidden',
       // we automatically set this to '0' unless the field magically gets set to '-1'
       '#value' => ($form_state['values']['imported'] == -1) ? '1' : '0',
+    );
+
+    $form['imported_data'] = array(
+      '#type' => 'hidden',
+      '#value' => $form_state['values']['imported_data'],
     );
   }
 }

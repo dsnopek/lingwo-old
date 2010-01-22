@@ -67,83 +67,6 @@ function _lingwo_data_node_save($node) {
   return $nid;
 }
 
-function _lingwo_data_field_has_changed($node1, $node2, $field_alias, $key_names=NULL, $data_key=NULL) {
-  $field_name = lingwo_data_settings('field_'. $field_alias);
-  if (!$field_name)
-    return FALSE;
-
-  if (is_null($key_names)) {
-    $key_names = array('value');
-  }
-  else if (is_string($key_names)) {
-    $key_names = array($key_names);
-  }
-
-  $field1 = $node1->$field_name;
-  $field2 = $node2->$field_name;
-
-  if (count($field1) != count($field2)) {
-    return TRUE;
-  }
-
-  for($i = 0; $i < count($field1); $i++) {
-    $v1 = $field1[$i];
-    $v2 = $field2[$i];
-
-    // for things like lingwo_sense which embed all the data in a special data key
-    if (!is_null($data_key)) {
-      $v1 = $v1[$data_key];
-      $v2 = $v2[$data_key];
-    }
-
-    foreach($key_names as $key) {
-      if ($v1[$key] != $v2[$key]) {
-        return TRUE;
-      }
-    }
-  }
-
-  return FALSE;
-}
-
-function _lingwo_data_entry_has_changed($node) {
-  // If this is a new node, then it has changed!
-  if (empty($node->nid))
-    return TRUE;
-
-  // TODO: For now we are punting on this.  I don't have a clever way to figure it out
-  // right now, and a better testing environment (mock functions!!) would make this
-  // waaay easier.
-  return TRUE;
-
-  /*
-  // since we haven't saved yet, the current 'nid' and 'vid' are for
-  // the previous revision.
-  $old_node = node_load($node->nid, $node->vid);
-
-  // TODO: it would be AWESOME if there was an automatic way to do this, but
-  // no matter what, data from the database is going to be different than the
-  // way the importer puts it together (id's on senses for example).  So, this
-  // is what we are doing for now..
-
-  return _lingwo_data_field_has_changed($node, $old_node, 'pron') ||
-         _lingwo_data_field_has_changed($node, $old_node, 'senses',
-           array('difference', 'example', 'trans', 'clue'), 'data') ||
-         _lingwo_data_field_has_changed($node, $old_node, 'fields',
-           array('name', 'type', 'value', 'automatic'));
-  */
-}
-
-// TODO: use this for sorting the JSON before stashing it on the database.
-function _lingwo_data_recursive_ksort(&$entry) {
-  ksort($entry);
-  foreach ($entry as $key => &$value) {
-    if (is_array($value)) {
-      _lingwo_data_recursive_ksort($value);
-    }
-  }
-}
-
 function _lingwo_data_import_process_language($entry) {
   // get a list of the enabled languages
   // TODO: there has to be a more functional way to do this?!
@@ -302,6 +225,16 @@ function _lingwo_data_import_setup_node($nid, $entry, $newExtras=array()) {
   return $node;
 }
 
+function _lingwo_data_entry_has_changed($node, $entry_data) {
+  // If this is a new node, then it has changed!
+  if (empty($node->nid))
+    return TRUE;
+
+  // compare the data from the previous import with the data we have now
+  $old_entry_data = unserialize($node->imported_data);
+  return $entry_data != $old_entry_data;
+}
+
 function _lingwo_data_import_set_field_value(&$field, $value, $type) {
   switch ($type) {
     case 'lingwo_fields':
@@ -341,6 +274,9 @@ function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
 }
 
 function _lingwo_data_import_set_fields(&$node, $fields) {
+  // stash the fields data on imported_data so we can compare it on later revisions
+  $node->imported_data = serialize($fields);
+  
   foreach ($fields as $field_alias => $values) {
     _lingwo_data_import_set_field($node, $field_alias, $values);
   }
