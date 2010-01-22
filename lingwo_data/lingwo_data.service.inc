@@ -178,18 +178,12 @@ function _lingwo_data_import_process_taxonomy($entry) {
   return $taxonomy;
 }
 
-function _lingwo_data_import_process_simple_field($entry, $field_name, $key_name = 'value') {
+function _lingwo_data_import_process_simple_field($entry, $field_name) {
   $value = $entry[$field_name];
   if (!is_array($value)) {
     $value = array($value);
   }
-  $res = array();
-  foreach ($value as $x) {
-    $res[] = array(
-      $key_name => $x
-    );
-  }
-  return $res;
+  return $value;
 }
 
 function _lingwo_data_import_process_sources($entry) {
@@ -198,17 +192,13 @@ function _lingwo_data_import_process_sources($entry) {
   if (!empty($entry['sources'])) {
     // put sources into the format we need
     foreach ($entry['sources'] as $source_name => $source) {
-      // TODO: what to do about fields that don't use value?
-      // TODO: this should probably use _lingwo_data_import_process_simple_field, which
-      // given the current situation, needs to be made aware of CCK..  Hmmm, probably not
-      // a good design!
       $res[] = array(
-        'source_name'      => array('value' => $source_name),
-        'source_url'       => array('value' => $source['url']),
-        'source_copyright' => array('value' => $source['copyright']),
-        'source_license'   => array('value' => $source['license']),
-        'source_raw'       => array('value' => $source['raw']),
-        'source_timestamp' => array('value' => $source['timestamp']),
+        'source_name'      => $source_name,
+        'source_url'       => $source['url'],
+        'source_copyright' => $source['copyright'],
+        'source_license'   => $source['license'],
+        'source_raw'       => $source['raw'],
+        'source_timestamp' => $source['timestamp'],
       );
     }
   }
@@ -228,7 +218,7 @@ function _lingwo_data_import_process_original($entry) {
   if (!empty($entry['senses']) && lingwo_data_settings('field_senses') &&
       module_exists('lingwo_senses')) {
 
-    $res['senses'] = _lingwo_data_import_process_simple_field($entry, 'senses', 'data');
+    $res['senses'] = _lingwo_data_import_process_simple_field($entry, 'senses');
   }
 
   // process fields
@@ -262,7 +252,7 @@ function _lingwo_data_import_process_translation($entry) {
   if (!empty($entry['senses']) && lingwo_data_settings('field_senses') &&
       module_exists('lingwo_senses')) {
 
-    $res['senses'] = _lingwo_data_import_process_simple_field($entry, 'senses', 'data');
+    $res['senses'] = _lingwo_data_import_process_simple_field($entry, 'senses');
   }
 
   return $res;
@@ -293,11 +283,33 @@ function _lingwo_data_import_setup_node($nid, $entry, $newExtras=array()) {
   return $node;
 }
 
+function _lingwo_data_import_set_field_value(&$field, $value, $type) {
+  switch ($type) {
+    case 'lingwo_fields':
+      $field['type'] = $value['type'];
+      $field['name'] = $value['name'];
+      $field['value'] = $value['value'];
+      $field['automatic'] = $value['automatic'];
+      break;
+
+    case 'lingwo_senses':
+      $field['data'] = $value;
+      break;
+
+    default:
+      $field['value'] = $value;
+      break;
+  }
+}
+
 function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
   $field_name = lingwo_data_settings('field_'. $field_alias);
   if (empty($field_name)) {
     return;
   }
+
+  // TODO: get CCK infos about this field
+  $field_type = content_fields($field_name, lingwo_dictionary_settings('entry_content_type'));
 
   if (!isset($node->$field_name)) {
     $node->$field_name = array();
@@ -305,7 +317,7 @@ function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
   // TODO: we really should merge these, not just overwrite them!
   $field = &$node->$field_name;
   for($i = 0; $i < count($values); $i++) {
-    $field[$i] = $values[$i];
+    _lingwo_data_import_set_field_value($field[$i], $values[$i], $field_type['type']);
   }
 }
 
@@ -323,8 +335,6 @@ function _lingwo_data_import_set_fields_multigroup(&$node, $values) {
     }
   }
   foreach ($flatten as $name => $x) {
-    // TODO: what about fields that take something other than value?
-    // TODO: should the array(value => ) part be done here, or in *_process_source()?
     _lingwo_data_import_set_field($node, $name, $x);
   }
 }

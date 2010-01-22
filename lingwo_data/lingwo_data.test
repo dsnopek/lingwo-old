@@ -355,6 +355,38 @@ class LingwoDataImportUnitTestCase extends DrupalUnitTestCase {
     $this->assertEqual($taxonomy, array($pos_vid => 2));
   }
 
+  public function testProcessSources() {
+    $sources = _lingwo_data_import_process_sources(array(
+      'sources' => array(
+        'pl.wiktionary.org' => array(
+          'url' => 'http://pl.wiktionary.org',
+          'license' => 'CC-BY-SA-3.0',
+        ),
+        'www.Open-Dictionaries.com' => array(
+          'copyright' => 'Copyright 2010 Jerzy Kazojć',
+          'timestamp' => '2010-01-20T00:00:00Z',
+        )
+      )
+    ));
+
+    $this->assertEqual($sources[0], array(
+      'source_name'      => 'pl.wiktionary.org',
+      'source_url'       => 'http://pl.wiktionary.org',
+      'source_copyright' => NULL,
+      'source_license'   => 'CC-BY-SA-3.0',
+      'source_raw'       => NULL,
+      'source_timestamp' => NULL,
+    ));
+    $this->assertEqual($sources[1], array(
+      'source_name'      => 'www.Open-Dictionaries.com',
+      'source_url'       => NULL,
+      'source_copyright' => 'Copyright 2010 Jerzy Kazojć',
+      'source_license'   => NULL,
+      'source_raw'       => NULL,
+      'source_timestamp' => '2010-01-20T00:00:00Z',
+    ));
+  }
+
   public function testProcessOriginal() {
     $lingwo_data_settings = PHPMockFunction::mock('lingwo_data_settings');
     $lingwo_data_settings->expects(InvocationRestriction::once())
@@ -383,7 +415,7 @@ class LingwoDataImportUnitTestCase extends DrupalUnitTestCase {
 
     $res = _lingwo_data_import_process_original(array(
       'language' => 'zzz',
-      'pos'      => 'noun',
+      'pos' => 'noun',
       'pron' => 'pron',
       'senses' => array(
         array(
@@ -403,18 +435,14 @@ class LingwoDataImportUnitTestCase extends DrupalUnitTestCase {
     ));
 
     // verify each part
-    $this->assertEqual($res['pron'], array(array('value' => 'pron')));
+    $this->assertEqual($res['pron'], array('pron'));
     $this->assertEqual($res['senses'], array(
       array(
-        'data' => array(
-          'difference' => 'diff1',
-          'example'    => 'example',
-        )
+        'difference' => 'diff1',
+        'example'    => 'example',
       ),
       array(
-        'data' => array(
-          'difference' => 'diff2',
-        )
+        'difference' => 'diff2',
       )
     ));
     $this->assertEqual($res['fields'], array(
@@ -439,11 +467,19 @@ class LingwoDataImportUnitTestCase extends DrupalUnitTestCase {
       ->with('field_pron')
       ->will(WillAction::returnValue('field_pron'));
     
+    $lingwo_dictionary_settings = PHPMockFunction::mock('lingwo_dictionary_settings');
+    $lingwo_dictionary_settings->expects(InvocationRestriction::once())
+      ->with('entry_content_type')
+      ->will(WillAction::returnValue('entry'));
+
+    $content_fields = PHPMockFunction::mock('content_fields');
+    $content_fields->expects(InvocationRestriction::once())
+      ->with('field_pron', 'entry')
+      ->will(WillAction::returnValue(array('type' => 'text')));
+
     $node = (object)array();
     _lingwo_data_import_set_fields($node, array(
-      'pron' => array(
-        array('value' => 'blah')
-      )
+      'pron' => array('blah')
     ));
 
     $this->assertEqual((array)$node, array(
@@ -461,16 +497,29 @@ class LingwoDataImportUnitTestCase extends DrupalUnitTestCase {
     $lingwo_data_settings->expects(InvocationRestriction::once())
       ->with('field_source_name')
       ->will(WillAction::returnValue('field_source_name'));
+
+    $lingwo_dictionary_settings = PHPMockFunction::mock('lingwo_dictionary_settings');
+    $lingwo_dictionary_settings->expects(InvocationRestriction::exactly(2))
+      ->with('entry_content_type')
+      ->will(WillAction::returnValue('entry'));
+
+    $content_fields = PHPMockFunction::mock('content_fields');
+    $content_fields->expects(InvocationRestriction::once())
+      ->with('field_source_url', 'entry')
+      ->will(WillAction::returnValue(array('type' => 'text')));
+    $content_fields->expects(InvocationRestriction::once())
+      ->with('field_source_name', 'entry')
+      ->will(WillAction::returnValue(array('type' => 'text')));
     
     $node = (object)array();
     _lingwo_data_import_set_fields_multigroup($node, array(
       array(
-        'source_url' => array('value' => 'url1'),
-        'source_name' => array('value' => 'name1')
+        'source_url' => 'url1',
+        'source_name' => 'name1'
       ),
       array(
-        'source_url' => array('value' => 'url2'),
-        'source_name' => array('value' => 'name2')
+        'source_url' => 'url2',
+        'source_name' => 'name2'
       )
     ));
 

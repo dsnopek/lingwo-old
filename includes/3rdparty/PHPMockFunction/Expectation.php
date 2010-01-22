@@ -123,6 +123,10 @@
             return new self(1, 1);
         }
         
+        public static function exactly($number) {
+            return new self($number, $number);
+        }
+
         // I question this feature is possible w/o an verify phase after
         // program execution          
         public static function atLeast($minInvocation) {
