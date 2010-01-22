@@ -489,7 +489,37 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
             var s = sections['meaning'][0];
             // remove periods from pos (strange data inconsistency)
             s = s.replace(/\./g, '');
-            return extractRegex(s, /^''([^\<,'$]+)/, 1, posTrans, 'posTrans');
+            var pos = extractRegex(s, /^''([^\<,'$]+)/, 1, posTrans, 'posTrans');
+            // We want to break these down to the most basic types (basically, we want these to be
+            // broad categories, to seperate it from other words.  Read as a transitive verb would
+            // not have another entry that is an intransitive verb. -- actually we might!)
+            // TODO: I'm not sure this is the correct thing to do..
+            if (/phrase/.exec(pos)) {
+                pos = 'phrase';
+            }
+            else if (/noun/.exec(pos)) {
+                pos = 'noun';
+            }
+            else if (/adjective/.exec(pos)) {
+                pos = 'adjective';
+            }
+            else if (/verb/.exec(pos)) {
+                pos = 'verb';
+            }
+            else if (/pronoun/.exec(pos)) {
+                pos = 'pronoun';
+            }
+            else if (/participle/.exec(pos)) {
+                pos = 'participle';
+            }
+            else if (pos == 'ordinal number') {
+                pos = 'adjective';
+            }
+            else if (/number/.exec(pos) || pos == 'fraction') {
+                pos = 'noun';
+            }
+
+            return pos;
         }],
         ['fields', function (entry, sections) {
             if (!sections['meaning']) {
@@ -529,6 +559,14 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
             }
             // TODO: load up the forms!!
 
+            // re-layout into the format that the service wants
+            for(var name in res) {
+                 res[name] = {
+                     'value': res[name],
+                     'automatic': false,
+                 };
+            }
+
             return res;
         }],
         ['senses', function (entry, sections) {
@@ -537,9 +575,10 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
             }
 
             var map = {};
+            var idx = {};
             var res = [];
 
-            sections['meaning'].slice(1).forEach(function (line) {
+            sections['meaning'].slice(1).forEach(function (line, i) {
                 var name = extractRegex(line, /\((\d\.\d)\)/, 1);
 
                 // Remove the sense numbers
@@ -553,6 +592,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
                 };
                 res.push(sense);
                 map[name] = sense;
+                idx[name] = i;
             });
 
             var getName = function (line) {
@@ -589,6 +629,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
             }
 
             if (sections['translations']) {
+                entry.translations = {};
                 sections['translations'].forEach(function (line) {
                     var lang = extractRegex(line, /^\* ([^:]+):/, 1, langCodes, 'langCodes');
 
@@ -606,7 +647,9 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
                     line = line.replace(/\((\d\.\d)(?:-[^\)]+)?\)/g, '');
                     line = removeWikiText(line);
 
-                    map[name].trans[lang] = line.split(/,\s*/);
+                    // TODO: only on one sense!  Do more!
+                    entry.translations[lang] = [];
+                    entry.translations[lang][idx[name]] = {'trans': line.split(/,\s*/)};
                 });
             }
 
@@ -627,7 +670,14 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
                 var entry = new Lingwo.importer.Entry();
                 entry.headword = page.title.toString();
                 entry.language = code;
-                entry.setSource('pl.wiktionary.org', {raw: text.getSection(sec)});
+                entry.setSource('pl.wiktionary.org', {
+                    raw: text.getSection(sec),
+                    url: 'http://pl.wiktionay.org/wiki/'+entry.headword,
+                    license: 'CC-BY-SA',
+                    // what is the copyright for this?
+                    //copyright: '',
+                    timestamp: page.revision.timestamp.toString(),
+                });
 
                 // Run a language specific parser on the wikitext
                 var parser = parsers[code];

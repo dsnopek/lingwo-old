@@ -205,7 +205,8 @@ function lingwo_data_service_update_entry($data) {
     }
   }
   if (is_null($taxonomy)) {
-    return services_error(t('Couldn\'t find the given pos in our list'), 400);
+    return services_error(t('Couldn\'t find the given pos in our list: @pos', 
+        array('@pos' => $entry['pos'])), 400);
   }
 
   // create the original entry/update the original entry
@@ -232,6 +233,7 @@ function lingwo_data_service_update_entry($data) {
   _lingwo_data_set_field($node, 'pron', $entry['pron']);
 
   // map sources
+  // TODO: we need to attach the sources to both source nodes and translation nodes
   if (!empty($entry['sources'])) {
     // put sources into the format we need
     $sources = array();
@@ -274,6 +276,20 @@ function lingwo_data_service_update_entry($data) {
 
   // map senses (but only if we have more than 1 sense!!)
   if (module_exists('lingwo_senses') && lingwo_data_settings('field_senses') && count($entry['senses']) > 1) {
+    // TODO: we need to write the senses *over* the existing ones, so that we
+    // get the sense IDs!!
+    /*
+    $field_senses = lingwo_data_settings('field_senses');
+    if ($is_new) {
+        $node->$field_senses = array();
+    }
+    for($i = 0; $i < count($entry['senses']); $i++) {
+        if (is_array($node->$field_senses[$i])) {
+            $entry['senses'] += $node->$field_senses[$i]['data'];
+        }
+        $node->$field_senses[$i] = array('data' => $entry['senses']);
+    }
+    */
     // TODO: FWIW, I think senses should use 'value' like everyone else...
     _lingwo_data_set_field($node, 'senses', $entry['senses'], 'data');
   }
@@ -319,6 +335,7 @@ function lingwo_data_service_update_entry($data) {
 
       // TODO: FWIW, I think senses should use 'value' like everyone else...
       _lingwo_data_set_field($tnode, 'senses', $trans, 'data');
+      //return json_encode($tnode);
 
       if (empty($tnode->nid) || _lingwo_data_entry_has_changed($tnode)) {
         // save the translation node

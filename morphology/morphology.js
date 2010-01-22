@@ -508,7 +508,7 @@ Lingwo.dictionary = {};
 
             this._cachedClasses[name] = value;
             return value;
-        }
+        },
     });
 })();
 

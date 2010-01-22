@@ -27,6 +27,8 @@ function main() {
 
     // TODO: This handler really should put items on the server!
     function handler(entry) {
+        //print(JSON.stringify(entry));
+
         db.setEntry(entry);
         db.commit();
         // TODO: remove this hack!!
