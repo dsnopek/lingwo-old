@@ -632,6 +632,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
                 entry.translations = {};
                 sections['translations'].forEach(function (line) {
                     var lang = extractRegex(line, /^\* ([^:]+):/, 1, langCodes, 'langCodes');
+                    var senses = [];
 
                     // Remove the language name
                     line = line.replace(/^\* [^:]+:/, '');
@@ -648,8 +649,9 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
                     line = removeWikiText(line);
 
                     // TODO: only on one sense!  Do more!
-                    entry.translations[lang] = [];
-                    entry.translations[lang][idx[name]] = {'trans': line.split(/,\s*/)};
+                    senses[idx[name]] = {'trans': line.split(/,\s*/)};
+
+                    entry.translations[lang] = {'senses': senses};
                 });
             }
 
