@@ -56,7 +56,9 @@
                         continue;
                     }
                 }
-                throw new Exception("Arguments {". var_export($actualArguments, True) ."} do not match. Expected ". $this->toString());
+
+                // allow the next expectation to check
+                return FALSE;
             }
             return $this->checkBounds();
         }

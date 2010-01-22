@@ -189,15 +189,16 @@ function _lingwo_data_import_process_source($entry) {
   if (!empty($entry['pron']) && lingwo_data_settings('field_pron')) {
     $res['pron'] = _lingwo_data_import_process_simple_field($entry, 'pron');
   }
-  $res['senses'] = _lingwo_data_import_process_simple_field($entry, 'senses', 'data');
+
+  if (!empty($entry['senses']) && lingwo_data_settings('field_senses') &&
+      module_exists('lingwo_senses')) {
+
+    $res['senses'] = _lingwo_data_import_process_simple_field($entry, 'senses', 'data');
+  }
 
   // process fields
-  /*
-  if (module_exists('lingwo_fields') && lingwo_data_settings('field_fields')) {
-    $field_fields = lingwo_data_settings('field_fields');
-
-    // clear existing fields
-    $node->$field_fields = array();
+  if (!empty($entry['fields']) && lingwo_data_settings('field_fields') &&
+      module_exists('lingwo_fields')) {
 
     // we have to add the fields in the same order as the form
     foreach (lingwo_language_fields($entry['language'], $entry['pos']) as $field) {
@@ -206,15 +207,15 @@ function _lingwo_data_import_process_source($entry) {
       if (!isset($auto)) {
         $auto = TRUE;
       }
-      array_push($node->$field_fields, array(
+
+      $res['fields'][] = array(
         'name'      => $field_name,
         'type'      => $field['type'],
         'value'     => $entry['fields'][$field_name]['value'],
         'automatic' => $auto,
-      ));
+      );
     }
   }
-  */
 
   return $res;
 }
