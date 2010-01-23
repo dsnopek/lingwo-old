@@ -42,10 +42,10 @@ function lingwo_senses_theme() {
       'arguments' => array('element' => NULL),
     ),
     'lingwo_senses_original' => array(
-      'arguments' => array('items' => NULL),
+      'arguments' => array('node' => NULL, 'items' => NULL),
     ),
     'lingwo_senses_translation' => array(
-      'arguments' => array('items' => NULL),
+      'arguments' => array('node' => NULL, 'items' => NULL),
     ),
   );
 }
@@ -562,10 +562,10 @@ function theme_lingwo_senses_formatter_default($element) {
     $theme = $theme .'_original';
   }
 
-  return theme($theme, $items);
+  return theme($theme, $node, $items);
 }
 
-function theme_lingwo_senses_original($items) {
+function theme_lingwo_senses_original($node, $items) {
   if (!empty($items)) {
     $output .= '<div class="lingwo-entry">';
     $output .= '<ol class="lingwo-sense-list">';
@@ -597,20 +597,16 @@ function theme_lingwo_senses_original($items) {
   return $output;
 }
 
-function theme_lingwo_senses_translation($items) {
+function theme_lingwo_senses_translation($node, $items) {
   $output = '';
   $output .= '<div class="lingwo-entry">';
   $output .= '<ol class="lingwo-sense-list">';
 
+  $without_translations = 0;
   foreach ($items as $sense) {
     $orig_sense = $sense['orig_sense'];
     $sense = $sense['data'];
     
-    $output .= '<li class="lingwo-sense">';
-    if ($sense['clue']) {
-      $output .= '<span class="lingwo-sense-clue">('. $sense['clue'] .')</span> ';
-    }
-
     $values = array();
     if (!empty($sense['trans'])) {
       foreach ($sense['trans'] as $value) {
@@ -622,11 +618,17 @@ function theme_lingwo_senses_translation($items) {
       }
     }
     if (empty($values)) {
-      $output .= t('No translation');
+      //$output .= t('No translation');
+      $without_translations++;
+      continue;
     }
-    else {
-      $output .= join(', ', $values);
+
+    $output .= '<li class="lingwo-sense">';
+    if ($sense['clue']) {
+      $output .= '<span class="lingwo-sense-clue">('. $sense['clue'] .')</span> ';
     }
+
+    $output .= join(', ', $values);
 
     if (!empty($orig_sense['example'])) {
       $output .= ': <blockquote class="lingwo-example">"'. $orig_sense['example'] .'"</blockquote>';
@@ -634,6 +636,15 @@ function theme_lingwo_senses_translation($items) {
     $output .= '</li>';
   };
   $output .= '</ol>';
+
+  if ($without_translations > 0) {
+    $output .= '<p>';
+    $output .= t('There are @count senses without translations.', array('@count' => $without_translations));
+    $output .= '  ';
+    $output .= l(t('Edit this entry and contribute!'), 'node/'. $node->nid .'/edit');
+    $output .= '</p>';
+  }
+
   $output .= '</div>';
 
   drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.css');

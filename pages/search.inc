@@ -63,13 +63,20 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
   }
 
   if (empty($nids)) {
+    //drupal_set_title(t('Entry Not Found'));
     // TODO: give node creation form!
     $output = '<p>'. t('Unabled to find entry.') .'</p>';
   }
   else {
     // show the teaser for each entry
+    $first = 1;
     foreach ($nids as $nid) {
-      $output .= node_view(node_load($nid), 1);
+      $node = node_load($nid);
+      if ($first) {
+        //drupal_set_title($node->title);
+        $first = 0;
+      }
+      $output .= node_view($node, 1);
     }
   }
 
