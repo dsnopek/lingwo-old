@@ -32,7 +32,7 @@ function lingwo_dictionary_entry_get_pos($node, $is_new = FALSE) {
     $a = array_values($node->taxonomy);
     if (0+$a[0] != 0) {
     */
-    if (is_numeric($node->taxonomy[$pos_vid])) {
+    if (is_numeric($node->taxonomy[$pos_vid]) || is_numeric($node->taxonomy[$pos_vid][0])) {
       // This means the term object's haven't been loaded yet because we are
       // coming directly off the node form.  So load 'em!
       $taxonomy = taxonomy_preview_terms($node);

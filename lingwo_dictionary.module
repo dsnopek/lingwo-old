@@ -122,11 +122,19 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       if (isset($node->delete))
         return NULL;
 
-      $existing = lingwo_dictionary_entry_lookup($node->title, $node->language,
-        lingwo_dictionary_entry_get_pos($node));
+      $pos = lingwo_dictionary_entry_get_pos($node);
+      if (empty($pos)) {
+        form_set_error('taxnomony['. lingwo_dictionary_settings('pos_vocabulary') .']',
+          t("Couldn't derive Part of Speech from entry form edit!"));
+        return;
+      }
+
+      $existing = lingwo_dictionary_entry_lookup($node->title, $node->language, $pos);
 
       if ($existing && $existing != $node->nid) {
-        form_set_error('title', 'Entry with this language, part of speech and headword combination already exists: '. l($node->title, 'node/'.$existing->nid));
+        form_set_error('title', 
+          t('Entry with this language, part of speech and headword combination already exists: @link',
+            array('@link' => l($node->title, 'node/'.$existing->nid))));
       }
       break;
     case 'insert':
