@@ -293,6 +293,8 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'tłumaczenia': 'translations',
     };
 
+    // TODO: we have dropped this in favor of a mostly regex approach
+    /*
     posTrans = {
         'rzeczownik': 'noun',
         'rzeczownik męski': 'noun',
@@ -358,6 +360,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'związek wyrazów w funkcji rzeczownika własnego rodzaju żeńskiego': 'noun phrase',
         'związek wyrazowy w funkcji rzeczownika': 'noun phrase',
     };
+    */
 
     // TODO: we have dropped this for a straight regex
     /*
@@ -499,44 +502,75 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
             var s = sections['meaning'][0];
             // remove periods from pos (strange data inconsistency)
             s = s.replace(/\./g, '');
-            var pos = extractRegex(s, /^''([^\<,'$]+)/, 1, posTrans, 'posTrans');
+            //var pos = extractRegex(s, /^''([^\<,'$]+)/, 1, posTrans, 'posTrans');
+            var pos = extractRegex(s, /^''([^\<,'$]+)/, 1);
+
             // We want to break these down to the most basic types (basically, we want these to be
             // broad categories, to seperate it from other words.  Read as a transitive verb would
             // not have another entry that is an intransitive verb. -- actually we might!)
             // TODO: I'm not sure this is the correct thing to do..
-            if (/phrase/.exec(pos) || pos == 'idiom') {
+            if (pos == 'wyraz dżwiękonaśladowczy') {
+                pos = 'onomatopoeia';
+            }
+            else if (/związek|wyraz|wyrażenie|fraz|powiedzenie|zwrot/.exec(pos)) {
                 pos = 'phrase';
             }
-            else if (/noun/.exec(pos)) {
-                pos = 'noun';
-            }
-            else if (/adjective/.exec(pos)) {
+            else if (pos == 'liczebnik porządkowy') {
                 pos = 'adjective';
             }
-            else if (/verb/.exec(pos)) {
-                pos = 'verb';
+            else if (/liczebnik/.exec(pos)) {
+                pos = 'noun';
             }
-            else if (/preposition/.exec(pos)) {
+            else if (/przyimek/.exec(pos)) {
                 pos = 'preposition';
             }
-            else if (/pronoun/.exec(pos)) {
-                pos = 'pronoun';
+            else if (/skrót/.exec(pos)) {
+                pos = 'abbreviation';
             }
             else if (/spójnik/.exec(pos)) {
                 pos = 'conjunction';
             }
-            else if (/zaim/.exec(pos)) {
+            else if (/imiesłów/.exec(pos)) {
+                pos = 'adjective';
+            }
+            else if (/zaimek|zaimk/.exec(pos)) {
                 pos = 'pronoun';
             }
-            else if (/participle/.exec(pos)) {
-                pos = 'adjective';
-            }
-            else if (pos == 'ordinal number') {
-                pos = 'adjective';
-            }
-            else if (/number/.exec(pos) || pos == 'fraction') {
+            else if (/rzeczownik/.exec(pos)) {
                 pos = 'noun';
             }
+            // to catch both: 'wykrzyknik' and 'wykrzyknienie'
+            else if (/wykrzyk/.exec(pos)) {
+                pos = 'exclamation';
+            }
+            else if (/czasownik/.exec(pos)) {
+                pos = 'verb';
+            }
+            else if (/partykuła/.exec(pos)) {
+                pos = 'particle';
+            }
+            else if (/przymiotnik/.exec(pos)) {
+                pos = 'adjective';
+            }
+            else if (/przedrostek/.exec(pos)) {
+                pos = 'prefix';
+            }
+            else if (/przyrostek/.exec(pos)) {
+                pos = 'prefix';
+            }
+            else if (/przysłówek/.exec(pos)) {
+                pos = 'adverb';
+            }
+            else if (/symbol/.exec(pos)) {
+                pos = 'symbol';
+            }
+            else if (/tytuł/.exec(pos)) {
+                pos = 'symbol';
+            }
+            else {
+                print('posTrans: cant map POS: '+pos);
+                pos = null;
+            };
 
             return pos;
         }],
