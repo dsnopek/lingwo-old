@@ -297,6 +297,8 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'rzeczownik': 'noun',
         'rzeczownik męski': 'noun',
         'rzeczownik rodzaj żeński': 'noun',
+        'rzeczownik rodzaj męski': 'noun',
+        'rzeczownik rodzaj nijaki': 'noun',
         'rzeczownik własny': 'proper noun',
         'czasownik przechodni': 'transitive verb',
         'czasownik przechodni (modalny)': 'modal verb',
@@ -347,6 +349,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'wykrzyknik': 'exclamation',
         'związek': 'phrase',
         'związek wyrazowy': 'phrase',
+        'związek frazeologiczny': 'phrase',
         // TODO: This is a phrase, but it represents a noun which is masculine.  How do 
         // we represent that and similar cases?
         'związek wyrazowy w funkcji rzeczownika rodzaju męskiego': 'noun phrase',

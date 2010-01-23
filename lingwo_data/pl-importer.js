@@ -124,7 +124,7 @@ function main() {
         print(res);
     }
 
-    // TODO: This handler really should put items on the server!
+    // Handle each item.
     function handler(entry) {
         if (!entry.pos) {
             print('!*** Skipping entry because it has no POS: '+entry.headword);
@@ -132,16 +132,9 @@ function main() {
         }
 
         generateFields(entry);
-        //print(JSON.stringify(entry));
 
         db.setEntry(entry);
         db.commit();
-
-        /*
-        if (entry.headword == 'drzewo') {
-            print(JSON.stringify(entry));
-        }
-        */
 
         print(service.update_entry(entry));
     }
