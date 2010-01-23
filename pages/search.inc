@@ -3,9 +3,10 @@
 
 /**
  * @file
- * The search page.
+ * Pages related to search and lookup.
  */
 
+/*
 function lingwo_dictionary_search_form($form_state, $lang_pair = NULL, $word = '') {
   $languages = array();
 
@@ -42,30 +43,36 @@ function lingwo_dictionary_search_form_submit($form, &$form_state) {
   $form_state['redirect'] = lingwo_dictionary_lookup_path() .'/'.
     $form_state['values']['lang'] .'/'. $form_state['values']['search'];
 }
+*/
 
 function lingwo_dictionary_lookup_page($lang_pair, $word) {
   list($source_lang, $target_lang) = explode("-", $lang_pair);
+  // TODO: bust the pos out of $word if its there (ie. /lookup/en-pl/file[verb])
 
-  $result = lingwo_dictionary_list('entry', array(
-    'lang' => $source_lang,
-    'headword' => $word,
-    '_preload' => TRUE,
-  ));
+  //$output = drupal_get_form('lingwo_dictionary_search_form', $lang_pair, $word);
 
-  include_once(drupal_get_path('module', 'lingwo_dictionary') .'/pages/lingwo_dictionary.trans.inc');
-
-  $output = drupal_get_form('lingwo_dictionary_search_form', $lang_pair, $word);
-  foreach ($result->documents as $entry) {
-    $trans = lingwo_dictionary_trans_load($entry, $target_lang);
-    if ($trans) {
-      $output .= theme('lingwo_dictionary_translation', $entry, $trans);
+  $nids = array();
+  if ($source_nids = lingwo_dictionary_entry_lookup($word, $source_lang)) {
+    foreach ($source_nids as $nid) {
+      // find translation nodes
+      $trans = translation_node_get_translations($nid);
+      if ($trans[$target_lang]) {
+        $nids[] = $trans[$target_lang]->nid;
+      }
     }
-    else {
-      $output .= "Found entry but no translation for your languages";
+  }
+
+  if (empty($nids)) {
+    // TODO: give node creation form!
+    $output = '<p>'. t('Unabled to find entry.') .'</p>';
+  }
+  else {
+    // show the teaser for each entry
+    foreach ($nids as $nid) {
+      $output .= node_view(node_load($nid), 1);
     }
   }
 
   return $output;
 }
-
 

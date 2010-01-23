@@ -62,17 +62,16 @@ function lingwo_dictionary_menu() {
     'weight' => -10,
   );
 
-  /*
   if ($lookup_path = lingwo_dictionary_settings('lookup_path')) {
+    $i = count(explode('/', $lookup_path));
     $items[$lookup_path .'/%/%'] = array(
       'page callback' => 'lingwo_dictionary_lookup_page',
-      'page arguments' => array(1, 2),
-      'access arguments' => array('access lingwo_dictionary content'),
+      'page arguments' => array($i, $i+1),
+      'access arguments' => array('access content'),
       'file' => 'pages/search.inc',
       'type' => MENU_CALLBACK
     );
   }
-  */
 
   return $items;
 }

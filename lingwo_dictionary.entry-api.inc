@@ -57,12 +57,22 @@ function lingwo_dictionary_entry_get_pos($node, $is_new = FALSE) {
 }
 
 // Lookup an entry based on its headword, language and pos
-function lingwo_dictionary_entry_lookup($headword, $language, $pos) {
-  $res = db_query("SELECT nid FROM {lingwo_dictionary_entry} WHERE title = '%s' AND language = '%s' AND pos = '%s'", $headword, $language, $pos);
+function lingwo_dictionary_entry_lookup($headword, $language, $pos = NULL) {
+  if (is_null($pos)) {
+    $res = db_query("SELECT nid FROM {lingwo_dictionary_entry} WHERE title = '%s' AND language = '%s'", $headword, $language);
 
-  $obj = db_fetch_object($res);
-  if ($obj) {
-    return $obj->nid;
+    $nids = NULL;
+    while($obj = db_fetch_object($res)) {
+      $nids[] = $obj->nid;
+    }
+    return $nids;
+  }
+  else {
+    $res = db_query("SELECT nid FROM {lingwo_dictionary_entry} WHERE title = '%s' AND language = '%s' AND pos = '%s'", $headword, $language, $pos);
+    $obj = db_fetch_object($res);
+    if ($obj) {
+      return $obj->nid;
+    }
   }
   
   return NULL;
