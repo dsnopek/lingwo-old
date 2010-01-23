@@ -325,11 +325,11 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         'liczebnik porządkowy': 'ordinal number',
         'przedrostek': 'prefix',
         // TODO: what kind of prepositions are these?
-        'przyimek określający': 'proposition',
-        'przyimek opisujący': 'proposition',
-        'przyimek tworzący konstrukcję opisującą': 'proposition',
-        'przyimek tworzący zwroty wyrażające': 'proposition',
-        'przyimek': 'proposition',
+        'przyimek określający': 'preposition',
+        'przyimek opisujący': 'preposition',
+        'przyimek tworzący konstrukcję opisującą': 'preposition',
+        'przyimek tworzący zwroty wyrażające': 'preposition',
+        'przyimek': 'preposition',
         'przymiotnik': 'adjective',
         'przyrostek': 'suffix',
         'przysłówek': 'adverb',
@@ -479,6 +479,13 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
         return line;
     };
 
+    var limitString = function (s, max) {
+        if (s.length > max) {
+            s = s.substr(0, max);
+        }
+        return s;
+    };
+
     var polishStructure = [
         ['pron', makeRegexExtractor('pron', /\{\{IPA3\|([^\}]+)\}\}/, 1)],
         ['pos', function (entry, sections) {
@@ -494,7 +501,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
             // broad categories, to seperate it from other words.  Read as a transitive verb would
             // not have another entry that is an intransitive verb. -- actually we might!)
             // TODO: I'm not sure this is the correct thing to do..
-            if (/phrase/.exec(pos)) {
+            if (/phrase/.exec(pos) || pos == 'idiom') {
                 pos = 'phrase';
             }
             else if (/noun/.exec(pos)) {
@@ -506,11 +513,20 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
             else if (/verb/.exec(pos)) {
                 pos = 'verb';
             }
+            else if (/preposition/.exec(pos)) {
+                pos = 'preposition';
+            }
             else if (/pronoun/.exec(pos)) {
                 pos = 'pronoun';
             }
+            else if (/spójnik/.exec(pos)) {
+                pos = 'conjunction';
+            }
+            else if (/zaim/.exec(pos)) {
+                pos = 'pronoun';
+            }
             else if (/participle/.exec(pos)) {
-                pos = 'participle';
+                pos = 'adjective';
             }
             else if (pos == 'ordinal number') {
                 pos = 'adjective';
@@ -587,8 +603,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
 
                 // stash the difference
                 var sense = {
-                    difference: line,
-                    trans: {}
+                    difference: limitString(line, 255),
                 };
                 res.push(sense);
                 map[name] = sense;
@@ -624,7 +639,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
                     line = line.replace(/\(\d\.\d\)/g, '');
                     line = removeWikiText(line);
 
-                    map[name].example = line;
+                    map[name].example = limitString(line, 255);
                 });
             }
 

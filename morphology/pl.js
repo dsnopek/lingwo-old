@@ -611,7 +611,10 @@ Lingwo.dictionary.defineLanguage('pl', function (lang, utils) {
             return word.ending('ować','iwać','awać','ywać').result('first') ||
                    word.ending('ać','ieć').result('third') ||
                    word.ending('ić', 'yć', 'eć').result('second') ||
-                   'unknown';
+                   // TODO: 'unknown' is probably better, but we need something is acceptable to
+                   // the server.
+                   '';
+                   //'unknown';
         }
     };
 

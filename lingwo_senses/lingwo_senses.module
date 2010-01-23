@@ -622,14 +622,14 @@ function theme_lingwo_senses_translation($items) {
       }
     }
     if (empty($values)) {
-      $output .= t('No translation.');
+      $output .= t('No translation');
     }
     else {
       $output .= join(', ', $values);
     }
 
-    if ($orig_sense['example']) {
-      $output .= ': <blockquote class="lingwo-example">"'. $entry_sense['example'] .'"</blockquote>';
+    if (!empty($orig_sense['example'])) {
+      $output .= ': <blockquote class="lingwo-example">"'. $orig_sense['example'] .'"</blockquote>';
     }
     $output .= '</li>';
   };

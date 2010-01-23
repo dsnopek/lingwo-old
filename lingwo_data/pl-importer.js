@@ -13,6 +13,9 @@ load('src/service.js');
 opts = arguments.splice(0);
 
 // load the morphology stuff
+console = {
+    debug: print
+};
 load('../morphology/morphology.js');
 load('../morphology/pl.js');
 
@@ -68,11 +71,10 @@ function generateFields(importer_entry) {
         }
     }
     
+    // go through each of the possible fields, see if it is set on importer_entry,
+    // if not, pull it from the morphology entry.
     for(name in language_fields[entry.pos]) {
         type = language_fields[entry.pos][name].type;
-
-        print('looping: '+name);
-        print('type: '+type);
 
         if (importer_entry.fields[name] && !importer_entry.fields[name].automatic &&
             typeof importer_entry.fields[name].value != 'undefined')
@@ -81,27 +83,31 @@ function generateFields(importer_entry) {
             continue;
         }
 
-        // get entry to calculate it for us
-        switch (type) {
-            case 'form':
-                importer_entry.fields[name] = {
-                    'value': entry.getForm(name).toString(),
-                    'automatic': true,
-                };
-                break;
-            case 'option':
-                importer_entry.fields[name] = {
-                    'value': entry.getOption(name),
-                    'automatic': true,
-                };
-                break;
-            case 'class':
-                importer_entry.fields[name] = {
-                    'value': entry.isClass(name),
-                    'automatic': true,
-                };
-                break;
-        };
+        try {
+            // get entry to calculate it for us
+            switch (type) {
+                case 'form':
+                    importer_entry.fields[name] = {
+                        'value': entry.getForm(name).toString(),
+                        'automatic': true,
+                    };
+                    break;
+                case 'option':
+                    importer_entry.fields[name] = {
+                        'value': entry.getOption(name),
+                        'automatic': true,
+                    };
+                    break;
+                case 'class':
+                    importer_entry.fields[name] = {
+                        'value': entry.isClass(name),
+                        'automatic': true,
+                    };
+                    break;
+            };
+        }
+        // eat exceptions!  For now, we don't care if we miss some forms
+        catch (e) {}
     }
 }
 
@@ -120,14 +126,23 @@ function main() {
 
     // TODO: This handler really should put items on the server!
     function handler(entry) {
+        if (!entry.pos) {
+            print('!*** Skipping entry because it has no POS: '+entry.headword);
+            return;
+        }
+
         generateFields(entry);
-        print(JSON.stringify(entry));
+        //print(JSON.stringify(entry));
 
         db.setEntry(entry);
         db.commit();
 
-        // TODO: remove this hack!!
-        //entry.pos = 'verb';
+        /*
+        if (entry.headword == 'drzewo') {
+            print(JSON.stringify(entry));
+        }
+        */
+
         print(service.update_entry(entry));
     }
 
@@ -136,7 +151,7 @@ function main() {
         type: 'pl-wiktionary-org',
         filename: '/home/dsnopek/dl/plwiktionary-20091202-pages-articles.xml.bz2',
         handler: handler,
-        limit: 10
+        //limit: 1500
     });
 }
 main();

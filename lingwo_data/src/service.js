@@ -1,5 +1,29 @@
 
 module('Lingwo.importer.Service', function () {
+    // escapes characters, yo!
+    function xmlSafe(s) {
+        var i, l = s.length, out = "", ustr, uval, p;
+
+        for(i = 0; i < l; i++) {
+            uval = s.charCodeAt(i);
+            if (uval > 255) {
+                ustr = uval.toString(16);
+                p = 4 - ustr.length;
+                while(p > 0) {
+                    ustr = '0' + ustr;
+                    p--;
+                }
+                ustr = '\\u' + ustr;
+            }
+            else {
+                ustr = s[i];
+            }
+            out += ustr;
+        }
+
+        return out;
+    }
+
     var nonce_length = 10;
     var nonce_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     function getNonce() {
@@ -96,7 +120,7 @@ module('Lingwo.importer.Service', function () {
 
         update_entry: function (entry) {
             var params = this._getDefaultParams('lingwo_data.update_entry');
-            params.add(JSON.stringify(entry));
+            params.add(xmlSafe(JSON.stringify(entry)));
             return this._client.execute('lingwo_data.update_entry', params);
         }
     });
