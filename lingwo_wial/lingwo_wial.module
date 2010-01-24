@@ -1,0 +1,134 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * For storing a users "Words I Am Learning" list
+ */
+
+/*
+ * Implementation of hook_nodeapi().
+ */
+function lingwo_wial_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  if ($node->type != lingwo_dictionary_settings('entry_content_type'))
+    return;
+
+  switch ($op) {
+    case 'view':
+      // Add information about whether this node is on this users WIAL or not.
+      // But only if its a translation node.
+      if (lingwo_dictionary_entry_is_translation($node)) {
+        if (lingwo_wial_get($node->nid)) {
+          $op = 'remove';
+        }
+        else {
+          $op = 'add';
+        }
+
+        $node->content['wial_status'] = array(
+          '#value' => drupal_get_form('lingwo_wial_form', $op, $node, $a3, $a4)
+        );
+      }
+      break;
+
+    case 'delete':
+      db_query('DELETE FROM {lingwo_wial_node} WHERE nid = %d', $node->nid);
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function lingwo_wial_theme() {
+  return array(
+    'lingwo_wial_form' => array(
+      'arguments' => array('form' => NULL),
+    )
+  );
+}
+
+// WIAL add form
+function lingwo_wial_form(&$form_state, $op, $node, $teaser=FALSE, $page=FALSE) {
+  $form = array(
+    // pack some data in here for the theme
+    '#node'     => $node,
+    '#teaser'   => $teaser,
+    '#page'     => $page,
+    '#headword' => $node->title
+  );
+
+  $form['wial_op'] = array(
+    '#type' => 'hidden',
+    '#value' => $op
+  );
+  $form['nid'] = array(
+    '#type' => 'hidden',
+    '#value' => $node->nid,
+  );
+
+  if ($op == 'add') {
+    $msg = t('Add to my "Words I Am Learning" List');
+  }
+  else {
+    $msg = t('Remove from my "Words I Am Learning" List');
+  }
+  $form['button'] = array(
+    '#type' => 'submit',
+    '#value' => $msg,
+  );
+
+  return $form;
+}
+
+function lingwo_wial_form_submit($form, &$form_state) {
+  global $user;
+
+
+  if ($form_state['values']['wial_op'] == 'add') {
+    $obj = (object)array(
+      'uid'   => $user->uid,
+      'nid'   => $form_state['values']['nid'],
+      'added' => time(),
+    );
+
+    if (drupal_write_record('lingwo_wial_node', $obj)) {
+      drupal_set_message(t('Added <em>@headword</em> to your "Words I Am Learning" list',
+        array('@headword' => $form_state['values']['headword'])));
+    }
+    else {
+      drupal_set_message(t('Unable to add entry to your "Words I Am Learning" list'), 'error');
+    }
+  }
+  else {
+    db_query("DELETE FROM {lingwo_wial_node} WHERE uid = '%s' AND nid = '%s'",
+      $user->uid, $form_state['values']['nid']);
+
+    drupal_set_message(t('Removed <em>@headword</em> from your "Words I Am Learning" list',
+      array('@headword' => $form_state['values']['headword'])));
+  }
+}
+
+function templace_preprocess_theme_lingwo_wial_form(&$vars, $form) {
+  $vars['teaser']  = $form['#teaser'];
+  $vars['page']    = $form['#page'];
+  $vars['node']    = $form['#node'];
+  $vars['wial_op'] = $form['#wial_op'];
+}
+
+function theme_lingwo_wial_form($form) {
+  return drupal_render($form);
+}
+
+// API function for determining if a user has a particular item
+function lingwo_wial_get($nid, $uid=NULL) {
+  global $user;
+
+  if (is_null($uid)) {
+    $uid = $user->uid;
+  }
+
+  $res = db_query("SELECT * FROM {lingwo_wial_node} WHERE nid = '%s' AND uid = '%s'", $nid, $uid);
+  return db_fetch_object($res);
+}
+

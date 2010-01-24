@@ -1,0 +1,58 @@
+<?php
+
+/**
+ * @file
+ * Install file for lingwo_wial.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function lingwo_wial_schema() {
+  $schema['lingwo_wial_node'] = array(
+    'description' => 'Used to store the list of nodes on a users WIAL.',
+    'fields' => array(
+      'uid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'User ID.',
+      ),
+      'nid' => array(
+        'description' => 'The primary identifier for the entry node.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'added' => array(
+        'description' => 'The Unix timestamp when the node was added to the WIAL.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0
+      ),
+    ),
+    'primary key' => array('uid', 'nid'),
+    'indexes' => array(
+      'nid' => array('nid'),
+    )
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function lingwo_wial_install() {
+  variable_set('lingwo_wial_schema_version', 6000);
+  drupal_install_schema('lingwo_wial');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function lingwo_wial_uninstall() {
+  drupal_uninstall_schema('lingwo_wial');
+  variable_del('lingwo_wial_schema_version');
+}
+
