@@ -49,6 +49,18 @@ function lingwo_wial_views_api() {
 }
 
 /**
+ * Implementation of hook_node_operations().
+ */
+function lingwo_wial_node_operations() {
+  return array(
+    array(
+      'label' => t('Remove from my "Words I Am Learning" List'),
+      'callback' => 'lingwo_wial_bulk_remove',
+    )
+  );
+}
+
+/**
  * Implementation of hook_theme().
  */
 function lingwo_wial_theme() {
@@ -57,6 +69,20 @@ function lingwo_wial_theme() {
       'arguments' => array('form' => NULL),
     )
   );
+}
+
+// Bulk remove nodes
+function lingwo_wial_bulk_remove($nids, $uid=NULL) {
+  global $user;
+
+  if (is_null($uid)) {
+    $uid = $user->uid;
+  }
+
+  foreach ($nids as $nid) {
+    // TODO: this should be an API function, since we've already written it twice!
+    db_query("DELETE FROM {lingwo_wial_node} WHERE uid = %d AND nid = %d", $uid, $nid);
+  }
 }
 
 // WIAL add form
@@ -112,7 +138,7 @@ function lingwo_wial_form_submit($form, &$form_state) {
     }
   }
   else {
-    db_query("DELETE FROM {lingwo_wial_node} WHERE uid = '%s' AND nid = '%s'",
+    db_query("DELETE FROM {lingwo_wial_node} WHERE uid = %d AND nid = %d",
       $user->uid, $form_state['values']['nid']);
 
     drupal_set_message(t('Removed <em>@headword</em> from your "Words I Am Learning" list',
