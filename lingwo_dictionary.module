@@ -43,6 +43,33 @@ function _ld_form_to_node(&$form, &$form_state) {
 }
 
 /**
+ * Implementation of hook_init().
+ *
+ * Early checking of URL requested.
+ * If a entry node is refered to by "node/$node->nid", the user is
+ * redirected using drupal_goto()
+ *
+ * This code was lifted graciously from the path_redirect module.
+ */
+function lingwo_dictionary_init() {
+  if (lingwo_dictionary_settings('redirect_node') && lingwo_dictionary_settings('lookup_path')) {
+    if (preg_match('/^node\/(\d+)$/', $_GET['q'], $matches)) {
+      $node = node_load($matches[1]);
+      if ($node->type == lingwo_dictionary_settings('entry_content_type')) {
+        $redirect = lingwo_dictionary_entry_path($node);
+      }
+    }
+
+    // do the redirect if we've managed to locate a wikilink
+    if ($redirect) {
+      // if there's a result found, do the redirect
+      unset($_REQUEST['destination']);
+      drupal_goto($redirect);
+    }
+  }
+}
+
+/**
  * Implementation of hook_menu().
  */
 function lingwo_dictionary_menu() {
@@ -175,6 +202,7 @@ function lingwo_dictionary_theme() {
 function lingwo_dictionary_settings($name, $value = NULL) {
   static $_settings = array(
     'lookup_path' => 'lookup',
+    'redirect_node' => FALSE,
     'entry_content_type' => NULL,
     'pos_vocabulary' => NULL,
   );

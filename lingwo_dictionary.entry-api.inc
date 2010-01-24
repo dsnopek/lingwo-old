@@ -81,3 +81,21 @@ function lingwo_dictionary_entry_lookup($headword, $language, $pos = NULL) {
   return NULL;
 }
 
+function lingwo_dictionary_entry_path($node) {
+  if (lingwo_dictionary_settings('lookup_path')) {
+    $lang = $node->language;
+    if ($source_node = lingwo_dictionary_entry_load_translation_source($node)) {
+      $lang = $source_node->language .'-'. $lang;
+    }
+    $pos = lingwo_dictionary_entry_get_pos($node);
+
+    return implode('/', array(
+      lingwo_dictionary_settings('lookup_path'),
+      $lang,
+      $node->title .'('. $pos .')'
+    ));
+  }
+
+  return isset($node->alias) ? $node->alias : ('node/'. $node->nid);
+}
+

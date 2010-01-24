@@ -20,6 +20,12 @@ function lingwo_dictionary_admin_settings() {
     '#description' => t('The drupal path for dictionary lookup. Do not include a trailing slash. Leave empty to disable the lookup path.'),
     '#field_prefix' => url(NULL, array('absolute' => FALSE)) . (variable_get('clean_url', 0) ? '' : '?q=')
   );
+  $form['lingwo_dictionary_redirect_node'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Redirect entry nodes to lookup path'),
+    '#default_value' => lingwo_dictionary_settings('redirect_node'),
+    '#description' => t('If you activate this option, by going to an entry nodes <em>node/nid</em> page, you will be redirected to the same page as <em>&lt;Lookup path&gt;/Headword</em>.'),
+  );
 
   foreach (node_get_types() as $type) {
     $type_options[$type->type] = $type->name;

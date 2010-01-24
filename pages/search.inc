@@ -47,21 +47,51 @@ function lingwo_dictionary_search_form_submit($form, &$form_state) {
 
 function lingwo_dictionary_lookup_page($lang_pair, $word) {
   list($source_lang, $target_lang) = explode("-", $lang_pair);
-  // TODO: bust the pos out of $word if its there (ie. /lookup/en-pl/file[verb])
+
+  // bust the pos out of $word if its there (ie. /lookup/en-pl/file[verb])
+  $pos = NULL;
+  if (preg_match('/([^\(]+)\((\S+)\)/', $word, $matches)) {
+    $word = trim($matches[1]);
+    $pos  = $matches[2];
+  }
+
+  // if this is a single node
+  if ($pos) {
+    // TODO: give node creation form if it doesn't exist!
+    $nid = lingwo_dictionary_entry_lookup($word, $source_lang, $pos);
+    return lingwo_dictionary_lookup_page_node($nid);
+  }
 
   //$output = drupal_get_form('lingwo_dictionary_search_form', $lang_pair, $word);
 
   $nids = array();
   if ($source_nids = lingwo_dictionary_entry_lookup($word, $source_lang)) {
-    foreach ($source_nids as $nid) {
-      // find translation nodes
-      $trans = translation_node_get_translations($nid);
-      if ($trans[$target_lang]) {
-        $nids[] = $trans[$target_lang]->nid;
+    if ($target_lang) {
+      foreach ($source_nids as $nid) {
+        // find translation nodes
+        $trans = translation_node_get_translations($nid);
+        if ($trans[$target_lang]) {
+          $nids[] = $trans[$target_lang]->nid;
+        }
       }
+    }
+    else {
+      $nids = $source_nids;
     }
   }
 
+  return lingwo_dictionary_lookup_page_list($nids);
+}
+
+function lingwo_dictionary_lookup_page_node($nid) {
+  // Set query path so that the tabs from the node get displayed.
+  menu_set_active_item('node/'. $nid);
+
+  // Generate the node.
+  return menu_execute_active_handler($url);
+}
+
+function lingwo_dictionary_lookup_page_list($nids) {
   if (empty($nids)) {
     //drupal_set_title(t('Entry Not Found'));
     // TODO: give node creation form!
@@ -82,4 +112,5 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
 
   return $output;
 }
+
 
