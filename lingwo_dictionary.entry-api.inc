@@ -40,7 +40,7 @@ function lingwo_dictionary_entry_get_pos($node, $is_new = FALSE) {
 
       // This means the term object's haven't been loaded yet because we are
       // coming directly off the node form.  So load 'em!
-      $pos = taxonomy_get_term($node->taxonomy[$pos_vid]);
+      $pos = taxonomy_get_term($pos_tid);
     }
     else {
       foreach ($node->taxonomy as $term) {
