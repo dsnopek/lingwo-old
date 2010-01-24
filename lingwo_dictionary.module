@@ -125,7 +125,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       $pos = lingwo_dictionary_entry_get_pos($node);
       if (empty($pos)) {
         form_set_error('taxnomony['. lingwo_dictionary_settings('pos_vocabulary') .']',
-          t("Couldn't derive Part of Speech from entry form edit!"));
+          t("Couldn't derive Part of Speech from node!"));
         return;
       }
 

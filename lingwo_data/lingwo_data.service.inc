@@ -200,8 +200,8 @@ function _lingwo_data_import_setup_node($nid, $entry, $newExtras=array()) {
     // what we want.
     foreach ($newExtras as $n1 => $v1) {
       if (is_array($v1)) {
+        $f = &$node->$n1;
         foreach ($v1 as $n2 => $v2) {
-          $f = &$node->$n1;
           $f[$n2] = $v2;
         }
       }

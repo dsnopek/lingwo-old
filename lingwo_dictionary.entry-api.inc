@@ -33,18 +33,21 @@ function lingwo_dictionary_entry_get_pos($node, $is_new = FALSE) {
     if (0+$a[0] != 0) {
     */
     if (is_numeric($node->taxonomy[$pos_vid]) || is_numeric($node->taxonomy[$pos_vid][0])) {
+      $pos_tid = $node->taxonomy[$pos_vid];
+      if (is_array($pos_tid)) {
+        $pos_tid = $pos_tid[0];
+      }
+
       // This means the term object's haven't been loaded yet because we are
       // coming directly off the node form.  So load 'em!
-      $taxonomy = taxonomy_preview_terms($node);
+      $pos = taxonomy_get_term($node->taxonomy[$pos_vid]);
     }
     else {
-      $taxonomy = $node->taxonomy;
-    }
-
-    foreach ($taxonomy as $term) {
-      if ($term->vid == $pos_vid) {
-        $pos = $term;
-        break;
+      foreach ($node->taxonomy as $term) {
+        if ($term->vid == $pos_vid) {
+          $pos = $term;
+          break;
+        }
       }
     }
   }
