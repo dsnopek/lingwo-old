@@ -13,7 +13,7 @@ function lingwo_wial_schema() {
     'description' => 'Used to store the list of nodes on a users WIAL.',
     'fields' => array(
       'uid' => array(
-        'type' => 'serial',
+        'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'description' => 'User ID.',
