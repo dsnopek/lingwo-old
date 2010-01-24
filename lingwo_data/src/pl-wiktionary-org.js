@@ -727,7 +727,7 @@ module('Lingwo.importer.sources.pl-wiktionary-org', function () {
                 entry.setSource('pl.wiktionary.org', {
                     raw: text.getSection(sec),
                     url: 'http://pl.wiktionay.org/wiki/'+entry.headword,
-                    license: 'CC-BY-SA',
+                    license: 'CC-BY-SA-3.0',
                     // what is the copyright for this?
                     //copyright: '',
                     timestamp: page.revision.timestamp.toString(),

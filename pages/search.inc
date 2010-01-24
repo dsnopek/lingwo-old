@@ -64,17 +64,12 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
     $pos  = $matches[2];
   }
 
-  // if this is a single node
-  if ($pos) {
-    // TODO: give node creation form if it doesn't exist!
-    $nid = lingwo_dictionary_entry_lookup($word, $source_lang, $pos);
-    return lingwo_dictionary_lookup_page_node($nid);
-  }
-
-  $output = drupal_get_form('lingwo_dictionary_search_form', $lang_pair, $word);
-
+  # lookup the appropriate node or nodes
   $nids = array();
-  if ($source_nids = lingwo_dictionary_entry_lookup($word, $source_lang)) {
+  if ($source_nids = lingwo_dictionary_entry_lookup($word, $source_lang, $pos)) {
+    if (!is_array($source_nids)) {
+      $source_nids = array($source_nids);
+    }
     if ($target_lang) {
       foreach ($source_nids as $nid) {
         // find translation nodes
@@ -89,6 +84,18 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
     }
   }
 
+  if (empty($nids)) {
+    //drupal_set_title(t('Entry Not Found'));
+    // TODO: give node creation form!
+    return '<p>'. t('Unabled to find entry.') .'</p>';
+  }
+
+  // if this is a single node
+  if ($pos) {
+    return lingwo_dictionary_lookup_page_node($nids[0]);
+  }
+
+  $output = drupal_get_form('lingwo_dictionary_search_form', $lang_pair, $word);
   $output .= lingwo_dictionary_lookup_page_list($nids);
   return $output;
 }
@@ -102,22 +109,15 @@ function lingwo_dictionary_lookup_page_node($nid) {
 }
 
 function lingwo_dictionary_lookup_page_list($nids) {
-  if (empty($nids)) {
-    //drupal_set_title(t('Entry Not Found'));
-    // TODO: give node creation form!
-    $output = '<p>'. t('Unabled to find entry.') .'</p>';
-  }
-  else {
-    // show the teaser for each entry
-    $first = 1;
-    foreach ($nids as $nid) {
-      $node = node_load($nid);
-      if ($first) {
-        //drupal_set_title($node->title);
-        $first = 0;
-      }
-      $output .= node_view($node, 1);
+  // show the teaser for each entry
+  $first = 1;
+  foreach ($nids as $nid) {
+    $node = node_load($nid);
+    if ($first) {
+      //drupal_set_title($node->title);
+      $first = 0;
     }
+    $output .= node_view($node, 1);
   }
 
   return $output;
