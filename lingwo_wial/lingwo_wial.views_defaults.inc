@@ -257,10 +257,10 @@ function lingwo_wial_views_default_views() {
   $handler = $view->new_display('page', 'Page', 'page_1');
   $handler->override_option('path', 'user/%/wial');
   $handler->override_option('menu', array(
-    'type' => 'none',
-    'title' => '',
+    'type' => 'tab',
+    'title' => 'Words I Am Learning',
     'description' => '',
-    'weight' => 0,
+    'weight' => '0',
     'name' => 'navigation',
   ));
   $handler->override_option('tab_options', array(
@@ -273,4 +273,6 @@ function lingwo_wial_views_default_views() {
 
   return $views;
 }
+
+
 
