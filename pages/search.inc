@@ -85,9 +85,34 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
   }
 
   if (empty($nids)) {
-    //drupal_set_title(t('Entry Not Found'));
-    // TODO: give node creation form!
-    return '<p>'. t('Unabled to find entry.') .'</p>';
+    drupal_set_title(t('Entry Not Found: @title', array('@title' => $word)));
+
+    $type_url_str = str_replace('_', '-', lingwo_dictionary_settings('entry_content_type'));
+    $url_args = array('headword' => $word);
+    if ($pos) {
+      $url_args['pos'] = $pos;
+    }
+
+    $output = drupal_get_form('lingwo_dictionary_search_form', $lang_pair, $word);
+
+    if ($target_lang && !empty($source_nids)) {
+      // we are translating an existing entry
+      $output .= '<p>'. t('Entry exists but there are no translations for this language.') .'</p>';
+      // TODO: we really should give options for which source node we are translating!!
+      $url_args['translation'] = $source_nids[0];
+      $url_args['language'] = $target_lang;
+    }
+    else {
+      // we are creating a source node
+      $output .= '<p>'. t('Unabled to find entry.') .'</p>';
+      $url_args['headword'] = urlencode($word);
+      $url_args['language'] = $source_lang;
+    }
+
+    $link = l('Click here', "node/add/$type_url_str", array('query' => $url_args));
+    $output .= '<p>'. t('!link to add the entry to dictionary.', array('!link' => $link)) .'</p>';
+
+    return $output;
   }
 
   // if this is a single node

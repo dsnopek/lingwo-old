@@ -132,6 +132,31 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
   if ($form_id == (lingwo_dictionary_settings('entry_content_type') .'_node_form')) {
     $node = $form['#node'];
 
+    // allow some fields to be set automagically for new nodes
+    if (empty($node->nid)) {
+      if (isset($_GET['headword'])) {
+        $form['title']['#default_value'] = urldecode($_GET['headword']);
+      }
+      if (isset($_GET['language'])) {
+        $form['language']['#default_value'] = $_GET['language'];
+      }
+      if (isset($_GET['pos'])) {
+        // copied from lingwo_data.service.inc
+        // TODO: probably needs to be in an API function
+        $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
+        if ($pos_vid) {
+          foreach (taxonomy_get_tree($pos_vid) as $term) {
+            if (drupal_strtolower($term->name) == $_GET['pos']) {
+              $form['taxonomy'][$pos_vid]['#default_value'] = $term->tid;
+              break;
+            }
+          }
+        }
+        // TODO: we need to set the POS on the node too, so that the form loads the
+        // fields immediately.
+      }
+    }
+
     // remove language neutral and set language as required (for asthetic purposes)
     unset($form['language']['#options']['']);
     $form['language']['#required'] = TRUE;
