@@ -6,17 +6,17 @@
  * Pages related to search and lookup.
  */
 
-/*
-function lingwo_dictionary_search_form($form_state, $lang_pair = NULL, $word = '') {
-  $languages = array();
-
-  $result = lingwo_dictionary_list('language',
-    array('active' => TRUE, '_preload' => TRUE, '_order_by' => 'ref_name', '_limit' => 100));
-
-  foreach ($result->documents as $lang1) {
-    foreach ($result->documents as $lang2) {
-      if ($lang1->code != $lang2->code) {
-        $languages[$lang1->code .'-'. $lang2->code] = $lang1->ref_name .'-'. $lang2->ref_name;
+function lingwo_dictionary_search_form(&$form_state, $lang_pair=NULL, $word=NULL) {
+  $language_options = array();
+  $languages = language_list('enabled');
+  foreach ($languages[1] as $lang1_code => $lang1) {
+    foreach ($languages[1] as $lang2_code => $lang2) {
+      $name = $lang1->name;
+      if ($lang1_code != $lang2_code) {
+        $name = $name .' => '. $lang2->name;
+        // TODO: we should allow the pure dictionaries, but for now, we will
+        // limit to just the translations.
+        $language_options["$lang1_code-$lang2_code"] = $name .' '. t('Dictionary');
       }
     }
   }
@@ -27,23 +27,32 @@ function lingwo_dictionary_search_form($form_state, $lang_pair = NULL, $word = '
     '#default_value' => $word,
     '#attributes' => array('title' => t('Enter the terms you wish to search for.')),
   );
-  $form['lang'] = array(
+  $form['lang_pair'] = array(
     '#title' => t('Languages'),
     '#type' => 'select',
-    '#options' => $languages,
+    '#options' => $language_options,
     '#default_value' => $lang_pair,
   );
 
+  // TODO: we should write some JavaScript that will do the redirect straight
+  // off to save the extra round-trip to the server.
   $form['submit'] = array('#type' => 'submit', '#value' => t('Search'));
 
   return $form;
 }
 
 function lingwo_dictionary_search_form_submit($form, &$form_state) {
-  $form_state['redirect'] = lingwo_dictionary_lookup_path() .'/'.
-    $form_state['values']['lang'] .'/'. $form_state['values']['search'];
+  $form_state['redirect'] = implode('/', array(
+    lingwo_dictionary_settings('lookup_path'),
+    $form_state['values']['lang_pair'],
+    $form_state['values']['search']
+  ));
 }
-*/
+
+function theme_lingwo_dictionary_search_form($form) {
+  //return '<div id="lingwo-dictionary-search-block">'.drupal_render($form).'</div>';
+  return drupal_render($form);
+}
 
 function lingwo_dictionary_lookup_page($lang_pair, $word) {
   list($source_lang, $target_lang) = explode("-", $lang_pair);
@@ -62,7 +71,7 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
     return lingwo_dictionary_lookup_page_node($nid);
   }
 
-  //$output = drupal_get_form('lingwo_dictionary_search_form', $lang_pair, $word);
+  $output = drupal_get_form('lingwo_dictionary_search_form', $lang_pair, $word);
 
   $nids = array();
   if ($source_nids = lingwo_dictionary_entry_lookup($word, $source_lang)) {
@@ -80,7 +89,8 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
     }
   }
 
-  return lingwo_dictionary_lookup_page_list($nids);
+  $output .= lingwo_dictionary_lookup_page_list($nids);
+  return $output;
 }
 
 function lingwo_dictionary_lookup_page_node($nid) {

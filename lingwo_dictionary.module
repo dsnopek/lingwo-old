@@ -104,6 +104,28 @@ function lingwo_dictionary_menu() {
 }
 
 /**
+ * Implementation of hook_block().
+ */
+function lingwo_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $blocks[0] = array(
+        'info' => t('Lingwo Dictionary: Search block'),
+      );
+      return $blocks;
+
+    case 'view':
+      if ($delta == 0) {
+        module_load_include('inc', 'lingwo_dictionary', 'pages/search');
+        $block['subject'] = t('Search Dictionary');
+        $block['content'] = drupal_get_form('lingwo_dictionary_search_form');
+        return $block;
+      }
+      break; 
+  }
+}
+
+/**
  * Implementation of hook_form_alter().
  */
 function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
@@ -182,15 +204,14 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
 /**
  * Implementation of hook_theme().
  */
-/*
 function lingwo_dictionary_theme() {
   return array(
-    'lingwo_dictionary_search' => array(
+    'lingwo_dictionary_search_form' => array(
       'arguments' => array('form' => NULL),
+      'file' => 'pages/search.inc',
     ),
   );
 }
-*/
 
 /*
  * Settings
