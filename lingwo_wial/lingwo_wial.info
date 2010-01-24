@@ -4,4 +4,5 @@ description = Gives each user a list of entries they are learning
 package = Lingwo Dictionary
 core = 6.x
 dependencies[] = lingwo_dictionary
+dependencies[] = views
 
