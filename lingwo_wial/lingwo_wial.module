@@ -37,6 +37,9 @@ function lingwo_wial_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       break;
 
     case 'delete':
+      // TODO: Should we loop through all the users who have this on their WIAL list
+      // and call the remove hook?  Sounds dangerous.  This could lock up the request
+      // in trying to edit a million Anki decks...
       db_query('DELETE FROM {lingwo_wial_node} WHERE nid = %d', $node->nid);
       break;
   }
@@ -75,19 +78,9 @@ function lingwo_wial_theme() {
   );
 }
 
-// Bulk remove nodes
-function lingwo_wial_bulk_remove($nids, $uid=NULL) {
-  global $user;
-
-  if (is_null($uid)) {
-    $uid = $user->uid;
-  }
-
-  foreach ($nids as $nid) {
-    // TODO: this should be an API function, since we've already written it twice!
-    db_query("DELETE FROM {lingwo_wial_node} WHERE uid = %d AND nid = %d", $uid, $nid);
-  }
-}
+/*
+ * Forms
+ */
 
 // WIAL add form
 function lingwo_wial_form(&$form_state, $op, $node, $teaser=FALSE, $page=FALSE) {
@@ -123,43 +116,32 @@ function lingwo_wial_form(&$form_state, $op, $node, $teaser=FALSE, $page=FALSE) 
 }
 
 function lingwo_wial_form_submit($form, &$form_state) {
-  global $user;
+  switch ($form_state['values']['wial_op']) {
+    case 'add':
+      if (lingwo_wial_add($form_state['values']['nid'])) {
+        drupal_set_message(t('Added <em>@headword</em> to your "Words I Am Learning" list',
+          array('@headword' => $form_state['values']['headword'])));
+      }
+      else {
+        drupal_set_message(t('Unable to add entry to your "Words I Am Learning" list'), 'error');
+      }
+      break;
 
-
-  if ($form_state['values']['wial_op'] == 'add') {
-    $obj = (object)array(
-      'uid'   => $user->uid,
-      'nid'   => $form_state['values']['nid'],
-      'added' => time(),
-    );
-
-    if (drupal_write_record('lingwo_wial_node', $obj)) {
-      drupal_set_message(t('Added <em>@headword</em> to your "Words I Am Learning" list',
-        array('@headword' => $form_state['values']['headword'])));
-    }
-    else {
-      drupal_set_message(t('Unable to add entry to your "Words I Am Learning" list'), 'error');
-    }
-  }
-  else {
-    db_query("DELETE FROM {lingwo_wial_node} WHERE uid = %d AND nid = %d",
-      $user->uid, $form_state['values']['nid']);
-
-    drupal_set_message(t('Removed <em>@headword</em> from your "Words I Am Learning" list',
-      array('@headword' => $form_state['values']['headword'])));
+    case 'remove':
+      if (lingwo_wial_remove($form_state['values']['nid'])) {
+        drupal_set_message(t('Removed <em>@headword</em> from your "Words I Am Learning" list',
+          array('@headword' => $form_state['values']['headword'])));
+      }
+      else {
+        drupal_set_message(t('Unable to remove entry from your "Words I Am Learning" list'), 'error');
+      }
+      break;
   }
 }
 
-function templace_preprocess_theme_lingwo_wial_form(&$vars, $form) {
-  $vars['teaser']  = $form['#teaser'];
-  $vars['page']    = $form['#page'];
-  $vars['node']    = $form['#node'];
-  $vars['wial_op'] = $form['#wial_op'];
-}
-
-function theme_lingwo_wial_form($form) {
-  return drupal_render($form);
-}
+/*
+ * API functions
+ */
 
 // API function for determining if a user has a particular item
 function lingwo_wial_get($nid, $uid=NULL) {
@@ -171,5 +153,72 @@ function lingwo_wial_get($nid, $uid=NULL) {
 
   $res = db_query("SELECT * FROM {lingwo_wial_node} WHERE nid = '%s' AND uid = '%s'", $nid, $uid);
   return db_fetch_object($res);
+}
+
+// Add a node to a users WIAL list
+function lingwo_wial_add($nid, $uid=NULL) {
+  global $user;
+
+  if (is_null($uid)) {
+    $uid = $user->uid;
+  }
+
+  $obj = (object)array(
+    'uid'   => $uid,
+    'nid'   => $nid,
+    'added' => time(),
+  );
+
+  if (drupal_write_record('lingwo_wial_node', $obj)) {
+    module_invoke_all('lingwo_wial', 'add', $nid, $uid);
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+// Remove a node from a users WIAL list
+function lingwo_wial_remove($nid, $uid=NULL) {
+  global $user;
+
+  if (is_null($uid)) {
+    $uid = $user->uid;
+  }
+
+  if (db_query("DELETE FROM {lingwo_wial_node} WHERE uid = %d AND nid = %d", $uid, $nid)) {
+    module_invoke_all('lingwo_wial', 'remove', $nid, $uid);
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+// Bulk remove nodes
+function lingwo_wial_bulk_remove($nids, $uid=NULL) {
+  global $user;
+
+  if (is_null($uid)) {
+    $uid = $user->uid;
+  }
+
+  foreach ($nids as $nid) {
+    lingwo_wial_remove($nid, $uid);
+  }
+}
+
+
+/*
+ * Theme functions
+ */
+
+function templace_preprocess_theme_lingwo_wial_form(&$vars, $form) {
+  $vars['teaser']  = $form['#teaser'];
+  $vars['page']    = $form['#page'];
+  $vars['node']    = $form['#node'];
+  $vars['wial_op'] = $form['#wial_op'];
+}
+
+function theme_lingwo_wial_form($form) {
+  return drupal_render($form);
 }
 
