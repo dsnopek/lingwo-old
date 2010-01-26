@@ -60,7 +60,7 @@ class AnkiServerApp(object):
 
     def _output_fact(self, fact):
         res = dict(zip(fact.keys(), fact.values()))
-        res['id'] = fact.id
+        res['id'] = str(fact.id)
         return res
 
     def add_fact(self, deck_id, fields):
@@ -70,7 +70,7 @@ class AnkiServerApp(object):
             fact = deck.newFact()
             try:
                 for key in fact.keys():
-                    fact[key] = fields[key]
+                    fact[key] = unicode(fields[key])
             except KeyError, e:
                 raise HTTPBadRequest(e)
 
@@ -87,7 +87,7 @@ class AnkiServerApp(object):
         deck = self._open_deck(deck_id)
         
         try:
-            newFact = deck.s.query(Fact).get(fact['id'])
+            newFact = deck.s.query(Fact).get(int(fact['id']))
             for key in newFact.keys():
                 newFact[key] = fact[key]
 
@@ -128,7 +128,7 @@ class AnkiServerApp(object):
     def delete_fact(self, deck_id, fact_id):
         deck = self._open_deck(deck_id)
         try:
-            deck.deleteFact(fact_id)
+            deck.deleteFact(int(fact_id))
             deck.save()
         finally:
             deck.close()

@@ -2,6 +2,8 @@
 
 require_once('HTTP/Request2.php');
 
+class AnkiServerException extends Exception { }
+
 class AnkiServer {
   private $url;
 
@@ -12,7 +14,7 @@ class AnkiServer {
   // TODO: should we provide convenience functions we the names and normal arguments?
   // I'm not aware of an automatic way to do it, so my inclination is to let it be.
   function request($func, $args) {
-    $req = new HTTP_Request2($this->url .'/'. $func, HTTP_Request2::METHOD_GET);
+    $req = new HTTP_Request2('http://'. $this->url .'/'. $func, HTTP_Request2::METHOD_POST);
     $req->setHeader('Content-Type', 'application/json');
     $req->setBody(json_encode($args));
     $res = $req->send();
