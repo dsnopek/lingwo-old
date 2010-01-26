@@ -1,1 +1,4 @@
 staging.db
+AnkiServer.egg-info
+build
+dist
