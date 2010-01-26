@@ -6,6 +6,9 @@
  * API functions for dealing with entries.  All of them start with "lingwo_dictionary_entry_".
  */
 
+// TODO: it would be pretty sweet to turn this into a class, rather these functions
+// with such HUGE names.  Yeah, work on that.
+
 // Let's us know if a node is a translation
 function lingwo_dictionary_entry_is_translation($node) {
   return isset($node->translation_source) ||
@@ -15,10 +18,32 @@ function lingwo_dictionary_entry_is_translation($node) {
 // Loads and returns a node's translation source
 function lingwo_dictionary_entry_load_translation_source(&$node) {
   if (lingwo_dictionary_entry_is_translation($node) && !isset($node->translation_source)) {
+    // TODO: we shouldn't modify the node!  At least not using this name, since 'translation'
+    // owns it..
     $node->translation_source = node_load($node->tnid);
   }
   
   return $node->translation_source;
+}
+
+// Returns an array of languages where the first is always the source language
+function lingwo_dictionary_entry_get_languages($node, $for_humans=FALSE) {
+  if ($source_node = lingwo_dictionary_entry_load_translation_source($node)) {
+    $res = array($source_node->language, $node->language);
+  }
+  else {
+    $res = array($node->language);
+  }
+
+  if ($for_humans) {
+    $languages = language_list();
+    for ($i = 0; $i < count($res); $i++) {
+      // TODO: we need to translate the names to the current interface!
+      $res[$i] = $languages[$res[$i]]->name;
+    }
+  }
+
+  return $res;
 }
 
 // Gets the Part of Speech from a node
@@ -57,6 +82,14 @@ function lingwo_dictionary_entry_get_pos($node, $is_new = FALSE) {
   }
 
   return NULL;
+}
+
+// Makes a "Lingwo ID" for the entry
+// TODO: we need a paired parse_id function!
+function lingwo_dictionary_entry_get_id($node) {
+  return implode('/', array(
+    implode('-', lingwo_dictionary_entry_get_languages($node)),
+    $node->title)) .'('. lingwo_dictionary_entry_get_pos($node) .')';
 }
 
 // Lookup an entry based on its headword, language and pos

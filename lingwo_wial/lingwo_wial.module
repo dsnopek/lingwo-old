@@ -7,6 +7,55 @@
  */
 
 /*
+ * Implementation of hook_menu().
+ */
+function lingwo_wial_menu() {
+  $menu['lingwo_wial/toggle'] = array(
+    'page callback' => 'lingwo_wial_toggle',
+    // TODO: we really SHOULD have a permission for this!!  Anonymous users shouldn't
+    // be able to do it!!
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK
+  );
+  return $menu;
+}
+
+/*
+ * Implementation of hook_link().
+ */
+function lingwo_wial_link($type, $node, $teaser=FALSE) {
+  if ($type != 'node' || $node->type != lingwo_dictionary_settings('entry_content_type'))
+    return;
+
+  // the wial list only deals with translations
+  if (!lingwo_dictionary_entry_is_translation($node))
+    return;
+
+  if (lingwo_wial_get($node->nid)) {
+    $op = 'remove';
+  }
+  else {
+    $op = 'add';
+  }
+
+  $link['href'] = 'lingwo_wial/toggle';
+  $link['query'] = array(
+    'destination' => $_GET['q'],
+    'op'          => $op,
+    'nid'         => $node->nid,
+  );
+  $link['title'] = ($op == 'add') ?
+      t('Add to my "Words I Am Learning" List') :
+      t('Remove from my "Words I Am Learning" List');
+  // For the JavaScript that doesn't yet exist
+  $link['attributes'] = array('class' => 'lingwo-wial lingwo-wial-'. $op);
+
+  // TODO: add a javascript helper!!
+
+  return array($link);
+}
+
+/*
  * Implementation of hook_nodeapi().
  */
 function lingwo_wial_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
@@ -18,24 +67,6 @@ function lingwo_wial_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
     return;
 
   switch ($op) {
-    case 'view':
-      // TODO: we should be able to optionally exclude this from the node view,
-      // leaving it up to the theme to include this form somewhere.
-
-      // Add information about whether this node is on this users WIAL or not.
-      if (lingwo_wial_get($node->nid)) {
-        $op = 'remove';
-      }
-      else {
-        $op = 'add';
-      }
-
-      $node->content['wial_status'] = array(
-        '#weight' => -10,
-        '#value'  => drupal_get_form('lingwo_wial_form', $op, $node, $a3, $a4)
-      );
-      break;
-
     case 'delete':
       // TODO: Should we loop through all the users who have this on their WIAL list
       // and call the remove hook?  Sounds dangerous.  This could lock up the request
@@ -67,76 +98,26 @@ function lingwo_wial_node_operations() {
   );
 }
 
-/**
- * Implementation of hook_theme().
- */
-function lingwo_wial_theme() {
-  return array(
-    'lingwo_wial_form' => array(
-      'arguments' => array('form' => NULL),
-    )
-  );
-}
-
 /*
- * Forms
+ * Pages
  */
 
-// WIAL add form
-function lingwo_wial_form(&$form_state, $op, $node, $teaser=FALSE, $page=FALSE) {
-  $form = array(
-    // pack some data in here for the theme
-    '#node'     => $node,
-    '#teaser'   => $teaser,
-    '#page'     => $page,
-    '#headword' => $node->title
-  );
-
-  $form['wial_op'] = array(
-    '#type' => 'hidden',
-    '#value' => $op
-  );
-  $form['nid'] = array(
-    '#type' => 'hidden',
-    '#value' => $node->nid,
-  );
-
-  if ($op == 'add') {
-    $msg = t('Add to my "Words I Am Learning" List');
-  }
-  else {
-    $msg = t('Remove from my "Words I Am Learning" List');
-  }
-  $form['button'] = array(
-    '#type' => 'submit',
-    '#value' => $msg,
-  );
-
-  return $form;
-}
-
-function lingwo_wial_form_submit($form, &$form_state) {
-  switch ($form_state['values']['wial_op']) {
+function lingwo_wial_toggle() {
+  switch ($_GET['op']) {
     case 'add':
-      if (lingwo_wial_add($form_state['values']['nid'])) {
-        drupal_set_message(t('Added <em>@headword</em> to your "Words I Am Learning" list',
-          array('@headword' => $form_state['values']['headword'])));
-      }
-      else {
-        drupal_set_message(t('Unable to add entry to your "Words I Am Learning" list'), 'error');
+      if (!lingwo_wial_add($_GET['nid'])) {
+        drupal_set_message(t('Unable to add word to your "Words I Am Learning" list'), 'error');
       }
       break;
 
     case 'remove':
-      if (lingwo_wial_remove($form_state['values']['nid'])) {
-        drupal_set_message(t('Removed <em>@headword</em> from your "Words I Am Learning" list',
-          array('@headword' => $form_state['values']['headword'])));
-      }
-      else {
-        drupal_set_message(t('Unable to remove entry from your "Words I Am Learning" list'), 'error');
+      if (!lingwo_wial_remove($_GET['nid'])) {
+        drupal_set_message(t('Unable to remove word from your "Words I Am Learning" list'), 'error');
       }
       break;
   }
+
+  drupal_goto($_GET['destination']);
 }
 
 /*

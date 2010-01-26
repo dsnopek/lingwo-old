@@ -17,8 +17,12 @@ import os
 
 def LingwoModel():
     m = Model(u'Lingwo')
+    # we can only guarantee that the Front will be unique because it will
+    # be based on the headword, language, pos.  The Back could be anything!
     m.addFieldModel(FieldModel(u'Front', True, True))
-    m.addFieldModel(FieldModel(u'Back', True, True))
+    # while I think that Back should be required, I don't really want this to
+    # fail just because of that!!
+    m.addFieldModel(FieldModel(u'Back', False, False))
     m.addFieldModel(FieldModel(u'Lingwo ID', True, True))
     m.addCardModel(CardModel(u'Forward', u'%(Front)s', u'%(Back)s'))
     m.addCardModel(CardModel(u'Reverse', u'%(Back)s', u'%(Front)s'))
@@ -154,6 +158,7 @@ class AnkiServerApp(object):
             raise HTTPBadRequest()
         # make the keys into non-unicode strings
         input = dict([(str(k), v) for k, v in input.items()])
+        print input
 
         # run it!
         output = func(**input)

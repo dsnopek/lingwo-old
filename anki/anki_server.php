@@ -17,7 +17,13 @@ class AnkiServer {
     $req = new HTTP_Request2('http://'. $this->url .'/'. $func, HTTP_Request2::METHOD_POST);
     $req->setHeader('Content-Type', 'application/json');
     $req->setBody(json_encode($args));
-    $res = $req->send();
+
+    try {
+      $res = $req->send();
+    }
+    catch (HTTP_Request2_Exception $e) {
+      throw new AnkiServerException($e->getMessage());
+    }
 
     if ($res->getStatus() >= 300) {
       throw new AnkiServerException($res->getBody());
