@@ -33,10 +33,18 @@ def LingwoModel():
 class AnkiServerApp(object):
     """ Our WSGI app. """
 
-    def __init__(self):
-        self.decks = {}
+    def __init__(self, data_root):
+        self.data_root = os.path.abspath(data_root)
+
+    def _get_path(self, path):
+        npath = os.path.normpath(os.path.join(self.data_root, path))
+        if npath[0:len(self.data_root)] != self.data_root:
+            # attempting to escape our data jail!
+            raise HTTPBadRequest('"%s" is not a valid path/id' % path)
+        return npath
 
     def create_deck(self, path):
+        path = self._get_path(path)
         if os.path.exists(path):
             raise HTTPBadRequest('"%s" already exists' % path)
 
@@ -51,6 +59,7 @@ class AnkiServerApp(object):
         return {'id':path}
 
     def _open_deck(self, path):
+        path = self._get_path(path)
         if not os.path.exists(path):
             raise HTTPBadRequest('"%s" doesn\'t exist' % path)
 

@@ -2,3 +2,5 @@ staging.db
 AnkiServer.egg-info
 build
 dist
+AnkiServer.env
+drupal_files

@@ -10,8 +10,9 @@ def make_app(global_conf, **local_conf):
         import logging.config
         logging.config.fileConfig(logging_config_file)
 
-    # TODO: does this need any config?
-    app = AnkiServerApp()
+    app = AnkiServerApp(
+        data_root=local_conf.get('data_root', '.')
+    )
     # TODO: this should be configurable and, um, better.
     app = translogger.TransLogger(app)
     return app

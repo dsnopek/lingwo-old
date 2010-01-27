@@ -44,12 +44,27 @@ function anki_server_url($value = NULL) {
   variable_set('anki_server_url', $value);
 }
 
-function anki_server_deck_path($value = NULL) {
+function anki_server_data_path($value = NULL) {
   if (is_null($value)) {
-    return variable_get('anki_server_deck_path', drupal_get_path('module', 'anki'). '/AnkiServer/decks');
+    return variable_get('anki_server_data_path', drupal_get_path('module', 'anki'). '/AnkiServer/decks');
   }
 
-  variable_set('anki_server_deck_path', $value);
+  variable_set('anki_server_data_path', $value);
 }
 
+function anki_deck_content_type($value = NULL) {
+  if (is_null($value)) {
+    return variable_get('anki_deck_content_type', NULL);
+  }
+
+  variable_set('anki_deck_content_type', $value);
+}
+
+function anki_deck_content_field($value = NULL) {
+  if (is_null($value)) {
+    return variable_get('anki_deck_content_field', NULL);
+  }
+
+  variable_set('anki_deck_content_field', $value);
+}
 
