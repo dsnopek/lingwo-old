@@ -45,11 +45,11 @@ class AnkiServerApp(object):
         return npath
 
     def create_deck(self, path):
-        path = self._get_path(path)
-        if os.path.exists(path):
+        full_path = self._get_path(path)
+        if os.path.exists(full_path):
             raise HTTPBadRequest('"%s" already exists' % path)
 
-        deck = anki.DeckStorage.Deck(path)
+        deck = anki.DeckStorage.Deck(full_path)
         try:
             deck.initUndo()
             deck.addModel(LingwoModel())
@@ -60,11 +60,11 @@ class AnkiServerApp(object):
         return {'id':path}
 
     def _open_deck(self, path):
-        path = self._get_path(path)
-        if not os.path.exists(path):
+        full_path = self._get_path(path)
+        if not os.path.exists(full_path):
             raise HTTPBadRequest('"%s" doesn\'t exist' % path)
 
-        return anki.DeckStorage.Deck(path)
+        return anki.DeckStorage.Deck(full_path)
 
     def open_deck(self, path):
         # verify that it really exists and is an Anki file
