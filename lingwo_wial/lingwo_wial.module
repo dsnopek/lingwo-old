@@ -183,9 +183,12 @@ function lingwo_wial_remove($nid, $uid=NULL) {
 }
 
 // Bulk remove nodes
-function lingwo_wial_bulk_remove($nids, $uid=NULL) {
+// TODO: I'd like this to take $uid as an argument, but it ends up being the $view
+// object for some reason!!
+function lingwo_wial_bulk_remove($nids) {//, $uid=NULL) {
+  global $user;
   foreach ($nids as $nid) {
-    lingwo_wial_remove($nid, $uid);
+    lingwo_wial_remove($nid, $user->uid);
   }
 }
 
