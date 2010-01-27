@@ -13,7 +13,7 @@ setup(
     test_suite='nose.collector',
     entry_points="""
     [paste.app_factory]
-    main = AnkiServer.middleware:make_app
+    main = AnkiServer:make_app
     """,
 )
 
