@@ -15,13 +15,6 @@ function anki_admin_settings() {
     '#description' => 'The URL (including <em>hostname</em> and <em>port</em>) that the AnkiServer is listening on.  For example: <em>localhost:5000</em>',
   );
 
-  $form['anki_server_data_path'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Deck path'),
-    '#default_value' => anki_server_data_path(),
-    '#description' => 'The path to where the AnkiServer keeps the decks on the filesystem.',
-  );
-
   foreach (node_get_types() as $type) {
     $type_options[$type->type] = $type->name;
   }
