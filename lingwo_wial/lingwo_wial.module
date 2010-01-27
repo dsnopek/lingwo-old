@@ -24,7 +24,9 @@ function lingwo_wial_menu() {
  * Implementation of hook_link().
  */
 function lingwo_wial_link($type, $node, $teaser=FALSE) {
-  if ($type != 'node' || $node->type != lingwo_dictionary_settings('entry_content_type'))
+  global $user;
+
+  if ($user->uid == 0 || $type != 'node' || $node->type != lingwo_dictionary_settings('entry_content_type'))
     return;
 
   // the wial list only deals with translations
@@ -143,6 +145,9 @@ function lingwo_wial_add($nid, $uid=NULL) {
   if (is_null($uid)) {
     $uid = $user->uid;
   }
+  if ($uid == 0) {
+    return FALSE;
+  }
 
   $obj = (object)array(
     'uid'   => $uid,
@@ -165,6 +170,9 @@ function lingwo_wial_remove($nid, $uid=NULL) {
   if (is_null($uid)) {
     $uid = $user->uid;
   }
+  if ($uid == 0) {
+    return FALSE;
+  }
 
   if (db_query("DELETE FROM {lingwo_wial_node} WHERE uid = %d AND nid = %d", $uid, $nid)) {
     module_invoke_all('lingwo_wial', 'remove', $nid, $uid);
@@ -176,12 +184,6 @@ function lingwo_wial_remove($nid, $uid=NULL) {
 
 // Bulk remove nodes
 function lingwo_wial_bulk_remove($nids, $uid=NULL) {
-  global $user;
-
-  if (is_null($uid)) {
-    $uid = $user->uid;
-  }
-
   foreach ($nids as $nid) {
     lingwo_wial_remove($nid, $uid);
   }
