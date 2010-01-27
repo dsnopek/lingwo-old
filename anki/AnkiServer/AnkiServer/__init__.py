@@ -33,8 +33,9 @@ def LingwoModel():
 class AnkiServerApp(object):
     """ Our WSGI app. """
 
-    def __init__(self, data_root):
+    def __init__(self, data_root, allowed_hosts):
         self.data_root = os.path.abspath(data_root)
+        self.allowed_hosts = allowed_hosts
 
     def _get_path(self, path):
         npath = os.path.normpath(os.path.join(self.data_root, path))
@@ -148,6 +149,10 @@ class AnkiServerApp(object):
 
     @wsgify
     def __call__(self, req):
+        if self.allowed_hosts != '*':
+            if req.remote_addr != self.allowed_hosts:
+                raise HTTPForbidden()
+
         if req.method != 'POST':
             raise HTTPMethodNotAllowed(allow=['POST'])
 
@@ -167,7 +172,10 @@ class AnkiServerApp(object):
             raise HTTPBadRequest()
         # make the keys into non-unicode strings
         input = dict([(str(k), v) for k, v in input.items()])
-        print input
+
+        # debug
+        from pprint import pprint
+        pprint(input)
 
         # run it!
         output = func(**input)
@@ -181,7 +189,6 @@ class AnkiServerApp(object):
 
 # Our entry point
 def make_app(global_conf, **local_conf):
-    from AnkiServer.app import AnkiServerApp
     from paste import translogger
 
     # setup the logger
@@ -191,7 +198,8 @@ def make_app(global_conf, **local_conf):
         logging.config.fileConfig(logging_config_file)
 
     app = AnkiServerApp(
-        data_root=local_conf.get('data_root', '.')
+        data_root=local_conf.get('data_root', '.'),
+        allowed_hosts=local_conf.get('allowed_hosts', '*')
     )
     # TODO: this should be configurable and, um, better.
     app = translogger.TransLogger(app)
