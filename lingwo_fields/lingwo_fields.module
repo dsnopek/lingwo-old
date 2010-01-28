@@ -246,6 +246,14 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
   foreach (lingwo_language_fields($node->language, $pos) as $field) {
     // TODO: use $form_state['storage'] to get the interim default values!
     $default = $default_values[$field['type']][$field['name']];
+    if (empty($default)) {
+      $default = array(
+        'type' => $field['type'],
+        'name' => $field['name'],
+        'value' => NULL,
+        'automatic' => TRUE,
+      );
+    }
     $field_form = array(
       '#prefix' => '<div>',
       '#suffix' => '</div>',
@@ -302,7 +310,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     $field_form['automatic'] = array(
       '#type' => 'checkbox',
       '#title' => t('Automatic'),
-      '#default_value' => !empty($default) ? $default['automatic'] : TRUE,
+      '#default_value' => $default['automatic'],
     );
 
     $element['wrapper']['fields'][$index++] = $field_form;
