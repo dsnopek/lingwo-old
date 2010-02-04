@@ -143,7 +143,7 @@ function lingwo_senses_field($op, &$node, $field, &$items, $teaser, $page) {
 /**
  * Implementation of hook_content_is_empty().
  */
-function lingwo_senses_content_is_empty($item, $field) {
+function lingwo_senses_content_is_empty($item, $field=NULL) {
   if ($item['retire_sense']) {
     return TRUE;
   }
@@ -159,6 +159,11 @@ function lingwo_senses_content_is_empty($item, $field) {
   }
   return FALSE;
 }
+
+// TODO: Hold over because we can use Fn::not() on PHP 5.2
+function lingwo_senses_content_not_empty($item, $field=NULL) {
+  return !lingwo_senses_content_is_empty($item, $field);
+};
 
 function lingwo_senses_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   $node = $form['#node'];
@@ -191,6 +196,11 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
     '#theme' => 'lingwo_senses_original_form',
     '#parents' => array($field['field_name']),
   );
+
+  // filter out empty items
+  //require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/Fn.php');
+  //$items = Fn::filter(Fn::not('lingwo_senses_content_is_empty')), $items);
+  $items = array_filter($items, 'lingwo_senses_content_not_empty');
 
   // we count it as empty if there is less than 2 senses!
   if (!empty($items) && count($items) > 1) {
@@ -561,6 +571,11 @@ function theme_lingwo_senses_formatter_default($element) {
   else {
     $theme = $theme .'_original';
   }
+
+  // filter out empty items
+  //require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/Fn.php');
+  //$items = Fn::filter(Fn::not('lingwo_senses_content_is_empty')), $items);
+  $items = array_filter($items, 'lingwo_senses_content_not_empty');
 
   return theme($theme, $node, $items);
 }
