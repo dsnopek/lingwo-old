@@ -44,7 +44,11 @@ function lingwo_dictionary_schema() {
     'primary key' => array('language', 'pos', 'title'),
     'unique keys' => array(
       'node' => array('nid'),
-    )
+    ),
+    // The default collation (utf8_general_ci) treats accented characters (like: ó, ą, ę, ń)
+    // as equivalent to their unaccented counter-parts.  Also, we want entry titles to be
+    // case-sensitively unique (ie. "Ps" is different than "PS") -- ticket #38.
+    'mysql_suffix' => "DEFAULT CHARSET=utf8 COLLATE=utf8_bin",
   );
 
   return $schema;
@@ -59,7 +63,7 @@ function lingwo_dictionary_install() {
 
   // we need to happen after the "locale" module (which we would if the module name was
   // alphabetically higher) and probably after some other modules too..
-  db_query("UPDATE {system} SET weight = 50 WHERE name = 'lingwo_dictionary'");
+  update_sql("UPDATE {system} SET weight = 50 WHERE name = 'lingwo_dictionary'");
 }
 
 /**
