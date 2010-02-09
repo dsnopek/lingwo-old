@@ -10,17 +10,24 @@
     })();
 
     // load requirejs
-    load(lingwo_dictionary_path + '/js/allplugins-require.js');
+    require = {
+        paths: {
+            'lingwo_dictionary': lingwo_dictionary_path,
+        }
+    };
+    //load(lingwo_dictionary_path + '/js/allplugins-require.js');
+    load(lingwo_dictionary_path + '/../requirejs/require.js');
 
     // override the load function
     require.load = function (moduleName, contextName) {
-         var context = s.contexts[contextName], url;
-         s.isDone = false;
+         var context = require.s.contexts[contextName], url;
+         require.s.isDone = false;
 
          // load the module
          url = require.nameToUrl(moduleName, null, contextName);
          context.startTime = (new Date()).getTime();
-         load(moduleName);
+         //print (url);
+         load(url);
 
          context.loaded[moduleName] = true;
          require.checkLoaded(contextName);
