@@ -25,7 +25,7 @@ require.def('lingwo_dictionary/scripts/importer/common/Database',
                 if (newFile) {
                     this.resetDb();
                 }
-                this._insert_stmt = this._conn.prepareStatement("REPLACE INTO entry VALUES (?, ?, ?, ?)");
+                this._insert_stmt = this._conn.prepareStatement("REPLACE INTO entry (lang, pos, headword, data) VALUES (?, ?, ?, ?)");
                 this._select_stmt = this._conn.prepareStatement("SELECT data FROM entry WHERE lang = ? AND pos = ? AND headword = ? LIMIT 1");
             },
             resetDb: function () {

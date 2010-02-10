@@ -99,6 +99,8 @@ require.def('lingwo_dictionary/scripts/common/TestCase',
             var newClass = function () { };
             newClass.prototype = new TestCase();
             extendPrototype(newClass, members);
+            // convenience function for running from an anonymous sub-class
+            newClass.run = function () { (new newClass()).run(); };
             return newClass;
         };
 
