@@ -3,12 +3,6 @@
  * Here we will develop an importer for Polish language.
  */
 
-load('src/importer.js');
-load('src/mediawiki.js');
-load('src/db.js');
-load('src/pl-wiktionary-org.js');
-load('src/service.js');
-
 // save the arguments for later
 opts = arguments.splice(0);
 
@@ -16,8 +10,8 @@ opts = arguments.splice(0);
 console = {
     debug: print
 };
-load('../morphology/morphology.js');
-load('../morphology/pl.js');
+load('../../morphology/morphology.js');
+load('../../morphology/pl.js');
 
 // This list is copied from lingwo_language/lingwo_language.module
 // TODO: this should be shared!!
@@ -111,41 +105,55 @@ function generateFields(importer_entry) {
     }
 }
 
-function main() {
-    var db = new Lingwo.importer.db.Database('staging.db');
+require([
+        'lingwo_dictionary/scripts/importer/common/Database',
+        'lingwo_dictionary/scripts/importer/common/Service',
+        'lingwo_dictionary/scripts/importer/common/wiktionary/pl',
+    ],
+    function (Database, Service, wiktionary_pl) {
+        var db = new Database('staging.db');
 
-    var service = new Lingwo.importer.Service({
-        domain: 'localhost',
-        url: 'http://127.0.0.1:8082/services/xmlrpc',
-        key: '028edd447fce610ef46dd685ae186d7f'
-    });
-    if (service.connect()) {
-        var res = service.login('Normal User', 'test');
-        print(res);
-    }
-
-    // Handle each item.
-    function handler(entry) {
-        if (!entry.pos) {
-            print('!*** Skipping entry because it has no POS: '+entry.headword);
-            return;
+        var service = new Service({
+            domain: 'localhost',
+            url: 'http://127.0.0.1:8082/services/xmlrpc',
+            key: '028edd447fce610ef46dd685ae186d7f'
+        });
+        if (service.connect()) {
+            var res = service.login('Normal User', 'test');
+            print(res);
         }
 
-        generateFields(entry);
+        // Handle each item.
+        function handler(entry) {
+            if (!entry.pos) {
+                print('!*** Skipping entry because it has no POS: '+entry.headword);
+                return;
+            }
 
-        db.setEntry(entry);
-        db.commit();
+            generateFields(entry);
 
-        print(service.update_entry(entry));
+            db.setEntry(entry);
+            db.commit();
+
+            print(service.update_entry(entry));
+        }
+
+        // TODO: We really should be combining the two sources
+        wiktionary_pl.process({
+            // TODO: this should really take the language ('pl') that we are processing,
+            // since we could pull *any* language out of this dictionary.
+            filename: '/home/dsnopek/dl/plwiktionary-20091202-pages-articles.xml.bz2',
+            handler: handler,
+            //limit: 1500
+        });
+        /*
+        Lingwo.importer.processSource({
+            type: 'pl-wiktionary-org',
+            filename: '/home/dsnopek/dl/plwiktionary-20091202-pages-articles.xml.bz2',
+            handler: handler,
+            //limit: 1500
+        });
+        */
     }
-
-    // TODO: We really should be combining the two sources
-    Lingwo.importer.processSource({
-        type: 'pl-wiktionary-org',
-        filename: '/home/dsnopek/dl/plwiktionary-20091202-pages-articles.xml.bz2',
-        handler: handler,
-        //limit: 1500
-    });
-}
-main();
+);
 
