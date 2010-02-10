@@ -7,8 +7,9 @@ importPackage(java.sql);
 importPackage(java.io);
 
 require.def('lingwo_dictionary/scripts/importer/common/Database',
-    ['lingwo_dictionary/js/declare'],
-    function (declare) {
+    ['lingwo_dictionary/js/declare',
+     'lingwo_dictionary/js/json2'],
+    function (declare, JSON) {
         return declare({
             _constructor: function (filename) {
                 if (typeof filename == 'undefined') {

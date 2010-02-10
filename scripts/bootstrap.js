@@ -22,6 +22,7 @@
     require.load = function (moduleName, contextName) {
          var context = require.s.contexts[contextName], url;
          require.s.isDone = false;
+         context.loaded[moduleName] = false;
 
          // load the module
          url = require.nameToUrl(moduleName, null, contextName);
@@ -30,7 +31,6 @@
          load(url);
 
          context.loaded[moduleName] = true;
-         require.checkLoaded(contextName);
     };
 
     // ultimately, load the actual script
