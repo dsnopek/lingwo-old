@@ -15,8 +15,7 @@
             'lingwo_dictionary': lingwo_dictionary_path,
         }
     };
-    //load(lingwo_dictionary_path + '/js/allplugins-require.js');
-    load(lingwo_dictionary_path + '/../requirejs/require.js');
+    load(lingwo_dictionary_path + '/js/allplugins-require.js');
 
     // override the load function
     require.load = function (moduleName, contextName) {
