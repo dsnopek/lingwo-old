@@ -15,22 +15,8 @@
             'lingwo_dictionary': lingwo_dictionary_path,
         }
     };
-    load(lingwo_dictionary_path + '/js/allplugins-require.js');
-
-    // override the load function
-    require.load = function (moduleName, contextName) {
-         var context = require.s.contexts[contextName], url;
-         require.s.isDone = false;
-         context.loaded[moduleName] = false;
-
-         // load the module
-         url = require.nameToUrl(moduleName, null, contextName);
-         context.startTime = (new Date()).getTime();
-         //print (url);
-         load(url);
-
-         context.loaded[moduleName] = true;
-    };
+    load(lingwo_dictionary_path + '/js/require.js');
+    load(lingwo_dictionary_path + '/js/require/rhino.js');
 
     // ultimately, load the actual script
     load(args[0]);
