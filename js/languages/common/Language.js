@@ -373,17 +373,15 @@ require.def('lingwo_dictionary/js/languages/common/Language',
             */
         });
 
-        var utils = {
-            'cls': function (cls) {
-                return {'spec': 'cls', 'value': cls};
-            }
+        // Minor utility function
+        Language.cls = function (cls) {
+            return {'spec': 'cls', 'value': cls};
         };
 
         // the external function used to create new language definitions.
-        Language.defineLanguage = function (name, func) {
+        Language.defineLanguage = function (name) {
             var lang = new Language();
             lang.name = name;
-            func.apply(lang, [lang, utils]);
             Language.languages[name] = lang;
             return lang;
         };
@@ -391,5 +389,4 @@ require.def('lingwo_dictionary/js/languages/common/Language',
         return Language;
     }
 );
-
 
