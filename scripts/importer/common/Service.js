@@ -4,8 +4,8 @@
  */
 
 require.def('lingwo_dictionary/scripts/importer/common/Service',
-    ['lingwo_dictionary/js/declare',
-     'lingwo_dictionary/js/json2',
+    ['lingwo_dictionary/js/util/declare',
+     'lingwo_dictionary/js/util/json2',
     ],
     function (declare, JSON) {
         // escapes characters, yo!

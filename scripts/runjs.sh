@@ -3,7 +3,7 @@
 RUNJS_PATH=$(cd $(dirname "$0"); pwd)
 
 JAVA_LIBS="."
-for i in $RUNJS_PATH/lib/*.jar; do
+for i in $RUNJS_PATH/java-lib/*.jar; do
 	JAVA_LIBS="$JAVA_LIBS:$i"
 done
 

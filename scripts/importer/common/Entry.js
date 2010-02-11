@@ -4,7 +4,7 @@
  */
 
 require.def('lingwo_dictionary/scripts/importer/common/Entry',
-    ['lingwo_dictionary/js/declare',
+    ['lingwo_dictionary/js/util/declare',
     ],
     function (declare) {
         return declare({

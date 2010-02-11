@@ -3,7 +3,7 @@
  * Very simple utility function for creating a "class".
  */
 
-require.def('lingwo_dictionary/js/declare',
+require.def('lingwo_dictionary/js/util/declare',
     [],
     function () {
         return function (props) {

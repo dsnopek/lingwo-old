@@ -3,7 +3,7 @@ require(
     ['lingwo_dictionary/scripts/common/TestCase',
      'lingwo_dictionary/scripts/importer/common/Entry',
      'lingwo_dictionary/scripts/importer/common/wiktionary/pl',
-     'lingwo_dictionary/js/json2',
+     'lingwo_dictionary/js/util/json2',
     ],
     function (TestCase, Entry, wiktionary_pl, JSON) {
         TestCase.subclass({

@@ -159,7 +159,7 @@
 // Create a JSON object only if one does not already exist. We create the
 // methods in a closure to avoid creating global variables.
 
-require.def('lingwo_dictionary/js/json2', [], function () {
+require.def('lingwo_dictionary/js/util/json2', [], function () {
     var JSON = {};
 
     function f(n) {

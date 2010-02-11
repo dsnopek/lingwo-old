@@ -6,7 +6,7 @@
 importPackage(java.io);
 
 require.def('lingwo_dictionary/scripts/importer/common/mediawiki/Producer',
-    ['lingwo_dictionary/js/declare',
+    ['lingwo_dictionary/js/util/declare',
     ],
     function (declare) {
         IN_BUF_SZ = 1024 * 1024;
