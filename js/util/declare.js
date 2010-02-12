@@ -4,14 +4,12 @@
  */
 
 require.def('lingwo_dictionary/js/util/declare',
-    [],
-    function () {
+    ['lingwo_dictionary/js/util/extendPrototype'],
+    function (extendPrototype) {
         return function (props) {
             var cons = props['_constructor'];
             delete props['_constructor'];
-            for(var name in props) {
-                cons.prototype[name] = props[name];
-            }
+            extendPrototype(cons, props);
             return cons;
         };
     }

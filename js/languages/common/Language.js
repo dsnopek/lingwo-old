@@ -4,8 +4,9 @@
  */
 
 require.def('lingwo_dictionary/js/languages/common/Language',
-    ['lingwo_dictionary/js/languages/common/err'],
-    function (err) {
+    ['lingwo_dictionary/js/util/extendPrototype',
+     'lingwo_dictionary/js/languages/common/err'],
+    function (extendPrototype, err) {
         // we string everything off of the Language constructor function.
         var Language = function () {
             // defer the actual setup to function defined later.
@@ -44,13 +45,6 @@ require.def('lingwo_dictionary/js/languages/common/Language',
 
                 return cons;
             };
-        };
-
-        // A helper for extending a constructors prototype
-        var extendPrototype = function (cons, props) {
-            for (var name in props) {
-                cons.prototype[name] = props[name];
-            }
         };
 
         // A helper for making Array.splice() a little easier to work with.
