@@ -3,17 +3,18 @@ require(
     ['lingwo_dictionary/scripts/common/TestCase',
      'lingwo_dictionary/scripts/importer/common/Database',
      'lingwo_dictionary/scripts/importer/common/DatabaseProducer',
+     'lingwo_dictionary/js/languages/common/Entry',
     ],
-    function (TestCase, Database, DatabaseProducer) {
+    function (TestCase, Database, DatabaseProducer, Entry) {
         TestCase.subclass({
             setUp: function () {
                 this.db = new Database();
                 for(var i = 0; i < 20; i++) {
-                    this.db.setEntry({
-                        language: 'xxx',
+                    this.db.setEntry(new Entry({
+                        language: {name: 'xxx', fields: {}},
                         pos: 'noun',
                         headword: 'entry'+i,
-                    });
+                    }));
                 }
                 this.db.commit();
             },

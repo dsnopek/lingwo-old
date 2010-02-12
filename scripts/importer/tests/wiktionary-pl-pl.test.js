@@ -1,11 +1,12 @@
 
 require(
     ['lingwo_dictionary/scripts/common/TestCase',
-     'lingwo_dictionary/scripts/importer/common/Entry',
+     'lingwo_dictionary/js/languages/common/Entry',
+     'lingwo_dictionary/js/languages/pl',
      'lingwo_dictionary/scripts/importer/common/wiktionary/pl',
      'lingwo_dictionary/js/util/json2',
     ],
-    function (TestCase, Entry, wiktionary_pl, JSON) {
+    function (TestCase, Entry, pl, wiktionary_pl, JSON) {
         TestCase.subclass({
             testParse1: function () {
                 var text = "== pies ({{język polski}}) ==\n" +
@@ -40,7 +41,7 @@ require(
 
                 var entry = new Entry();
                 entry.headword = 'pies';
-                entry.language = 'pl';
+                entry.language = pl;
                 entry.setSource('pl.wiktionary.org', {raw: text});
 
                 var parser = wiktionary_pl.parsers.pl;
@@ -48,7 +49,7 @@ require(
 
                 this.assertEquals(entry.pos, 'noun');
                 this.assertEquals(entry.pron, 'pʲɛs');
-                this.assertEquals(entry.fields.gender.value, 'masculine');
+                this.assertEquals(entry.fields.gender, 'masculine');
 
                 // senses
                 this.assertEquals(entry.senses[0].difference, '(zool) Canis familiaris, zwierzę domowe');

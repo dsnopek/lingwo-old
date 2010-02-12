@@ -39,13 +39,15 @@ require.def('lingwo_dictionary/js/languages/common/Entry',
             getFields: function () {
                 var pos = this.getFieldsPos(), fields = {}, name, def;
 
-                for (name in this.language.fields[pos]) {
-                    def = this.language.fields[pos][name];
-                    fields[name] = {
-                        type: def.type,
-                        value: this.getField(name),
-                        automatic: this.isAutomatic(name),
-                    };
+                if (typeof this.language.fields[pos] != 'undefined') {
+                    for (name in this.language.fields[pos]) {
+                        def = this.language.fields[pos][name];
+                        fields[name] = {
+                            type: def.type,
+                            value: this.getField(name),
+                            automatic: this.isAutomatic(name),
+                        };
+                    }
                 }
 
                 return fields;

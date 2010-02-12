@@ -24,6 +24,12 @@ require(
                 }
             },
 
+            checkFieldList: function (field_name, field_value, entry_list) {
+                for(var i = 0; i < entry_list.length; i++) {
+                    this.assertEquals(getEntry(entry_list[i]).getField(field_name), field_value);
+                }
+            },
+
             testJaki: function () {
                 this.checkFields('jaki', {
                     'nominative.singular.masculine': 'jaki',
@@ -33,31 +39,31 @@ require(
             },
 
             testNounGenderMasculine: function () {
-                this.checkFieldMulti('gender', 'masculine', [
+                this.checkFieldList('gender', 'masculine', [
                     'stół', 'kot', 'pokój', 'chłopiec', 'kolega', 'dentysta', 'mężczyzna'
                 ]);
             },
 
             testNounGenderFeminine: function () {
-                this.checkFieldMulti('gender', 'feminine', [
+                this.checkFieldList('gender', 'feminine', [
                     'kobieta', 'ulica', 'Polska', 'gospodyni', 'noc', 'część', 'jesień', 'wieś', 'mysz', 'miłość', 'ciekawość'
                 ]);
             },
 
             testNounGenderNeuter: function () {
-                this.checkFieldMulti('gender', 'neuter', [
+                this.checkFieldList('gender', 'neuter', [
                     'okno', 'dziecko', 'życie', 'imię', 'szczenię', 'zwierzę', 'niemowlę', 'muzeum', 'gimnazjum'
                 ]);
             },
 
             testAdjectiveSoft: function () {
                 // not soft!
-                this.checkFieldMulti('soft', false, [
+                this.checkFieldList('soft', false, [
                     'duży', 'mały', 'dobry', 'zły', 'wysoki', 'niski', 'polski', 'długi', 'drogi', 'drugi'
                 ]);
 
                 // soft
-                this.checkFieldMulti('soft', true, [
+                this.checkFieldList('soft', true, [
                     'głupi', 'tani', 'trzeci', 'ostatni', 'średni'
                 ]);
             },
