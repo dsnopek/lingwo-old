@@ -14,110 +14,101 @@ require.def('lingwo_dictionary/js/languages/common/Entry',
                 this.pos = args.pos;
                 // TODO: Not filling in any of the above should probobaly be an exception?
 
+                // TODO: this should be a normal field!
                 this.like = args.like || null;
 
-                this.forms = args.forms || {};
-                this.options = args.options || {};
-
-                // we can get classes as either an Array of strings or an Object of booleans
-                var classes = args.classes || {};
-                if (classes.length) {
-                    this.classes = {};
-                    for(var i = 0; i < classes.length; i++) {
-                        if (classes[i].substr(0, 1) == '!') {
-                            this.classes[classes[i].substr(1)] = false;
-                        }
-                        else {
-                            this.classes[classes[i]] = true;
-                        }
-                    }
-                }
-                else {
-                    this.classes = classes;
-                }
+                this.fields = args.fields || {};
 
                 this.clearCache();
             },
 
             clearCache: function () {
-                this._baseForm = null;
+                this._cachedFields = {};
+                this._cachedWords = {};
+            },
 
-                this._cachedForms = {};
-                this._cachedOptions = {};
-                this._cachedClasses = {};
+            getField: function (name) {
+                var pos, field, value = null;
+
+                if (typeof this.fields[name] != 'undefined') {
+                    return this.fields[name];
+                }
+                if (typeof this._cachedFields[name] != 'undefined') {
+                    return this._cachedFields[name];
+                }
+
+                // TODO: 'like' should be a field just like any other field!  We will need some
+                // special support here if we are trying to generate like itself.
+                pos = this.like || this.pos;
+                if (typeof this.lang.fields[pos] == 'undefined' ||
+                    typeof this.lang.fields[pos][name] == 'undefined')
+                {
+                    throw new err.NoSuchField(name, pos);
+                }
+
+                field = this.lang.fields[pos][name];
+                if (field.automatic) {
+                    value = field.automatic.apply(this.lang, new Array(this));
+                }
+
+                if (field.type == 'form') {
+                    if (!(value instanceof this.lang.Word)) {
+                        throw("Value returned from automatic function '"+name+"' is not a Word!");
+                    }
+
+                    // form functions return a word object, so we cache it with the words
+                    // and convert it to a string, which the field value is supposed to be.
+                    this._cachedWords[name] = value;
+                    value = value.toString();
+                }
+                else if (field.type == 'class') {
+                    // super-explicit conversion to boolean
+                    value = !!value;
+                }
+                else if (field.type == 'option') {
+                    // explicitly make this into a string
+                    value = value.toString();
+                    // TODO: we should check that it has a valid value
+                }
+
+                this._cachedFields[name] = value;
+                
+                return value;
+            },
+
+            getWord: function (name) {
+                if (typeof name == 'undefined') {
+                    name = '';
+                }
+                if (typeof this._cachedWords[name] != 'undefined') {
+                    return this._cachedWords[name];
+                }
+
+                if (name == '') {
+                    this._cachedWords[name] = this.lang.parseWord(this.name);
+                }
+                else if (typeof this.fields[name] != 'undefined') {
+                    this._cachedWords[name] = this.lang.parseWord(this.fields[name]);
+                }
+                else {
+                    // we want to trigger caching the word via getField().
+                    this.getField(name);
+                }
+
+                return this._cachedWords[name];
             },
 
             getForm: function (name) {
-                if (!name) {
-                    if (this._baseForm === null) {
-                        this._baseForm = this.lang.parseWord(this.name);
-                    }
-                    return this._baseForm;
-                }
-
-                if (this._cachedForms[name]) {
-                    return this._cachedForms[name];
-                }
-
-                var word;
-                if (this.forms[name]) {
-                    word = this.lang.parseWord(this.forms[name]);
-                }
-                else {
-                    word = this.lang.callMorphologyFunc(this, 'forms', name);
-                }
-
-                if (!word instanceof this.lang.Word) {
-                    throw("Value returned from morphology function '"+name+"' is not a Word!");
-                }
-
-                this._cachedForms[name] = word;
-
-                return word;
+                return this.getWord(name);
             },
 
             getOption: function (name) {
-                if (this.options[name]) {
-                    return this.options[name];
-                }
-                if (this._cachedOptions[name]) {
-                    return this._cachedOptions[name];
-                }
-                
-                var option = this._cachedOptions[name] =
-                    this.lang.callMorphologyFunc(this, 'options', name).toString();
-                return option;
+                return this.getField(name);
             },
 
             isClass: function (name) {
-                if (typeof this.classes[name] != 'undefined') {
-                    return this.classes[name];
-                }
-
-                if (typeof this._cachedClasses[name] != 'undefined') {
-                    return this._cachedClasses[name];
-                }
-
-                var value;
-
-                try {
-                    value = this.lang.callMorphologyFunc(this, 'classes', name);
-                }
-                catch (e) {
-                    if (e instanceof err.NoSuchMorphologyFunction) {
-                        value = false;
-                    }
-                    else {
-                        throw e;
-                    }
-                }
-
-                // super-explicit conversion to boolean
-                value = !!value;
-
-                this._cachedClasses[name] = value;
-                return value;
-            },
+                return this.getField(name);
+            }
         });
     }
 );

@@ -220,31 +220,10 @@ require.def('lingwo_dictionary/js/languages/common/Language',
         // the real work.
         function _LanguageConstructor(lang) {
             lang.Word = makeWordClass(lang);
-
-            lang.morphology = {
-                'options': {},
-                'forms': {},
-                'classes': {}
-            };
+            lang.fields = {};
         };
         extendPrototype(Language, {
             alphabet: null,
-
-            callMorphologyFunc: function (entry, type, which) {
-                var pos = entry.like || entry.pos;
-
-                if (typeof this.morphology[type] == 'undefined') {
-                    throw new err.NoSuchMorphologyFunction('Invalid morphology function type: '+type);
-                }
-
-                if (typeof this.morphology[type][pos] == 'undefined' ||
-                    typeof this.morphology[type][pos][which] == 'undefined')
-                {
-                    throw new err.NoSuchMorphologyFunction('No morphology function for "'+pos+'" called "'+which+'"');
-                }
-
-                return this.morphology[type][pos][which].apply(this, new Array(entry));
-            },
 
             // creates a Word's "letter" from a string.
             //

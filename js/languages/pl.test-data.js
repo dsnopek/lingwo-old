@@ -21,7 +21,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "stół",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "stoł"
             }
         });
@@ -30,8 +30,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "kot",
             "pos": "noun",
-            "classes": ["animate"],
-            "forms": {
+            "fields": {
+                "animate": true,
                 "dative.singular": "kotu"
             }
         });
@@ -40,7 +40,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "pokój",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "pokoj"
             }
         });
@@ -49,8 +49,10 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "chłopiec",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
+
                 "*stem": "chłopc",
                 "dative.singular": "chłopcu"
             }
@@ -60,8 +62,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "kolega",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "options": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "gender": "masculine"
             }
         });
@@ -70,8 +73,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "dentysta",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "options": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "gender": "masculine"
             }
         });
@@ -80,11 +84,10 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "mężczyzna",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "options": {
-                "gender": "masculine"
-            },
-            "forms": {
+            "fields": {
+                "gender": "masculine",
+                "animate": true,
+                "virile": true,
                 "genitive.plural": "mężczyzn"
             }
         });
@@ -93,7 +96,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "kobieta",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["ulica"] = new Entry({
@@ -112,14 +117,16 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "gospodyni",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["noc"] = new Entry({
             "lang": pl,
             "name": "noc",
             "pos": "noun",
-            "options": {
+            "fields": {
                 "gender": "feminine"
             }
         });
@@ -128,7 +135,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "część",
             "pos": "noun",
-            "options": {
+            "fields": {
                 "gender": "feminine"
             }
         });
@@ -137,7 +144,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "jesień",
             "pos": "noun",
-            "options": {
+            "fields": {
                 "gender": "feminine"
             }
         });
@@ -146,10 +153,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "wieś",
             "pos": "noun",
-            "options": {
-                "gender": "feminine"
-            },
-            "forms": {
+            "fields": {
+                "gender": "feminine",
                 "*stem": "wś"
             }
         });
@@ -158,8 +163,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "mysz",
             "pos": "noun",
-            "classes": ["animate"],
-            "options": {
+            "fields": {
+                "animate": true,
                 "gender": "feminine"
             }
         });
@@ -168,7 +173,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "miłość",
             "pos": "noun",
-            "options": {
+            "fields": {
                 "gender": "feminine"
             }
         });
@@ -177,7 +182,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "ciekawość",
             "pos": "noun",
-            "options": {
+            "fields": {
                 "gender": "feminine"
             }
         });
@@ -192,8 +197,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "dziecko",
             "pos": "noun",
-            "classes": ["animate"],
-            "forms": {
+            "fields": {
+                "animate": true,
                 "genitive.plural": "dzieci",
                 "instrumental.plural": "dziećmi",
                 "nominative.plural": "dzieci"
@@ -210,7 +215,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "morze",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "mórz"
             }
         });
@@ -225,21 +230,27 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "szczenię",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["zwierzę"] = new Entry({
             "lang": pl,
             "name": "zwierzę",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["niemowlę"] = new Entry({
             "lang": pl,
             "name": "niemowlę",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["muzeum"] = new Entry({
@@ -348,7 +359,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "być",
             "pos": "verb",
-            "forms": {
+            "fields": {
                 "nonpast.singular.1p": "jestem",
                 "nonpast.singular.2p": "jesteś",
                 "nonpast.plural.1p": "jesteśmy",
@@ -374,7 +385,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "ząb",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "zęb",
                 "genitive.singular": "zęba"
             }
@@ -384,7 +395,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "kościół",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "kościoł",
                 "genitive.singular": "kościoła"
             }
@@ -394,7 +405,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "samochód",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "samochod"
             }
         });
@@ -403,7 +414,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "dzwonek",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "nominative.plural": "dzwonki"
             }
         });
@@ -412,7 +423,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "róg",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "nominative.plural": "rogi"
             }
         });
@@ -427,7 +438,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "ptak",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["pociąg"] = new Entry({
@@ -440,7 +453,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "kraj",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "krajów"
             }
         });
@@ -473,7 +486,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "tysiąc",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "tysięcy"
             }
         });
@@ -482,7 +495,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "pieniądz",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "pieniędzy",
                 "instrumental.plural": "pieniędzmi"
             }
@@ -498,7 +511,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "miesiąc",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "miesięcy",
                 "genitive.singular": "miesiąca"
             }
@@ -520,7 +533,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "nóż",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "noży",
                 "locative.singular": "nożu",
                 "genitive.singular": "noża",
@@ -532,8 +545,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "koń",
             "pos": "noun",
-            "classes": ["animate"],
-            "forms": {
+            "fields": {
+                "animate": true,
                 "instrumental.plural": "końmi"
             }
         });
@@ -542,7 +555,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "liść",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "instrumental.plural": "liśćmi"
             }
         });
@@ -551,14 +564,16 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "niedźwiedź",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["ogień"] = new Entry({
             "lang": pl,
             "name": "ogień",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "ogń"
             }
         });
@@ -567,7 +582,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "tydzień",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "tygodń"
             }
         });
@@ -576,8 +591,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "gołąb",
             "pos": "noun",
-            "classes": ["animate"],
-            "forms": {
+            "fields": {
+                "animate": true,
                 "nominative.plural": "gołębie"
             }
         });
@@ -586,7 +601,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "karp",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "nominative.plural": "karpie"
             }
         });
@@ -595,7 +610,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "szkoła",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "szkół"
             }
         });
@@ -604,7 +619,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "ryba",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["gwiazda"] = new Entry({
@@ -617,8 +634,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "siostra",
             "pos": "noun",
-            "classes": ["animate"],
-            "forms": {
+            "fields": {
+                "animate": true,
                 "genitive.plural": "sióstr"
             }
         });
@@ -633,7 +650,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "rzecz",
             "pos": "noun",
-            "options": {
+            "fields": {
                 "gender": "feminine"
             }
         });
@@ -642,21 +659,27 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "matka",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["córka"] = new Entry({
             "lang": pl,
             "name": "córka",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["Polka"] = new Entry({
             "lang": pl,
             "name": "Polka",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["figa"] = new Entry({
@@ -669,7 +692,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "droga",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "dróg"
             }
         });
@@ -678,7 +701,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "ręka",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "rąk",
                 "nominative.plural": "ręce"
             }
@@ -694,7 +717,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "kolej",
             "pos": "noun",
-            "options": {
+            "fields": {
                 "gender": "feminine"
             }
         });
@@ -703,7 +726,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "kąpiel",
             "pos": "noun",
-            "options": {
+            "fields": {
                 "gender": "feminine"
             }
         });
@@ -730,7 +753,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "babcia",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["kuchnia"] = new Entry({
@@ -767,7 +792,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "podróż",
             "pos": "noun",
-            "options": {
+            "fields": {
                 "gender": "feminine"
             }
         });
@@ -794,7 +819,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "miłość",
             "pos": "noun",
-            "options": {
+            "fields": {
                 "gender": "feminine"
             }
         });
@@ -803,10 +828,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "opowieść",
             "pos": "noun",
-            "options": {
-                "gender": "feminine"
-            },
-            "forms": {
+            "fields": {
+                "gender": "feminine",
                 "nominative.plural": "opowieści"
             }
         });
@@ -815,10 +838,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "nić",
             "pos": "noun",
-            "options": {
-                "gender": "feminine"
-            },
-            "forms": {
+            "fields": {
+                "gender": "feminine",
                 "instrumental.plural": "nićmi",
                 "nominative.plural": "nici"
             }
@@ -828,10 +849,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "pieśń",
             "pos": "noun",
-            "options": {
-                "gender": "feminine"
-            },
-            "forms": {
+            "fields": {
+                "gender": "feminine",
                 "nominative.plural": "pieśni"
             }
         });
@@ -840,10 +859,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "przyjaźń",
             "pos": "noun",
-            "options": {
-                "gender": "feminine"
-            },
-            "forms": {
+            "fields": {
+                "gender": "feminine",
                 "nominative.plural": "przyjaźni"
             }
         });
@@ -852,7 +869,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "jabłoń",
             "pos": "noun",
-            "options": {
+            "fields": {
                 "gender": "feminine"
             }
         });
@@ -861,10 +878,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "łódź",
             "pos": "noun",
-            "options": {
-                "gender": "feminine"
-            },
-            "forms": {
+            "fields": {
+                "gender": "feminine",
                 "*stem": "łodź"
             }
         });
@@ -873,10 +888,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "gałąź",
             "pos": "noun",
-            "options": {
-                "gender": "feminine"
-            },
-            "forms": {
+            "fields": {
+                "gender": "feminine",
                 "*stem": "gałęź"
             }
         });
@@ -885,10 +898,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "wieś",
             "pos": "noun",
-            "options": {
-                "gender": "feminine"
-            },
-            "forms": {
+            "fields": {
+                "gender": "feminine",
                 "*stem": "wś"
             }
         });
@@ -927,28 +938,36 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "jagnię",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["prosię"] = new Entry({
             "lang": pl,
             "name": "prosię",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["kurczę"] = new Entry({
             "lang": pl,
             "name": "kurczę",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["dziewczę"] = new Entry({
             "lang": pl,
             "name": "dziewczę",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["młody"] = new Entry({
@@ -961,32 +980,40 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "Polak",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["Chińczyk"] = new Entry({
             "lang": pl,
             "name": "Chińczyk",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["Anglik"] = new Entry({
             "lang": pl,
             "name": "Anglik",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["kaleka"] = new Entry({
             "lang": pl,
             "name": "kaleka",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "options": {
-                "gender": "masculine"
-            },
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
+                "gender": "masculine",
                 "genitive.plural": "kalek"
             }
         });
@@ -995,36 +1022,49 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "Norweg",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["inżynier"] = new Entry({
             "lang": pl,
             "name": "inżynier",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["kelner"] = new Entry({
             "lang": pl,
             "name": "kelner",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["doktor"] = new Entry({
             "lang": pl,
             "name": "doktor",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["kierowca"] = new Entry({
             "lang": pl,
             "name": "kierowca",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "options": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "gender": "masculine"
             }
         });
@@ -1033,8 +1073,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "sprzedawca",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "options": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "gender": "masculine"
             }
         });
@@ -1043,8 +1084,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "Niemiec",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "*stem": "Niemc"
             }
         });
@@ -1053,8 +1095,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "mieszkaniec",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "*stem": "mieszkańc"
             }
         });
@@ -1063,71 +1106,99 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "lekarz",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["złodziej"] = new Entry({
             "lang": pl,
             "name": "złodziej",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["towarzysz"] = new Entry({
             "lang": pl,
             "name": "towarzysz",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["słuchacz"] = new Entry({
             "lang": pl,
             "name": "słuchacz",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["nauczyciel"] = new Entry({
             "lang": pl,
             "name": "nauczyciel",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["góral"] = new Entry({
             "lang": pl,
             "name": "góral",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["Francuz"] = new Entry({
             "lang": pl,
             "name": "Francuz",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["chłop"] = new Entry({
             "lang": pl,
             "name": "chłop",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["architekt"] = new Entry({
             "lang": pl,
             "name": "architekt",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["poeta"] = new Entry({
             "lang": pl,
             "name": "poeta",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "options": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "gender": "masculine"
             }
         });
@@ -1136,8 +1207,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "specjalista",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "options": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "gender": "masculine"
             }
         });
@@ -1146,8 +1218,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "turysta",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "options": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "gender": "masculine"
             }
         });
@@ -1156,36 +1229,49 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "Czech",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["Szwed"] = new Entry({
             "lang": pl,
             "name": "Szwed",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["student"] = new Entry({
             "lang": pl,
             "name": "student",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["Włoch"] = new Entry({
             "lang": pl,
             "name": "Włoch",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["sąsiad"] = new Entry({
             "lang": pl,
             "name": "sąsiad",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "nominative.plural": "sąsiedzi"
             }
         });
@@ -1194,8 +1280,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "diabeł",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "*stem": 'diabł'
             }
         });
@@ -1204,8 +1291,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "syn",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "nominative.plural": "synowie"
             }
         });
@@ -1214,8 +1302,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "mąż",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "genitive.plural": "mężów",
                 "*stem": "męż",
                 "nominative.plural": "mężowie"
@@ -1226,8 +1315,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "Belg",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "nominative.plural": "Belgowie"
             }
         });
@@ -1236,8 +1326,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "professor",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "nominative.plural": "professorowie"
             }
         });
@@ -1246,8 +1337,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "uczeń",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "*stem": "uczń",
                 "nominative.plural": "uczniowie"
             }
@@ -1257,8 +1349,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "więzień",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "*stem": "więźń",
                 "nominative.plural": "więźniowie"
             }
@@ -1268,8 +1361,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "brat",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "genitive.plural": "braci",
                 "dative.singular": "bratu",
                 "instrumental.plural": "braćmi",
@@ -1281,8 +1375,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "Amerykanin",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "*stem": "Amerykan",
                 "nominative.plural": "Amerykanie"
             }
@@ -1292,8 +1387,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "Rosjanin",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "nominative.plural": "Rosjanie"
             }
         });
@@ -1398,7 +1494,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "twarz",
             "pos": "noun",
-            "options": {
+            "fields": {
                 "gender": "feminine"
             }
         });
@@ -1437,7 +1533,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "wiedzieć",
             "pos": "verb",
-            "forms": {
+            "fields": {
                 "*stem": "wiej",
                 "nonpast.plural.3p": "wiedzą"
             }
@@ -1471,7 +1567,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "nazywać",
             "pos": "verb",
-            "options": {
+            "fields": {
                 "conjugation": "third"
             }
         });
@@ -1480,8 +1576,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "pies",
             "pos": "noun",
-            "classes": ["animate"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "*stem": "ps",
                 "dative.singular": "psu"
             }
@@ -1491,15 +1588,18 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "królik",
             "pos": "noun",
-            "classes": ["animate"]
+            "fields": {
+                "animate": true
+            }
         });
 
         entries["siostrzeniec"] = new Entry({
             "lang": pl,
             "name": "siostrzeniec",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "*stem": "siostrzeńc"
             }
         });
@@ -1508,8 +1608,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "dziadek",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "*stem": "dziadk"
             }
         });
@@ -1518,8 +1619,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "szwagier",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "*stem": "szwagr"
             }
         });
@@ -1528,8 +1630,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "gość",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "instrumental.plural": "gośćmi"
             }
         });
@@ -1538,8 +1641,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "artysta",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "options": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "gender": "masculine"
             }
         });
@@ -1548,8 +1652,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "ojciec",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "*stem": "ojc",
                 "dative.singular": "ojcu",
                 "nominative.plural": "ojcowie"
@@ -1560,14 +1665,20 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "listonosz",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["żołnierz"] = new Entry({
             "lang": pl,
             "name": "żołnierz",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["obiad"] = new Entry({
@@ -1586,7 +1697,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "kosz",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.singular": "kosza"
             }
         });
@@ -1595,7 +1706,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "palec",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "palc",
                 "genitive.singular": "palca"
             }
@@ -1605,7 +1716,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "kwiatek",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "kwiatk",
                 "genitive.singular": "kwiatka"
             }
@@ -1627,7 +1738,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "pamięć",
             "pos": "noun",
-            "options": {
+            "fields": {
                 "gender": "feminine"
             }
         });
@@ -1660,10 +1771,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "krew",
             "pos": "noun",
-            "options": {
-                "gender": "feminine"
-            },
-            "forms": {
+            "fields": {
+                "gender": "feminine",
                 "*stem": "krw"
             }
         });
@@ -1672,10 +1781,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "chorągiew",
             "pos": "noun",
-            "options": {
-                "gender": "feminine"
-            },
-            "forms": {
+            "fields": {
+                "gender": "feminine",
                 "*stem": "chorągw"
             }
         });
@@ -1684,7 +1791,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "myśl",
             "pos": "noun",
-            "options": {
+            "fields": {
                 "gender": "feminine"
             }
         });
@@ -1693,10 +1800,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "sól",
             "pos": "noun",
-            "options": {
-                "gender": "feminine"
-            },
-            "forms": {
+            "fields": {
+                "gender": "feminine",
                 "*stem": "sol"
             }
         });
@@ -1705,10 +1810,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "idea",
             "pos": "noun",
-            "options": {
-                "gender": "feminine"
-            },
-            "forms": {
+            "fields": {
+                "gender": "feminine",
                 "genitive.singular": "idei"
             }
         });
@@ -1717,10 +1820,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "statua",
             "pos": "noun",
-            "options": {
-                "gender": "feminine"
-            },
-            "forms": {
+            "fields": {
+                "gender": "feminine",
                 "genitive.singular": "statui"
             }
         });
@@ -1802,7 +1903,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "koniec",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "końc"
             }
         });
@@ -1811,7 +1912,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "zegarek",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "zegark"
             }
         });
@@ -1874,7 +1975,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "głowa",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "głów"
             }
         });
@@ -1919,7 +2020,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "miasto",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "locative.singular": "mieście"
             }
         });
@@ -1928,7 +2029,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "słowo",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "słów"
             }
         });
@@ -1937,7 +2038,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "święto",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "świąt"
             }
         });
@@ -1946,7 +2047,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "piętro",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "pięter"
             }
         });
@@ -1967,7 +2068,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "narzędzie",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "narzędzi"
             }
         });
@@ -1976,7 +2077,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "wybrzeże",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "genitive.plural": "wybrzeży"
             }
         });
@@ -1985,7 +2086,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "świat",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "dative.singular": "światu"
             }
         });
@@ -1994,7 +2095,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "Bóg",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "Bog",
                 "dative.singular": "Bogu"
             }
@@ -2076,7 +2177,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "dzień",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "dń"
             }
         });
@@ -2085,8 +2186,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "wuj",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "nominative.plural": "wujowie"
             }
         });
@@ -2101,7 +2203,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "gwóźdź",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "gwoźdź"
             }
         });
@@ -2122,8 +2224,9 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "przyjaciel",
             "pos": "noun",
-            "classes": ["animate", "virile"],
-            "forms": {
+            "fields": {
+                "animate": true,
+                "virile": true,
                 "genitive.plural": "przyjaciół",
                 "instrumental.plural": "przyjaciółmi",
                 "*stem.plural": "przyjaciół"
@@ -2134,7 +2237,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "dłoń",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "instrumental.plural": "dłońmi"
             }
         });
@@ -2143,10 +2246,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "kość",
             "pos": "noun",
-            "options": {
-                "gender": "bone"
-            },
-            "forms": {
+            "fields": {
+                "gender": "feminine",
                 "instrumental.plural": "kośćmi"
             }
         });
@@ -2161,7 +2262,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "marzec",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "marc"
             }
         });
@@ -2188,7 +2289,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "wyjazd",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "wyjezd"
             }
         });
@@ -2203,14 +2304,17 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "szef",
             "pos": "noun",
-            "classes": ["animate", "virile"]
+            "fields": {
+                "animate": true,
+                "virile": true
+            }
         });
 
         entries["wóz"] = new Entry({
             "lang": pl,
             "name": "wóz",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "woz"
             }
         });
@@ -2255,7 +2359,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "oko",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem.plural": "ocz"
             }
         });
@@ -2270,7 +2374,7 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
             "lang": pl,
             "name": "gniazdo",
             "pos": "noun",
-            "forms": {
+            "fields": {
                 "*stem": "gniezd"
             }
         });

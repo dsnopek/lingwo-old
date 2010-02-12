@@ -1,10 +1,9 @@
 
 require(
     ['lingwo_dictionary/scripts/common/TestCase',
-     'lingwo_dictionary/js/languages/pl',
      'lingwo_dictionary/js/languages/pl.test-data',
     ],
-    function (TestCase, pl, test_data) {
+    function (TestCase, test_data) {
         function getEntry(entry_name) {
             if (typeof test_data[entry_name] == 'undefined')
                 throw("No such entry named: "+entry_name);
@@ -37,6 +36,7 @@ require(
                 }
             },
 
+            /*
             testJaki: function () {
                 this.checkForms('jaki', {
                     'nominative.singular.masculine': 'jaki',
@@ -44,6 +44,7 @@ require(
                     'nominative.singular.neuter': 'jakie'
                 });
             },
+            */
 
             testNounGenderMasculine: function () {
                 this.checkOptionMulti('gender', 'masculine', [
@@ -63,6 +64,7 @@ require(
                 ]);
             },
 
+            /*
             testAdjectiveSoft: function () {
                 // not soft!
                 this.checkClassMulti('soft', false, [
@@ -132,6 +134,7 @@ require(
                     'nonpast.plural.3p': 'są'
                 });
             },
+            */
 
             testNounMasculineNonVirilePlural: function () {
                 this.checkFormMulti('nominative.plural', {
@@ -259,6 +262,7 @@ require(
                 });
             },
 
+            /*
             testAdjectiveNominativePluralNonVirile: function () {
                 this.checkFormMulti('nominative.plural.non_virile', {
                     'mały': 'małe',
@@ -1209,6 +1213,7 @@ require(
                   'ostatni': 'ostatnich'
                });
             }
+            */
         }).run();
     }
 );
