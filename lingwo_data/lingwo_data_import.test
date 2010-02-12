@@ -123,13 +123,11 @@ class LingwoDataImportUnitTestCase extends DrupalUnitTestCase {
     $lingwo_language_fields->expects(InvocationRestriction::once())
       ->with('zzz', 'noun')
       ->will(WillAction::returnValue(array(
-        array(
+        'first' => array(
           'type' => 'option',
-          'name' => 'first',
         ),
-        array(
+        'second' => array(
           'type' => 'form',
-          'name' => 'second',
         )
     )));
 

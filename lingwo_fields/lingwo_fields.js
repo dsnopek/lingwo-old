@@ -9,16 +9,15 @@
 
     // updates the on screen form with values from the entry
     function updateForm() {
+        var name;
+
         // get rid of old cached values
         entry.clearCache();
 
-        var type, name;
-        for (type in field_map) {
-            for (name in field_map[type]) {
-                var control = field_map[type][name];
-                if (control.automatic) {
-                    control.fromEntry();
-                }
+        for (name in field_map) {
+            var control = field_map[name];
+            if (control.automatic) {
+                control.fromEntry();
             }
         }
     };
@@ -31,7 +30,6 @@
         this.wrapperNode = $(this.inputNode).parent().parent().get(0);
         this.valueNode = $('<a class="lingwo-fields-value" href="#"></a>');
         this.autoNode = $('#'+(''+node.id).replace(/-value$/, '-automatic')).get();
-        this.showFunc = $(this.inputNode).attr('data-show');
 
         $(this.inputNode).after(this.valueNode);
 
@@ -96,18 +94,7 @@
         if (this.automatic) {
             $(this.inputNode).hide();
             $(this.valueNode).show();
-            
-            switch (this.type) {
-                case 'class':
-                    delete entry.classes[this.name];
-                    break;
-                case 'option':
-                    delete entry.options[this.name];
-                    break;
-                case 'form':
-                    delete entry.forms[this.name];
-                    break;
-            }
+            delete entry.fields[this.name];
         }
         else {
             $(this.inputNode).show();
@@ -121,20 +108,13 @@
     // pulls the values for this control from an entry
     Control.prototype.fromEntry = function () {
         var value      = '<i>(empty)</i>',
-            inputValue = '';
+            inputValue = '',
+            showFunc;
 
-        if (entry.name) {
-            switch (this.type) {
-                case 'class':
-                    value = entry.isClass(this.name).toString();
-                    inputValue = (value == 'true') ? '1' : '0';
-                    break;
-                case 'option':
-                    inputValue = value = entry.getOption(this.name);
-                    break;
-                case 'form':
-                    inputValue = value = entry.getForm(this.name).toString();
-                    break;
+        if (entry.headword) {
+            value = inputValue = entry.getField(this.name).toString();
+            if (this.type == 'class') {
+                inputValue = (value == 'true') ? '1' : '0';
             }
         }
 
@@ -142,8 +122,8 @@
         $(this.valueNode).html(value);
 
         // Run our show function if one exists
-        if (this.showFunc) {
-            if (eval(this.showFunc)) {
+        if (showFunc = entry.getFieldInfo(this.name).show) {
+            if (showFunc(entry)) {
                 $(this.wrapperNode).show();
             }
             else {
@@ -155,13 +135,13 @@
     Control.prototype.toEntry = function () {
         switch(this.type) {
             case 'class':
-                entry.classes[this.name] = $(':selected', this.inputNode).val() == '1';
+                entry.fields[this.name] = $(':selected', this.inputNode).val() == '1';
                 break;
             case 'option':
-                entry.options[this.name] = $(':selected', this.inputNode).val();
+                entry.fields[this.name] = $(':selected', this.inputNode).val();
                 break;
             case 'form':
-                entry.forms[this.name] = $(this.inputNode).val();
+                entry.fields[this.name] = $(this.inputNode).val();
                 break;
         };
     };
@@ -176,41 +156,43 @@
         var pos  = settings.pos ||
             settings.pos_values[$('#edit-taxonomy-'+settings.pos_vid+' :selected').val()];
 
-        // this will be run every time the AHAH completes, so we need to rebuild
-        // the entry object.
-        entry = new Lingwo.dictionary.Entry({
-            // NOTE: we don't search for #edit-title on context because we want it always
-            name: $('#edit-title').val(),
-            lang: Lingwo.dictionary.languages[lang],
-            pos: pos
-        });
+        require(
+            ['lingwo_dictionary/languages/'+lang,
+             'lingwo_dictionary/Entry'],
+            function (lang, Entry) {
+                // this will be run every time the AHAH completes, so we need to rebuild
+                // the entry object.
+                entry = new Entry({
+                    // NOTE: we don't search for #edit-title on context because we want it always
+                    headword: $('#edit-title').val(),
+                    language: lang,
+                    pos: pos
+                });
 
-        // remove the Refresh button, AHAH will handle the reloading
-        $('#edit-'+settings.field_name+'-refresh', context).remove();
+                // remove the Refresh button, AHAH will handle the reloading
+                $('#edit-'+settings.field_name+'-refresh', context).remove();
 
-        $('#edit-title', context).bind('keyup', function (evt) {
-            entry.name = evt.target.value;
-            if (timer !== null) {
-                clearTimeout(timer);
-            }
-            timer = setTimeout(function () {
+                $('#edit-title', context).bind('keyup', function (evt) {
+                    entry.headword = evt.target.value;
+                    if (timer !== null) {
+                        clearTimeout(timer);
+                    }
+                    timer = setTimeout(function () {
+                        updateForm();
+                        timer = null;
+                    }, 500);
+                });
+
+                field_map = {};
+                $('.'+settings.field_name+'-control', context).each(function (i) {
+                    var control = new Control(this);
+                    field_map[control.name] = control;
+                });
+
+                // updated the form!!
                 updateForm();
-                timer = null;
-            }, 500);
-        });
-
-        field_map = {
-            'class': {},
-            'option': {},
-            'form': {}
-        };
-        $('.'+settings.field_name+'-control', context).each(function (i) {
-            var control = new Control(this);
-            field_map[control.type][control.name] = control;
-        });
-
-        // updated the form!!
-        updateForm();
+            }
+        );
     };
 })();
 
