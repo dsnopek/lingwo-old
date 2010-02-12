@@ -1,7 +1,7 @@
 
 require(
-    ['lingwo_dictionary/scripts/common/TestCase',
-     'lingwo_dictionary/js/languages/pl.test-data',
+    ['lingwo_dictionary/util/TestCase',
+     'lingwo_dictionary/languages/pl.test-data',
     ],
     function (TestCase, test_data) {
         function getEntry(entry_name) {

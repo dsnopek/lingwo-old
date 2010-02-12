@@ -12,7 +12,7 @@
     // load requirejs
     require = {
         paths: {
-            'lingwo_dictionary': lingwo_dictionary_path,
+            'lingwo_dictionary': lingwo_dictionary_path+'/js',
         }
     };
     load(lingwo_dictionary_path + '/js/require.js');

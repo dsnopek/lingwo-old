@@ -1,9 +1,9 @@
 
 require(
-    ['lingwo_dictionary/scripts/common/TestCase',
-     'lingwo_dictionary/scripts/importer/common/Database',
-     'lingwo_dictionary/scripts/importer/common/DatabaseProducer',
-     'lingwo_dictionary/js/languages/common/Entry',
+    ['lingwo_dictionary/util/TestCase',
+     'lingwo_dictionary/importer/Database',
+     'lingwo_dictionary/importer/DatabaseProducer',
+     'lingwo_dictionary/Entry',
     ],
     function (TestCase, Database, DatabaseProducer, Entry) {
         TestCase.subclass({

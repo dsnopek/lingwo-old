@@ -1,7 +1,7 @@
 
 require(
-    ['lingwo_dictionary/scripts/common/TestCase',
-     'lingwo_dictionary/scripts/importer/common/mediawiki/WikiText',
+    ['lingwo_dictionary/util/TestCase',
+     'lingwo_dictionary/importer/mediawiki/WikiText',
     ],
     function (TestCase, WikiText) {
         TestCase.subclass({

@@ -3,11 +3,11 @@
  * For parsing data from pl.wikitionary.org.
  */
 
-require.def('lingwo_dictionary/scripts/importer/common/wiktionary/pl',
-    ['lingwo_dictionary/js/languages/common/Entry',
-     'lingwo_dictionary/js/languages/common/Language',
-     'lingwo_dictionary/scripts/importer/common/mediawiki/WikiText',
-     'lingwo_dictionary/scripts/importer/common/mediawiki/Producer',
+require.def('lingwo_dictionary/importer/wiktionary/pl',
+    ['lingwo_dictionary/Entry',
+     'lingwo_dictionary/Language',
+     'lingwo_dictionary/importer/mediawiki/WikiText',
+     'lingwo_dictionary/importer/mediawiki/Producer',
     ],
     function (Entry, Language, WikiText, Producer) {
         var langNames = {

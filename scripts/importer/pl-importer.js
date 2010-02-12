@@ -12,10 +12,10 @@ console = {
 };
 
 require([
-        'lingwo_dictionary/scripts/importer/common/Database',
-        'lingwo_dictionary/scripts/importer/common/Service',
-        'lingwo_dictionary/scripts/importer/common/wiktionary/pl',
-        'lingwo_dictionary/js/languages/pl',
+        'lingwo_dictionary/importer/Database',
+        'lingwo_dictionary/importer/Service',
+        'lingwo_dictionary/importer/wiktionary/pl',
+        'lingwo_dictionary/languages/pl',
     ],
     function (Database, Service, wiktionary_pl, pl) {
         var db = new Database('staging.db');

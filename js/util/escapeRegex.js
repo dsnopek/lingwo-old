@@ -1,5 +1,5 @@
 
-require.def('lingwo_dictionary/js/util/escapeRegex',
+require.def('lingwo_dictionary/util/escapeRegex',
     [],
     function () {
         var regexSpecial = ['(',')','{','}','*'];

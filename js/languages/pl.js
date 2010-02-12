@@ -3,8 +3,8 @@
  * Defines the morphology of the Polish language.
  */
 
-require.def('lingwo_dictionary/js/languages/pl',
-    ['lingwo_dictionary/js/languages/common/Language'],
+require.def('lingwo_dictionary/languages/pl',
+    ['lingwo_dictionary/Language'],
     function (Language) {
         var lang = Language.defineLanguage('pl');
 

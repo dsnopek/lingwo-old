@@ -3,9 +3,9 @@
  * The generic framework for making/using a language definition.
  */
 
-require.def('lingwo_dictionary/js/languages/common/Language',
-    ['lingwo_dictionary/js/util/extendPrototype',
-     'lingwo_dictionary/js/languages/common/err'],
+require.def('lingwo_dictionary/Language',
+    ['lingwo_dictionary/util/extendPrototype',
+     'lingwo_dictionary/err'],
     function (extendPrototype, err) {
         // we string everything off of the Language constructor function.
         var Language = function () {

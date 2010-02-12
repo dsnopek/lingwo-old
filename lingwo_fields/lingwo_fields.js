@@ -157,8 +157,8 @@
             settings.pos_values[$('#edit-taxonomy-'+settings.pos_vid+' :selected').val()];
 
         require(
-            ['lingwo_dictionary/js/languages/'+lang,
-             'lingwo_dictionary/js/languages/common/Entry'],
+            ['lingwo_dictionary/languages/'+lang,
+             'lingwo_dictionary/Entry'],
             function (lang, Entry) {
                 // this will be run every time the AHAH completes, so we need to rebuild
                 // the entry object.

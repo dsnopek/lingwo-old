@@ -3,7 +3,7 @@
  * Standard Exceptions
  */
 
-require.def('lingwo_dictionary/js/languages/common/err',
+require.def('lingwo_dictionary/err',
     [],
     {
         NoSuchField: function (field_name, pos) {

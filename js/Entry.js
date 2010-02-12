@@ -1,9 +1,9 @@
 
-require.def('lingwo_dictionary/js/languages/common/Entry',
-    ['lingwo_dictionary/js/util/declare',
-     'lingwo_dictionary/js/languages/common/err',
-     'lingwo_dictionary/js/util/json2',
-     'lingwo_dictionary/js/languages/common/Language',
+require.def('lingwo_dictionary/Entry',
+    ['lingwo_dictionary/util/declare',
+     'lingwo_dictionary/err',
+     'lingwo_dictionary/util/json2',
+     'lingwo_dictionary/Language',
     ],
     function (declare, err, JSON, Language) {
         var Entry = declare({

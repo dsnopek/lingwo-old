@@ -3,7 +3,7 @@
  * Very simple function for mixing properties into a constructors prototype.
  */
 
-require.def('lingwo_dictionary/js/util/extendPrototype',
+require.def('lingwo_dictionary/util/extendPrototype',
     [],
     function () {
         return function (cons, props) {
