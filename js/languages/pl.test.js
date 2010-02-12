@@ -11,33 +11,21 @@ require(
         }
 
         TestCase.subclass({
-            checkForms: function (entry_name, forms) {
+            checkFields: function (entry_name, fields) {
                 var entry = getEntry(entry_name);
-                for(var name in forms) {
-                    this.assertEquals(entry.getForm(name), forms[name], entry.name);
+                for(var name in fields) {
+                    this.assertEquals(entry.getField(name), fields[name], entry.name);
                 }
             },
 
-            checkOptionMulti: function (option_name, value, entry_names) {
-                for (var i = 0; i < entry_names.length; i++) {
-                    this.assertEquals(getEntry(entry_names[i]).getOption(option_name), value, entry_names[i]);
-                }
-            },
-
-            checkClassMulti: function (class_name, value, entry_names) {
-                for (var i = 0; i < entry_names.length; i++) {
-                    this.assertEquals(getEntry(entry_names[i]).isClass(class_name), value, entry_names[i]);
-                }
-            },
-
-            checkFormMulti: function (form_name, entry_form_map) {
-                for (var entry_name in entry_form_map) {
-                    this.assertEquals(getEntry(entry_name).getForm(form_name), entry_form_map[entry_name]);
+            checkFieldMulti: function (field_name, field_map) {
+                for (var entry_name in field_map) {
+                    this.assertEquals(getEntry(entry_name).getField(field_name), field_map[entry_name]);
                 }
             },
 
             testJaki: function () {
-                this.checkForms('jaki', {
+                this.checkFields('jaki', {
                     'nominative.singular.masculine': 'jaki',
                     'nominative.singular.feminine': 'jaka',
                     'nominative.singular.neuter': 'jakie'
@@ -45,37 +33,37 @@ require(
             },
 
             testNounGenderMasculine: function () {
-                this.checkOptionMulti('gender', 'masculine', [
+                this.checkFieldMulti('gender', 'masculine', [
                     'stół', 'kot', 'pokój', 'chłopiec', 'kolega', 'dentysta', 'mężczyzna'
                 ]);
             },
 
             testNounGenderFeminine: function () {
-                this.checkOptionMulti('gender', 'feminine', [
+                this.checkFieldMulti('gender', 'feminine', [
                     'kobieta', 'ulica', 'Polska', 'gospodyni', 'noc', 'część', 'jesień', 'wieś', 'mysz', 'miłość', 'ciekawość'
                 ]);
             },
 
             testNounGenderNeuter: function () {
-                this.checkOptionMulti('gender', 'neuter', [
+                this.checkFieldMulti('gender', 'neuter', [
                     'okno', 'dziecko', 'życie', 'imię', 'szczenię', 'zwierzę', 'niemowlę', 'muzeum', 'gimnazjum'
                 ]);
             },
 
             testAdjectiveSoft: function () {
                 // not soft!
-                this.checkClassMulti('soft', false, [
+                this.checkFieldMulti('soft', false, [
                     'duży', 'mały', 'dobry', 'zły', 'wysoki', 'niski', 'polski', 'długi', 'drogi', 'drugi'
                 ]);
 
                 // soft
-                this.checkClassMulti('soft', true, [
+                this.checkFieldMulti('soft', true, [
                     'głupi', 'tani', 'trzeci', 'ostatni', 'średni'
                 ]);
             },
 
             testAdjectiveFormStem: function () {
-                this.checkFormMulti('*stem', {
+                this.checkFieldMulti('*stem', {
                     'mały': 'mał',
                     'duży': 'duż',
                     'dobry': 'dobr',
@@ -95,7 +83,7 @@ require(
             },
 
             testAdjectiveNominativeSingularMasculine: function () {
-                this.checkFormMulti('nominative.singular.masculine', {
+                this.checkFieldMulti('nominative.singular.masculine', {
                     'mały': 'mały',
                     'wysoki': 'wysoki',
                     'drogi': 'drogi',
@@ -104,7 +92,7 @@ require(
             },
 
             testAdjectiveNominativeSingularFeminine: function () {
-                this.checkFormMulti('nominative.singular.feminine', {
+                this.checkFieldMulti('nominative.singular.feminine', {
                     'mały': 'mała',
                     'wysoki': 'wysoka',
                     'drogi': 'droga',
@@ -113,7 +101,7 @@ require(
             },
 
             testAdjectiveNominativeSingularNeuter: function () {
-                this.checkFormMulti('nominative.singular.neuter', {
+                this.checkFieldMulti('nominative.singular.neuter', {
                     'mały': 'małe',
                     'wysoki': 'wysokie',
                     'drogi': 'drogie',
@@ -122,7 +110,7 @@ require(
             },
 
             testToBeNonPast: function () {
-                this.checkForms('być', {
+                this.checkFields('być', {
                     'nonpast.singular.1p': 'jestem',
                     'nonpast.singular.2p': 'jesteś',
                     'nonpast.singular.3p': 'jest',
@@ -133,7 +121,7 @@ require(
             },
 
             testNounMasculineNonVirilePlural: function () {
-                this.checkFormMulti('nominative.plural', {
+                this.checkFieldMulti('nominative.plural', {
                     // -y group
                     'dom': 'domy',
                     'kot': 'koty',
@@ -177,7 +165,7 @@ require(
             },
 
             testNounFemininePlural: function () {
-                this.checkFormMulti('nominative.plural', {
+                this.checkFieldMulti('nominative.plural', {
                     // -y group
                     'kobieta': 'kobiety',
                     'szkoła': 'szkoły',
@@ -235,7 +223,7 @@ require(
             },
 
             testNounNeuterPlural: function () {
-                this.checkFormMulti('nominative.plural', {
+                this.checkFieldMulti('nominative.plural', {
                     // -a group
                     'jabłko': 'jabłka',
                     'morze': 'morza',
@@ -259,7 +247,7 @@ require(
             },
 
             testAdjectiveNominativePluralNonVirile: function () {
-                this.checkFormMulti('nominative.plural.non_virile', {
+                this.checkFieldMulti('nominative.plural.non_virile', {
                     'mały': 'małe',
                     'młody': 'młode',
                     'duży': 'duże',
@@ -270,7 +258,7 @@ require(
             },
 
             testNounMasculinePluralVirile: function () {
-                this.checkFormMulti('nominative.plural', {
+                this.checkFieldMulti('nominative.plural', {
                     // -y group (hard which remains hard)
                     'Polak': 'Polacy',
                     'Chińczyk': 'Chińczycy',
@@ -327,7 +315,7 @@ require(
             },
 
             testAdjectiveNominativePluralVirile: function () {
-                this.checkFormMulti('nominative.plural.virile', {
+                this.checkFieldMulti('nominative.plural.virile', {
                     // -y group (hard which remain hard
                     'polski': 'polscy',
                     'wysoki': 'wysocy',
@@ -363,7 +351,7 @@ require(
             },
 
             testNounFeminineAccusativeSingular: function () {
-                this.checkFormMulti('accusative.singular', {
+                this.checkFieldMulti('accusative.singular', {
                     'matka': 'matkę',
                     'kobieta': 'kobietę',
                     'babcia': 'babcię',
@@ -379,7 +367,7 @@ require(
             },
 
             testAdjectiveAccusativeSingularFeminine: function () {
-                this.checkFormMulti('accusative.singular.feminine', {
+                this.checkFieldMulti('accusative.singular.feminine', {
                     'duży': 'dużą',
                     'piękny': 'piękną',
                     'tani': 'tanią',
@@ -389,9 +377,9 @@ require(
             },
 
             testVerbSecondConjugation: function () {
-                this.assertEquals(getEntry('wierzyć').getOption('conjugation'), 'second');
+                this.assertEquals(getEntry('wierzyć').getField('conjugation'), 'second');
 
-                this.checkForms('wierzyć', {
+                this.checkFields('wierzyć', {
                     'nonpast.singular.1p': 'wierzę',
                     'nonpast.singular.2p': 'wierzysz',
                     'nonpast.singular.3p': 'wierzy',
@@ -402,9 +390,9 @@ require(
             },
 
             testVerbSecondConjugationEC: function () {
-                this.assertEquals(getEntry('słyszeć').getOption('conjugation'), 'second');
+                this.assertEquals(getEntry('słyszeć').getField('conjugation'), 'second');
 
-                this.checkForms('słyszeć', {
+                this.checkFields('słyszeć', {
                     'nonpast.singular.1p': 'słyszę',
                     'nonpast.singular.2p': 'słyszysz',
                     'nonpast.singular.3p': 'słyszy',
@@ -415,9 +403,9 @@ require(
             },
 
             testVerbSecondConjugationIC: function () {
-                this.assertEquals(getEntry('dzwonić').getOption('conjugation'), 'second');
+                this.assertEquals(getEntry('dzwonić').getField('conjugation'), 'second');
 
-                this.checkForms('dzwonić', {
+                this.checkFields('dzwonić', {
                     'nonpast.singular.1p': 'dzwonię',
                     'nonpast.singular.2p': 'dzwonisz',
                     'nonpast.singular.3p': 'dzwoni',
@@ -428,9 +416,9 @@ require(
             },
 
             testVerbThirdConjugation: function () {
-                this.assertEquals(getEntry('mieszkać').getOption('conjugation'), 'third');
+                this.assertEquals(getEntry('mieszkać').getField('conjugation'), 'third');
 
-                this.checkForms('mieszkać', {
+                this.checkFields('mieszkać', {
                     'nonpast.singular.1p': 'mieszkam',
                     'nonpast.singular.2p': 'mieszkasz',
                     'nonpast.singular.3p': 'mieszka',
@@ -441,9 +429,9 @@ require(
             },
 
             testVerbThirdConjugationIrregularStem: function () {
-                this.assertEquals(getEntry('wiedzieć').getOption('conjugation'), 'third');
+                this.assertEquals(getEntry('wiedzieć').getField('conjugation'), 'third');
 
-                this.checkForms('wiedzieć', {
+                this.checkFields('wiedzieć', {
                     'nonpast.singular.1p': 'wiem',
                     'nonpast.singular.2p': 'wiesz',
                     'nonpast.singular.3p': 'wie',
@@ -454,9 +442,9 @@ require(
             },
 
             testVerbOWAC: function () {
-                this.assertEquals(getEntry('dziękować').getOption('conjugation'), 'first');
+                this.assertEquals(getEntry('dziękować').getField('conjugation'), 'first');
 
-                this.checkForms('dziękować', {
+                this.checkFields('dziękować', {
                     'nonpast.singular.1p': 'dziękuję',
                     'nonpast.singular.2p': 'dziękujesz',
                     'nonpast.singular.3p': 'dziękuje',
@@ -467,9 +455,9 @@ require(
             },
 
             testVerbYWAC: function () {
-                this.assertEquals(getEntry('obiecywać').getOption('conjugation'), 'first');
+                this.assertEquals(getEntry('obiecywać').getField('conjugation'), 'first');
 
-                this.checkForms('obiecywać', {
+                this.checkFields('obiecywać', {
                     'nonpast.singular.1p': 'obiecuję',
                     'nonpast.singular.2p': 'obiecujesz',
                     'nonpast.singular.3p': 'obiecuje',
@@ -480,9 +468,9 @@ require(
             },
 
             testVerbIWAC: function () {
-                this.assertEquals(getEntry('oczekiwać').getOption('conjugation'), 'first');
+                this.assertEquals(getEntry('oczekiwać').getField('conjugation'), 'first');
 
-                this.checkForms('oczekiwać', {
+                this.checkFields('oczekiwać', {
                     'nonpast.singular.1p': 'oczekuję',
                     'nonpast.singular.2p': 'oczekujesz',
                     'nonpast.singular.3p': 'oczekuje',
@@ -493,9 +481,9 @@ require(
             },
 
             testVerbAWAC: function () {
-                this.assertEquals(getEntry('dawać').getOption('conjugation'), 'first');
+                this.assertEquals(getEntry('dawać').getField('conjugation'), 'first');
 
-                this.checkForms('dawać', {
+                this.checkFields('dawać', {
                     'nonpast.singular.1p': 'daję',
                     'nonpast.singular.2p': 'dajesz',
                     'nonpast.singular.3p': 'daje',
@@ -506,9 +494,9 @@ require(
             },
 
             testVerbThirdConjugationYWAC: function () {
-                this.assertEquals(getEntry('nazywać').getOption('conjugation'), 'third');
+                this.assertEquals(getEntry('nazywać').getField('conjugation'), 'third');
 
-                this.checkForms('nazywać', {
+                this.checkFields('nazywać', {
                     'nonpast.singular.1p': 'nazywam',
                     'nonpast.singular.2p': 'nazywasz',
                     'nonpast.singular.3p': 'nazywa',
@@ -519,7 +507,7 @@ require(
             },
 
             testNounMasculineAccusativeSingularAnimate: function () {
-                this.checkFormMulti('accusative.singular', {
+                this.checkFieldMulti('accusative.singular', {
                     'brat': 'brata',
                     'kelner': 'kelnera',
                     'królik': 'królika',
@@ -543,7 +531,7 @@ require(
             },
 
             testNounMasculineAccusativePluralVirile: function () {
-                this.checkFormMulti('accusative.plural', {
+                this.checkFieldMulti('accusative.plural', {
                     'syn': 'synów',
                     'ojciec': 'ojców',
                     'Polak': 'Polaków',
@@ -569,7 +557,7 @@ require(
             },
 
             testNounMasculineGenitiveSingular: function () {
-                this.checkFormMulti('genitive.singular', {
+                this.checkFieldMulti('genitive.singular', {
                     'turysta': 'turysty',
                     'mężczyzna': 'mężczyzny',
                     'kierowca': 'kierowcy',
@@ -592,7 +580,7 @@ require(
             },
 
             testNounFeminineGenitiveSingular: function () {
-                this.checkFormMulti('genitive.singular', {
+                this.checkFieldMulti('genitive.singular', {
                     'lampa': 'lampy',
                     'szkoła': 'szkoły',
                     'kobieta': 'kobiety',
@@ -652,7 +640,7 @@ require(
             },
 
             testNounNeuterGenitiveSingular: function () {
-                this.checkFormMulti('genitive.singular', {
+                this.checkFieldMulti('genitive.singular', {
                     'okno': 'okna',
                     'jabłko': 'jabłka',
                     'krzesło': 'krzesła',
@@ -669,7 +657,7 @@ require(
             },
 
             testNounMasculineGenitivePlural: function () {
-                this.checkFormMulti('genitive.plural', {
+                this.checkFieldMulti('genitive.plural', {
                     'bank': 'banków',
                     'pociąg': 'pociągów',
                     'ptak': 'ptaków',
@@ -710,7 +698,7 @@ require(
             },
 
             testNounFeminineGenitivePlural: function () {
-                this.checkFormMulti('genitive.plural', {
+                this.checkFieldMulti('genitive.plural', {
                     'gwiazda': 'gwiazd',
                     'ulica': 'ulic',
                     'żona': 'żon',
@@ -745,7 +733,7 @@ require(
             },
 
             testNounNeuterGenitivePlural: function () {
-                this.checkFormMulti('genitive.plural', {
+                this.checkFieldMulti('genitive.plural', {
                     'drzewo': 'drzew',
                     'pióro': 'piór',
                     'jezioro': 'jezior',
@@ -785,7 +773,7 @@ require(
             },
 
             testAdjectiveGenitiveSingularFeminine: function () {
-                this.checkFormMulti('genitive.singular.feminine', {
+                this.checkFieldMulti('genitive.singular.feminine', {
                     'dobry': 'dobrej',
                     'polski': 'polskiej',
                     'ostatni': 'ostatniej'
@@ -793,7 +781,7 @@ require(
             },
 
             testAdjectiveGenitiveSingularMasculine: function () {
-                this.checkFormMulti('genitive.singular.masculine', {
+                this.checkFieldMulti('genitive.singular.masculine', {
                     'dobry': 'dobrego',
                     'polski': 'polskiego',
                     'ostatni': 'ostatniego'
@@ -801,7 +789,7 @@ require(
             },
 
             testAdjectiveGenitivePlural: function () {
-                this.checkFormMulti('genitive.plural', {
+                this.checkFieldMulti('genitive.plural', {
                     'dobry': 'dobrych',
                     'polski': 'polskich',
                     'ostatni': 'ostatnich'
@@ -809,7 +797,7 @@ require(
             },
 
             testNounMasculineDativeSingular: function () {
-                this.checkFormMulti('dative.singular', {
+                this.checkFieldMulti('dative.singular', {
                     'Polak': 'Polakowi',
                     'sąsiad': 'sąsiadowi',
                     'mąż': 'mężowi',
@@ -835,7 +823,7 @@ require(
             },
 
             testNounFeminineDativeSingular: function () {
-                this.checkFormMulti('dative.singular', {
+                this.checkFieldMulti('dative.singular', {
                     'szkoła': 'szkole',
                     'sosna': 'sośnie',
                     'kobieta': 'kobiecie',
@@ -861,7 +849,7 @@ require(
             },
 
             testNounNeuterDativeSingular: function () {
-                this.checkFormMulti('dative.singular', {
+                this.checkFieldMulti('dative.singular', {
                     'dziecko': 'dziecku',
                     'pole': 'polu',
                     'życie': 'życiu',
@@ -877,7 +865,7 @@ require(
             },
 
             testAdjectiveDativeSingularFeminine: function () {
-                this.checkFormMulti('dative.singular.feminine', {
+                this.checkFieldMulti('dative.singular.feminine', {
                     'dobry': 'dobrej',
                     'polski': 'polskiej',
                     'ostatni': 'ostatniej'
@@ -885,7 +873,7 @@ require(
             },
 
             testAdjectiveDativeSingularMasculine: function () {
-                this.checkFormMulti('dative.singular.masculine', {
+                this.checkFieldMulti('dative.singular.masculine', {
                     'dobry': 'dobremu',
                     'polski': 'polskiemu',
                     'ostatni': 'ostatniemu'
@@ -893,7 +881,7 @@ require(
             },
 
             testNounDativePlural: function () {
-                this.checkFormMulti('dative.plural', {
+                this.checkFieldMulti('dative.plural', {
                     'ojciec': 'ojcom',
                     'kolega': 'kolegom',
                     'mąż': 'mężom',
@@ -922,7 +910,7 @@ require(
             },
 
             testAdjectiveDativePlural: function () {
-                this.checkFormMulti('dative.plural', {
+                this.checkFieldMulti('dative.plural', {
                     'dobry': 'dobrym',
                     'polski': 'polskim',
                     'ostatni': 'ostatnim'
@@ -930,7 +918,7 @@ require(
             },
 
             testNounMasculineInstrumentalSingular: function () {
-                this.checkFormMulti('instrumental.singular', {
+                this.checkFieldMulti('instrumental.singular', {
                     'syn': 'synem',
                     'brat': 'bratem',
                     'chłopiec': 'chłopcem',
@@ -955,7 +943,7 @@ require(
             },
 
             testNounFeminineInstrumentalSingular: function () {
-                this.checkFormMulti('instrumental.singular', {
+                this.checkFieldMulti('instrumental.singular', {
                     'matka': 'matką',
                     'lekcja': 'lekcją',
                     'droga': 'drogą',
@@ -978,7 +966,7 @@ require(
             },
 
             testNounNeuterInstrumentalSingular: function () {
-                this.checkFormMulti('instrumental.singular', {
+                this.checkFieldMulti('instrumental.singular', {
                     'pióro': 'piórem',
                     'krzesło': 'krzesłem',
                     'morze': 'morzem',
@@ -1000,7 +988,7 @@ require(
             },
 
             testAdjectiveInstrumentalSingularFeminine: function () {
-                this.checkFormMulti('instrumental.singular.feminine', {
+                this.checkFieldMulti('instrumental.singular.feminine', {
                     'dobry': 'dobrą',
                     'polski': 'polską',
                     'ostatni': 'ostatnią'
@@ -1008,7 +996,7 @@ require(
             },
 
             testAdjectiveInstrumentalSingularMasculine: function () {
-                this.checkFormMulti('instrumental.singular.masculine', {
+                this.checkFieldMulti('instrumental.singular.masculine', {
                     'dobry': 'dobrym',
                     'polski': 'polskim',
                     'ostatni': 'ostatnim'
@@ -1016,7 +1004,7 @@ require(
             },
 
             testNounInstrumentalPlural: function () {
-                this.checkFormMulti('instrumental.plural', {
+                this.checkFieldMulti('instrumental.plural', {
                     // regular, hard
                     'syn': 'synami',
                     'ojciec': 'ojcami',
@@ -1067,7 +1055,7 @@ require(
             },
 
             testAdjectiveInstrumentalPlural: function () {
-                this.checkFormMulti('instrumental.plural', {
+                this.checkFieldMulti('instrumental.plural', {
                     'dobry': 'dobrymi',
                     'polski': 'polskimi',
                     'ostatni': 'ostatnimi'
@@ -1075,7 +1063,7 @@ require(
             },
 
             testNounMasculineLocativeSingular: function () {
-                this.checkFormMulti('locative.singular', {
+                this.checkFieldMulti('locative.singular', {
                     'dach': 'dachu',
                     'hotel': 'hotelu',
                     'dziadek': 'dziadku',
@@ -1108,7 +1096,7 @@ require(
             },
 
             testNounFeminineLocativeSingular: function () {
-                this.checkFormMulti('locative.singular', {
+                this.checkFieldMulti('locative.singular', {
                     'szkoła': 'szkole',
                     'sosna': 'sośnie',
                     'kobieta': 'kobiecie',
@@ -1124,7 +1112,7 @@ require(
             },
 
             testNounNeuterLocativeSingular: function () {
-                this.checkFormMulti('locative.singular', {
+                this.checkFieldMulti('locative.singular', {
                     'jabłko': 'jabłku',
                     'ucho': 'uchu',
                     'jajko': 'jajku',
@@ -1157,7 +1145,7 @@ require(
             },
 
             testNounLocativePlural: function () {
-                this.checkFormMulti('locative.plural', {
+                this.checkFieldMulti('locative.plural', {
                     'pies': 'psach',
                     'muzeum': 'muzeach',
                     'pokój': 'pokojach',
@@ -1185,7 +1173,7 @@ require(
             },
 
             testAdjectiveLocativeSingularMasculine: function () {
-               this.checkFormMulti('locative.singular.masculine', {
+               this.checkFieldMulti('locative.singular.masculine', {
                   'dobry': 'dobrym',
                   'polski': 'polskim',
                   'ostatni': 'ostatnim'
@@ -1194,7 +1182,7 @@ require(
             },
 
             testAdjectiveLocativeSingularFeminine: function () {
-               this.checkFormMulti('locative.singular.feminine', {
+               this.checkFieldMulti('locative.singular.feminine', {
                   'dobry': 'dobrej',
                   'polski': 'polskiej',
                   'ostatni': 'ostatniej'
@@ -1202,7 +1190,7 @@ require(
             },
 
             testAdjectiveLocativePlural: function () {
-               this.checkFormMulti('locative.plural', {
+               this.checkFieldMulti('locative.plural', {
                   'dobry': 'dobrych',
                   'polski': 'polskich',
                   'ostatni': 'ostatnich'

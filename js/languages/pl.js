@@ -122,7 +122,7 @@ require.def('lingwo_dictionary/js/languages/pl',
             'animate': {
                 type: 'class',
                 automatic: function (entry) {
-                    return entry.isClass('virile');
+                    return entry.getField('virile');
                 }
             },
 
@@ -137,7 +137,7 @@ require.def('lingwo_dictionary/js/languages/pl',
             'gender': {
                 type: 'option',
                 automatic: function (entry) {
-                    var word = entry.getForm();
+                    var word = entry.getWord();
                     return word.ending('o', 'e', 'ę', 'um').result('neuter')  ||
                            word.ending(Language.cls('vowel')).result('feminine') ||
                            'masculine';
@@ -147,7 +147,7 @@ require.def('lingwo_dictionary/js/languages/pl',
             '*stem': {
                 type: 'form',
                 automatic: function (entry) {
-                    var word = entry.getForm();
+                    var word = entry.getWord();
                     return word.ending('a', 'o', 'e', 'um').drop() ||
                            word;
                 }
@@ -156,20 +156,20 @@ require.def('lingwo_dictionary/js/languages/pl',
             '*stem.singular': {
                 type: 'form',
                 automatic: function (entry) {
-                    var word = entry.getForm();
+                    var word = entry.getWord();
                     return word.ending('mię').replace('mieni') ||
                            word.ending('ę').append('ci')       ||
-                           entry.getForm('*stem');
+                           entry.getWord('*stem');
                 }
             },
 
             '*stem.plural': {
                 type: 'form',
                 automatic: function (entry) {
-                    var word = entry.getForm();
+                    var word = entry.getWord();
                     return word.ending('mię').replace('mion') ||
                            word.ending('ę').append('t')       ||
-                           entry.getForm('*stem');
+                           entry.getWord('*stem');
                 }
             },
 
@@ -180,17 +180,17 @@ require.def('lingwo_dictionary/js/languages/pl',
             'nominative.singular': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm();
+                    return entry.getWord();
                 }
             },
 
             'nominative.plural': {
                 type: 'form',
                 automatic: function (entry) {
-                    var word = entry.getForm(), ending;
-                    if (entry.getOption('gender') == 'masculine' && entry.isClass('virile')) {
+                    var word = entry.getWord(), ending;
+                    if (entry.getField('gender') == 'masculine' && entry.getField('virile')) {
                         // masculine virile, yo!
-                        var stem = entry.getForm('*stem.plural');
+                        var stem = entry.getWord('*stem.plural');
 
                         if (ending = stem.endingOrFalse('rz','sz','cz','l','j')) {
                             // softs and psuedo softs that take -e
@@ -207,19 +207,19 @@ require.def('lingwo_dictionary/js/languages/pl',
                                    stem;
                         }
                     }
-                    else if (entry.getOption('gender') == 'feminine' && word.hasEnding('cz', 'sz')) {
+                    else if (entry.getField('gender') == 'feminine' && word.hasEnding('cz', 'sz')) {
                         // this is a sort of funny case, thats different than you would expect
                         return word.append('y');
                     }
-                    else if ((ending = word.endingOrFalse('ość')) && entry.getOption('gender') == 'feminine') {
+                    else if ((ending = word.endingOrFalse('ość')) && entry.getField('gender') == 'feminine') {
                         // feminine abstract nouns
                         return ending.replace('ości');
                     }
                     else {
                         // the "standard" cases
-                        var stem = entry.getForm('*stem.plural');
+                        var stem = entry.getWord('*stem.plural');
                         
-                        if (entry.getOption('gender') == 'neuter')
+                        if (entry.getField('gender') == 'neuter')
                             return stem.append('a');
 
                         if (stem.hasEnding(Language.cls('soft')))
@@ -239,13 +239,13 @@ require.def('lingwo_dictionary/js/languages/pl',
             'accusative.singular': {
                 type: 'form',
                 automatic: function (entry) {
-                    var word = entry.getForm();
+                    var word = entry.getWord();
 
                     if (word.hasEnding('a','i')) {
-                        return entry.getForm('*stem.singular').append('ę');
+                        return entry.getWord('*stem.singular').append('ę');
                     }
-                    else if (entry.getOption('gender') == 'masculine' && entry.isClass('animate')) {
-                        return entry.getForm('genitive.singular');
+                    else if (entry.getField('gender') == 'masculine' && entry.getField('animate')) {
+                        return entry.getWord('genitive.singular');
                     }
                     
                     return word;
@@ -255,10 +255,10 @@ require.def('lingwo_dictionary/js/languages/pl',
             'accusative.plural': {
                 type: 'form',
                 automatic: function (entry) {
-                    if (entry.isClass('virile')) {
-                        return entry.getForm('genitive.plural');
+                    if (entry.getField('virile')) {
+                        return entry.getWord('genitive.plural');
                     }
-                    return entry.getForm('nominative.plural');
+                    return entry.getWord('nominative.plural');
                 }
             },
 
@@ -269,8 +269,8 @@ require.def('lingwo_dictionary/js/languages/pl',
             'genitive.singular': {
                 type: 'form',
                 automatic: function (entry) {
-                    var word = entry.getForm(), stem = entry.getForm('*stem.singular');
-                    var gender = entry.getOption('gender');
+                    var word = entry.getWord(), stem = entry.getWord('*stem.singular');
+                    var gender = entry.getField('gender');
 
                     if (gender == 'masculine' && word.hasEnding('a')) {
                         return stem.ending('g','k').append('i') ||
@@ -291,7 +291,7 @@ require.def('lingwo_dictionary/js/languages/pl',
                                append_y(stem);
                     }
                     else if (gender == 'masculine') {
-                        if (entry.isClass('animate')) {
+                        if (entry.getField('animate')) {
                             if (stem.hasEnding(Language.cls('soft'))) {
                                 return append_i(stem).append('a');
                             }
@@ -311,12 +311,12 @@ require.def('lingwo_dictionary/js/languages/pl',
             'genitive.plural': {
                 type: 'form',
                 automatic: function (entry) {
-                    var word = entry.getForm(), stem = entry.getForm('*stem.plural'), ending, endWord;
-                    var gender = entry.getOption('gender');
+                    var word = entry.getWord(), stem = entry.getWord('*stem.plural'), ending, endWord;
+                    var gender = entry.getField('gender');
 
                     if (gender == 'masculine') {
                         if (ending = stem.endingOrFalse('ń')) {
-                            if (entry.isClass('virile')) {
+                            if (entry.getField('virile')) {
                                 return ending.replace('niów');
                             }
                             return ending.replace('ni');
@@ -338,7 +338,7 @@ require.def('lingwo_dictionary/js/languages/pl',
                         return stem.append('ów');
                     }
                     else if (word.hasEnding('c','cz','sz','rz','ż','nia','ja','j')) {
-                        return entry.getForm('genitive.singular');
+                        return entry.getWord('genitive.singular');
                     }
                     else {
                         if (stem.hasEnding('i')) {
@@ -380,13 +380,13 @@ require.def('lingwo_dictionary/js/languages/pl',
             'dative.singular': {
                 type: 'form',
                 automatic: function (entry) {
-                    var gender = entry.getOption('gender'),
-                        word   = entry.getForm(),
-                        stem   = entry.getForm('*stem.singular');
+                    var gender = entry.getField('gender'),
+                        word   = entry.getWord(),
+                        stem   = entry.getWord('*stem.singular');
                     if (gender == 'feminine' || word.hasEnding('a')) {
                         if (stem.hasEnding('i')) {
                             // maybe?
-                            return entry.getForm('genitive.singular');
+                            return entry.getWord('genitive.singular');
                         }
 
                         return stem.ending('c', 'cz').append('y') ||
@@ -407,7 +407,7 @@ require.def('lingwo_dictionary/js/languages/pl',
             'dative.plural': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_i_on_soft(entry.getForm('*stem.plural')).append('om');
+                    return append_i_on_soft(entry.getWord('*stem.plural')).append('om');
                 }
             },
 
@@ -418,9 +418,9 @@ require.def('lingwo_dictionary/js/languages/pl',
             'instrumental.singular': {
                 type: 'form',
                 automatic: function (entry) {
-                    var gender = entry.getOption('gender'),
-                        word   = entry.getForm(),
-                        stem   = entry.getForm('*stem.singular');
+                    var gender = entry.getField('gender'),
+                        word   = entry.getWord(),
+                        stem   = entry.getWord('*stem.singular');
                     
                     if (gender == 'feminine' || word.hasEnding('a')) {
                         return append_i_on_soft(stem).append('ą');
@@ -433,7 +433,7 @@ require.def('lingwo_dictionary/js/languages/pl',
             'instrumental.plural': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_i_on_soft(entry.getForm('*stem.plural')).append('ami');
+                    return append_i_on_soft(entry.getWord('*stem.plural')).append('ami');
                 }
             },
 
@@ -444,11 +444,11 @@ require.def('lingwo_dictionary/js/languages/pl',
             'locative.singular': {
                 type: 'form',
                 automatic: function (entry) {
-                    var word = entry.getForm(),
-                        stem = entry.getForm('*stem.singular');
+                    var word = entry.getWord(),
+                        stem = entry.getWord('*stem.singular');
 
-                    if (entry.getOption('gender') == 'feminine' || word.hasEnding('a')) {
-                        return entry.getForm('dative.singular');
+                    if (entry.getField('gender') == 'feminine' || word.hasEnding('a')) {
+                        return entry.getWord('dative.singular');
                     }
 
                     if (word.hasEnding('um')) {
@@ -471,7 +471,7 @@ require.def('lingwo_dictionary/js/languages/pl',
             'locative.plural': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_i_on_soft(entry.getForm('*stem.plural')).append('ach');
+                    return append_i_on_soft(entry.getWord('*stem.plural')).append('ach');
                 }
             }
         };
@@ -484,7 +484,7 @@ require.def('lingwo_dictionary/js/languages/pl',
             'soft': {
                 type: 'class',
                 automatic: function (entry) {
-                    var word = entry.getForm();
+                    var word = entry.getWord();
                     return word.hasEnding('i') && !word.hasEnding('ki', 'gi');
                 }
             },
@@ -492,7 +492,7 @@ require.def('lingwo_dictionary/js/languages/pl',
             '*stem': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm().ending(1).drop();
+                    return entry.getWord().ending(1).drop();
                 }
             },
 
@@ -503,15 +503,15 @@ require.def('lingwo_dictionary/js/languages/pl',
             'nominative.singular.masculine': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_y(entry.getForm('*stem'), entry.isClass('soft'));
+                    return append_y(entry.getWord('*stem'), entry.getField('soft'));
                 }
             },
 
             'nominative.singular.feminine': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('*stem').append(
-                        entry.isClass('soft') ? 'ia' : 'a'
+                    return entry.getWord('*stem').append(
+                        entry.getField('soft') ? 'ia' : 'a'
                     );
                 }
             },
@@ -519,23 +519,23 @@ require.def('lingwo_dictionary/js/languages/pl',
             'nominative.singular.neuter': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_e(entry.getForm('*stem'), entry.isClass('soft'));
+                    return append_e(entry.getWord('*stem'), entry.getField('soft'));
                 }
             },
 
             'nominative.plural.non_virile': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('nominative.singular.neuter');
+                    return entry.getWord('nominative.singular.neuter');
                 }
             },
 
             'nominative.plural.virile': {
                 type: 'form',
                 automatic: function (entry) {
-                    var stem = entry.getForm('*stem'), ending;
+                    var stem = entry.getWord('*stem'), ending;
 
-                    if (entry.isClass('soft'))
+                    if (entry.getField('soft'))
                         return stem.append('i');
                     
                     if (ending = stem.endingOrFalse('ż')) {
@@ -571,8 +571,8 @@ require.def('lingwo_dictionary/js/languages/pl',
             'accusative.singular.feminine': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('*stem').append(
-                        entry.isClass('soft') ? 'ią' : 'ą'
+                    return entry.getWord('*stem').append(
+                        entry.getField('soft') ? 'ią' : 'ą'
                     );
                 }
             },
@@ -580,35 +580,35 @@ require.def('lingwo_dictionary/js/languages/pl',
             'accusative.singular.neuter': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('nominative.singular.neuter');
+                    return entry.getWord('nominative.singular.neuter');
                 }
             },
 
             'accusative.singular.masculine.animate': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('genitive.singular.masculine');
+                    return entry.getWord('genitive.singular.masculine');
                 }
             },
 
             'accusative.singular.masculine.inanimate': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('nominative.singular.masculine');
+                    return entry.getWord('nominative.singular.masculine');
                 }
             },
 
             'accusative.plural.virile': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('genitive.plural');
+                    return entry.getWord('genitive.plural');
                 }
             },
 
             'accusative.plural.non_virile': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('nominative.plural.non_virile');
+                    return entry.getWord('nominative.plural.non_virile');
                 }
             },
 
@@ -619,28 +619,28 @@ require.def('lingwo_dictionary/js/languages/pl',
             'genitive.singular.feminine': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('j');
+                    return append_e(entry.getWord('*stem'), entry.getField('soft')).append('j');
                 }
             },
 
             'genitive.singular.masculine': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('go');
+                    return append_e(entry.getWord('*stem'), entry.getField('soft')).append('go');
                 }
             },
 
             'genitive.singular.neuter': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('genitive.singular.masculine');
+                    return entry.getWord('genitive.singular.masculine');
                 }
             },
 
             'genitive.plural': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('ch');
+                    return append_y(entry.getWord('*stem'), entry.getField('soft')).append('ch');
                 }
             },
 
@@ -651,28 +651,28 @@ require.def('lingwo_dictionary/js/languages/pl',
             'dative.singular.feminine': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('j');
+                    return append_e(entry.getWord('*stem'), entry.getField('soft')).append('j');
                 }
             },
 
             'dative.singular.masculine': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('mu');
+                    return append_e(entry.getWord('*stem'), entry.getField('soft')).append('mu');
                 }
             },
 
             'dative.singular.neuter': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('dative.singular.masculine');
+                    return entry.getWord('dative.singular.masculine');
                 }
             },
 
             'dative.plural': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
+                    return append_y(entry.getWord('*stem'), entry.getField('soft')).append('m');
                 }
             },
 
@@ -683,8 +683,8 @@ require.def('lingwo_dictionary/js/languages/pl',
             'instrumental.singular.feminine': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('*stem').append(
-                        entry.isClass('soft') ? 'ią' : 'ą'
+                    return entry.getWord('*stem').append(
+                        entry.getField('soft') ? 'ią' : 'ą'
                     );
                 }
             },
@@ -692,21 +692,21 @@ require.def('lingwo_dictionary/js/languages/pl',
             'instrumental.singular.masculine': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
+                    return append_y(entry.getWord('*stem'), entry.getField('soft')).append('m');
                 }
             },
 
             'instrumental.singular.neuter': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('instrumental.singular.masculine');
+                    return entry.getWord('instrumental.singular.masculine');
                 }
             },
 
             'instrumental.plural': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('mi');
+                    return append_y(entry.getWord('*stem'), entry.getField('soft')).append('mi');
                 }
             },
 
@@ -717,28 +717,28 @@ require.def('lingwo_dictionary/js/languages/pl',
             'locative.singular.masculine': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
+                    return append_y(entry.getWord('*stem'), entry.getField('soft')).append('m');
                 }
             },
 
             'locative.singular.feminine': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('j');
+                    return append_e(entry.getWord('*stem'), entry.getField('soft')).append('j');
                 }
             },
 
             'locative.singular.neuter': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('locative.singular.masculine');
+                    return entry.getWord('locative.singular.masculine');
                 }
             },
 
             'locative.plural': {
                 type: 'form',
                 automatic: function (entry) {
-                    return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('ch');
+                    return append_y(entry.getWord('*stem'), entry.getField('soft')).append('ch');
                 }
             }
         };
@@ -753,7 +753,7 @@ require.def('lingwo_dictionary/js/languages/pl',
                 automatic: function (entry) {
                     // Here we attempt to guess the conjugation class, which has the highest
                     // likelyhood of being inaccurate.
-                    var word = entry.getForm();
+                    var word = entry.getWord();
                     return word.ending('ować','iwać','awać','ywać').result('first') ||
                            word.ending('ać','ieć').result('third') ||
                            word.ending('ić', 'yć', 'eć').result('second') ||
@@ -769,8 +769,8 @@ require.def('lingwo_dictionary/js/languages/pl',
                 automatic: function (entry) {
                     // Now, we attempt to guess the verb stem using what we know about the conjugation
                     // class.  This has the second highest likelyhood of being a bad guess.
-                    var word = entry.getForm(), ending;
-                    var conj = entry.getOption('conjugation');
+                    var word = entry.getWord(), ending;
+                    var conj = entry.getField('conjugation');
 
                     if ((ending = word.endingOrFalse('ować','iwać','ywać')) && conj != 'third') {
                         // an -ować, -iwać, or -ywać verb where we didn't manually set the conjugation class
@@ -799,8 +799,8 @@ require.def('lingwo_dictionary/js/languages/pl',
             'nonpast.singular.1p': {
                 type: 'form',
                 automatic: function (entry) {
-                    var word = entry.getForm('*stem'), ending;
-                    if (entry.getOption('conjugation') == 'third') {
+                    var word = entry.getWord('*stem'), ending;
+                    if (entry.getField('conjugation') == 'third') {
                         return word.ending(1).drop().append('m');
                     }
 
@@ -815,15 +815,15 @@ require.def('lingwo_dictionary/js/languages/pl',
             'nonpast.singular.2p': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('nonpast.singular.3p').append('sz');
+                    return entry.getWord('nonpast.singular.3p').append('sz');
                 }
             },
 
             'nonpast.singular.3p': {
                 type: 'form',
                 automatic: function (entry) {
-                    var stem = entry.getForm('*stem');
-                    var conj = entry.getOption('conjugation');
+                    var stem = entry.getWord('*stem');
+                    var conj = entry.getField('conjugation');
 
                     if (conj == 'first') {
                         return stem.append('e');
@@ -839,21 +839,21 @@ require.def('lingwo_dictionary/js/languages/pl',
             'nonpast.plural.1p': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('nonpast.singular.3p').append('my');
+                    return entry.getWord('nonpast.singular.3p').append('my');
                 }
             },
 
             'nonpast.plural.2p': {
                 type: 'form',
                 automatic: function (entry) {
-                    return entry.getForm('nonpast.singular.3p').append('cie');
+                    return entry.getWord('nonpast.singular.3p').append('cie');
                 }
             },
 
             'nonpast.plural.3p': {
                 type: 'form',
                 automatic: function (entry) {
-                    var word = entry.getForm('*stem'), ending;
+                    var word = entry.getWord('*stem'), ending;
 
                     if (ending = word.endingOrFalse('y')) {
                         word = ending.drop();

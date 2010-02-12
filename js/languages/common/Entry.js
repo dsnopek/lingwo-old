@@ -96,18 +96,6 @@ require.def('lingwo_dictionary/js/languages/common/Entry',
                 }
 
                 return this._cachedWords[name];
-            },
-
-            getForm: function (name) {
-                return this.getWord(name);
-            },
-
-            getOption: function (name) {
-                return this.getField(name);
-            },
-
-            isClass: function (name) {
-                return this.getField(name);
             }
         });
     }
