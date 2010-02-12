@@ -9,16 +9,15 @@
 
     // updates the on screen form with values from the entry
     function updateForm() {
+        var name;
+
         // get rid of old cached values
         entry.clearCache();
 
-        var type, name;
-        for (type in field_map) {
-            for (name in field_map[type]) {
-                var control = field_map[type][name];
-                if (control.automatic) {
-                    control.fromEntry();
-                }
+        for (name in field_map) {
+            var control = field_map[name];
+            if (control.automatic) {
+                control.fromEntry();
             }
         }
     };
@@ -184,14 +183,10 @@
                     }, 500);
                 });
 
-                field_map = {
-                    'class': {},
-                    'option': {},
-                    'form': {}
-                };
+                field_map = {};
                 $('.'+settings.field_name+'-control', context).each(function (i) {
                     var control = new Control(this);
-                    field_map[control.type][control.name] = control;
+                    field_map[control.name] = control;
                 });
 
                 // updated the form!!
