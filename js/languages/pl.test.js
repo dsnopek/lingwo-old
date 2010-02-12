@@ -36,7 +36,6 @@ require(
                 }
             },
 
-            /*
             testJaki: function () {
                 this.checkForms('jaki', {
                     'nominative.singular.masculine': 'jaki',
@@ -44,7 +43,6 @@ require(
                     'nominative.singular.neuter': 'jakie'
                 });
             },
-            */
 
             testNounGenderMasculine: function () {
                 this.checkOptionMulti('gender', 'masculine', [
@@ -64,7 +62,6 @@ require(
                 ]);
             },
 
-            /*
             testAdjectiveSoft: function () {
                 // not soft!
                 this.checkClassMulti('soft', false, [
@@ -124,6 +121,7 @@ require(
                 });
             },
 
+            /*
             testToBeNonPast: function () {
                 this.checkForms('być', {
                     'nonpast.singular.1p': 'jestem',
@@ -262,7 +260,6 @@ require(
                 });
             },
 
-            /*
             testAdjectiveNominativePluralNonVirile: function () {
                 this.checkFormMulti('nominative.plural.non_virile', {
                     'mały': 'małe',
@@ -393,6 +390,7 @@ require(
                 });
             },
 
+            /*
             testVerbSecondConjugation: function () {
                 this.assertEquals(getEntry('wierzyć').getOption('conjugation'), 'second');
 

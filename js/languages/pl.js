@@ -476,192 +476,277 @@ require.def('lingwo_dictionary/js/languages/pl',
             }
         };
 
-//        /*
-//         * Adjectives
-//         */
-//
-//        lang.morphology.classes.adjective = {
-//            'soft': function (entry) {
-//                var word = entry.getForm();
-//                return word.hasEnding('i') && !word.hasEnding('ki', 'gi');
-//            }
-//        };
-//
-//        lang.morphology.forms.adjective = {
-//            '*stem': function (entry) {
-//                return entry.getForm().ending(1).drop();
-//            },
-//
-//            /*
-//             * Nominative
-//             */
-//
-//            'nominative.singular.masculine': function (entry) {
-//                return append_y(entry.getForm('*stem'), entry.isClass('soft'));
-//            },
-//
-//            'nominative.singular.feminine': function (entry) {
-//                return entry.getForm('*stem').append(
-//                    entry.isClass('soft') ? 'ia' : 'a'
-//                );
-//            },
-//
-//            'nominative.singular.neuter': function (entry) {
-//                return append_e(entry.getForm('*stem'), entry.isClass('soft'));
-//            },
-//
-//            'nominative.plural.non_virile': function (entry) {
-//                return entry.getForm('nominative.singular.neuter');
-//            },
-//
-//            'nominative.plural.virile': function (entry) {
-//                var stem = entry.getForm('*stem'), ending;
-//
-//                if (entry.isClass('soft'))
-//                    return stem.append('i');
-//                
-//                if (ending = stem.endingOrFalse('ż')) {
-//                    // TODO: shouldn't nouns do this transformation too?
-//                    return ending.replace('zi');
-//                }
-//                else if (ending = stem.endingOrFalse('sz')) {
-//                    // TODO: shouldn't nouns do this transformation too?
-//                    return ending.replace('si');
-//                }
-//                else if (ending = stem.endingOrFalse('on')) {
-//                    return ending.replace('eni');
-//                }
-//                else {
-//                    stem = stemChange(stem);
-//                    
-//                    if (stem.hasEnding('c','dz','rz')) {
-//                        return stem.append('y');
-//                    }
-//                    else if (!stem.hasEnding('i')) {
-//                        return stem.append('i');
-//                    }
-//
-//                    return stem;
-//                }
-//            },
-//
-//            /*
-//             * Accusative.
-//             */
-//
-//            'accusative.singular.feminine': function (entry) {
-//                return entry.getForm('*stem').append(
-//                    entry.isClass('soft') ? 'ią' : 'ą'
-//                );
-//            },
-//
-//            'accusative.singular.neuter': function (entry) {
-//                return entry.getForm('nominative.singular.neuter');
-//            },
-//
-//            'accusative.singular.masculine.animate': function (entry) {
-//                return entry.getForm('genitive.singular.masculine');
-//            },
-//
-//            'accusative.singular.masculine.inanimate': function (entry) {
-//                return entry.getForm('nominative.singular.masculine');
-//            },
-//
-//            'accusative.plural.virile': function (entry) {
-//                return entry.getForm('genitive.plural');
-//            },
-//
-//            'accusative.plural.non_virile': function (entry) {
-//                return entry.getForm('nominative.plural.non_virile');
-//            },
-//
-//            /*
-//             * Genitive
-//             */
-//
-//            'genitive.singular.feminine': function (entry) {
-//                return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('j');
-//            },
-//
-//            'genitive.singular.masculine': function (entry) {
-//                return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('go');
-//            },
-//
-//            'genitive.singular.neuter': function (entry) {
-//                return entry.getForm('genitive.singular.masculine');
-//            },
-//
-//            'genitive.plural': function (entry) {
-//                return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('ch');
-//            },
-//
-//            /*
-//             * Dative
-//             */
-//            
-//            'dative.singular.feminine': function (entry) {
-//                return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('j');
-//            },
-//
-//            'dative.singular.masculine': function (entry) {
-//                return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('mu');
-//            },
-//
-//            'dative.singular.neuter': function (entry) {
-//                return entry.getForm('dative.singular.masculine');
-//            },
-//
-//            'dative.plural': function (entry) {
-//                return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
-//            },
-//
-//            /*
-//             * Instrumental
-//             */
-//
-//            'instrumental.singular.feminine': function (entry) {
-//                return entry.getForm('*stem').append(
-//                    entry.isClass('soft') ? 'ią' : 'ą'
-//                );
-//            },
-//
-//            'instrumental.singular.masculine': function (entry) {
-//                return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
-//            },
-//
-//            'instrumental.singular.neuter': function (entry) {
-//                return entry.getForm('instrumental.singular.masculine');
-//            },
-//
-//            'instrumental.plural': function (entry) {
-//                return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('mi');
-//            },
-//
-//            /*
-//             * Locative
-//             */
-//            
-//            'locative.singular.masculine': function (entry) {
-//                return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
-//            },
-//
-//            'locative.singular.feminine': function (entry) {
-//                return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('j');
-//            },
-//
-//            'locative.singular.neuter': function (entry) {
-//                return entry.getForm('locative.singular.masculine');
-//            },
-//
-//            'locative.plural': function (entry) {
-//                return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('ch');
-//            }
-//        };
-//
-//        /*
-//         * Verbs
-//         */
-//
+        /*
+         * Adjectives
+         */
+
+        lang.fields.adjective = {
+            'soft': {
+                type: 'class',
+                automatic: function (entry) {
+                    var word = entry.getForm();
+                    return word.hasEnding('i') && !word.hasEnding('ki', 'gi');
+                }
+            },
+
+            '*stem': {
+                type: 'form',
+                automatic: function (entry) {
+                    return entry.getForm().ending(1).drop();
+                }
+            },
+
+            /*
+             * Nominative
+             */
+
+            'nominative.singular.masculine': {
+                type: 'form',
+                automatic: function (entry) {
+                    return append_y(entry.getForm('*stem'), entry.isClass('soft'));
+                }
+            },
+
+            'nominative.singular.feminine': {
+                type: 'form',
+                automatic: function (entry) {
+                    return entry.getForm('*stem').append(
+                        entry.isClass('soft') ? 'ia' : 'a'
+                    );
+                }
+            },
+
+            'nominative.singular.neuter': {
+                type: 'form',
+                automatic: function (entry) {
+                    return append_e(entry.getForm('*stem'), entry.isClass('soft'));
+                }
+            },
+
+            'nominative.plural.non_virile': {
+                type: 'form',
+                automatic: function (entry) {
+                    return entry.getForm('nominative.singular.neuter');
+                }
+            },
+
+            'nominative.plural.virile': {
+                type: 'form',
+                automatic: function (entry) {
+                    var stem = entry.getForm('*stem'), ending;
+
+                    if (entry.isClass('soft'))
+                        return stem.append('i');
+                    
+                    if (ending = stem.endingOrFalse('ż')) {
+                        // TODO: shouldn't nouns do this transformation too?
+                        return ending.replace('zi');
+                    }
+                    else if (ending = stem.endingOrFalse('sz')) {
+                        // TODO: shouldn't nouns do this transformation too?
+                        return ending.replace('si');
+                    }
+                    else if (ending = stem.endingOrFalse('on')) {
+                        return ending.replace('eni');
+                    }
+                    else {
+                        stem = stemChange(stem);
+                        
+                        if (stem.hasEnding('c','dz','rz')) {
+                            return stem.append('y');
+                        }
+                        else if (!stem.hasEnding('i')) {
+                            return stem.append('i');
+                        }
+
+                        return stem;
+                    }
+                }
+            },
+
+            /*
+             * Accusative.
+             */
+
+            'accusative.singular.feminine': {
+                type: 'form',
+                automatic: function (entry) {
+                    return entry.getForm('*stem').append(
+                        entry.isClass('soft') ? 'ią' : 'ą'
+                    );
+                }
+            },
+
+            'accusative.singular.neuter': {
+                type: 'form',
+                automatic: function (entry) {
+                    return entry.getForm('nominative.singular.neuter');
+                }
+            },
+
+            'accusative.singular.masculine.animate': {
+                type: 'form',
+                automatic: function (entry) {
+                    return entry.getForm('genitive.singular.masculine');
+                }
+            },
+
+            'accusative.singular.masculine.inanimate': {
+                type: 'form',
+                automatic: function (entry) {
+                    return entry.getForm('nominative.singular.masculine');
+                }
+            },
+
+            'accusative.plural.virile': {
+                type: 'form',
+                automatic: function (entry) {
+                    return entry.getForm('genitive.plural');
+                }
+            },
+
+            'accusative.plural.non_virile': {
+                type: 'form',
+                automatic: function (entry) {
+                    return entry.getForm('nominative.plural.non_virile');
+                }
+            },
+
+            /*
+             * Genitive
+             */
+
+            'genitive.singular.feminine': {
+                type: 'form',
+                automatic: function (entry) {
+                    return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('j');
+                }
+            },
+
+            'genitive.singular.masculine': {
+                type: 'form',
+                automatic: function (entry) {
+                    return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('go');
+                }
+            },
+
+            'genitive.singular.neuter': {
+                type: 'form',
+                automatic: function (entry) {
+                    return entry.getForm('genitive.singular.masculine');
+                }
+            },
+
+            'genitive.plural': {
+                type: 'form',
+                automatic: function (entry) {
+                    return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('ch');
+                }
+            },
+
+            /*
+             * Dative
+             */
+
+            'dative.singular.feminine': {
+                type: 'form',
+                automatic: function (entry) {
+                    return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('j');
+                }
+            },
+
+            'dative.singular.masculine': {
+                type: 'form',
+                automatic: function (entry) {
+                    return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('mu');
+                }
+            },
+
+            'dative.singular.neuter': {
+                type: 'form',
+                automatic: function (entry) {
+                    return entry.getForm('dative.singular.masculine');
+                }
+            },
+
+            'dative.plural': {
+                type: 'form',
+                automatic: function (entry) {
+                    return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
+                }
+            },
+
+            /*
+             * Instrumental
+             */
+
+            'instrumental.singluar.feminine': {
+                type: 'form',
+                automatic: function (entry) {
+                    return entry.getForm('*stem').append(
+                        entry.isClass('soft') ? 'ią' : 'ą'
+                    );
+                }
+            },
+
+            'instrumental.singular.masculine': {
+                type: 'form',
+                automatic: function (entry) {
+                    return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
+                }
+            },
+
+            'instrumental.singular.neuter': {
+                type: 'form',
+                automatic: function (entry) {
+                    return entry.getForm('instrumental.singular.masculine');
+                }
+            },
+
+            'insturmental.plural': {
+                type: 'form',
+                automatic: function (entry) {
+                    return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('mi');
+                }
+            },
+
+            /*
+             * Locative
+             */
+
+            'locative.singular.masculine': {
+                type: 'form',
+                automatic: function (entry) {
+                    return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('m');
+                }
+            },
+
+            'locative.singular.feminine': {
+                type: 'form',
+                automatic: function (entry) {
+                    return append_e(entry.getForm('*stem'), entry.isClass('soft')).append('j');
+                }
+            },
+
+            'locative.singular.neuter': {
+                type: 'form',
+                automatic: function (entry) {
+                    return entry.getForm('locative.singular.masculine');
+                }
+            },
+
+            'locative.plural': {
+                type: 'form',
+                automatic: function (entry) {
+                    return append_y(entry.getForm('*stem'), entry.isClass('soft')).append('ch');
+                }
+            }
+        };
+
+        /*
+         * Verbs
+         */
+
 //        lang.morphology.options.verb = {
 //            'conjugation': function (entry) {
 //                // Here we attempt to guess the conjugation class, which has the highest
