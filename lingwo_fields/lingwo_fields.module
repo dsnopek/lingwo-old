@@ -180,7 +180,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
 
   $default_values = array();
   foreach ($items as $item) {
-    $default_values[$item['type']][$item['name']] = $item;
+    $default_values[$item['name']] = $item;
   }
 
   $field_name = $field['field_name'];
@@ -243,13 +243,13 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
   );
 
   $index = 0;
-  foreach (lingwo_language_fields($node->language, $pos) as $field) {
+  foreach (lingwo_language_fields($node->language, $pos) as $name => $field) {
     // TODO: use $form_state['storage'] to get the interim default values!
-    $default = $default_values[$field['type']][$field['name']];
+    $default = $default_values[$name];
     if (empty($default)) {
       $default = array(
         'type' => $field['type'],
-        'name' => $field['name'],
+        'name' => $name,
         'value' => NULL,
         'automatic' => TRUE,
       );
@@ -261,21 +261,21 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     );
     $field_form['name'] = array(
       '#type' => 'hidden',
-      '#value' => $field['name']
+      '#value' => $name,
     );
     $field_form['type'] = array(
       '#type' => 'hidden',
       '#value' => $field['type'],
     );
     $field_form['value'] = array(
-      '#title' => isset($field['label']) ? $field['label'] : $field['name'],
+      '#title' => isset($field['label']) ? $field['label'] : $name,
       '#default_value' => $default['value'],
       // TODO: we need to enforce required with select boxes
       '#required' => $field['required'] ? TRUE : FALSE,
       '#attributes' => array(
         'class' => $field_name_enc .'-control',
         'data-type' => $field['type'],
-        'data-name' => $field['name'],
+        'data-name' => $name,
       ),
       '#description' => $field['description'],
     );
@@ -458,10 +458,7 @@ function theme_lingwo_fields_formatter_default($element) {
     }
   }
 
-  $fdef = array();
-  foreach (lingwo_language_fields($node->language, lingwo_dictionary_entry_get_pos($node)) as $field) {
-    $fdef[$field['name']] = $field;
-  }
+  $fdef = lingwo_language_fields($node->language, lingwo_dictionary_entry_get_pos($node));
 
   // fill element with real FAPI elements that simple display the item
   foreach (element_children($element) as $index) {

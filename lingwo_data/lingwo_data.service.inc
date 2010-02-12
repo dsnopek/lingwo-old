@@ -155,8 +155,7 @@ function _lingwo_data_import_process_original($entry) {
       module_exists('lingwo_fields')) {
 
     // we have to add the fields in the same order as the form
-    foreach (lingwo_language_fields($entry['language'], $entry['pos']) as $field) {
-      $field_name = $field['name'];
+    foreach (lingwo_language_fields($entry['language'], $entry['pos']) as $field_name => $field) {
       $auto = $entry['fields'][$field_name]['automatic'];
       if (!isset($auto)) {
         $auto = TRUE;
