@@ -5,9 +5,9 @@
 
 require.def('lingwo_dictionary/scripts/importer/common/Service',
     ['lingwo_dictionary/js/util/declare',
-     'lingwo_dictionary/js/util/json2',
+     'lingwo_dictionary/js/languages/common/Entry',
     ],
-    function (declare, JSON) {
+    function (declare, Entry) {
         // escapes characters, yo!
         function xmlSafe(s) {
             var i, l = s.length, out = "", ustr, uval, p;
@@ -128,7 +128,7 @@ require.def('lingwo_dictionary/scripts/importer/common/Service',
 
             update_entry: function (entry) {
                 var params = this._getDefaultParams('lingwo_data.update_entry');
-                params.add(xmlSafe(JSON.stringify(entry)));
+                params.add(xmlSafe(entry.serialize()));
                 return this._client.execute('lingwo_data.update_entry', params);
             }
         });

@@ -8,8 +8,9 @@ importPackage(java.io);
 
 require.def('lingwo_dictionary/scripts/importer/common/Database',
     ['lingwo_dictionary/js/util/declare',
-     'lingwo_dictionary/js/util/json2'],
-    function (declare, JSON) {
+     'lingwo_dictionary/js/languages/common/Entry'
+    ],
+    function (declare, Entry) {
         return declare({
             _constructor: function (filename) {
                 if (typeof filename == 'undefined') {
@@ -36,10 +37,10 @@ require.def('lingwo_dictionary/scripts/importer/common/Database',
             },
             setEntry: function (entry) {
                 var prep = this._insert_stmt;
-                prep.setString(1, entry.language);
+                prep.setString(1, entry.language.name);
                 prep.setString(2, entry.pos);
                 prep.setString(3, entry.headword);
-                prep.setString(4, JSON.stringify(entry));
+                prep.setString(4, entry.serialize());
                 prep.addBatch();
             },
             getEntry: function (lang, pos, headword) {
@@ -49,7 +50,7 @@ require.def('lingwo_dictionary/scripts/importer/common/Database',
                 prep.setString(3, headword);
                 var rs = prep.executeQuery();
                 if (rs.next()) {
-                    return JSON.parse(rs.getString("data"));
+                    return Entry.deserialize(rs.getString("data"));
                 }
                 return null;
             },

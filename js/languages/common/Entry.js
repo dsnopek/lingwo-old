@@ -2,15 +2,19 @@
 require.def('lingwo_dictionary/js/languages/common/Entry',
     ['lingwo_dictionary/js/util/declare',
      'lingwo_dictionary/js/languages/common/err',
+     'lingwo_dictionary/js/util/json2',
+     'lingwo_dictionary/js/languages/common/Language',
     ],
-    function (declare, err) {
-        return declare({
+    function (declare, err, JSON, Language) {
+        var Entry = declare({
+            sources: null,
+
             _constructor: function (args) {
                 args = args || {};
 
-                this.lang = args.lang;
+                this.language = args.language;
                 // TODO: should we call this 'headword' to fit with everything else?
-                this.name = args.name;
+                this.headword = args.headword;
                 this.pos = args.pos;
                 // TODO: Not filling in any of the above should probobaly be an exception?
 
@@ -27,6 +31,30 @@ require.def('lingwo_dictionary/js/languages/common/Entry',
                 this._cachedWords = {};
             },
 
+            getFieldsPos: function () {
+                // TODO: 'like' should be a field just like any other field!
+                return this.like || this.pos;
+            },
+
+            getFields: function () {
+                var pos = this.getFieldsPos(), fields = {}, name, def;
+
+                for (name in this.language.fields[pos]) {
+                    def = this.language.fields[pos][name];
+                    fields[name] = {
+                        type: def.type,
+                        value: this.getField(name),
+                        automatic: this.isAutomatic(name),
+                    };
+                }
+
+                return fields;
+            },
+
+            isAutomatic: function (name) {
+                return typeof this.fields[name] === 'undefined';
+            },
+
             getField: function (name) {
                 var pos, field, value = null;
 
@@ -39,20 +67,20 @@ require.def('lingwo_dictionary/js/languages/common/Entry',
 
                 // TODO: 'like' should be a field just like any other field!  We will need some
                 // special support here if we are trying to generate like itself.
-                pos = this.like || this.pos;
-                if (typeof this.lang.fields[pos] == 'undefined' ||
-                    typeof this.lang.fields[pos][name] == 'undefined')
+                pos = this.getFieldsPos();
+                if (typeof this.language.fields[pos] == 'undefined' ||
+                    typeof this.language.fields[pos][name] == 'undefined')
                 {
                     throw new err.NoSuchField(name, pos);
                 }
 
-                field = this.lang.fields[pos][name];
+                field = this.language.fields[pos][name];
                 if (field.automatic) {
-                    value = field.automatic.apply(this.lang, new Array(this));
+                    value = field.automatic.apply(this.language, new Array(this));
                 }
 
                 if (field.type == 'form') {
-                    if (!(value instanceof this.lang.Word)) {
+                    if (!(value instanceof this.language.Word)) {
                         throw("Value returned from automatic function '"+name+"' is not a Word!");
                     }
 
@@ -85,10 +113,10 @@ require.def('lingwo_dictionary/js/languages/common/Entry',
                 }
 
                 if (name == '') {
-                    this._cachedWords[name] = this.lang.parseWord(this.name);
+                    this._cachedWords[name] = this.language.parseWord(this.headword);
                 }
                 else if (typeof this.fields[name] != 'undefined') {
-                    this._cachedWords[name] = this.lang.parseWord(this.fields[name]);
+                    this._cachedWords[name] = this.language.parseWord(this.fields[name]);
                 }
                 else {
                     // we want to trigger caching the word via getField().
@@ -96,8 +124,57 @@ require.def('lingwo_dictionary/js/languages/common/Entry',
                 }
 
                 return this._cachedWords[name];
-            }
+            },
+
+            setSource: function (name, args) {
+                if (this.sources === null) {
+                    this.sources = {};
+                }
+                this.sources[name] = args;
+            },
+
+            getSource: function (name) {
+                if (this.sources === null) {
+                    return undefined;
+                }
+                return this.sources[name];
+            },
+
+            serialize: function () {
+                return JSON.stringify(this, function (key, value) {
+                    if (key == 'fields') {
+                        return this.getFields();
+                    }
+                    else if (key == 'language') {
+                        return value.name;
+                    }
+                    else if (key.toString().substr(0, 1) == '_') {
+                        return undefined;
+                    }
+                    return value;
+                });
+            },
         });
+
+        Entry.deserialize = function (text) {
+            return new Entry(JSON.parse(text, function (key, value) {
+                var name, fields = {};
+                if (key == 'fields') {
+                    for(name in value) {
+                        if (!value[name].automatic) {
+                            fields[name] = value[name].value;
+                        }
+                    }
+                    return fields;
+                }
+                else if (key == 'language') {
+                    return Language.languages[value];
+                }
+                return value;
+            }));
+        };
+
+        return Entry;
     }
 );
 

@@ -11,15 +11,15 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         entries = {};
 
         entries["jaki"] = new Entry({
-            "lang": pl,
-            "name": "jaki",
+            "language": pl,
+            "headword": "jaki",
             "pos": "question",
             "like": "adjective"
         });
 
         entries["stół"] = new Entry({
-            "lang": pl,
-            "name": "stół",
+            "language": pl,
+            "headword": "stół",
             "pos": "noun",
             "fields": {
                 "*stem": "stoł"
@@ -27,8 +27,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["kot"] = new Entry({
-            "lang": pl,
-            "name": "kot",
+            "language": pl,
+            "headword": "kot",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -37,8 +37,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["pokój"] = new Entry({
-            "lang": pl,
-            "name": "pokój",
+            "language": pl,
+            "headword": "pokój",
             "pos": "noun",
             "fields": {
                 "*stem": "pokoj"
@@ -46,8 +46,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["chłopiec"] = new Entry({
-            "lang": pl,
-            "name": "chłopiec",
+            "language": pl,
+            "headword": "chłopiec",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -59,8 +59,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["kolega"] = new Entry({
-            "lang": pl,
-            "name": "kolega",
+            "language": pl,
+            "headword": "kolega",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -70,8 +70,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["dentysta"] = new Entry({
-            "lang": pl,
-            "name": "dentysta",
+            "language": pl,
+            "headword": "dentysta",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -81,8 +81,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["mężczyzna"] = new Entry({
-            "lang": pl,
-            "name": "mężczyzna",
+            "language": pl,
+            "headword": "mężczyzna",
             "pos": "noun",
             "fields": {
                 "gender": "masculine",
@@ -93,8 +93,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["kobieta"] = new Entry({
-            "lang": pl,
-            "name": "kobieta",
+            "language": pl,
+            "headword": "kobieta",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -102,20 +102,20 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["ulica"] = new Entry({
-            "lang": pl,
-            "name": "ulica",
+            "language": pl,
+            "headword": "ulica",
             "pos": "noun"
         });
 
         entries["Polska"] = new Entry({
-            "lang": pl,
-            "name": "Polska",
+            "language": pl,
+            "headword": "Polska",
             "pos": "noun"
         });
 
         entries["gospodyni"] = new Entry({
-            "lang": pl,
-            "name": "gospodyni",
+            "language": pl,
+            "headword": "gospodyni",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -123,8 +123,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["noc"] = new Entry({
-            "lang": pl,
-            "name": "noc",
+            "language": pl,
+            "headword": "noc",
             "pos": "noun",
             "fields": {
                 "gender": "feminine"
@@ -132,8 +132,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["część"] = new Entry({
-            "lang": pl,
-            "name": "część",
+            "language": pl,
+            "headword": "część",
             "pos": "noun",
             "fields": {
                 "gender": "feminine"
@@ -141,8 +141,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["jesień"] = new Entry({
-            "lang": pl,
-            "name": "jesień",
+            "language": pl,
+            "headword": "jesień",
             "pos": "noun",
             "fields": {
                 "gender": "feminine"
@@ -150,8 +150,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["wieś"] = new Entry({
-            "lang": pl,
-            "name": "wieś",
+            "language": pl,
+            "headword": "wieś",
             "pos": "noun",
             "fields": {
                 "gender": "feminine",
@@ -160,8 +160,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["mysz"] = new Entry({
-            "lang": pl,
-            "name": "mysz",
+            "language": pl,
+            "headword": "mysz",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -170,8 +170,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["miłość"] = new Entry({
-            "lang": pl,
-            "name": "miłość",
+            "language": pl,
+            "headword": "miłość",
             "pos": "noun",
             "fields": {
                 "gender": "feminine"
@@ -179,8 +179,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["ciekawość"] = new Entry({
-            "lang": pl,
-            "name": "ciekawość",
+            "language": pl,
+            "headword": "ciekawość",
             "pos": "noun",
             "fields": {
                 "gender": "feminine"
@@ -188,14 +188,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["okno"] = new Entry({
-            "lang": pl,
-            "name": "okno",
+            "language": pl,
+            "headword": "okno",
             "pos": "noun"
         });
 
         entries["dziecko"] = new Entry({
-            "lang": pl,
-            "name": "dziecko",
+            "language": pl,
+            "headword": "dziecko",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -206,14 +206,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["życie"] = new Entry({
-            "lang": pl,
-            "name": "życie",
+            "language": pl,
+            "headword": "życie",
             "pos": "noun"
         });
 
         entries["morze"] = new Entry({
-            "lang": pl,
-            "name": "morze",
+            "language": pl,
+            "headword": "morze",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "mórz"
@@ -221,14 +221,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["imię"] = new Entry({
-            "lang": pl,
-            "name": "imię",
+            "language": pl,
+            "headword": "imię",
             "pos": "noun"
         });
 
         entries["szczenię"] = new Entry({
-            "lang": pl,
-            "name": "szczenię",
+            "language": pl,
+            "headword": "szczenię",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -236,8 +236,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["zwierzę"] = new Entry({
-            "lang": pl,
-            "name": "zwierzę",
+            "language": pl,
+            "headword": "zwierzę",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -245,8 +245,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["niemowlę"] = new Entry({
-            "lang": pl,
-            "name": "niemowlę",
+            "language": pl,
+            "headword": "niemowlę",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -254,110 +254,110 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["muzeum"] = new Entry({
-            "lang": pl,
-            "name": "muzeum",
+            "language": pl,
+            "headword": "muzeum",
             "pos": "noun"
         });
 
         entries["gimnazjum"] = new Entry({
-            "lang": pl,
-            "name": "gimnazjum",
+            "language": pl,
+            "headword": "gimnazjum",
             "pos": "noun"
         });
 
         entries["duży"] = new Entry({
-            "lang": pl,
-            "name": "duży",
+            "language": pl,
+            "headword": "duży",
             "pos": "adjective"
         });
 
         entries["mały"] = new Entry({
-            "lang": pl,
-            "name": "mały",
+            "language": pl,
+            "headword": "mały",
             "pos": "adjective"
         });
 
         entries["dobry"] = new Entry({
-            "lang": pl,
-            "name": "dobry",
+            "language": pl,
+            "headword": "dobry",
             "pos": "adjective"
         });
 
         entries["zły"] = new Entry({
-            "lang": pl,
-            "name": "zły",
+            "language": pl,
+            "headword": "zły",
             "pos": "adjective"
         });
 
         entries["wysoki"] = new Entry({
-            "lang": pl,
-            "name": "wysoki",
+            "language": pl,
+            "headword": "wysoki",
             "pos": "adjective"
         });
 
         entries["niski"] = new Entry({
-            "lang": pl,
-            "name": "niski",
+            "language": pl,
+            "headword": "niski",
             "pos": "adjective"
         });
 
         entries["polski"] = new Entry({
-            "lang": pl,
-            "name": "polski",
+            "language": pl,
+            "headword": "polski",
             "pos": "adjective"
         });
 
         entries["długi"] = new Entry({
-            "lang": pl,
-            "name": "długi",
+            "language": pl,
+            "headword": "długi",
             "pos": "adjective"
         });
 
         entries["drogi"] = new Entry({
-            "lang": pl,
-            "name": "drogi",
+            "language": pl,
+            "headword": "drogi",
             "pos": "adjective"
         });
 
         entries["drugi"] = new Entry({
-            "lang": pl,
-            "name": "drugi",
+            "language": pl,
+            "headword": "drugi",
             "pos": "adjective"
         });
 
         entries["głupi"] = new Entry({
-            "lang": pl,
-            "name": "głupi",
+            "language": pl,
+            "headword": "głupi",
             "pos": "adjective"
         });
 
         entries["tani"] = new Entry({
-            "lang": pl,
-            "name": "tani",
+            "language": pl,
+            "headword": "tani",
             "pos": "adjective"
         });
 
         entries["trzeci"] = new Entry({
-            "lang": pl,
-            "name": "trzeci",
+            "language": pl,
+            "headword": "trzeci",
             "pos": "adjective"
         });
 
         entries["ostatni"] = new Entry({
-            "lang": pl,
-            "name": "ostatni",
+            "language": pl,
+            "headword": "ostatni",
             "pos": "adjective"
         });
 
         entries["średni"] = new Entry({
-            "lang": pl,
-            "name": "średni",
+            "language": pl,
+            "headword": "średni",
             "pos": "adjective"
         });
 
         entries["być"] = new Entry({
-            "lang": pl,
-            "name": "być",
+            "language": pl,
+            "headword": "być",
             "pos": "verb",
             "fields": {
                 "nonpast.singular.1p": "jestem",
@@ -370,20 +370,20 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["dom"] = new Entry({
-            "lang": pl,
-            "name": "dom",
+            "language": pl,
+            "headword": "dom",
             "pos": "noun"
         });
 
         entries["sklep"] = new Entry({
-            "lang": pl,
-            "name": "sklep",
+            "language": pl,
+            "headword": "sklep",
             "pos": "noun"
         });
 
         entries["ząb"] = new Entry({
-            "lang": pl,
-            "name": "ząb",
+            "language": pl,
+            "headword": "ząb",
             "pos": "noun",
             "fields": {
                 "*stem": "zęb",
@@ -392,8 +392,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["kościół"] = new Entry({
-            "lang": pl,
-            "name": "kościół",
+            "language": pl,
+            "headword": "kościół",
             "pos": "noun",
             "fields": {
                 "*stem": "kościoł",
@@ -402,8 +402,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["samochód"] = new Entry({
-            "lang": pl,
-            "name": "samochód",
+            "language": pl,
+            "headword": "samochód",
             "pos": "noun",
             "fields": {
                 "*stem": "samochod"
@@ -411,8 +411,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["dzwonek"] = new Entry({
-            "lang": pl,
-            "name": "dzwonek",
+            "language": pl,
+            "headword": "dzwonek",
             "pos": "noun",
             "fields": {
                 "nominative.plural": "dzwonki"
@@ -420,8 +420,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["róg"] = new Entry({
-            "lang": pl,
-            "name": "róg",
+            "language": pl,
+            "headword": "róg",
             "pos": "noun",
             "fields": {
                 "nominative.plural": "rogi"
@@ -429,14 +429,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["bank"] = new Entry({
-            "lang": pl,
-            "name": "bank",
+            "language": pl,
+            "headword": "bank",
             "pos": "noun"
         });
 
         entries["ptak"] = new Entry({
-            "lang": pl,
-            "name": "ptak",
+            "language": pl,
+            "headword": "ptak",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -444,14 +444,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["pociąg"] = new Entry({
-            "lang": pl,
-            "name": "pociąg",
+            "language": pl,
+            "headword": "pociąg",
             "pos": "noun"
         });
 
         entries["kraj"] = new Entry({
-            "lang": pl,
-            "name": "kraj",
+            "language": pl,
+            "headword": "kraj",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "krajów"
@@ -459,32 +459,32 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["parasol"] = new Entry({
-            "lang": pl,
-            "name": "parasol",
+            "language": pl,
+            "headword": "parasol",
             "pos": "noun"
         });
 
         entries["hotel"] = new Entry({
-            "lang": pl,
-            "name": "hotel",
+            "language": pl,
+            "headword": "hotel",
             "pos": "noun"
         });
 
         entries["szpital"] = new Entry({
-            "lang": pl,
-            "name": "szpital",
+            "language": pl,
+            "headword": "szpital",
             "pos": "noun"
         });
 
         entries["pałac"] = new Entry({
-            "lang": pl,
-            "name": "pałac",
+            "language": pl,
+            "headword": "pałac",
             "pos": "noun"
         });
 
         entries["tysiąc"] = new Entry({
-            "lang": pl,
-            "name": "tysiąc",
+            "language": pl,
+            "headword": "tysiąc",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "tysięcy"
@@ -492,8 +492,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["pieniądz"] = new Entry({
-            "lang": pl,
-            "name": "pieniądz",
+            "language": pl,
+            "headword": "pieniądz",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "pieniędzy",
@@ -502,14 +502,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["grosz"] = new Entry({
-            "lang": pl,
-            "name": "grosz",
+            "language": pl,
+            "headword": "grosz",
             "pos": "noun"
         });
 
         entries["miesiąc"] = new Entry({
-            "lang": pl,
-            "name": "miesiąc",
+            "language": pl,
+            "headword": "miesiąc",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "miesięcy",
@@ -518,20 +518,20 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["talerz"] = new Entry({
-            "lang": pl,
-            "name": "talerz",
+            "language": pl,
+            "headword": "talerz",
             "pos": "noun"
         });
 
         entries["klucz"] = new Entry({
-            "lang": pl,
-            "name": "klucz",
+            "language": pl,
+            "headword": "klucz",
             "pos": "noun"
         });
 
         entries["nóż"] = new Entry({
-            "lang": pl,
-            "name": "nóż",
+            "language": pl,
+            "headword": "nóż",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "noży",
@@ -542,8 +542,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["koń"] = new Entry({
-            "lang": pl,
-            "name": "koń",
+            "language": pl,
+            "headword": "koń",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -552,8 +552,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["liść"] = new Entry({
-            "lang": pl,
-            "name": "liść",
+            "language": pl,
+            "headword": "liść",
             "pos": "noun",
             "fields": {
                 "instrumental.plural": "liśćmi"
@@ -561,8 +561,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["niedźwiedź"] = new Entry({
-            "lang": pl,
-            "name": "niedźwiedź",
+            "language": pl,
+            "headword": "niedźwiedź",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -570,8 +570,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["ogień"] = new Entry({
-            "lang": pl,
-            "name": "ogień",
+            "language": pl,
+            "headword": "ogień",
             "pos": "noun",
             "fields": {
                 "*stem": "ogń"
@@ -579,8 +579,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["tydzień"] = new Entry({
-            "lang": pl,
-            "name": "tydzień",
+            "language": pl,
+            "headword": "tydzień",
             "pos": "noun",
             "fields": {
                 "*stem": "tygodń"
@@ -588,8 +588,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["gołąb"] = new Entry({
-            "lang": pl,
-            "name": "gołąb",
+            "language": pl,
+            "headword": "gołąb",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -598,8 +598,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["karp"] = new Entry({
-            "lang": pl,
-            "name": "karp",
+            "language": pl,
+            "headword": "karp",
             "pos": "noun",
             "fields": {
                 "nominative.plural": "karpie"
@@ -607,8 +607,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["szkoła"] = new Entry({
-            "lang": pl,
-            "name": "szkoła",
+            "language": pl,
+            "headword": "szkoła",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "szkół"
@@ -616,8 +616,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["ryba"] = new Entry({
-            "lang": pl,
-            "name": "ryba",
+            "language": pl,
+            "headword": "ryba",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -625,14 +625,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["gwiazda"] = new Entry({
-            "lang": pl,
-            "name": "gwiazda",
+            "language": pl,
+            "headword": "gwiazda",
             "pos": "noun"
         });
 
         entries["siostra"] = new Entry({
-            "lang": pl,
-            "name": "siostra",
+            "language": pl,
+            "headword": "siostra",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -641,14 +641,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["kiełbasa"] = new Entry({
-            "lang": pl,
-            "name": "kiełbasa",
+            "language": pl,
+            "headword": "kiełbasa",
             "pos": "noun"
         });
 
         entries["rzecz"] = new Entry({
-            "lang": pl,
-            "name": "rzecz",
+            "language": pl,
+            "headword": "rzecz",
             "pos": "noun",
             "fields": {
                 "gender": "feminine"
@@ -656,8 +656,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["matka"] = new Entry({
-            "lang": pl,
-            "name": "matka",
+            "language": pl,
+            "headword": "matka",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -665,8 +665,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["córka"] = new Entry({
-            "lang": pl,
-            "name": "córka",
+            "language": pl,
+            "headword": "córka",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -674,8 +674,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["Polka"] = new Entry({
-            "lang": pl,
-            "name": "Polka",
+            "language": pl,
+            "headword": "Polka",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -683,14 +683,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["figa"] = new Entry({
-            "lang": pl,
-            "name": "figa",
+            "language": pl,
+            "headword": "figa",
             "pos": "noun"
         });
 
         entries["droga"] = new Entry({
-            "lang": pl,
-            "name": "droga",
+            "language": pl,
+            "headword": "droga",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "dróg"
@@ -698,8 +698,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["ręka"] = new Entry({
-            "lang": pl,
-            "name": "ręka",
+            "language": pl,
+            "headword": "ręka",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "rąk",
@@ -708,14 +708,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["lekcja"] = new Entry({
-            "lang": pl,
-            "name": "lekcja",
+            "language": pl,
+            "headword": "lekcja",
             "pos": "noun"
         });
 
         entries["kolej"] = new Entry({
-            "lang": pl,
-            "name": "kolej",
+            "language": pl,
+            "headword": "kolej",
             "pos": "noun",
             "fields": {
                 "gender": "feminine"
@@ -723,8 +723,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["kąpiel"] = new Entry({
-            "lang": pl,
-            "name": "kąpiel",
+            "language": pl,
+            "headword": "kąpiel",
             "pos": "noun",
             "fields": {
                 "gender": "feminine"
@@ -732,26 +732,26 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["chwila"] = new Entry({
-            "lang": pl,
-            "name": "chwila",
+            "language": pl,
+            "headword": "chwila",
             "pos": "noun"
         });
 
         entries["aleja"] = new Entry({
-            "lang": pl,
-            "name": "aleja",
+            "language": pl,
+            "headword": "aleja",
             "pos": "noun"
         });
 
         entries["sala"] = new Entry({
-            "lang": pl,
-            "name": "sala",
+            "language": pl,
+            "headword": "sala",
             "pos": "noun"
         });
 
         entries["babcia"] = new Entry({
-            "lang": pl,
-            "name": "babcia",
+            "language": pl,
+            "headword": "babcia",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -759,38 +759,38 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["kuchnia"] = new Entry({
-            "lang": pl,
-            "name": "kuchnia",
+            "language": pl,
+            "headword": "kuchnia",
             "pos": "noun"
         });
 
         entries["historia"] = new Entry({
-            "lang": pl,
-            "name": "historia",
+            "language": pl,
+            "headword": "historia",
             "pos": "noun"
         });
 
         entries["tęcza"] = new Entry({
-            "lang": pl,
-            "name": "tęcza",
+            "language": pl,
+            "headword": "tęcza",
             "pos": "noun"
         });
 
         entries["burza"] = new Entry({
-            "lang": pl,
-            "name": "burza",
+            "language": pl,
+            "headword": "burza",
             "pos": "noun"
         });
 
         entries["wieża"] = new Entry({
-            "lang": pl,
-            "name": "wieża",
+            "language": pl,
+            "headword": "wieża",
             "pos": "noun"
         });
 
         entries["podróż"] = new Entry({
-            "lang": pl,
-            "name": "podróż",
+            "language": pl,
+            "headword": "podróż",
             "pos": "noun",
             "fields": {
                 "gender": "feminine"
@@ -798,26 +798,26 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["owca"] = new Entry({
-            "lang": pl,
-            "name": "owca",
+            "language": pl,
+            "headword": "owca",
             "pos": "noun"
         });
 
         entries["róża"] = new Entry({
-            "lang": pl,
-            "name": "róża",
+            "language": pl,
+            "headword": "róża",
             "pos": "noun"
         });
 
         entries["grusza"] = new Entry({
-            "lang": pl,
-            "name": "grusza",
+            "language": pl,
+            "headword": "grusza",
             "pos": "noun"
         });
 
         entries["miłość"] = new Entry({
-            "lang": pl,
-            "name": "miłość",
+            "language": pl,
+            "headword": "miłość",
             "pos": "noun",
             "fields": {
                 "gender": "feminine"
@@ -825,8 +825,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["opowieść"] = new Entry({
-            "lang": pl,
-            "name": "opowieść",
+            "language": pl,
+            "headword": "opowieść",
             "pos": "noun",
             "fields": {
                 "gender": "feminine",
@@ -835,8 +835,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["nić"] = new Entry({
-            "lang": pl,
-            "name": "nić",
+            "language": pl,
+            "headword": "nić",
             "pos": "noun",
             "fields": {
                 "gender": "feminine",
@@ -846,8 +846,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["pieśń"] = new Entry({
-            "lang": pl,
-            "name": "pieśń",
+            "language": pl,
+            "headword": "pieśń",
             "pos": "noun",
             "fields": {
                 "gender": "feminine",
@@ -856,8 +856,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["przyjaźń"] = new Entry({
-            "lang": pl,
-            "name": "przyjaźń",
+            "language": pl,
+            "headword": "przyjaźń",
             "pos": "noun",
             "fields": {
                 "gender": "feminine",
@@ -866,8 +866,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["jabłoń"] = new Entry({
-            "lang": pl,
-            "name": "jabłoń",
+            "language": pl,
+            "headword": "jabłoń",
             "pos": "noun",
             "fields": {
                 "gender": "feminine"
@@ -875,8 +875,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["łódź"] = new Entry({
-            "lang": pl,
-            "name": "łódź",
+            "language": pl,
+            "headword": "łódź",
             "pos": "noun",
             "fields": {
                 "gender": "feminine",
@@ -885,8 +885,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["gałąź"] = new Entry({
-            "lang": pl,
-            "name": "gałąź",
+            "language": pl,
+            "headword": "gałąź",
             "pos": "noun",
             "fields": {
                 "gender": "feminine",
@@ -895,8 +895,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["wieś"] = new Entry({
-            "lang": pl,
-            "name": "wieś",
+            "language": pl,
+            "headword": "wieś",
             "pos": "noun",
             "fields": {
                 "gender": "feminine",
@@ -905,38 +905,38 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["jabłko"] = new Entry({
-            "lang": pl,
-            "name": "jabłko",
+            "language": pl,
+            "headword": "jabłko",
             "pos": "noun"
         });
 
         entries["krzesło"] = new Entry({
-            "lang": pl,
-            "name": "krzesło",
+            "language": pl,
+            "headword": "krzesło",
             "pos": "noun"
         });
 
         entries["zdjęcie"] = new Entry({
-            "lang": pl,
-            "name": "zdjęcie",
+            "language": pl,
+            "headword": "zdjęcie",
             "pos": "noun"
         });
 
         entries["pole"] = new Entry({
-            "lang": pl,
-            "name": "pole",
+            "language": pl,
+            "headword": "pole",
             "pos": "noun"
         });
 
         entries["ramię"] = new Entry({
-            "lang": pl,
-            "name": "ramię",
+            "language": pl,
+            "headword": "ramię",
             "pos": "noun"
         });
 
         entries["jagnię"] = new Entry({
-            "lang": pl,
-            "name": "jagnię",
+            "language": pl,
+            "headword": "jagnię",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -944,8 +944,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["prosię"] = new Entry({
-            "lang": pl,
-            "name": "prosię",
+            "language": pl,
+            "headword": "prosię",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -953,8 +953,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["kurczę"] = new Entry({
-            "lang": pl,
-            "name": "kurczę",
+            "language": pl,
+            "headword": "kurczę",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -962,8 +962,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["dziewczę"] = new Entry({
-            "lang": pl,
-            "name": "dziewczę",
+            "language": pl,
+            "headword": "dziewczę",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -971,14 +971,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["młody"] = new Entry({
-            "lang": pl,
-            "name": "młody",
+            "language": pl,
+            "headword": "młody",
             "pos": "adjective"
         });
 
         entries["Polak"] = new Entry({
-            "lang": pl,
-            "name": "Polak",
+            "language": pl,
+            "headword": "Polak",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -987,8 +987,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["Chińczyk"] = new Entry({
-            "lang": pl,
-            "name": "Chińczyk",
+            "language": pl,
+            "headword": "Chińczyk",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -997,8 +997,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["Anglik"] = new Entry({
-            "lang": pl,
-            "name": "Anglik",
+            "language": pl,
+            "headword": "Anglik",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1007,8 +1007,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["kaleka"] = new Entry({
-            "lang": pl,
-            "name": "kaleka",
+            "language": pl,
+            "headword": "kaleka",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1019,8 +1019,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["Norweg"] = new Entry({
-            "lang": pl,
-            "name": "Norweg",
+            "language": pl,
+            "headword": "Norweg",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1029,8 +1029,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["inżynier"] = new Entry({
-            "lang": pl,
-            "name": "inżynier",
+            "language": pl,
+            "headword": "inżynier",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1039,8 +1039,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["kelner"] = new Entry({
-            "lang": pl,
-            "name": "kelner",
+            "language": pl,
+            "headword": "kelner",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1049,8 +1049,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["doktor"] = new Entry({
-            "lang": pl,
-            "name": "doktor",
+            "language": pl,
+            "headword": "doktor",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1059,8 +1059,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["kierowca"] = new Entry({
-            "lang": pl,
-            "name": "kierowca",
+            "language": pl,
+            "headword": "kierowca",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1070,8 +1070,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["sprzedawca"] = new Entry({
-            "lang": pl,
-            "name": "sprzedawca",
+            "language": pl,
+            "headword": "sprzedawca",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1081,8 +1081,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["Niemiec"] = new Entry({
-            "lang": pl,
-            "name": "Niemiec",
+            "language": pl,
+            "headword": "Niemiec",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1092,8 +1092,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["mieszkaniec"] = new Entry({
-            "lang": pl,
-            "name": "mieszkaniec",
+            "language": pl,
+            "headword": "mieszkaniec",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1103,8 +1103,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["lekarz"] = new Entry({
-            "lang": pl,
-            "name": "lekarz",
+            "language": pl,
+            "headword": "lekarz",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1113,8 +1113,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["złodziej"] = new Entry({
-            "lang": pl,
-            "name": "złodziej",
+            "language": pl,
+            "headword": "złodziej",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1123,8 +1123,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["towarzysz"] = new Entry({
-            "lang": pl,
-            "name": "towarzysz",
+            "language": pl,
+            "headword": "towarzysz",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1133,8 +1133,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["słuchacz"] = new Entry({
-            "lang": pl,
-            "name": "słuchacz",
+            "language": pl,
+            "headword": "słuchacz",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1143,8 +1143,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["nauczyciel"] = new Entry({
-            "lang": pl,
-            "name": "nauczyciel",
+            "language": pl,
+            "headword": "nauczyciel",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1153,8 +1153,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["góral"] = new Entry({
-            "lang": pl,
-            "name": "góral",
+            "language": pl,
+            "headword": "góral",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1163,8 +1163,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["Francuz"] = new Entry({
-            "lang": pl,
-            "name": "Francuz",
+            "language": pl,
+            "headword": "Francuz",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1173,8 +1173,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["chłop"] = new Entry({
-            "lang": pl,
-            "name": "chłop",
+            "language": pl,
+            "headword": "chłop",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1183,8 +1183,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["architekt"] = new Entry({
-            "lang": pl,
-            "name": "architekt",
+            "language": pl,
+            "headword": "architekt",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1193,8 +1193,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["poeta"] = new Entry({
-            "lang": pl,
-            "name": "poeta",
+            "language": pl,
+            "headword": "poeta",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1204,8 +1204,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["specjalista"] = new Entry({
-            "lang": pl,
-            "name": "specjalista",
+            "language": pl,
+            "headword": "specjalista",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1215,8 +1215,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["turysta"] = new Entry({
-            "lang": pl,
-            "name": "turysta",
+            "language": pl,
+            "headword": "turysta",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1226,8 +1226,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["Czech"] = new Entry({
-            "lang": pl,
-            "name": "Czech",
+            "language": pl,
+            "headword": "Czech",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1236,8 +1236,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["Szwed"] = new Entry({
-            "lang": pl,
-            "name": "Szwed",
+            "language": pl,
+            "headword": "Szwed",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1246,8 +1246,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["student"] = new Entry({
-            "lang": pl,
-            "name": "student",
+            "language": pl,
+            "headword": "student",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1256,8 +1256,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["Włoch"] = new Entry({
-            "lang": pl,
-            "name": "Włoch",
+            "language": pl,
+            "headword": "Włoch",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1266,8 +1266,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["sąsiad"] = new Entry({
-            "lang": pl,
-            "name": "sąsiad",
+            "language": pl,
+            "headword": "sąsiad",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1277,8 +1277,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["diabeł"] = new Entry({
-            "lang": pl,
-            "name": "diabeł",
+            "language": pl,
+            "headword": "diabeł",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1288,8 +1288,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["syn"] = new Entry({
-            "lang": pl,
-            "name": "syn",
+            "language": pl,
+            "headword": "syn",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1299,8 +1299,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["mąż"] = new Entry({
-            "lang": pl,
-            "name": "mąż",
+            "language": pl,
+            "headword": "mąż",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1312,8 +1312,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["Belg"] = new Entry({
-            "lang": pl,
-            "name": "Belg",
+            "language": pl,
+            "headword": "Belg",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1323,8 +1323,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["professor"] = new Entry({
-            "lang": pl,
-            "name": "professor",
+            "language": pl,
+            "headword": "professor",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1334,8 +1334,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["uczeń"] = new Entry({
-            "lang": pl,
-            "name": "uczeń",
+            "language": pl,
+            "headword": "uczeń",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1346,8 +1346,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["więzień"] = new Entry({
-            "lang": pl,
-            "name": "więzień",
+            "language": pl,
+            "headword": "więzień",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1358,8 +1358,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["brat"] = new Entry({
-            "lang": pl,
-            "name": "brat",
+            "language": pl,
+            "headword": "brat",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1372,8 +1372,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["Amerykanin"] = new Entry({
-            "lang": pl,
-            "name": "Amerykanin",
+            "language": pl,
+            "headword": "Amerykanin",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1384,8 +1384,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["Rosjanin"] = new Entry({
-            "lang": pl,
-            "name": "Rosjanin",
+            "language": pl,
+            "headword": "Rosjanin",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1395,104 +1395,104 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["brzydki"] = new Entry({
-            "lang": pl,
-            "name": "brzydki",
+            "language": pl,
+            "headword": "brzydki",
             "pos": "adjective"
         });
 
         entries["bliski"] = new Entry({
-            "lang": pl,
-            "name": "bliski",
+            "language": pl,
+            "headword": "bliski",
             "pos": "adjective"
         });
 
         entries["ubogi"] = new Entry({
-            "lang": pl,
-            "name": "ubogi",
+            "language": pl,
+            "headword": "ubogi",
             "pos": "adjective"
         });
 
         entries["stary"] = new Entry({
-            "lang": pl,
-            "name": "stary",
+            "language": pl,
+            "headword": "stary",
             "pos": "adjective"
         });
 
         entries["były"] = new Entry({
-            "lang": pl,
-            "name": "były",
+            "language": pl,
+            "headword": "były",
             "pos": "adjective"
         });
 
         entries["biedny"] = new Entry({
-            "lang": pl,
-            "name": "biedny",
+            "language": pl,
+            "headword": "biedny",
             "pos": "adjective"
         });
 
         entries["zadowolony"] = new Entry({
-            "lang": pl,
-            "name": "zadowolony",
+            "language": pl,
+            "headword": "zadowolony",
             "pos": "adjective"
         });
 
         entries["zmęczony"] = new Entry({
-            "lang": pl,
-            "name": "zmęczony",
+            "language": pl,
+            "headword": "zmęczony",
             "pos": "adjective"
         });
 
         entries["pierwszy"] = new Entry({
-            "lang": pl,
-            "name": "pierwszy",
+            "language": pl,
+            "headword": "pierwszy",
             "pos": "adjective"
         });
 
         entries["lepszy"] = new Entry({
-            "lang": pl,
-            "name": "lepszy",
+            "language": pl,
+            "headword": "lepszy",
             "pos": "adjective"
         });
 
         entries["gotowy"] = new Entry({
-            "lang": pl,
-            "name": "gotowy",
+            "language": pl,
+            "headword": "gotowy",
             "pos": "adjective"
         });
 
         entries["ciekawy"] = new Entry({
-            "lang": pl,
-            "name": "ciekawy",
+            "language": pl,
+            "headword": "ciekawy",
             "pos": "adjective"
         });
 
         entries["bogaty"] = new Entry({
-            "lang": pl,
-            "name": "bogaty",
+            "language": pl,
+            "headword": "bogaty",
             "pos": "adjective"
         });
 
         entries["smutny"] = new Entry({
-            "lang": pl,
-            "name": "smutny",
+            "language": pl,
+            "headword": "smutny",
             "pos": "adjective"
         });
 
         entries["miły"] = new Entry({
-            "lang": pl,
-            "name": "miły",
+            "language": pl,
+            "headword": "miły",
             "pos": "adjective"
         });
 
         entries["zajęty"] = new Entry({
-            "lang": pl,
-            "name": "zajęty",
+            "language": pl,
+            "headword": "zajęty",
             "pos": "adjective"
         });
 
         entries["twarz"] = new Entry({
-            "lang": pl,
-            "name": "twarz",
+            "language": pl,
+            "headword": "twarz",
             "pos": "noun",
             "fields": {
                 "gender": "feminine"
@@ -1500,38 +1500,38 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["piękny"] = new Entry({
-            "lang": pl,
-            "name": "piękny",
+            "language": pl,
+            "headword": "piękny",
             "pos": "adjective"
         });
 
         entries["wierzyć"] = new Entry({
-            "lang": pl,
-            "name": "wierzyć",
+            "language": pl,
+            "headword": "wierzyć",
             "pos": "verb"
         });
 
         entries["słyszeć"] = new Entry({
-            "lang": pl,
-            "name": "słyszeć",
+            "language": pl,
+            "headword": "słyszeć",
             "pos": "verb"
         });
 
         entries["dzwonić"] = new Entry({
-            "lang": pl,
-            "name": "dzwonić",
+            "language": pl,
+            "headword": "dzwonić",
             "pos": "verb"
         });
 
         entries["mieszkać"] = new Entry({
-            "lang": pl,
-            "name": "mieszkać",
+            "language": pl,
+            "headword": "mieszkać",
             "pos": "verb"
         });
 
         entries["wiedzieć"] = new Entry({
-            "lang": pl,
-            "name": "wiedzieć",
+            "language": pl,
+            "headword": "wiedzieć",
             "pos": "verb",
             "fields": {
                 "*stem": "wiej",
@@ -1540,32 +1540,32 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["dziękować"] = new Entry({
-            "lang": pl,
-            "name": "dziękować",
+            "language": pl,
+            "headword": "dziękować",
             "pos": "verb"
         });
 
         entries["obiecywać"] = new Entry({
-            "lang": pl,
-            "name": "obiecywać",
+            "language": pl,
+            "headword": "obiecywać",
             "pos": "verb"
         });
 
         entries["oczekiwać"] = new Entry({
-            "lang": pl,
-            "name": "oczekiwać",
+            "language": pl,
+            "headword": "oczekiwać",
             "pos": "verb"
         });
 
         entries["dawać"] = new Entry({
-            "lang": pl,
-            "name": "dawać",
+            "language": pl,
+            "headword": "dawać",
             "pos": "verb"
         });
 
         entries["nazywać"] = new Entry({
-            "lang": pl,
-            "name": "nazywać",
+            "language": pl,
+            "headword": "nazywać",
             "pos": "verb",
             "fields": {
                 "conjugation": "third"
@@ -1573,8 +1573,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["pies"] = new Entry({
-            "lang": pl,
-            "name": "pies",
+            "language": pl,
+            "headword": "pies",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1585,8 +1585,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["królik"] = new Entry({
-            "lang": pl,
-            "name": "królik",
+            "language": pl,
+            "headword": "królik",
             "pos": "noun",
             "fields": {
                 "animate": true
@@ -1594,8 +1594,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["siostrzeniec"] = new Entry({
-            "lang": pl,
-            "name": "siostrzeniec",
+            "language": pl,
+            "headword": "siostrzeniec",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1605,8 +1605,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["dziadek"] = new Entry({
-            "lang": pl,
-            "name": "dziadek",
+            "language": pl,
+            "headword": "dziadek",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1616,8 +1616,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["szwagier"] = new Entry({
-            "lang": pl,
-            "name": "szwagier",
+            "language": pl,
+            "headword": "szwagier",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1627,8 +1627,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["gość"] = new Entry({
-            "lang": pl,
-            "name": "gość",
+            "language": pl,
+            "headword": "gość",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1638,8 +1638,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["artysta"] = new Entry({
-            "lang": pl,
-            "name": "artysta",
+            "language": pl,
+            "headword": "artysta",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1649,8 +1649,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["ojciec"] = new Entry({
-            "lang": pl,
-            "name": "ojciec",
+            "language": pl,
+            "headword": "ojciec",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1662,8 +1662,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["listonosz"] = new Entry({
-            "lang": pl,
-            "name": "listonosz",
+            "language": pl,
+            "headword": "listonosz",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1672,8 +1672,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["żołnierz"] = new Entry({
-            "lang": pl,
-            "name": "żołnierz",
+            "language": pl,
+            "headword": "żołnierz",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -1682,20 +1682,20 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["obiad"] = new Entry({
-            "lang": pl,
-            "name": "obiad",
+            "language": pl,
+            "headword": "obiad",
             "pos": "noun"
         });
 
         entries["wiatr"] = new Entry({
-            "lang": pl,
-            "name": "wiatr",
+            "language": pl,
+            "headword": "wiatr",
             "pos": "noun"
         });
 
         entries["kosz"] = new Entry({
-            "lang": pl,
-            "name": "kosz",
+            "language": pl,
+            "headword": "kosz",
             "pos": "noun",
             "fields": {
                 "genitive.singular": "kosza"
@@ -1703,8 +1703,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["palec"] = new Entry({
-            "lang": pl,
-            "name": "palec",
+            "language": pl,
+            "headword": "palec",
             "pos": "noun",
             "fields": {
                 "*stem": "palc",
@@ -1713,8 +1713,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["kwiatek"] = new Entry({
-            "lang": pl,
-            "name": "kwiatek",
+            "language": pl,
+            "headword": "kwiatek",
             "pos": "noun",
             "fields": {
                 "*stem": "kwiatk",
@@ -1723,20 +1723,20 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["lampa"] = new Entry({
-            "lang": pl,
-            "name": "lampa",
+            "language": pl,
+            "headword": "lampa",
             "pos": "noun"
         });
 
         entries["łza"] = new Entry({
-            "lang": pl,
-            "name": "łza",
+            "language": pl,
+            "headword": "łza",
             "pos": "noun"
         });
 
         entries["pamięć"] = new Entry({
-            "lang": pl,
-            "name": "pamięć",
+            "language": pl,
+            "headword": "pamięć",
             "pos": "noun",
             "fields": {
                 "gender": "feminine"
@@ -1744,32 +1744,32 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["szyja"] = new Entry({
-            "lang": pl,
-            "name": "szyja",
+            "language": pl,
+            "headword": "szyja",
             "pos": "noun"
         });
 
         entries["nadzieja"] = new Entry({
-            "lang": pl,
-            "name": "nadzieja",
+            "language": pl,
+            "headword": "nadzieja",
             "pos": "noun"
         });
 
         entries["żmija"] = new Entry({
-            "lang": pl,
-            "name": "żmija",
+            "language": pl,
+            "headword": "żmija",
             "pos": "noun"
         });
 
         entries["cebula"] = new Entry({
-            "lang": pl,
-            "name": "cebula",
+            "language": pl,
+            "headword": "cebula",
             "pos": "noun"
         });
 
         entries["krew"] = new Entry({
-            "lang": pl,
-            "name": "krew",
+            "language": pl,
+            "headword": "krew",
             "pos": "noun",
             "fields": {
                 "gender": "feminine",
@@ -1778,8 +1778,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["chorągiew"] = new Entry({
-            "lang": pl,
-            "name": "chorągiew",
+            "language": pl,
+            "headword": "chorągiew",
             "pos": "noun",
             "fields": {
                 "gender": "feminine",
@@ -1788,8 +1788,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["myśl"] = new Entry({
-            "lang": pl,
-            "name": "myśl",
+            "language": pl,
+            "headword": "myśl",
             "pos": "noun",
             "fields": {
                 "gender": "feminine"
@@ -1797,8 +1797,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["sól"] = new Entry({
-            "lang": pl,
-            "name": "sól",
+            "language": pl,
+            "headword": "sól",
             "pos": "noun",
             "fields": {
                 "gender": "feminine",
@@ -1807,8 +1807,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["idea"] = new Entry({
-            "lang": pl,
-            "name": "idea",
+            "language": pl,
+            "headword": "idea",
             "pos": "noun",
             "fields": {
                 "gender": "feminine",
@@ -1817,8 +1817,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["statua"] = new Entry({
-            "lang": pl,
-            "name": "statua",
+            "language": pl,
+            "headword": "statua",
             "pos": "noun",
             "fields": {
                 "gender": "feminine",
@@ -1827,81 +1827,81 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["melodia"] = new Entry({
-            "lang": pl,
-            "name": "melodia",
+            "language": pl,
+            "headword": "melodia",
             "pos": "noun"
         });
 
 
         entries["Belgia"] = new Entry({
-            "lang": pl,
-            "name": "Belgia",
+            "language": pl,
+            "headword": "Belgia",
             "pos": "noun"
         });
 
         entries["Anglia"] = new Entry({
-            "lang": pl,
-            "name": "Anglia",
+            "language": pl,
+            "headword": "Anglia",
             "pos": "noun"
         });
 
         entries["sympatia"] = new Entry({
-            "lang": pl,
-            "name": "sympatia",
+            "language": pl,
+            "headword": "sympatia",
             "pos": "noun"
         });
 
         entries["telewizja"] = new Entry({
-            "lang": pl,
-            "name": "telewizja",
+            "language": pl,
+            "headword": "telewizja",
             "pos": "noun"
         });
 
         entries["poezja"] = new Entry({
-            "lang": pl,
-            "name": "poezja",
+            "language": pl,
+            "headword": "poezja",
             "pos": "noun"
         });
 
         entries["Francja"] = new Entry({
-            "lang": pl,
-            "name": "Francja",
+            "language": pl,
+            "headword": "Francja",
             "pos": "noun"
         });
 
         entries["stacja"] = new Entry({
-            "lang": pl,
-            "name": "stacja",
+            "language": pl,
+            "headword": "stacja",
             "pos": "noun"
         });
 
         entries["Szkocja"] = new Entry({
-            "lang": pl,
-            "name": "Szkocja",
+            "language": pl,
+            "headword": "Szkocja",
             "pos": "noun"
         });
 
         entries["procesja"] = new Entry({
-            "lang": pl,
-            "name": "procesja",
+            "language": pl,
+            "headword": "procesja",
             "pos": "noun"
         });
 
         entries["źrebię"] = new Entry({
-            "lang": pl,
-            "name": "źrebię",
+            "language": pl,
+            "headword": "źrebię",
             "pos": "noun"
         });
 
         entries["mieszkanie"] = new Entry({
-            "lang": pl,
-            "name": "mieszkanie",
+            "language": pl,
+            "headword": "mieszkanie",
             "pos": "noun"
         });
 
         entries["koniec"] = new Entry({
-            "lang": pl,
-            "name": "koniec",
+            "language": pl,
+            "headword": "koniec",
             "pos": "noun",
             "fields": {
                 "*stem": "końc"
@@ -1909,8 +1909,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["zegarek"] = new Entry({
-            "lang": pl,
-            "name": "zegarek",
+            "language": pl,
+            "headword": "zegarek",
             "pos": "noun",
             "fields": {
                 "*stem": "zegark"
@@ -1918,62 +1918,62 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["kapelusz"] = new Entry({
-            "lang": pl,
-            "name": "kapelusz",
+            "language": pl,
+            "headword": "kapelusz",
             "pos": "noun"
         });
 
         entries["garaż"] = new Entry({
-            "lang": pl,
-            "name": "garaż",
+            "language": pl,
+            "headword": "garaż",
             "pos": "noun"
         });
 
         entries["łabędź"] = new Entry({
-            "lang": pl,
-            "name": "łabędź",
+            "language": pl,
+            "headword": "łabędź",
             "pos": "noun"
         });
 
         entries["płaszcz"] = new Entry({
-            "lang": pl,
-            "name": "płaszcz",
+            "language": pl,
+            "headword": "płaszcz",
             "pos": "noun"
         });
 
         entries["orkiestra"] = new Entry({
-            "lang": pl,
-            "name": "orkiestra",
+            "language": pl,
+            "headword": "orkiestra",
             "pos": "noun"
         });
 
         entries["żona"] = new Entry({
-            "lang": pl,
-            "name": "żona",
+            "language": pl,
+            "headword": "żona",
             "pos": "noun"
         });
 
         entries["cegła"] = new Entry({
-            "lang": pl,
-            "name": "cegła",
+            "language": pl,
+            "headword": "cegła",
             "pos": "noun"
         });
 
         entries["ziemia"] = new Entry({
-            "lang": pl,
-            "name": "ziemia",
+            "language": pl,
+            "headword": "ziemia",
             "pos": "noun"
         });
 
         entries["ciocia"] = new Entry({
-            "lang": pl,
-            "name": "ciocia",
+            "language": pl,
+            "headword": "ciocia",
             "pos": "noun"
         });
 
         entries["głowa"] = new Entry({
-            "lang": pl,
-            "name": "głowa",
+            "language": pl,
+            "headword": "głowa",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "głów"
@@ -1981,44 +1981,44 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["drzewo"] = new Entry({
-            "lang": pl,
-            "name": "drzewo",
+            "language": pl,
+            "headword": "drzewo",
             "pos": "noun"
         });
 
         entries["mieszkanie"] = new Entry({
-            "lang": pl,
-            "name": "mieszkanie",
+            "language": pl,
+            "headword": "mieszkanie",
             "pos": "noun"
         });
 
         entries["pióro"] = new Entry({
-            "lang": pl,
-            "name": "pióro",
+            "language": pl,
+            "headword": "pióro",
             "pos": "noun"
         });
 
         entries["lato"] = new Entry({
-            "lang": pl,
-            "name": "lato",
+            "language": pl,
+            "headword": "lato",
             "pos": "noun"
         });
 
         entries["serce"] = new Entry({
-            "lang": pl,
-            "name": "serce",
+            "language": pl,
+            "headword": "serce",
             "pos": "noun"
         });
 
         entries["jezioro"] = new Entry({
-            "lang": pl,
-            "name": "jezioro",
+            "language": pl,
+            "headword": "jezioro",
             "pos": "noun"
         });
 
         entries["miasto"] = new Entry({
-            "lang": pl,
-            "name": "miasto",
+            "language": pl,
+            "headword": "miasto",
             "pos": "noun",
             "fields": {
                 "locative.singular": "mieście"
@@ -2026,8 +2026,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["słowo"] = new Entry({
-            "lang": pl,
-            "name": "słowo",
+            "language": pl,
+            "headword": "słowo",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "słów"
@@ -2035,8 +2035,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["święto"] = new Entry({
-            "lang": pl,
-            "name": "święto",
+            "language": pl,
+            "headword": "święto",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "świąt"
@@ -2044,8 +2044,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["piętro"] = new Entry({
-            "lang": pl,
-            "name": "piętro",
+            "language": pl,
+            "headword": "piętro",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "pięter"
@@ -2053,20 +2053,20 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["śniadanie"] = new Entry({
-            "lang": pl,
-            "name": "śniadanie",
+            "language": pl,
+            "headword": "śniadanie",
             "pos": "noun"
         });
 
         entries["książę"] = new Entry({
-            "lang": pl,
-            "name": "książę",
+            "language": pl,
+            "headword": "książę",
             "pos": "noun"
         });
 
         entries["narzędzie"] = new Entry({
-            "lang": pl,
-            "name": "narzędzie",
+            "language": pl,
+            "headword": "narzędzie",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "narzędzi"
@@ -2074,8 +2074,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["wybrzeże"] = new Entry({
-            "lang": pl,
-            "name": "wybrzeże",
+            "language": pl,
+            "headword": "wybrzeże",
             "pos": "noun",
             "fields": {
                 "genitive.plural": "wybrzeży"
@@ -2083,8 +2083,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["świat"] = new Entry({
-            "lang": pl,
-            "name": "świat",
+            "language": pl,
+            "headword": "świat",
             "pos": "noun",
             "fields": {
                 "dative.singular": "światu"
@@ -2092,8 +2092,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["Bóg"] = new Entry({
-            "lang": pl,
-            "name": "Bóg",
+            "language": pl,
+            "headword": "Bóg",
             "pos": "noun",
             "fields": {
                 "*stem": "Bog",
@@ -2102,80 +2102,80 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["sosna"] = new Entry({
-            "lang": pl,
-            "name": "sosna",
+            "language": pl,
+            "headword": "sosna",
             "pos": "noun"
         });
 
         entries["kapusta"] = new Entry({
-            "lang": pl,
-            "name": "kapusta",
+            "language": pl,
+            "headword": "kapusta",
             "pos": "noun"
         });
 
         entries["lista"] = new Entry({
-            "lang": pl,
-            "name": "lista",
+            "language": pl,
+            "headword": "lista",
             "pos": "noun"
         });
 
         entries["bielizna"] = new Entry({
-            "lang": pl,
-            "name": "bielizna",
+            "language": pl,
+            "headword": "bielizna",
             "pos": "noun"
         });
 
         entries["ojczyzna"] = new Entry({
-            "lang": pl,
-            "name": "ojczyzna",
+            "language": pl,
+            "headword": "ojczyzna",
             "pos": "noun"
         });
 
         entries["podłoga"] = new Entry({
-            "lang": pl,
-            "name": "podłoga",
+            "language": pl,
+            "headword": "podłoga",
             "pos": "noun"
         });
 
         entries["mucha"] = new Entry({
-            "lang": pl,
-            "name": "mucha",
+            "language": pl,
+            "headword": "mucha",
             "pos": "noun"
         });
 
         entries["osoba"] = new Entry({
-            "lang": pl,
-            "name": "osoba",
+            "language": pl,
+            "headword": "osoba",
             "pos": "noun"
         });
 
         entries["prasa"] = new Entry({
-            "lang": pl,
-            "name": "prasa",
+            "language": pl,
+            "headword": "prasa",
             "pos": "noun"
         });
 
         entries["mama"] = new Entry({
-            "lang": pl,
-            "name": "mama",
+            "language": pl,
+            "headword": "mama",
             "pos": "noun"
         });
 
         entries["koza"] = new Entry({
-            "lang": pl,
-            "name": "koza",
+            "language": pl,
+            "headword": "koza",
             "pos": "noun"
         });
 
         entries["Europa"] = new Entry({
-            "lang": pl,
-            "name": "Europa",
+            "language": pl,
+            "headword": "Europa",
             "pos": "noun"
         });
 
         entries["dzień"] = new Entry({
-            "lang": pl,
-            "name": "dzień",
+            "language": pl,
+            "headword": "dzień",
             "pos": "noun",
             "fields": {
                 "*stem": "dń"
@@ -2183,8 +2183,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["wuj"] = new Entry({
-            "lang": pl,
-            "name": "wuj",
+            "language": pl,
+            "headword": "wuj",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -2194,14 +2194,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["las"] = new Entry({
-            "lang": pl,
-            "name": "las",
+            "language": pl,
+            "headword": "las",
             "pos": "noun"
         });
 
         entries["gwóźdź"] = new Entry({
-            "lang": pl,
-            "name": "gwóźdź",
+            "language": pl,
+            "headword": "gwóźdź",
             "pos": "noun",
             "fields": {
                 "*stem": "gwoźdź"
@@ -2209,20 +2209,20 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["słońce"] = new Entry({
-            "lang": pl,
-            "name": "słońce",
+            "language": pl,
+            "headword": "słońce",
             "pos": "noun"
         });
 
         entries["zboże"] = new Entry({
-            "lang": pl,
-            "name": "zboże",
+            "language": pl,
+            "headword": "zboże",
             "pos": "noun"
         });
 
         entries["przyjaciel"] = new Entry({
-            "lang": pl,
-            "name": "przyjaciel",
+            "language": pl,
+            "headword": "przyjaciel",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -2234,8 +2234,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["dłoń"] = new Entry({
-            "lang": pl,
-            "name": "dłoń",
+            "language": pl,
+            "headword": "dłoń",
             "pos": "noun",
             "fields": {
                 "instrumental.plural": "dłońmi"
@@ -2243,8 +2243,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["kość"] = new Entry({
-            "lang": pl,
-            "name": "kość",
+            "language": pl,
+            "headword": "kość",
             "pos": "noun",
             "fields": {
                 "gender": "feminine",
@@ -2253,14 +2253,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["dach"] = new Entry({
-            "lang": pl,
-            "name": "dach",
+            "language": pl,
+            "headword": "dach",
             "pos": "noun"
         });
 
         entries["marzec"] = new Entry({
-            "lang": pl,
-            "name": "marzec",
+            "language": pl,
+            "headword": "marzec",
             "pos": "noun",
             "fields": {
                 "*stem": "marc"
@@ -2268,26 +2268,26 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["cmentarz"] = new Entry({
-            "lang": pl,
-            "name": "cmentarz",
+            "language": pl,
+            "headword": "cmentarz",
             "pos": "noun"
         });
 
         entries["pomysł"] = new Entry({
-            "lang": pl,
-            "name": "pomysł",
+            "language": pl,
+            "headword": "pomysł",
             "pos": "noun"
         });
 
         entries["wykład"] = new Entry({
-            "lang": pl,
-            "name": "wykład",
+            "language": pl,
+            "headword": "wykład",
             "pos": "noun"
         });
 
         entries["wyjazd"] = new Entry({
-            "lang": pl,
-            "name": "wyjazd",
+            "language": pl,
+            "headword": "wyjazd",
             "pos": "noun",
             "fields": {
                 "*stem": "wyjezd"
@@ -2295,14 +2295,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["Rzym"] = new Entry({
-            "lang": pl,
-            "name": "Rzym",
+            "language": pl,
+            "headword": "Rzym",
             "pos": "noun"
         });
 
         entries["szef"] = new Entry({
-            "lang": pl,
-            "name": "szef",
+            "language": pl,
+            "headword": "szef",
             "pos": "noun",
             "fields": {
                 "animate": true,
@@ -2311,8 +2311,8 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["wóz"] = new Entry({
-            "lang": pl,
-            "name": "wóz",
+            "language": pl,
+            "headword": "wóz",
             "pos": "noun",
             "fields": {
                 "*stem": "woz"
@@ -2320,44 +2320,44 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["pończocha"] = new Entry({
-            "lang": pl,
-            "name": "pończocha",
+            "language": pl,
+            "headword": "pończocha",
             "pos": "noun"
         });
 
         entries["wojsko"] = new Entry({
-            "lang": pl,
-            "name": "wojsko",
+            "language": pl,
+            "headword": "wojsko",
             "pos": "noun"
         });
 
         entries["ucho"] = new Entry({
-            "lang": pl,
-            "name": "ucho",
+            "language": pl,
+            "headword": "ucho",
             "pos": "noun"
         });
 
         entries["echo"] = new Entry({
-            "lang": pl,
-            "name": "echo",
+            "language": pl,
+            "headword": "echo",
             "pos": "noun"
         });
 
         entries["mydło"] = new Entry({
-            "lang": pl,
-            "name": "mydło",
+            "language": pl,
+            "headword": "mydło",
             "pos": "noun"
         });
 
         entries["złoto"] = new Entry({
-            "lang": pl,
-            "name": "złoto",
+            "language": pl,
+            "headword": "złoto",
             "pos": "noun"
         });
 
         entries["oko"] = new Entry({
-            "lang": pl,
-            "name": "oko",
+            "language": pl,
+            "headword": "oko",
             "pos": "noun",
             "fields": {
                 "*stem.plural": "ocz"
@@ -2365,14 +2365,14 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["stado"] = new Entry({
-            "lang": pl,
-            "name": "stado",
+            "language": pl,
+            "headword": "stado",
             "pos": "noun"
         });
 
         entries["gniazdo"] = new Entry({
-            "lang": pl,
-            "name": "gniazdo",
+            "language": pl,
+            "headword": "gniazdo",
             "pos": "noun",
             "fields": {
                 "*stem": "gniezd"
@@ -2380,20 +2380,20 @@ require.def('lingwo_dictionary/js/languages/pl.test-data',
         });
 
         entries["pismo"] = new Entry({
-            "lang": pl,
-            "name": "pismo",
+            "language": pl,
+            "headword": "pismo",
             "pos": "noun"
         });
 
         entries["jajko"] = new Entry({
-            "lang": pl,
-            "name": "jajko",
+            "language": pl,
+            "headword": "jajko",
             "pos": "noun"
         });
 
         entries["mięso"] = new Entry({
-            "lang": pl,
-            "name": "mięso",
+            "language": pl,
+            "headword": "mięso",
             "pos": "noun"
         });
 

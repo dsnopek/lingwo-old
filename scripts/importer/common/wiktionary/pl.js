@@ -4,11 +4,12 @@
  */
 
 require.def('lingwo_dictionary/scripts/importer/common/wiktionary/pl',
-    ['lingwo_dictionary/scripts/importer/common/Entry',
+    ['lingwo_dictionary/js/languages/common/Entry',
+     'lingwo_dictionary/js/languages/common/Language',
      'lingwo_dictionary/scripts/importer/common/mediawiki/WikiText',
      'lingwo_dictionary/scripts/importer/common/mediawiki/Producer',
     ],
-    function (Entry, WikiText, Producer) {
+    function (Entry, Language, WikiText, Producer) {
         var langNames = {
             'ab': 'abchaski',
             'af': 'afrykanerski',
@@ -618,14 +619,6 @@ require.def('lingwo_dictionary/scripts/importer/common/wiktionary/pl',
                 }
                 // TODO: load up the forms!!
 
-                // re-layout into the format that the service wants
-                for(var name in res) {
-                     res[name] = {
-                         'value': res[name],
-                         'automatic': false,
-                     };
-                }
-
                 return res;
             }],
             ['senses', function (entry, sections) {
@@ -727,9 +720,10 @@ require.def('lingwo_dictionary/scripts/importer/common/wiktionary/pl',
                 
                 var sec = page.title + ' ({{język '+langNames[code]+'}})';
                 if (text.hasSection(sec)) {
-                    var entry = new Entry();
-                    entry.headword = page.title.toString();
-                    entry.language = code;
+                    var entry = new Entry({
+                        headword: page.title.toString(),
+                        language: Language.languages[code]
+                    });
                     entry.setSource('pl.wiktionary.org', {
                         raw: text.getSection(sec),
                         url: 'http://pl.wiktionary.org/wiki/'+entry.headword,
