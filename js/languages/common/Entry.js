@@ -57,8 +57,21 @@ require.def('lingwo_dictionary/js/languages/common/Entry',
                 return typeof this.fields[name] === 'undefined';
             },
 
+            getFieldInfo: function (name) {
+                // TODO: 'like' should be a field just like any other field!  We will need some
+                // special support here if we are trying to generate like itself.
+                var pos = this.getFieldsPos();
+                if (typeof this.language.fields[pos] == 'undefined' ||
+                    typeof this.language.fields[pos][name] == 'undefined')
+                {
+                    throw new err.NoSuchField(name, pos);
+                }
+                return this.language.fields[pos][name];
+                
+            },
+
             getField: function (name) {
-                var pos, field, value = null;
+                var field, value = null;
 
                 if (typeof this.fields[name] != 'undefined') {
                     return this.fields[name];
@@ -67,16 +80,7 @@ require.def('lingwo_dictionary/js/languages/common/Entry',
                     return this._cachedFields[name];
                 }
 
-                // TODO: 'like' should be a field just like any other field!  We will need some
-                // special support here if we are trying to generate like itself.
-                pos = this.getFieldsPos();
-                if (typeof this.language.fields[pos] == 'undefined' ||
-                    typeof this.language.fields[pos][name] == 'undefined')
-                {
-                    throw new err.NoSuchField(name, pos);
-                }
-
-                field = this.language.fields[pos][name];
+                field = this.getFieldInfo(name);
                 if (field.automatic) {
                     value = field.automatic.apply(this.language, new Array(this));
                 }
