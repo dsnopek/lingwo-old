@@ -121,7 +121,6 @@ require(
                 });
             },
 
-            /*
             testToBeNonPast: function () {
                 this.checkForms('być', {
                     'nonpast.singular.1p': 'jestem',
@@ -132,7 +131,6 @@ require(
                     'nonpast.plural.3p': 'są'
                 });
             },
-            */
 
             testNounMasculineNonVirilePlural: function () {
                 this.checkFormMulti('nominative.plural', {
@@ -390,7 +388,6 @@ require(
                 });
             },
 
-            /*
             testVerbSecondConjugation: function () {
                 this.assertEquals(getEntry('wierzyć').getOption('conjugation'), 'second');
 
@@ -1211,7 +1208,6 @@ require(
                   'ostatni': 'ostatnich'
                });
             }
-            */
         }).run();
     }
 );
