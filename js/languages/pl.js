@@ -121,21 +121,34 @@ require.def('lingwo_dictionary/js/languages/pl',
         lang.fields.noun = {
             'animate': {
                 type: 'class',
+                label: 'Animate',
+                description: 'Set to True if this noun is a living thing (gramatically).  Only important if the Gender is "masculine".',
+                show: function (entry) {
+                    return entry.getField('gender') == 'masculine';
+                },
                 automatic: function (entry) {
                     return entry.getField('virile');
                 }
             },
 
             'virile': {
-                type: 'class'
-            },
-
-            'animate': {
-                type: 'class'
+                type: 'class',
+                label: 'Virile',
+                description: 'Set to True if this noun is a male human.  Only important if the Gender is "masculine".',
+                show: function (entry) {
+                    return entry.getField('gender') == 'masculine';
+                }
             },
 
             'gender': {
                 type: 'option',
+                label: 'Gender',
+                options: {
+                    'masculine': 'Masculine',
+                    'feminine': 'Feminine',
+                    'neuter': 'Neuter'
+                },
+                required: true,
                 automatic: function (entry) {
                     var word = entry.getWord();
                     return word.ending('o', 'e', 'ę', 'um').result('neuter')  ||
@@ -750,6 +763,12 @@ require.def('lingwo_dictionary/js/languages/pl',
         lang.fields.verb = {
             'conjugation': {
                 type: 'option',
+                label: 'Conjugation',
+                options: {
+                    'first': 'First',
+                    'second': 'Second',
+                    'third': 'Third',
+                },
                 automatic: function (entry) {
                     // Here we attempt to guess the conjugation class, which has the highest
                     // likelyhood of being inaccurate.
