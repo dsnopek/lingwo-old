@@ -24,4 +24,58 @@ function lingwo_korpus_menu() {
   return $items;
 }
 
+/*
+ * Implementation of hook_nodeapi().
+ */
+function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
+  global $user;
+
+  if ($node->type != lingwo_korpus_text_type())
+    return;
+
+  switch ($op) {
+    case 'view':
+      if ($a4) {
+        $lang_pair = ($node->language ? $node->language : language_default()) .'-'. $user->language;
+        $node->content['body']['#value'] = lingwo_korpus_filter_text($node->content['body']['#value'], $lang_pair);
+        # TODO: output the JavaScript for the annotation reader
+      }
+      break;
+  }
+}
+
+function lingwo_korpus_filter_text($text, $lang_pair) {
+  require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
+
+  $html = str_get_html($text); 
+  foreach($html->find('anno') as $el) {
+    // get all the attributes and clear them
+    $attrs = $el->attr;
+    $el->attr = array();
+
+    // get the headword
+    $headword = isset($attrs['headword']) ? $attrs['headword'] : $el->plaintext;
+
+    // convert to a link
+    $el->tag = 'a';
+    $el->class = 'anno';
+    $el->href = lingwo_dictionary_settings('lookup_path').'/'.$lang_pair.'/'.$headword.'('.$attrs['pos'].')';
+    $el->setAttribute('data-form', $attrs['form']);
+    $el->setAttribute('data-sense', $attrs['sense']);
+  }
+
+  return $html->outertext;
+
+}
+
+/*
+ * Settings
+ */
+function lingwo_korpus_text_type($value=NULL) {
+  if (is_null($value)) {
+    return variable_get('lingwo_korpus_text_type', '');
+  }
+
+  variable_set('lingwo_korpus_text_type', $value);
+}
 
