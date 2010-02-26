@@ -75,7 +75,7 @@ function lingwo_dictionary_init() {
 function lingwo_dictionary_menu() {
   $items = array();
   $items['admin/settings/lingwo_dictionary'] = array(
-    'title' => 'Lingwo Dictionary',
+    'title' => 'Lingwo Dictionary Settings',
     'description' => 'Settings for Lingwo Dictionary module.',
     'access arguments' => array('administer site configuration'),
     'page callback' => 'drupal_get_form',

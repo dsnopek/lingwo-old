@@ -1,0 +1,27 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Extends Lingwo Dictionary for annotating texts
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function lingwo_korpus_menu() {
+  $items = array();
+  $items['admin/settings/lingwo_dictionary/korpus'] = array(
+    'title' => 'Korpus',
+    'description' => 'Settings for Lingwo Korpus module.',
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lingwo_korpus_admin_settings'),
+    'file' => 'lingwo_korpus.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+
