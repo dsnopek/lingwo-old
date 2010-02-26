@@ -1,0 +1,27 @@
+
+a.anno {
+    color: black;
+    text-decoration: none;
+}
+
+a.anno:hover {
+    background-color: #0066FF;
+    cursor: pointer;
+    color: white;
+}
+
+a.anno.selected {
+    background-color: #FF0000;
+    cursor: pointer;
+    color: white;
+}
+
+#lingwo-korpus-entry-view {
+    position: fixed;
+    background-color: white;
+    border: 1px solid black;
+    /* DRS: We subtract 2px for the border. */
+    width: 298px;
+    overflow: auto;
+}
+
