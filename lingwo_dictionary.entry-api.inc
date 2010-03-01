@@ -92,6 +92,28 @@ function lingwo_dictionary_entry_get_id($node) {
     $node->title)) .'('. lingwo_dictionary_entry_get_pos($node) .')';
 }
 
+// Gets an nid from the "Lingwo ID"
+function lingwo_dictionary_entry_from_id($id) {
+  list($source_lang, $headword) = explode('/', $id);
+  list($source_lang, $target_lang) = explode('-', $source_lang);
+  if (preg_match('/([^\(]+)\((\S+)\)/', $headword, $matches)) {
+    $headword = trim($matches[1]);
+    $pos  = $matches[2];
+  }
+
+  $nid = lingwo_dictionary_entry_lookup($headword, $source_lang, $pos);
+
+  if ($target_lang) {
+    $trans = translation_node_get_translations($nid);
+    if ($trans[$target_lang]) {
+      $nid = $trans[$target_lang]->nid;
+    }
+  }
+
+  return $nid;
+}
+
+
 // Lookup an entry based on its headword, language and pos
 function lingwo_dictionary_entry_lookup($headword, $language, $pos = NULL) {
   if (is_null($pos)) {

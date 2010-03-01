@@ -31,11 +31,18 @@
                         top: (offset.top + target.height() + 40) + 'px' });
 
                 pos = target.attr('data-pos');
-                bubble.html(target.attr('href'));
+                bubble.html('Loading ...');
 
                 // mark as selected
                 selected = target;
                 target.addClass('selected');
+
+                // lookup the entry on the server
+                $.getJSON('/lingwo_korpus/lookup_entry', {'url': target.attr('href')},
+                    function (res) {
+                        bubble.html(res.content);
+                    }
+                );
             }
             else {
                 bubble.hide();
