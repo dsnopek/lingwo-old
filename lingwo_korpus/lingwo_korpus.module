@@ -52,7 +52,7 @@ function lingwo_korpus_lookup_entry() {
 function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
   global $user;
 
-  if ($node->type != lingwo_korpus_text_type())
+  if ($node->type != lingwo_korpus_text_content_type())
     return;
 
   switch ($op) {
@@ -95,11 +95,11 @@ function lingwo_korpus_filter_text($text, $lang_pair) {
 /*
  * Settings
  */
-function lingwo_korpus_text_type($value=NULL) {
+function lingwo_korpus_text_content_type($value=NULL) {
   if (is_null($value)) {
-    return variable_get('lingwo_korpus_text_type', '');
+    return variable_get('lingwo_korpus_text_content_type', '');
   }
 
-  variable_set('lingwo_korpus_text_type', $value);
+  variable_set('lingwo_korpus_text_content_type', $value);
 }
 
