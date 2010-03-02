@@ -1,0 +1,34 @@
+<?php
+// $Id: $
+
+/**
+ * @file
+ * Install file for lingwo_korpus.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function lingwo_korpus_schema() {
+  // we are adding a new cache table
+  $schema['cache_lingwo_korpus'] = drupal_get_schema_unprocessed('system', 'cache');
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function lingwo_korpus_install() {
+  variable_set('lingwo_korpus_schema_version', 6000);
+  drupal_install_schema('lingwo_korpus');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function lingwo_korpus_uninstall() {
+  drupal_uninstall_schema('lingwo_korpus');
+  variable_del('lingwo_korpus_schema_version');
+}
+

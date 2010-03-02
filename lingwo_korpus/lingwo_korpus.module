@@ -31,6 +31,9 @@ function lingwo_korpus_menu() {
   return $items;
 }
 
+/*
+ * Our entry lookup AJAX callback.
+ */
 function lingwo_korpus_lookup_entry() {
   // get the "Lingwo ID" out of the 'url' GET argument
   $url = urldecode($_GET['url']);
@@ -47,6 +50,13 @@ function lingwo_korpus_lookup_entry() {
 }
 
 /*
+ * Implementation of hook_flush_caches().
+ */
+function lingwo_korpus_flush_caches() {
+  return array('cache_lingwo_korpus');
+}
+
+/*
  * Implementation of hook_nodeapi().
  */
 function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
@@ -56,10 +66,27 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
     return;
 
   switch ($op) {
+    case 'update':
+    case 'delete':
+      // clear all cached texts for this node
+      cache_clear_all($node->nid, 'cache_lingwo_korpus', TRUE);
+      break;
+
     case 'view':
       if ($a4) {
         $lang_pair = ($node->language ? $node->language : language_default()) .'-'. $user->language;
-        $node->content['body']['#value'] = lingwo_korpus_filter_text($node->content['body']['#value'], $lang_pair);
+        $cid = $node->nid .'-'. $lang_pair;
+
+        // get from the cache or process the data
+        $data = cache_get($cid, 'cache_lingwo_korpus');
+        if ($data) {
+          $data = $data->data;
+        }
+        else {
+          $data = lingwo_korpus_filter_text($node->content['body']['#value'], $lang_pair);
+          cache_set($cid, $data, 'cache_lingwo_korpus');
+        }
+        $node->content['body']['#value'] = $data;
 
         drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.js');
         drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.css');
