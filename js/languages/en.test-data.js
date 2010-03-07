@@ -40,6 +40,20 @@ require.def('lingwo_dictionary/languages/en.test-data',
             {   headword: 'lady',
                 pos: 'noun'
             },
+
+            // verbs
+            {   headword: 'read',
+                pos: 'verb'
+            },
+            {   headword: 'try',
+                pos: 'verb'
+            },
+            {   headword: 'buzz',
+                pos: 'verb'
+            },
+            {   headword: 'veto',
+                pos: 'verb'
+            },
     ]);
     }
 );

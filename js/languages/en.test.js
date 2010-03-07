@@ -22,6 +22,15 @@ require(
                     'hero': 'heroes',
                     'lady': 'ladies'
                 });
+            },
+
+            testSimplePresent3p: function () {
+                this.checkFieldMulti('simple.present.3p', {
+                    'read': 'reads',
+                    'try': 'tries',
+                    'buzz': 'buzzes',
+                    'veto': 'vetoes',
+                });
             }
         }).run();
     }

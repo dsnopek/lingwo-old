@@ -21,20 +21,35 @@ require.def('lingwo_dictionary/languages/en',
             }
         );
 
+        function append_s (word) {
+            if (word.hasEnding([Language.cls('consonant'), 'y'])) {
+                return word.ending(1).replace('ies');
+            }
+            return word.ending('sh','ch','s','z','o').append('es') ||
+                   word.append('s');
+        }
+
         lang.fields.noun = {
             'plural': {
                 type: 'form',
                 label: 'Plural',
                 automatic: function (entry) {
-                    var word = entry.getWord();
-                    if (word.hasEnding([Language.cls('consonant'), 'y'])) {
-                        return word.ending(1).replace('ies');
-                    }
-                    return word.ending('sh','ch','s','o').append('es') ||
-                           word.append('s');
+                    return append_s(entry.getWord());
                 }
             }
         };
+
+        lang.fields.verb = {
+            // TODO: do we want to do other persons just to accomidate the verb "to be"?  Its
+            // the *only* word in the language that would need it...
+            'simple.present.3p': {
+                type: 'form',
+                label: 'Simple Present 3rd Person',
+                automatic: function (entry) {
+                    return append_s(entry.getWord());
+                }
+            }
+        }
 
         return lang;
     }
