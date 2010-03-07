@@ -8,15 +8,39 @@ require.def('lingwo_dictionary/languages/en.test-data',
      'lingwo_dictionary/languages/en',
     ],
     function (Entry, en) {
-        entries = {};
+        function createEntries(l) {
+            var entries = {}, i, args;
+            for(i = 0; i < l.length; i++) {
+                args = l[i];
+                args.language = en;
+                entries[args.headword] = new Entry(args);
+            }
+            return entries;
+        };
 
-        entries["house"] = new Entry({
-            "language": en,
-            "headword": "house",
-            "pos": "noun"
-        });
-
-        return entries;
+        return createEntries([
+            {   headword: 'house',
+                pos: 'noun'
+            },
+            {   headword: 'kiss',
+                pos: 'noun'
+            },
+            {   headword: 'dish',
+                pos: 'noun'
+            },
+            {   headword: 'watch',
+                pos: 'noun'
+            },
+            {   headword: 'boy',
+                pos: 'noun'
+            },
+            {   headword: 'hero',
+                pos: 'noun'
+            },
+            {   headword: 'lady',
+                pos: 'noun'
+            },
+    ]);
     }
 );
 
