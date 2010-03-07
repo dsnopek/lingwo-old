@@ -1,44 +1,27 @@
 
+== 2010-03-07 ==
+
+ * Dealing with headwords with multiple words:
+
+   - We should treat the space (' ') as the word seperator.
+
+   - Add new function called Entry.getWords() which returns an array of all the parsed words.
+
+   - Entry.getWord() will by default return the first word from Entry.getWords() except
+     when a word in the headword string is surrounded by brackes (ie. "first [second]") where
+     that word will be returned.
+
+   - Fields automatic functions can return an array of word objects, which will be joined
+     with a space (' ') when returning from Entry.getField().
+
+   ** This System should accomidate English language phrasal verbs ("wake up") returning
+      multi-word forms ("to live") and Polish reflexive verbs ("udać się").
+
 == 2010-01-17 ==
 
  * I think that lingwo_dictionary should be dependent on i18ntaxonomy, because without it, the
    Part Of Speech isn't copied over in translations.  Although, you could say that lingwo_dictionary
    could maybe be useful without translations..  Not sure yet.
-
-== 2009-11-27 ==
-
- * Start working with the 'features' module.  As I see it, we have two features we should create:
-
-   (1) A feature for setting up lingwo_dictionary which enables the correct modules, creates
-       the 'entry' content type, etc..
-
-   (2) A feature for setting up the syndictation stuff, which involves making a few content
-       types and wiring them together in the appropriate way.
-
-== 2009-11-13 ==
-
-The next big steps as I see them are:
-
- 1. Start working to make a *viable* Polish dictionary, that means:
-
-    * Finishing the morphology definition and gearing it to web entry.
-	  - We don't have past tense of verbs!!
-	  - Verb conjugation categories are overly simple, copying pl.wiktionary.org's categories
-	    would probably be a good idea.
-
-	* Fixing bugs in the Sense entry field.
-
-	* Ensuring that entries are unique by headword / pos / language.
-
-	* Provide a search/lookup mechanism
-
- 2. Start working on wikitionary import.  This will probably dictate alot of the decisions for
-    what fields end up on an Entry and maybe force the related entries issue.  This will also
-	include working with services to actually add the entries.  Ideally this should be progressive
-	but in the initial version it doesn't need to be.
-
-After these steps are complete, we can start look to the next big piece of the puzzle and that
-is the annotator.  We can't really have an annotator without a working dictionary.
 
 == 2009-11-05 ==
 
@@ -154,11 +137,4 @@ is the annotator.  We can't really have an annotator without a working dictionar
    to "[school:adjective]".
  
  * Add the "Same as" selector on translation senses, so that senses can be consolidated.
-
-== 2009-02-12 ==
-
- * Finish up "/languages":
-   
-   - Add a search bit, where we can try and find a language from keywords (fuzzily!)
-     and the language code.
 

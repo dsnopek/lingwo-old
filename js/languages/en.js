@@ -48,6 +48,13 @@ require.def('lingwo_dictionary/languages/en',
                 automatic: function (entry) {
                     return append_s(entry.getWord());
                 }
+            },
+
+            'infinitive': {
+                type: 'form',
+                automatic: function (entry) {
+                    return [lang.parseWord('to'), entry.getWord()];
+                }
             }
         }
 
