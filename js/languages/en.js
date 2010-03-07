@@ -42,16 +42,32 @@ require.def('lingwo_dictionary/languages/en',
         lang.fields.verb = {
             // TODO: do we want to do other persons just to accomidate the verb "to be"?  Its
             // the *only* word in the language that would need it...
-            'simple.present.3p': {
+            '-s': {
                 type: 'form',
-                label: 'Simple Present 3rd Person',
+                label: '-s Form',
                 automatic: function (entry) {
                     return append_s(entry.getWord());
                 }
             },
 
+            '-ing': {
+                type: 'form',
+                label: '-ing Form'
+            },
+
+            '2nd': {
+                type: 'form',
+                label: '2nd Form (past)'
+            },
+
+            '3rd': {
+                type: 'form',
+                label: '3rd Form (past participle)'
+            },
+
             'infinitive': {
                 type: 'form',
+                label: 'Infinitive',
                 automatic: function (entry) {
                     return [lang.parseWord('to'), entry.getWord()];
                 }

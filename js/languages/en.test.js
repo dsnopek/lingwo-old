@@ -25,7 +25,7 @@ require(
             },
 
             testSimplePresent3p: function () {
-                this.checkFieldMulti('simple.present.3p', {
+                this.checkFieldMulti('-s', {
                     'read': 'reads',
                     'try': 'tries',
                     'buzz': 'buzzes',
