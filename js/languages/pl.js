@@ -8,30 +8,8 @@ require.def('lingwo_dictionary/languages/pl',
     function (Language) {
         var lang = Language.defineLanguage('pl');
 
-        function generateAlphabet (single_letters, diagraphs, class_func) {
-            class_func = class_func || function () { return []; };
-            var alphabet = {}, i;
-            var makeLetter = function (letter) {
-                alphabet[letter] = {
-                    'classes': class_func(letter),
-                    'default_form': 'lower',
-                    'forms': {
-                        'lower': letter,
-                        'upper': letter.substr(0,1).toUpperCase() + letter.substr(1)
-                    }
-                };
-            };
-            for (i = 0; i < single_letters.length; i++) {
-                makeLetter(single_letters.substr(i,1));
-            }
-            for (i = 0; i < diagraphs.length; i++) {
-                makeLetter(diagraphs[i]);
-            }
-            return alphabet;
-        };
-        
         // must be done for diagraphs, maintaining forms and setting letter classes (ie. vowel).
-        lang.alphabet = generateAlphabet('aąbcćdeęfghijklłmnńoópqrsśtuvwxyzżź', ['ch','dz','dż','dź','sz','rz','sz'],
+        lang.alphabet = Language.generateAlphabet('aąbcćdeęfghijklłmnńoópqrsśtuvwxyzżź', ['ch','dz','dż','dź','sz','rz','sz'],
             function (l) {
                 var classes = [];
                 if (l == 'a' || l == 'ą' || l == 'e' || l == 'ę' || l == 'i' || l == 'o' || l == 'ó' || l == 'u' || l == 'y') {

@@ -359,6 +359,29 @@ require.def('lingwo_dictionary/Language',
             return lang;
         };
 
+        // function used to generate simple alphabets
+        Language.generateAlphabet = function (single_letters, diagraphs, class_func) {
+            class_func = class_func || function () { return []; };
+            var alphabet = {}, i;
+            var makeLetter = function (letter) {
+                alphabet[letter] = {
+                    'classes': class_func(letter),
+                    'default_form': 'lower',
+                    'forms': {
+                        'lower': letter,
+                        'upper': letter.substr(0,1).toUpperCase() + letter.substr(1)
+                    }
+                };
+            };
+            for (i = 0; i < single_letters.length; i++) {
+                makeLetter(single_letters.substr(i,1));
+            }
+            for (i = 0; i < diagraphs.length; i++) {
+                makeLetter(diagraphs[i]);
+            }
+            return alphabet;
+        };
+
         return Language;
     }
 );
