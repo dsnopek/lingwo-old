@@ -40,7 +40,6 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
 
         var parsers = {
             'en': function (entry) {
-                //print (entry.serialize());
             }
         };
 
@@ -66,7 +65,7 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                                 pos: posMap[pos],
                             });
                             entry.setSource('en.wiktionary.org', {
-                                raw: '=='+lang_name+'==\n\n'+text.getSection(pos, 2),
+                                raw: '=='+lang_name+'==\n\n'+text.getSection(pos, 2)+'\n\n'+text.getSection('Pronunciation', 2),
                                 url: 'http://en.wiktionary.org/wiki/'+entry.headword,
                                 license: 'CC-BY-SA-3.0',
                                 timestamp: page.revision.timestamp.toString()
