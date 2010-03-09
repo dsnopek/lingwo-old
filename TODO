@@ -1,4 +1,36 @@
 
+== 2010-03-09 ==
+
+ * Give the importer some slick arguments to allow us to run in multiple phases:
+
+   To read the en.wiktionary.org, run the parser, and import the data to localhost:8082:
+
+     ./en-importer --source en-wiktionary-org:path/to/data-file.xml.bz2
+	               --service http://localhost:8082
+				   --service-username "Normal User" --service-password "blah"
+
+   To read the en.wiktionary.org and stash the raw entries without parsing into a staging database:
+
+     ./en-importer --source en-wiktionary-org:path/to/data-file.xml.bz2 --output-staging source.db
+
+   Then in a 2nd phase read the staging database and import the data to localhost:8082:
+
+     ./en-importer --input-staging sqlite:source.db
+	               --service http://localhost:8082
+	               --service-username "Normal User" --service-password "blah"
+
+ * Get the importer to take a list of entries that should be included in the import.  This way we
+   can only import the words we care about and keep a close watch on them.  Maybe something like:
+
+     ./en-importer --include-entries entry-list.txt
+
+   Where entry-list.txt would contain a line per entry like:
+
+     en:dog:noun
+
+ * Write a quick SAX application (could be Python, whatever is the fastest since this is a temporary
+   fix) that extracts all the words needed for an annotation into a file like entry-list.txt above.
+
 == 2010-03-07 ==
 
  * Dealing with headwords with multiple words:
