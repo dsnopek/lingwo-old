@@ -44,8 +44,8 @@ require([
         }
 
         wiktionary_en.process({
-            language: 'en',
-            filename: '/home/dsnopek/dl/plwiktionary-20091202-pages-articles.xml.bz2',
+            lang_code: 'en',
+            filename: '/home/dsnopek/dl/enwiktionary-latest-pages-articles.xml.bz2',
             handler: handler,
             limit: 10
         });
