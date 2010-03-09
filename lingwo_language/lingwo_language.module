@@ -13,7 +13,7 @@
 // TODO: We're loading these from PHP files for now
 $GLOBALS['LANG_SETTINGS'] = array();
 require_once 'lingwo_language.pl.inc';
-//require_once (drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_language/lingwo_language.pl.inc');
+require_once 'lingwo_language.en.inc';
 
 function lingwo_language_load($lang) {
   // TODO: loads the node which represents this language.
@@ -30,6 +30,10 @@ function lingwo_language_settings($lang) {
 
 function lingwo_language_fields($lang, $pos) {
   $settings = lingwo_language_settings($lang);
-  return $settings['fields'][$pos];
+  $fields = $settings['fields'][$pos];
+  if (!isset($fields)) {
+    return array();
+  }
+  return $fields;
 }
 

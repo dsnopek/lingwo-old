@@ -54,6 +54,15 @@ require.def('lingwo_dictionary/languages/en.test-data',
             {   headword: 'veto',
                 pos: 'verb'
             },
+            {   headword: 'agree',
+                pos: 'verb'
+            },
+            {   headword: 'believe',
+                pos: 'verb'
+            },
+            {   headword: 'lie',
+                pos: 'verb'
+            },
     ]);
     }
 );

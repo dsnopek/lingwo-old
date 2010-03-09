@@ -52,26 +52,45 @@ require.def('lingwo_dictionary/languages/en',
 
             '-ing': {
                 type: 'form',
-                label: '-ing Form'
+                label: '-ing Form',
+                automatic: function (entry) {
+                    var word = entry.getWord();
+                    // TODO: Integrate the consonant doubling rules..
+                    return word.ending('ee').append('ing') ||
+                           word.ending('ie').replace('ying') ||
+                           word.ending('e').replace('ing') ||
+                           word.append('ing');
+                }
             },
 
             '2nd': {
                 type: 'form',
-                label: '2nd Form (past)'
+                label: '2nd Form (past)',
+                automatic: function (entry) {
+                    var word = entry.getWord();
+                    return word.ending('e').append('d') ||
+                           word.append('ed');
+                }
             },
 
             '3rd': {
                 type: 'form',
-                label: '3rd Form (past participle)'
+                label: '3rd Form (past participle)',
+                automatic: function (entry) {
+                    return entry.getWord('2nd');
+                }
             },
 
+            /*
             'infinitive': {
                 type: 'form',
                 label: 'Infinitive',
                 automatic: function (entry) {
+                    // TODO: This is our planned syntax for returning multi-word forms
                     return [lang.parseWord('to'), entry.getWord()];
                 }
             }
+            */
         }
 
         return lang;

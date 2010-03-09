@@ -12,7 +12,7 @@ require(
                 }
             },
 
-            testPlural: function () {
+            testNounPlural: function () {
                 this.checkFieldMulti('plural', {
                     'house': 'houses',
                     'kiss': 'kisses',
@@ -24,12 +24,35 @@ require(
                 });
             },
 
-            testSimplePresent3p: function () {
+            testVerbSimplePresent3p: function () {
                 this.checkFieldMulti('-s', {
                     'read': 'reads',
                     'try': 'tries',
                     'buzz': 'buzzes',
                     'veto': 'vetoes',
+                });
+            },
+
+            testVerbIngForm: function () {
+                this.checkFieldMulti('-ing', {
+                    'read': 'reading',
+                    'agree': 'agreeing',
+                    'lie': 'lying',
+                    'believe': 'believing',
+                });
+            },
+
+            testVerb2ndForm: function () {
+                this.checkFieldMulti('2nd', {
+                    'buzz': 'buzzed',
+                    'agree': 'agreed',
+                });
+            },
+
+            testVerb3rdForm: function () {
+                this.checkFieldMulti('3rd', {
+                    'buzz': 'buzzed',
+                    'agree': 'agreed',
                 });
             }
         }).run();
