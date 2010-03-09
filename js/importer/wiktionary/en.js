@@ -4,12 +4,14 @@
  */
 
 require.def('lingwo_dictionary/importer/wiktionary/en',
-    ['lingwo_dictionary/Entry',
+    ['lingwo_dictionary/util/declare',
+     'lingwo_dictionary/Entry',
      'lingwo_dictionary/Language',
      'lingwo_dictionary/importer/mediawiki/WikiText',
      'lingwo_dictionary/importer/mediawiki/Producer',
+     'lingwo_dictionary/util/text',
     ],
-    function (Entry, Language, WikiText, Producer) {
+    function (declare, Entry, Language, WikiText, Producer, text_utils) {
         var posList = ['Noun','Adjective','Verb','Proper noun','Interjection','Conjunction','Preposition','Pronoun',
             'Prefix','Initialism','Phrase','Adverb','Cardinal number','Ordinal number','Suffix','Idiom','Numeral'];
 
@@ -38,8 +40,112 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             'pl': 'Polish',
         };
 
+        function trim(s) {
+            s = s.replace(/^\s+/, '');
+            s = s.replace(/\s+$/, '');
+            return s;
+        }
+
+        var LineReader = declare({
+            _constructor: function (text) {
+                this.lines = text.split('\n');
+                this.cur = 0;
+            },
+
+            reset: function () {
+                this.cur = 0;
+            },
+
+            eof: function () {
+                return this.cur >= this.lines.length;
+            },
+
+            _next: function (updatePosition, allowEmpty) {
+                var cur = this.cur, line;
+
+                if (typeof allowEmpty == 'undefined') {
+                    allowEmpty = false;
+                }
+                if (!allowEmpty) {
+                    while(cur < this.lines.length && trim(this.lines[cur]) == '') {
+                        cur++;
+                    }
+                }
+
+                if (cur >= this.lines.length) {
+                    return null;
+                }
+
+                line = this.lines[cur++];
+                if (updatePosition) {
+                    this.cur = cur;
+                }
+                return line;
+            },
+
+            peekline: function (allowEmpty) {
+                return this._next(false, allowEmpty);
+            },
+
+            readline: function (allowEmpty) {
+                return this._next(true, allowEmpty);
+            }
+        });
+
+        function clean(line, max) {
+            line = line.replace(/^#:?/, '');
+            line = WikiText.clean(line);
+            line = trim(line);
+
+            if (typeof max != 'undefined') {
+                line = text_utils.limitString(line, max);
+            }
+
+            return line;
+        }
+
+        function parseSenses(text) {
+            var input = new LineReader(text), line, parsing = false,
+                senses = [], sense;
+
+            while (!input.eof()) {
+                line = input.readline();
+                
+                // we start parsing on encountering the first '===' section
+                if (!parsing) {
+                    if (/^===[^=]/.exec(line)) {
+                        parsing = true;
+                    }
+                    continue;
+                }
+
+                // we stop parsing when we encounter another wikitext section
+                if (/^=/.exec(line)) {
+                    break;
+                }
+                // we find a difference, on a line marked '#'
+                else if (/^#[^:*]/.exec(line)) {
+                    sense = {
+                        difference: clean(line, 255),
+                    };
+                    
+                    // If its followed by an example, read that too.
+                    if (/^#:/.exec(input.peekline())) {
+                        sense.example = clean(input.readline());
+                    }
+
+                    senses.push(sense);
+                }
+            }
+
+            return senses;
+        }
+
         var parsers = {
             'en': function (entry) {
+                var raw = entry.getSource('en.wiktionary.org').raw;
+                entry.senses = parseSenses(raw);
+                print (entry.serialize());
             }
         };
 

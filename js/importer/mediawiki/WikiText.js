@@ -4,7 +4,7 @@ require.def('lingwo_dictionary/importer/mediawiki/WikiText',
      'lingwo_dictionary/util/escapeRegex',
     ],
     function (declare, escapeRegex) {
-        return declare({
+        var WikiText = declare({
             _constructor: function (text) {
                 this.text = text;
             },
@@ -41,6 +41,41 @@ require.def('lingwo_dictionary/importer/mediawiki/WikiText',
                 return text.replace(regex, '');
             }
         });
+
+        WikiText.clean = function (line) {
+            // Remove indent
+            line = line.replace(/^:/g, '');
+
+            // remove wikipedia references
+            line = line.replace(/\{\{wikipedia\}\}/g, '');
+
+            // replace the the funky {{template}} things with paren phrases
+            line = line.replace(/\{\{(\S+)\}\}/g, '($1)');
+
+            // [[link|link text]] -> link text
+            line = line.replace(/\[\[(?:[^|\]]+\|)?([^\]]+)\]\]/g, '$1');
+
+            // [[link]] -> link
+            //line = line.replace(/\[\[([^\]]+)\]\]/g, '$1');
+
+            // Remove <ref></ref> tags
+            line = line.replace(/<ref>.*?<\/ref>/g, '');
+
+            // Remove various text emphasis markup
+            line = line.replace(/'{2,3}/g, '');
+
+            // clean up the whitespace
+            line = line.replace(/^\s+/, '');
+            line = line.replace(/\s+$/, '');
+            line = line.replace(/\s\s+/g, ' ');
+
+            // remove trailing semi-colons
+            line = line.replace(/;+$/g, '');
+
+            return line;
+        };
+
+        return WikiText;
     }
 );
 

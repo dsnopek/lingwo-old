@@ -8,8 +8,9 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
      'lingwo_dictionary/Language',
      'lingwo_dictionary/importer/mediawiki/WikiText',
      'lingwo_dictionary/importer/mediawiki/Producer',
+     'lingwo_dictionary/util/text',
     ],
-    function (Entry, Language, WikiText, Producer) {
+    function (Entry, Language, WikiText, Producer, text_utils) {
         var langNames = {
             'ab': 'abchaski',
             'af': 'afrykanerski',
@@ -459,46 +460,6 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
             };
         };
 
-        var removeWikiText = function (line) {
-            // Remove indent
-            line = line.replace(/^:/g, '');
-
-            // remove wikipedia references
-            line = line.replace(/\{\{wikipedia\}\}/g, '');
-
-            // replace the the funky {{template}} things with paren phrases
-            line = line.replace(/\{\{(\S+)\}\}/g, '($1)');
-
-            // [[link|link text]] -> link text
-            line = line.replace(/\[\[(?:[^|\]]+\|)?([^\]]+)\]\]/g, '$1');
-
-            // [[link]] -> link
-            //line = line.replace(/\[\[([^\]]+)\]\]/g, '$1');
-
-            // Remove <ref></ref> tags
-            line = line.replace(/<ref>.*?<\/ref>/g, '');
-
-            // Remove various text emphasis markup
-            line = line.replace(/'{2,3}/g, '');
-
-            // clean up the whitespace
-            line = line.replace(/^\s+/, '');
-            line = line.replace(/\s+$/, '');
-            line = line.replace(/\s\s+/g, ' ');
-
-            // remove trailing semi-colons
-            line = line.replace(/;+$/g, '');
-
-            return line;
-        };
-
-        var limitString = function (s, max) {
-            if (s.length > max) {
-                s = s.substr(0, max);
-            }
-            return s;
-        };
-
         var polishStructure = [
             ['pron', makeRegexExtractor('pron', /\{\{IPA3\|([^\}]+)\}\}/, 1)],
             ['pos', function (entry, sections) {
@@ -635,11 +596,11 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
 
                     // Remove the sense numbers
                     line = line.replace(/\(\d\.\d\)/g, '');
-                    line = removeWikiText(line);
+                    line = WikiText.clean(line);
 
                     // stash the difference
                     var sense = {
-                        difference: limitString(line, 255),
+                        difference: text_utils.limitString(line, 255),
                     };
                     res.push(sense);
                     map[name] = sense;
@@ -673,9 +634,9 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
 
                         // Remove the sense numbers
                         line = line.replace(/\(\d\.\d\)/g, '');
-                        line = removeWikiText(line);
+                        line = WikiText.clean(line);
 
-                        map[name].example = limitString(line, 255);
+                        map[name].example = text_utils.limitString(line, 255);
                     });
                 }
 
@@ -697,7 +658,7 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                         }
 
                         line = line.replace(/\((\d\.\d)(?:-[^\)]+)?\)/g, '');
-                        line = removeWikiText(line);
+                        line = WikiText.clean(line);
 
                         // TODO: only on one sense!  Do more!
                         senses[idx[name]] = {'trans': line.split(/,\s*/)};
