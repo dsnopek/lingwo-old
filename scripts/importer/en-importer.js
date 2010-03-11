@@ -38,7 +38,22 @@ function getopts(l) {
 
     return [opts, args];
 }
+
+function loadconfig(fn, opts) {
+    var config = eval('('+readFile(fn, 'utf-8')+')'), name;
+    if (opts) {
+        // overwrite the config file opts with the command-line opts
+        for (name in opts) {
+            config[name] = opts[name];
+        }
+    }
+    return config;
+}
+
 [OPTS, ARGS] = getopts(arguments);
+if (OPTS['config']) {
+    OPTS = loadconfig(OPTS['config'], OPTS);
+}
 
 if (!OPTS['lang']) {
     die ('Must pass --lang argument!');
@@ -134,7 +149,7 @@ require([
             producer = importer.makeProducer(source);
         }
         else {
-            producer = new DatabaseProducer(db);
+            producer = new DatabaseProducer(db, OPTS['lang']);
         }
 
         // run

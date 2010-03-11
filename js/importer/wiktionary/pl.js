@@ -4,13 +4,14 @@
  */
 
 require.def('lingwo_dictionary/importer/wiktionary/pl',
-    ['lingwo_dictionary/Entry',
+    ['lingwo_dictionary/util/declare',
+     'lingwo_dictionary/Entry',
      'lingwo_dictionary/Language',
      'lingwo_dictionary/importer/mediawiki/WikiText',
      'lingwo_dictionary/importer/mediawiki/Producer',
      'lingwo_dictionary/util/text',
     ],
-    function (Entry, Language, WikiText, Producer, text_utils) {
+    function (declare, Entry, Language, WikiText, MediawikiProducer, text_utils) {
         var langNames = {
             'ab': 'abchaski',
             'af': 'afrykanerski',
@@ -460,88 +461,89 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
             };
         };
 
+        var getPos = function (sections) {
+            if (!sections['meaning']) {
+                return null;
+            }
+
+            var s = sections['meaning'][0];
+            // remove periods from pos (strange data inconsistency)
+            s = s.replace(/\./g, '');
+            //var pos = extractRegex(s, /^''([^\<,'$]+)/, 1, posTrans, 'posTrans');
+            var pos = extractRegex(s, /^''([^\<,'$]+)/, 1);
+
+            // We want to break these down to the most basic types (basically, we want these to be
+            // broad categories, to seperate it from other words.  Read as a transitive verb would
+            // not have another entry that is an intransitive verb. -- actually we might!)
+            // TODO: I'm not sure this is the correct thing to do..
+            if (pos == 'wyraz dżwiękonaśladowczy') {
+                pos = 'onomatopoeia';
+            }
+            else if (/związek|wyraz|wyrażenie|fraz|powiedzenie|zwrot/.exec(pos)) {
+                pos = 'phrase';
+            }
+            else if (pos == 'liczebnik porządkowy') {
+                pos = 'adjective';
+            }
+            else if (/liczebnik/.exec(pos)) {
+                pos = 'noun';
+            }
+            else if (/przyimek/.exec(pos)) {
+                pos = 'preposition';
+            }
+            else if (/skrót/.exec(pos)) {
+                pos = 'abbreviation';
+            }
+            else if (/spójnik/.exec(pos)) {
+                pos = 'conjunction';
+            }
+            else if (/imiesłów/.exec(pos)) {
+                pos = 'adjective';
+            }
+            else if (/zaimek|zaimk/.exec(pos)) {
+                pos = 'pronoun';
+            }
+            else if (/rzeczownik/.exec(pos)) {
+                pos = 'noun';
+            }
+            // to catch both: 'wykrzyknik' and 'wykrzyknienie'
+            else if (/wykrzyk/.exec(pos)) {
+                pos = 'exclamation';
+            }
+            else if (/czasownik/.exec(pos)) {
+                pos = 'verb';
+            }
+            else if (/partykuła/.exec(pos)) {
+                pos = 'particle';
+            }
+            else if (/przymiotnik/.exec(pos)) {
+                pos = 'adjective';
+            }
+            else if (/przedrostek/.exec(pos)) {
+                pos = 'prefix';
+            }
+            else if (/przyrostek/.exec(pos)) {
+                pos = 'prefix';
+            }
+            else if (/przysłówek/.exec(pos)) {
+                pos = 'adverb';
+            }
+            else if (/symbol/.exec(pos)) {
+                pos = 'symbol';
+            }
+            else if (/tytuł/.exec(pos)) {
+                pos = 'symbol';
+            }
+            else {
+                print('posTrans: cant map POS: '+pos);
+                pos = null;
+            };
+
+            return pos;
+        };
+
         var polishStructure = [
             ['pron', makeRegexExtractor('pron', /\{\{IPA3\|([^\}]+)\}\}/, 1)],
-            ['pos', function (entry, sections) {
-                if (!sections['meaning']) {
-                    return;
-                }
-
-                var s = sections['meaning'][0];
-                // remove periods from pos (strange data inconsistency)
-                s = s.replace(/\./g, '');
-                //var pos = extractRegex(s, /^''([^\<,'$]+)/, 1, posTrans, 'posTrans');
-                var pos = extractRegex(s, /^''([^\<,'$]+)/, 1);
-
-                // We want to break these down to the most basic types (basically, we want these to be
-                // broad categories, to seperate it from other words.  Read as a transitive verb would
-                // not have another entry that is an intransitive verb. -- actually we might!)
-                // TODO: I'm not sure this is the correct thing to do..
-                if (pos == 'wyraz dżwiękonaśladowczy') {
-                    pos = 'onomatopoeia';
-                }
-                else if (/związek|wyraz|wyrażenie|fraz|powiedzenie|zwrot/.exec(pos)) {
-                    pos = 'phrase';
-                }
-                else if (pos == 'liczebnik porządkowy') {
-                    pos = 'adjective';
-                }
-                else if (/liczebnik/.exec(pos)) {
-                    pos = 'noun';
-                }
-                else if (/przyimek/.exec(pos)) {
-                    pos = 'preposition';
-                }
-                else if (/skrót/.exec(pos)) {
-                    pos = 'abbreviation';
-                }
-                else if (/spójnik/.exec(pos)) {
-                    pos = 'conjunction';
-                }
-                else if (/imiesłów/.exec(pos)) {
-                    pos = 'adjective';
-                }
-                else if (/zaimek|zaimk/.exec(pos)) {
-                    pos = 'pronoun';
-                }
-                else if (/rzeczownik/.exec(pos)) {
-                    pos = 'noun';
-                }
-                // to catch both: 'wykrzyknik' and 'wykrzyknienie'
-                else if (/wykrzyk/.exec(pos)) {
-                    pos = 'exclamation';
-                }
-                else if (/czasownik/.exec(pos)) {
-                    pos = 'verb';
-                }
-                else if (/partykuła/.exec(pos)) {
-                    pos = 'particle';
-                }
-                else if (/przymiotnik/.exec(pos)) {
-                    pos = 'adjective';
-                }
-                else if (/przedrostek/.exec(pos)) {
-                    pos = 'prefix';
-                }
-                else if (/przyrostek/.exec(pos)) {
-                    pos = 'prefix';
-                }
-                else if (/przysłówek/.exec(pos)) {
-                    pos = 'adverb';
-                }
-                else if (/symbol/.exec(pos)) {
-                    pos = 'symbol';
-                }
-                else if (/tytuł/.exec(pos)) {
-                    pos = 'symbol';
-                }
-                else {
-                    print('posTrans: cant map POS: '+pos);
-                    pos = null;
-                };
-
-                return pos;
-            }],
             ['fields', function (entry, sections) {
                 if (!sections['meaning']) {
                     return;
@@ -671,47 +673,52 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
             }],
         ];
 
-        var parsers = {
-            pl: makeStructureExtractor('pl.wiktionary.org', polishStructure)
-        };
-
-        var makeHandlerFunc = function(handler, code) {
-            return function(page) {
-                var text = new WikiText(page.revision.text);
-                
-                var sec = page.title + ' ({{język '+langNames[code]+'}})';
-                if (text.hasSection(sec)) {
-                    var entry = new Entry({
-                        headword: page.title.toString(),
-                        language: Language.languages[code]
-                    });
-                    entry.setSource('pl.wiktionary.org', {
-                        raw: text.getSection(sec),
-                        url: 'http://pl.wiktionary.org/wiki/'+entry.headword,
-                        license: 'CC-BY-SA-3.0',
-                        // what is the copyright for this?
-                        //copyright: '',
-                        timestamp: page.revision.timestamp.toString(),
-                    });
-
-                    // Run a language specific parser on the wikitext
-                    var parser = parsers[code];
-                    if (parser) {
-                        parser(entry);
-                    }
-
-                    handler(entry);
-                }
-            };
-        };
-
         return {
-            process: function (args) {
-                var producer = new Producer(args.filename);
-                args.handler = makeHandlerFunc(args.handler, 'pl');
-                producer.run(args);
-            },
-            parsers: parsers,
+            Producer: declare({
+                '_constructor': function (args) {
+                    this.code = args.code;
+                    this.producer = new MediawikiProducer(args.filename);
+                },
+
+                run: function (args) {
+                    var self = this, handler = args.handler;
+                    args.handler = function (page) {
+                        var text = new WikiText(page.revision.text);
+                        
+                        var sec = page.title + ' ({{język '+langNames[self.code]+'}})';
+                        if (text.hasSection(sec)) {
+                            var raw = text.getSection(sec),
+                                sections = splitSections(raw),
+                                entry = new Entry({
+                                    headword: page.title.toString(),
+                                    language: Language.languages[self.code],
+                                    pos: getPos(sections)
+                                });
+
+                            entry.setSource('pl.wiktionary.org', {
+                                raw: raw,
+                                url: 'http://pl.wiktionary.org/wiki/'+entry.headword,
+                                license: 'CC-BY-SA-3.0',
+                                // what is the copyright for this?
+                                //copyright: '',
+                                timestamp: page.revision.timestamp.toString(),
+
+                                // We stash this here for if we are doing a complete
+                                // run.  If the Entry is serialized() this will be discarded.
+                                _sections: sections
+                            });
+
+                            handler(entry);
+                        }
+                    };
+
+                    this.producer.run(args);
+                }
+            }),
+
+            parsers: {
+                pl: makeStructureExtractor('pl.wiktionary.org', polishStructure)
+            }
         };
     }
 );

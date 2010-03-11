@@ -11,8 +11,9 @@ require.def('lingwo_dictionary/importer/DatabaseProducer',
      'lingwo_dictionary/Entry'],
     function (declare, Entry) {
         return declare({
-            _constructor: function (db) {
+            _constructor: function (db, lang) {
                 this.db = db;
+                this.lang = lang;
             },
 
             PAGE_SIZE: 10,
@@ -30,7 +31,13 @@ require.def('lingwo_dictionary/importer/DatabaseProducer',
                         _limit = Math.min(this.PAGE_SIZE, (limit - offset));
                     }
 
-                    var rows = this.db.query('SELECT data FROM entry LIMIT '+_limit+' OFFSET '+offset);
+                    var query = 'SELECT data FROM entry';
+                    if (this.lang) {
+                        query += ' WHERE lang = \''+this.lang+'\'';
+                    }
+                    query += ' LIMIT '+_limit+' OFFSET '+offset;
+
+                    var rows = this.db.query(query);
                     if (rows.length == 0) {
                         break;
                     }
