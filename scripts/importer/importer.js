@@ -109,6 +109,7 @@ require([
                 if (!entryList[[entry.language.name, entry.pos, entry.headword].join(':')])
                     return false;
             }
+            print ('Processing: '+entry.headword);
             return true;
         };
 
