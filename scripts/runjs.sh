@@ -10,5 +10,5 @@ done
 # bootstrap uses this to locate the lingwo_dictionary directory
 export RUNJS_PATH
 
-java -cp $JAVA_LIBS org.mozilla.javascript.tools.shell.Main $RUNJS_PATH/bootstrap.js $@
+java -cp $JAVA_LIBS org.mozilla.javascript.tools.shell.Main $RUNJS_PATH/bootstrap.js "$@"
 

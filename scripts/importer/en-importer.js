@@ -4,12 +4,38 @@
  */
 
 // save the arguments for later
-opts = arguments.splice(0);
+ARGV = arguments.splice(0);
 
 // TODO: is this still necessary?  It used to be used by the morphology code.
 console = {
     debug: print
 };
+
+// Super-simple argument parsing
+function getopts(l) {
+    var args=[], opts={}, i, x, name, value;
+
+    for (i = 0; i < l.length; i++) {
+        x = l[i];
+        if (x.substring(0, 2) == '--') {
+            name = x.substring(2);
+            if (name.indexOf('=') != -1) {
+                [name, value] = name.split('=');
+            }
+            else {
+                value = l[i+1];
+                i++;
+            }
+
+            opts[name] = value;
+        }
+        else {
+            args.push(x);
+        }
+    }
+
+    return [opts, args];
+}
 
 require([
         'lingwo_dictionary/importer/Database',
@@ -18,17 +44,39 @@ require([
         'lingwo_dictionary/languages/en',
     ],
     function (Database, Service, wiktionary_en, en) {
-        var db = new Database('staging.db');
+        var JSON = require('lingwo_dictionary/util/json2');
+        print (JSON.stringify(ARGV));
 
-        var service = new Service({
-            domain: 'localhost',
-            url: 'http://127.0.0.1:8082/services/xmlrpc',
-            key: '028edd447fce610ef46dd685ae186d7f'
-        });
-        if (service.connect()) {
-            var res = service.login('Normal User', 'test');
-            print(res);
+        function connectToService(opts) {
+            var service, res;
+            
+            service = new Service({
+                url: opts['service'],
+                domain: opts['service-domain'],
+                key: opts['service-key'],
+            });
+
+            if (service.connect()) {
+                res = service.login(
+                    opts['service-username'],
+                    opts['service-password']
+                );
+                print(res);
+            }
+
+            return service;
+        };
+
+        var opts, args, source, service;
+        [opts, args] = getopts(ARGV);
+
+        source = opts['source'];
+        if (!source) {
+            print ('Must pass --source argument');
+            quit(1);
         }
+
+        service = connectToService(opts);
 
         // Handle each item.
         function handler(entry) {
@@ -37,15 +85,12 @@ require([
                 return;
             }
 
-            db.setEntry(entry);
-            db.commit();
-
             print(service.update_entry(entry));
         }
 
         wiktionary_en.process({
             lang_code: 'en',
-            filename: '/home/dsnopek/dl/enwiktionary-latest-pages-articles.xml.bz2',
+            filename: source,
             handler: handler,
             limit: 10
         });
