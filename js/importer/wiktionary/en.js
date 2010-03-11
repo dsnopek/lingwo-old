@@ -11,7 +11,7 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
      'lingwo_dictionary/importer/mediawiki/Producer',
      'lingwo_dictionary/util/text',
     ],
-    function (declare, Entry, Language, WikiText, Producer, text_utils) {
+    function (declare, Entry, Language, WikiText, MediawikiProducer, text_utils) {
         var posList = ['Noun','Adjective','Verb','Proper noun','Interjection','Conjunction','Preposition','Pronoun',
             'Prefix','Initialism','Phrase','Adverb','Cardinal number','Ordinal number','Suffix','Idiom','Numeral'];
 
@@ -141,61 +141,60 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             return senses;
         }
 
-        var parsers = {
-            'en': function (entry) {
-                var raw = entry.getSource('en.wiktionary.org').raw;
-                entry.senses = parseSenses(raw);
-                //print (entry.serialize());
-            }
-        };
+        return {
+            Producer: declare({
+                _constructor: function (args) {
+                    this.producer = new MediawikiProducer(args.filename);
+                    this.code = args.code;
+                    this.lang_name = langNames[args.code];
+                },
 
-        function process(args) {
-            var producer = new Producer(args.filename),
-                handler = args.handler,
-                code = args.lang_code,
-                lang_name = langNames[code];
+                run: function (args) {
+                    var self = this, handler = args.handler;
+                    args.handler = function (page) {
+                        var text = new WikiText(page.revision.text),
+                            entry, found, pos;
 
-            function MyHandler(page) {
-                var text = new WikiText(page.revision.text),
-                    entry, found, pos;
+                        if (text.hasSection(self.lang_name)) {
+                            text.text = text.getSection(self.lang_name);
+                            found = false;
 
-                if (text.hasSection(lang_name)) {
-                    text.text = text.getSection(lang_name);
-                    found = false;
+                            for(pos in posMap) {
+                                if (text.hasSection(pos, 2)) {
+                                    entry = new Entry({
+                                        headword: page.title.toString(),
+                                        language: Language.languages[self.code],
+                                        pos: posMap[pos],
+                                    });
+                                    entry.setSource('en.wiktionary.org', {
+                                        raw: '=='+self.lang_name+'==\n\n'+text.getSection(pos, 2)+'\n\n'+text.getSection('Pronunciation', 2),
+                                        url: 'http://en.wiktionary.org/wiki/'+entry.headword,
+                                        license: 'CC-BY-SA-3.0',
+                                        timestamp: page.revision.timestamp.toString()
+                                    });
 
-                    for(pos in posMap) {
-                        if (text.hasSection(pos, 2)) {
-                            entry = new Entry({
-                                headword: page.title.toString(),
-                                language: Language.languages[code],
-                                pos: posMap[pos],
-                            });
-                            entry.setSource('en.wiktionary.org', {
-                                raw: '=='+lang_name+'==\n\n'+text.getSection(pos, 2)+'\n\n'+text.getSection('Pronunciation', 2),
-                                url: 'http://en.wiktionary.org/wiki/'+entry.headword,
-                                license: 'CC-BY-SA-3.0',
-                                timestamp: page.revision.timestamp.toString()
-                            });
+                                    handler(entry);
+                                    found = true;
+                                }
+                            }
 
-                            handler(entry);
-                            found = true;
+                            if (!found) {
+                                print ('Unknown POS: '+page.title);
+                            }
                         }
-                    }
+                    };
 
-                    if (!found) {
-                        print ('Unknown POS: '+page.title);
-                    }
+                    this.producer.run(args);
+                }
+            }),
+
+            parsers: {
+                'en': function (entry) {
+                    var raw = entry.getSource('en.wiktionary.org').raw;
+                    entry.senses = parseSenses(raw);
+                    //print (entry.serialize());
                 }
             }
-
-            // execule it!
-            args.handler = MyHandler;
-            producer.run(args);
-        }
-
-        return {
-            process: process,
-            parsers: parsers
         };
     }
 );

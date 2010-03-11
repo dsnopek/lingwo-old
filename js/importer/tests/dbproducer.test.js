@@ -4,14 +4,16 @@ require(
      'lingwo_dictionary/importer/Database',
      'lingwo_dictionary/importer/DatabaseProducer',
      'lingwo_dictionary/Entry',
+     'lingwo_dictionary/Language',
     ],
-    function (TestCase, Database, DatabaseProducer, Entry) {
+    function (TestCase, Database, DatabaseProducer, Entry, Language) {
         TestCase.subclass({
             setUp: function () {
                 this.db = new Database();
+                var lang = Language.defineLanguage('xxx');
                 for(var i = 0; i < 20; i++) {
                     this.db.setEntry(new Entry({
-                        language: {name: 'xxx', fields: {}},
+                        language: lang,
                         pos: 'noun',
                         headword: 'entry'+i,
                     }));
@@ -24,10 +26,8 @@ require(
 
                 var count = function (limit) {
                     var i = 0;
-                    var handler = {
-                        process: function (data) {
-                            i++;
-                        },
+                    function handler (data) {
+                        i++;
                     };
                     producer.run({ handler: handler, limit: limit });
                     return i;

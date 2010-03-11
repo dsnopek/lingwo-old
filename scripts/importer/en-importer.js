@@ -3,12 +3,14 @@
  * Here we will develop an importer for English language.
  */
 
-// save the arguments for later
-ARGV = arguments.splice(0);
-
 // TODO: is this still necessary?  It used to be used by the morphology code.
 console = {
     debug: print
+};
+
+function die(s) {
+    print (s);
+    quit(1);
 };
 
 // Super-simple argument parsing
@@ -36,33 +38,34 @@ function getopts(l) {
 
     return [opts, args];
 }
+[OPTS, ARGS] = getopts(arguments);
 
-function die(s) {
-    print (s);
-    quit(1);
-};
+if (!OPTS['lang']) {
+    die ('Must pass --lang argument!');
+}
 
 require([
         'lingwo_dictionary/importer/Database',
         'lingwo_dictionary/importer/Service',
         'lingwo_dictionary/importer/DatabaseProducer',
-        'lingwo_dictionary/importer/wiktionary/en',
-        'lingwo_dictionary/languages/en',
+        'lingwo_dictionary/importer/languages/'+OPTS['lang'],
     ],
-    function (Database, Service, DatabaseProducer, wiktionary_en, en) {
-        function connectToService(opts) {
+    function (Database, Service, DatabaseProducer, importer) {
+        var source, service, db, handler, limit, producer, parser;
+
+        function connectToService(args) {
             var service, res;
             
             service = new Service({
-                url: opts['service'],
-                domain: opts['service-domain'],
-                key: opts['service-key'],
+                url: args['service'],
+                domain: args['service-domain'],
+                key: args['service-key'],
             });
 
             if (service.connect()) {
                 res = service.login(
-                    opts['service-username'],
-                    opts['service-password']
+                    args['service-username'],
+                    args['service-password']
                 );
                 print(res);
             }
@@ -70,76 +73,75 @@ require([
             return service;
         };
 
-        var opts, args, source, service, db, handler, limit, parser;
-        [opts, args] = getopts(ARGV);
-
-        function saveToDatabase(entry) {
+        function checkEntry(entry) {
             if (!entry.pos) {
                 print('!*** Skipping entry because it has no POS: '+entry.headword);
-                return;
+                return false;
             }
-            
+            return true;
+        };
+
+        function saveToDatabase(entry) {
+            if (!checkEntry(entry)) return;
             db.setEntry(entry);
             db.commit();
         }
 
         function sendToService(entry) {
-            if (!entry.pos) {
-                print('!*** Skipping entry because it has no POS: '+entry.headword);
-                return;
-            }
+            if (!checkEntry(entry)) return;
 
             // pass into the language specific parser
-            wiktionary_en.parsers['en'](entry);
+            parser(entry);
 
             print(service.update_entry(entry));
         }
 
-        if (opts['source'] && opts['input-staging']) {
+        if (OPTS['source'] && OPTS['input-staging']) {
             die ('Can\'t pass both --source and --input-staging');
         }
-        if (!opts['source'] && !opts['input-staging']) {
+        if (!OPTS['source'] && !OPTS['input-staging']) {
             die ('Must pass either --source or --input-staging');
         }
-        if (opts['service'] && opts['output-staging']) {
+        if (OPTS['service'] && OPTS['output-staging']) {
             die ('Can\'t pass both --service and --output-staging');
         }
-        if (!opts['service'] && !opts['output-staging']) {
+        if (!OPTS['service'] && !OPTS['output-staging']) {
             die ('Must pass either --service or --output-staging');
         }
-        if (opts['input-staging'] || opts['output-staging']) {
+        if (OPTS['input-staging'] || OPTS['output-staging']) {
             // TODO: If input-staging, we need to check that it exists!
-            db = new Database(opts['input-staging'] || opts['output-staging']);
+            db = new Database(OPTS['input-staging'] || OPTS['output-staging']);
         }
 
-        source = opts['source'];
-        limit = opts['limit'];
+        source = OPTS['source'];
+        limit = OPTS['limit'];
         if (typeof limit != 'undefined') {
             limit = parseInt(limit);
         }
 
-        if (opts['service']) {
-            service = connectToService(opts);
+        // set-up "outputs"
+        if (OPTS['service']) {
+            service = connectToService(OPTS);
+            parser  = importer.makeParser();
             handler = sendToService;
         }
         else {
             handler = saveToDatabase;
         }
 
+        // set-up "inputs"
         if (source) {
-            wiktionary_en.process({
-                lang_code: 'en',
-                filename: source,
-                handler: handler,
-                limit: limit
-            });
+            producer = importer.makeProducer(source);
         }
         else {
-            (new DatabaseProducer(db)).run({
-                handler: handler,
-                limit: limit
-            });
+            producer = new DatabaseProducer(db);
         }
+
+        // run
+        producer.run({
+            handler: handler,
+            limit: limit
+        });
     }
 );
 
