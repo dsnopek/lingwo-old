@@ -65,33 +65,42 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
   if ($node->type != lingwo_korpus_text_content_type())
     return;
 
-  switch ($op) {
-    case 'update':
-    case 'delete':
-      // clear all cached texts for this node
-      cache_clear_all($node->nid, 'cache_lingwo_korpus', TRUE);
-      break;
+  if ($op == 'update' || $op == 'delete') {
+    // clear all cached texts for this node
+    cache_clear_all($node->nid, 'cache_lingwo_korpus', TRUE);
 
-    case 'view':
-      if ($a4) {
-        $lang_pair = ($node->language ? $node->language : language_default()) .'-'. $user->language;
-        $cid = $node->nid .'-'. $lang_pair;
+    // clear the entries used in this corpus text
+    db_query('DELETE FROM {lingwo_korpus_entry} WHERE nid = %d', $node->nid);
+  }
 
-        // get from the cache or process the data
-        $data = cache_get($cid, 'cache_lingwo_korpus');
-        if ($data) {
-          $data = $data->data;
-        }
-        else {
-          $data = lingwo_korpus_filter_text($node->content['body']['#value'], $lang_pair);
-          cache_set($cid, $data, 'cache_lingwo_korpus');
-        }
-        $node->content['body']['#value'] = $data;
+  if ($op == 'create' || $op == 'update') {
+    // record all the entries used in this corpus text
+    foreach (lingwo_korpus_text_entry_list($node->body, $node->language) as $entry) {
+      $entry->nid = $node->nid;
+      drupal_write_record('lingwo_korpus_entry', $entry);
+    }
+  }
 
-        drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.js');
-        drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.css');
+  if ($op == 'view') {
+    // display the text with the reader
+    if ($a4) {
+      $lang_pair = ($node->language ? $node->language : language_default()) .'-'. $user->language;
+      $cid = $node->nid .'-'. $lang_pair;
+
+      // get from the cache or process the data
+      $data = cache_get($cid, 'cache_lingwo_korpus');
+      if ($data) {
+        $data = $data->data;
       }
-      break;
+      else {
+        $data = lingwo_korpus_filter_text($node->content['body']['#value'], $lang_pair);
+        cache_set($cid, $data, 'cache_lingwo_korpus');
+      }
+      $node->content['body']['#value'] = $data;
+
+      drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.js');
+      drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.css');
+    }
   }
 }
 
@@ -99,7 +108,7 @@ function lingwo_korpus_filter_text($text, $lang_pair) {
   require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
 
   $html = str_get_html($text); 
-  foreach($html->find('anno') as $el) {
+  foreach($html->find('word') as $el) {
     // get all the attributes and clear them
     $attrs = $el->attr;
     $el->attr = array();
@@ -116,7 +125,36 @@ function lingwo_korpus_filter_text($text, $lang_pair) {
   }
 
   return $html->outertext;
+}
 
+function lingwo_korpus_text_entry_list($text, $lang) {
+  require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
+
+  $entries = array();
+  $found = array();
+
+  $html = str_get_html($text); 
+  foreach($html->find('word') as $el) {
+    // get all the attributes and clear them
+    $attrs = $el->attr;
+    $el->attr = array();
+
+    // get the headword
+    $entry = (object)array(
+      'headword' => isset($attrs['headword']) ? $attrs['headword'] : $el->plaintext,
+      'pos' => $attrs['pos'],
+      'language' => $lang,
+      'sense' => $attrs['sense'],
+    );
+
+    $key = $entry->language.':'.$entry->pos.':'.$entry->headword;
+    if (!isset($found[$key])) {
+      $found[$key] = TRUE;
+      $entries[] = $entry;
+    }
+  }
+
+  return $entries;
 }
 
 /*

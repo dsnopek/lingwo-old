@@ -13,6 +13,54 @@ function lingwo_korpus_schema() {
   // we are adding a new cache table
   $schema['cache_lingwo_korpus'] = drupal_get_schema_unprocessed('system', 'cache');
 
+  // for recording what entries are in each text
+  $schema['lingwo_korpus_entry'] = array(
+    'description' => 'Used to look-up which entries are on a corpus item.',
+    'fields' => array(
+      'nid' => array(
+        'description' => 'The primary identifier for the corpus text node.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'language' => array(
+        'description' => 'The {languages}.language of the entry.',
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'pos' => array(
+        'description' => 'Part of speech of the entry.',
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'headword' => array(
+        'description' => 'The headword of the entry.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'sense' => array(
+        'description' => 'The sense of the entry.',
+        'type' => 'varchar',
+        'length' => 36,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('nid', 'language', 'pos', 'headword', 'sense'),
+    'index' => array(
+      'nid_index' => array('nid'),
+    ),
+    // The default collation (utf8_general_ci) treats accented characters (like: ó, ą, ę, ń)
+    // as equivalent to their unaccented counter-parts.  Also, we want entry titles to be
+    // case-sensitively unique (ie. "Ps" is different than "PS") -- ticket #38.
+    'mysql_suffix' => "DEFAULT CHARSET=utf8 COLLATE=utf8_bin",
+  );
+
   return $schema;
 }
 
