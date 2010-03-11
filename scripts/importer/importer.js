@@ -1,6 +1,6 @@
 
 /*
- * Here we will develop an importer for English language.
+ * Command-line script for running our importers.
  */
 
 // TODO: is this still necessary?  It used to be used by the morphology code.
