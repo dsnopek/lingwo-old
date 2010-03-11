@@ -423,7 +423,16 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
 
         var makeStructureExtractor = function (sourceName, structure) {
             return function (entry) {
-                var sections = splitSections(entry.getSource(sourceName).raw);
+                var source = entry.getSource(sourceName),
+                    sections;
+
+                if (source._sections) {
+                    sections = source._sections;
+                }
+                else {
+                    sections = splitSections(source.raw);
+                }
+
                 return extractStructure(entry, sections, structure);
             };
         };
