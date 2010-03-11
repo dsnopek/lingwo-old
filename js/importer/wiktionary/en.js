@@ -145,7 +145,7 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             'en': function (entry) {
                 var raw = entry.getSource('en.wiktionary.org').raw;
                 entry.senses = parseSenses(raw);
-                print (entry.serialize());
+                //print (entry.serialize());
             }
         };
 
@@ -177,11 +177,6 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                                 timestamp: page.revision.timestamp.toString()
                             });
 
-                            // pass to the language specific parser if there is one, to the
-                            // handler and mark as found.
-                            if (parsers[code]) {
-                                parsers[code](entry);
-                            }
                             handler(entry);
                             found = true;
                         }

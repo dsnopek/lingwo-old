@@ -7,8 +7,6 @@ require.def('lingwo_dictionary/Entry',
     ],
     function (declare, err, JSON, Language) {
         var Entry = declare({
-            sources: null,
-
             _constructor: function (args) {
                 args = args || {};
 
@@ -22,6 +20,7 @@ require.def('lingwo_dictionary/Entry',
                 this.like = args.like || null;
 
                 this.fields = args.fields || {};
+                this.sources = args.sources || null;
 
                 this.clearCache();
             },

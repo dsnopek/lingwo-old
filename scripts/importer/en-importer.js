@@ -37,16 +37,19 @@ function getopts(l) {
     return [opts, args];
 }
 
+function die(s) {
+    print (s);
+    quit(1);
+};
+
 require([
         'lingwo_dictionary/importer/Database',
         'lingwo_dictionary/importer/Service',
+        'lingwo_dictionary/importer/DatabaseProducer',
         'lingwo_dictionary/importer/wiktionary/en',
         'lingwo_dictionary/languages/en',
     ],
-    function (Database, Service, wiktionary_en, en) {
-        var JSON = require('lingwo_dictionary/util/json2');
-        print (JSON.stringify(ARGV));
-
+    function (Database, Service, DatabaseProducer, wiktionary_en, en) {
         function connectToService(opts) {
             var service, res;
             
@@ -67,33 +70,76 @@ require([
             return service;
         };
 
-        var opts, args, source, service;
+        var opts, args, source, service, db, handler, limit, parser;
         [opts, args] = getopts(ARGV);
 
-        source = opts['source'];
-        if (!source) {
-            print ('Must pass --source argument');
-            quit(1);
+        function saveToDatabase(entry) {
+            if (!entry.pos) {
+                print('!*** Skipping entry because it has no POS: '+entry.headword);
+                return;
+            }
+            
+            db.setEntry(entry);
+            db.commit();
         }
 
-        service = connectToService(opts);
-
-        // Handle each item.
-        function handler(entry) {
+        function sendToService(entry) {
             if (!entry.pos) {
                 print('!*** Skipping entry because it has no POS: '+entry.headword);
                 return;
             }
 
+            // pass into the language specific parser
+            wiktionary_en.parsers['en'](entry);
+
             print(service.update_entry(entry));
         }
 
-        wiktionary_en.process({
-            lang_code: 'en',
-            filename: source,
-            handler: handler,
-            limit: 10
-        });
+        if (opts['source'] && opts['input-staging']) {
+            die ('Can\'t pass both --source and --input-staging');
+        }
+        if (!opts['source'] && !opts['input-staging']) {
+            die ('Must pass either --source or --input-staging');
+        }
+        if (opts['service'] && opts['output-staging']) {
+            die ('Can\'t pass both --service and --output-staging');
+        }
+        if (!opts['service'] && !opts['output-staging']) {
+            die ('Must pass either --service or --output-staging');
+        }
+        if (opts['input-staging'] || opts['output-staging']) {
+            // TODO: If input-staging, we need to check that it exists!
+            db = new Database(opts['input-staging'] || opts['output-staging']);
+        }
+
+        source = opts['source'];
+        limit = opts['limit'];
+        if (typeof limit != 'undefined') {
+            limit = parseInt(limit);
+        }
+
+        if (opts['service']) {
+            service = connectToService(opts);
+            handler = sendToService;
+        }
+        else {
+            handler = saveToDatabase;
+        }
+
+        if (source) {
+            wiktionary_en.process({
+                lang_code: 'en',
+                filename: source,
+                handler: handler,
+                limit: limit
+            });
+        }
+        else {
+            (new DatabaseProducer(db)).run({
+                handler: handler,
+                limit: limit
+            });
+        }
     }
 );
 
