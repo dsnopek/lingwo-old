@@ -66,7 +66,7 @@ require([
         'lingwo_dictionary/importer/languages/'+OPTS['lang'],
     ],
     function (Database, Service, DatabaseProducer, importer) {
-        var source, service, db, handler, limit, producer, parser;
+        var source, service, db, handler, limit, producer, parser, entryList;
 
         function connectToService(args) {
             var service, res;
@@ -88,10 +88,26 @@ require([
             return service;
         };
 
+        function readEntryList(fn) {
+            var reader = new BufferedReader(new FileReader(fn)),
+                line, entryList = {};
+            while (line = reader.readLine()) {
+                if (line) {
+                    entryList[line] = true;
+                }
+            }
+            return entryList;
+        }
+
         function checkEntry(entry) {
             if (!entry.pos) {
                 print('!*** Skipping entry because it has no POS: '+entry.headword);
                 return false;
+            }
+            if (entryList) {
+                // check if its in the entry list
+                if (!entryList[[entry.language.name, entry.pos, entry.headword].join(':')])
+                    return false;
             }
             return true;
         };
@@ -126,6 +142,9 @@ require([
         if (OPTS['input-staging'] || OPTS['output-staging']) {
             // TODO: If input-staging, we need to check that it exists!
             db = new Database(OPTS['input-staging'] || OPTS['output-staging']);
+        }
+        if (OPTS['entry-list']) {
+            entryList = readEntryList(OPTS['entry-list']);
         }
 
         source = OPTS['source'];
