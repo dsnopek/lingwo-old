@@ -70,6 +70,7 @@ require(
                     '-ing': 'working out',
                     '2nd': 'worked out',
                     '3rd': 'worked out',
+                    'infinitive': 'to work out',
                 });
             },
         }).run();

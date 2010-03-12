@@ -81,16 +81,13 @@ require.def('lingwo_dictionary/languages/en',
                 }
             },
 
-            /*
             'infinitive': {
                 type: 'form',
                 label: 'Infinitive',
                 automatic: function (entry) {
-                    // TODO: This is our planned syntax for returning multi-word forms
-                    return [lang.parseWord('to'), entry.getWord()];
+                    return [lang.parseWord('to')].concat(entry.getWords());
                 }
             }
-            */
         }
 
         return lang;
