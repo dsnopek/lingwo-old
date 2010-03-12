@@ -63,6 +63,9 @@ require.def('lingwo_dictionary/languages/en.test-data',
             {   headword: 'lie',
                 pos: 'verb'
             },
+            {   headword: 'work out',
+                pos: 'verb'
+            },
     ]);
     }
 );

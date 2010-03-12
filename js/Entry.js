@@ -70,7 +70,7 @@ require.def('lingwo_dictionary/Entry',
             },
 
             getField: function (name) {
-                var field, value = null;
+                var field, value = null, i;
 
                 if (typeof this.fields[name] != 'undefined') {
                     return this.fields[name];
@@ -85,14 +85,18 @@ require.def('lingwo_dictionary/Entry',
                 }
 
                 if (field.type == 'form') {
-                    if (!(value instanceof this.language.Word)) {
-                        throw("Value returned from automatic function '"+name+"' is not a Word!");
+                    value = this._handleFormValue(value);
+                    for (i = 0; i < value.length; i++) {
+                        if (!(value[i] instanceof this.language.Word)) {
+                            print (value[i]);
+                            throw("Value returned from automatic function '"+name+"' is not a Word!");
+                        }
                     }
 
                     // form functions return a word object, so we cache it with the words
                     // and convert it to a string, which the field value is supposed to be.
                     this._cachedWords[name] = value;
-                    value = value.toString();
+                    value = this._wordsToString(value);
                 }
                 else if (field.type == 'class') {
                     // super-explicit conversion to boolean
@@ -109,7 +113,47 @@ require.def('lingwo_dictionary/Entry',
                 return value;
             },
 
-            getWord: function (name) {
+            // TODO: this should be flexible enough to handle situations where we
+            //       don't want the first word to be THE word.
+            _handleFormValue: function (value) {
+                var tmp;
+
+                if (!(value instanceof Array)) {
+                    // If the value returned isn't an array, first, make it an array.
+                    value = [value];
+
+                    // If the headword has multiple words, we assume that the value returned,
+                    // was the first word, and we append the rest of the headword's words, unchanged.
+                    tmp = this.getWords();
+                    if (tmp.length > 1) {
+                        value = value.concat(tmp.slice(1));
+                    }
+                }
+
+                return value;
+
+            },
+
+            // TODO: eventually move into Language, because it should be languages
+            //       job to know what the word seperator (if any) there is.
+            _parseWords: function (text) {
+                var parts = text.split(' '), i;
+                for(i = 0; i < parts.length; i++) {
+                    parts[i] = this.language.parseWord(parts[i]);
+                }
+                return parts;
+            },
+
+            // TODO: eventually move into Language, see _parseWords().
+            _wordsToString: function (words) {
+                var strings=[], i;
+                for(i = 0; i < words.length; i++) {
+                    strings.push(words[i].toString());
+                }
+                return strings.join(' ');
+            },
+
+            getWords: function (name) {
                 if (typeof name == 'undefined') {
                     name = '';
                 }
@@ -118,10 +162,10 @@ require.def('lingwo_dictionary/Entry',
                 }
 
                 if (name == '') {
-                    this._cachedWords[name] = this.language.parseWord(this.headword);
+                    this._cachedWords[name] = this._parseWords(this.headword);
                 }
                 else if (typeof this.fields[name] != 'undefined') {
-                    this._cachedWords[name] = this.language.parseWord(this.fields[name]);
+                    this._cachedWords[name] = this._parseWords(this.fields[name]);
                 }
                 else {
                     // we want to trigger caching the word via getField().
@@ -129,6 +173,10 @@ require.def('lingwo_dictionary/Entry',
                 }
 
                 return this._cachedWords[name];
+            },
+
+            getWord: function (name) {
+                return this.getWords(name)[0];
             },
 
             setSource: function (name, args) {

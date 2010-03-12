@@ -12,6 +12,14 @@ require(
                 }
             },
 
+            // copied from pl.test.js
+            checkFields: function (entry_name, fields) {
+                var entry = test_data[entry_name];
+                for(var name in fields) {
+                    this.assertEquals(entry.getField(name), fields[name], entry.name);
+                }
+            },
+
             testNounPlural: function () {
                 this.checkFieldMulti('plural', {
                     'house': 'houses',
@@ -54,7 +62,16 @@ require(
                     'buzz': 'buzzed',
                     'agree': 'agreed',
                 });
-            }
+            },
+
+            testMultiWordEntry: function () {
+                this.checkFields('work out', {
+                    '-s': 'works out',
+                    '-ing': 'working out',
+                    '2nd': 'worked out',
+                    '3rd': 'worked out',
+                });
+            },
         }).run();
     }
 );
