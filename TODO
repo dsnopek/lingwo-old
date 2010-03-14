@@ -11,6 +11,12 @@
    - We need a "Same As: [_______]" field translatations with multiple senses.  This would
      allow merging them when languages share the same sense divisions for the some words.
 
+   - It would also be good to store a big table somewhere, with senses stored according to
+     their IDs.  Columns like: sense_id, source_lang, target_lang, data.  This would allow
+	 us to simply refer to a sense_id (is source_lang necessary since they are unique??) 
+	 and be able to look-up the sense data.  There might be a way to leverage this to make
+	 the annotation look-up faster (maybe).
+
 == 2010-03-07 ==
 
  * Dealing with headwords with multiple words:

@@ -347,6 +347,24 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
     }
     $sense_form['data']['trans']['0']['#title'] = t('Translation');
 
+    if (count($senses) > 1) {
+      $same_as_options = array('' => '-');
+      $same_as_count = 1;
+      foreach ($senses as $sense2) {
+        if (!empty($sense2['data']['id']) && $sense2['data']['id'] != $sense['data']['id']) {
+          $same_as_options[$sense2['data']['id']] = t('Sense #!sense_num', array('!sense_num' => $same_as_count));
+        }
+        $same_as_count++;
+      }
+
+      $sense_form['data']['same_as'] = array(
+        '#title' => t('Same as'),
+        '#type' => 'select',
+        '#options' => $same_as_options,
+        '#default_value' => !empty($sense['data']['same_as']) ? $sense['data']['same_as'] : '',
+      );
+    }
+
     $element[$index++] = $sense_form;
   }
 
