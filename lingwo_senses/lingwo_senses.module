@@ -100,7 +100,19 @@ function lingwo_senses_field_formatter_info() {
 function lingwo_senses_field_settings($op, $field) {
   switch ($op) {
     case 'database columns':
-      $columns['data'] = array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => FALSE, 'serialize' => TRUE);
+      $columns['id'] = array(
+        'type' => 'varchar',
+        'length' => '36',
+        'not null' => FALSE,
+        'sortable' => FALSE
+      );
+      $columns['data'] = array(
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => FALSE,
+        'serialize' => TRUE
+      );
       return $columns;
   }
 }
@@ -144,6 +156,8 @@ function lingwo_senses_field($op, &$node, $field, &$items, $teaser, $page) {
  * Implementation of hook_content_is_empty().
  */
 function lingwo_senses_content_is_empty($item, $field=NULL) {
+  return FALSE;
+  /*
   if ($item['retire_sense']) {
     return TRUE;
   }
@@ -158,12 +172,19 @@ function lingwo_senses_content_is_empty($item, $field=NULL) {
     return TRUE;
   }
   return FALSE;
+  */
 }
 
+/*
 // TODO: Hold over because we can use Fn::not() on PHP 5.2
 function lingwo_senses_content_not_empty($item, $field=NULL) {
   return !lingwo_senses_content_is_empty($item, $field);
 };
+*/
+
+function lingwo_senses_not_marker_row($item, $field=NULL) {
+  return !empty($item['id']);
+}
 
 function lingwo_senses_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   $node = $form['#node'];
@@ -200,56 +221,64 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
   // filter out empty items
   //require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/Fn.php');
   //$items = Fn::filter(Fn::not('lingwo_senses_content_is_empty')), $items);
-  $items = array_filter($items, 'lingwo_senses_content_not_empty');
+  $items = array_filter($items, 'lingwo_senses_not_marker_row');
+  if (count($items) == 0) {
+    $items[] = array('data' => array());
+  }
 
   // we count it as empty if there is less than 2 senses!
-  if (!empty($items) && count($items) > 1) {
-    $index = 0;
-    foreach ($items as $sense) {
-      $sense = $sense['data'];
+  $index = 0;
+  foreach ($items as $sense) {
+    if (!isset($sense['id'])) {
+      $sense['id'] = _ld_make_uuid();
+    }
 
-      if (!isset($sense['id'])) {
-        $sense['id'] = _ld_make_uuid();
-      }
+    $row['id'] = array(
+      '#type' => 'hidden',
+      '#value' => $sense['id'],
+    );
 
-      $row['id'] = array(
-        '#type' => 'hidden',
-        '#value' => $sense['id'],
-      );
-
-      $row['difference'] = array(
+    if (count($items) > 1) {
+      $row['data']['difference'] = array(
         '#title' => 'Difference',
         '#type' => 'textfield',
-        '#default_value' => $sense['difference'],
+        '#default_value' => $sense['data']['difference'],
         '#maxlength' => 255,
       );
-      $row['example'] = array(
+      $row['data']['example'] = array(
         '#title' => 'Example',
         '#type' => 'textfield',
-        '#default_value' => $sense['example'],
+        '#default_value' => $sense['data']['example'],
         '#maxlength' => 255,
       );
-      $row['weight'] = array(
-        '#type' => 'weight',
-        // TODO: Delta should probably be equal to the number of definitions?
-        '#delta' => 50,
-        '#default_value' => $index,
-      );
-      if (count($items) > 2) {
-        $row['remove_sense'] = array(
-          '#type' => 'submit',
-          '#value' => t('Remove Sense #!num', array('!num' => $index + 1)),
-          '#submit' => array('lingwo_senses_remove_submit'),
-          '#field_name' => $field_name,
-        );
-      }
-      $element['wrapper']['senses'][$index]['data'] = $row;
-      $index ++;
     }
+    else {
+      $row['message'] = array(
+        '#value' => t('This entry only has one sense.'),
+      );
+    }
+
+    $row['weight'] = array(
+      '#type' => 'weight',
+      // TODO: Delta should probably be equal to the number of definitions?
+      '#delta' => 50,
+      '#default_value' => $index,
+    );
+    if (count($items) > 2) {
+      $row['remove_sense'] = array(
+        '#type' => 'submit',
+        '#value' => t('Remove Sense #!num', array('!num' => $index + 1)),
+        '#submit' => array('lingwo_senses_remove_submit'),
+        '#field_name' => $field_name,
+      );
+    }
+
+    $element['wrapper']['senses'][$index] = $row;
+    $index ++;
   }
   $element['wrapper']['add_sense'] = array(
     '#type' => 'submit',
-    '#value' => count($items) == 1 ? t('Setup multiple senses') : t('Add Another Sense'),
+    '#value' => t('Add Another Sense'),
     '#submit' => array('lingwo_senses_add_submit'),
     '#field_name' => $field_name,
     /*
@@ -525,7 +554,7 @@ function theme_lingwo_senses_original_form($form) {
 
   $rows = array();
   foreach (element_children($form) as $key) {
-    $element = &$form[$key]['data'];
+    $element = &$form[$key];
     $element['weight']['#attributes']['class'] = 'sense-weight';
 
     $weight = drupal_render($element['weight']);
@@ -593,7 +622,7 @@ function theme_lingwo_senses_formatter_default($element) {
   // filter out empty items
   //require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/Fn.php');
   //$items = Fn::filter(Fn::not('lingwo_senses_content_is_empty')), $items);
-  $items = array_filter($items, 'lingwo_senses_content_not_empty');
+  $items = array_filter($items, 'lingwo_senses_not_marker_row');
 
   return theme($theme, $node, $items);
 }
