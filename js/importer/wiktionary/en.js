@@ -10,8 +10,9 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
      'lingwo_dictionary/importer/mediawiki/WikiText',
      'lingwo_dictionary/importer/mediawiki/Producer',
      'lingwo_dictionary/util/text',
+     'lingwo_dictionary/util/json2',
     ],
-    function (declare, Entry, Language, WikiText, MediawikiProducer, text_utils) {
+    function (declare, Entry, Language, WikiText, MediawikiProducer, text_utils, JSON) {
         var posList = ['Noun','Adjective','Verb','Proper noun','Interjection','Conjunction','Preposition','Pronoun',
             'Prefix','Initialism','Phrase','Adverb','Cardinal number','Ordinal number','Suffix','Idiom','Numeral'];
 
@@ -39,6 +40,14 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             'en': 'English',
             'pl': 'Polish',
         };
+
+        var langCodes = (function () {
+            var r={}, code;
+            for (code in langNames) {
+                r[langNames[code]] = code;
+            }
+            return r;
+        })();
 
         function trim(s) {
             s = s.replace(/^\s+/, '');
@@ -73,10 +82,12 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                 }
 
                 if (cur >= this.lines.length) {
-                    return null;
+                    line = null;
+                }
+                else {
+                    line = this.lines[cur++];
                 }
 
-                line = this.lines[cur++];
                 if (updatePosition) {
                     this.cur = cur;
                 }
@@ -104,9 +115,15 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             return line;
         }
 
-        function parseSenses(text) {
+        // TODO: These functions are more technically correct and lets us take more from the 
+        // wiktionary data, but unfortunately, the data isn't clean and consistent enough
+        // allow this..
+        /*
+        function parseSenses(entry, text) {
             var input = new LineReader(text), line, parsing = false,
-                senses = [], sense;
+                sense;
+
+            entry.senses = [];
 
             while (!input.eof()) {
                 line = input.readline();
@@ -134,11 +151,118 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                         sense.example = clean(input.readline());
                     }
 
-                    senses.push(sense);
+                    entry.senses.push(sense);
                 }
             }
+        }
 
-            return senses;
+        function parseTranslations(entry, text) {
+            var input = new LineReader(text), line, matches, sensesMap, senseIndex, langCode, tmp;
+
+            entry.translations = {};
+
+            // normalize to just the bare text bits
+            function normalize(s) {
+                s = WikiText.clean(s);
+                s = s.replace(/[.,;:()"]/g, '');
+                s = s.toLowerCase();
+                return s;
+            };
+
+            // index the sense differences so that we can connect them to translations
+            sensesMap = {};
+            entry.senses.forEach(function (sense, i) {
+                sensesMap[normalize(sense.difference)] = i;
+            });
+
+            while (!input.eof()) {
+                line = input.readline();
+
+                if (matches = /^{{trans-top\|([^}]+)}}/.exec(line)) {
+                    // look for the sense in our map
+                    senseIndex = sensesMap[normalize(matches[1])];
+                    if (typeof senseIndex == 'undefined') {
+                        senseIndex = null;
+                        print ('Unable to connect translation to sense: '+matches[1]);
+                    }
+                }
+                else if (/^{{trans-bottom}}/.exec(line)) {
+                    senseIndex = null;
+                }
+                else if (senseIndex != null && (matches = /^\* ([^:]+): (.*)$/.exec(line))) {
+                    langCode = WikiText.clean(matches[1]);
+                    langCode = langCodes[langCode] || langCode;
+                    if (typeof entry.translations[langCode] == 'undefined') {
+                        entry.translations[langCode] = {senses: []};
+                    }
+
+                    // parse the actual translation string
+                    tmp = matches[2];
+                    tmp = tmp.replace(/{{[mf]}}/g, '');
+                    tmp = tmp.replace(/{{t[+-]?\|([^}]+)}}/g, function (s, p1) {
+                        if (p1) {
+                            return p1.split('|')[1];
+                        }
+                        return '';
+                    });
+                    tmp = WikiText.clean(tmp);
+                    tmp = tmp.split(/,\s?/);
+
+                    entry.translations[langCode].senses[senseIndex] = {trans: tmp};
+                }
+            }
+        }
+        */
+
+        function parseSensesAndTranslations(entry, text) {
+            var input = new LineReader(text), line, matches, langCode, tmp
+                senseIndex = 0, inSense = false;
+
+            entry.senses = [];
+            entry.translations = {};
+
+            while (!input.eof()) {
+                line = input.readline();
+
+                if (matches = /^{{trans-top\|([^}]+)}}/.exec(line)) {
+                    entry.senses.push({
+                        difference: matches[1]
+                    });
+                    inSense = true;
+                }
+                else if (/^{{trans-bottom}}/.exec(line)) {
+                    inSense = false;
+                    senseIndex++;
+                }
+                else if (senseIndex != null && (matches = /^\* ([^:]+): (.*)$/.exec(line))) {
+                    langCode = WikiText.clean(matches[1]);
+                    langCode = langCodes[langCode] || langCode;
+                    if (typeof entry.translations[langCode] == 'undefined') {
+                        entry.translations[langCode] = {senses: []};
+                    }
+
+                    // parse the actual translation string
+                    tmp = matches[2];
+                    tmp = tmp.replace(/{{[mf]}}/g, '');
+                    tmp = tmp.replace(/{{t[+-]?\|([^}]+)}}/g, function (s, p1) {
+                        if (p1) {
+                            return p1.split('|')[1];
+                        }
+                        return '';
+                    });
+                    tmp = tmp.replace(/{{l\|([^}]+)}}/g, function (s, p1) {
+                        if (p1) {
+                            return p1.split('|')[1];
+                        }
+                        return '';
+                    });
+                    tmp = WikiText.clean(tmp);
+                    tmp = tmp.split(/,\s*/);
+                    tmp = tmp.map(trim);
+
+                    entry.translations[langCode].senses[senseIndex] = {trans: tmp};
+                }
+            }
         }
 
         return {
@@ -190,9 +314,12 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
 
             parsers: {
                 'en': function (entry) {
-                    var raw = entry.getSource('en.wiktionary.org').raw;
-                    entry.senses = parseSenses(raw);
-                    //print (entry.serialize());
+                    var raw = entry.getSource('en.wiktionary.org').raw,
+                        wikitext = new WikiText(raw);
+
+                    //parseSenses(entry, raw);
+                    //parseTranslations(entry, wikitext.getSection('Translations', 3));
+                    parseSensesAndTranslations(entry, wikitext.getSection('Translations', 3));
                 }
             }
         };

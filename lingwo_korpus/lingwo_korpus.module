@@ -116,6 +116,7 @@ function lingwo_korpus_filter_text($text, $lang_pair) {
     // get the headword
     $headword = isset($attrs['headword']) ? $attrs['headword'] : $el->plaintext;
 
+    // TODO: nested <a> tags is no good, so we need some solution here.
     // convert to a link
     $el->tag = 'a';
     $el->class = 'anno';
