@@ -244,7 +244,10 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                     // parse the actual translation string
                     tmp = matches[2];
                     tmp = tmp.replace(/{{[mf]}}/g, '');
-                    tmp = tmp.replace(/{{t[+-]?\|[^|]*\|[^|]*\|[fn]}}/g, '');
+                    if (entry.pos == 'adjective') {
+                        // We don't need all the genders, we're too cool for that.
+                        tmp = tmp.replace(/{{t[+-]?\|[^|]*\|[^|]*\|[fn]}}/g, '');
+                    }
                     tmp = tmp.replace(/{{t[+-]?\|([^}]+)}}/g, function (s, p1) {
                         if (p1) {
                             return p1.split('|')[1];
