@@ -6,7 +6,12 @@
  * Pages related to search and lookup.
  */
 
-function lingwo_dictionary_search_form(&$form_state, $lang_pair=NULL, $word=NULL) {
+function lingwo_dictionary_search_form(&$form_state) {
+  if (module_exists('context')) {
+    $word = context_get('lingwo_dictionary', 'search_word');
+    $lang_pair = context_get('lingwo_dictionary', 'search_language');
+  }
+
   $language_options = array();
   $languages = language_list('enabled');
   foreach ($languages[1] as $lang1_code => $lang1) {
@@ -62,6 +67,11 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
   if (preg_match('/([^\(]+)\((\S+)\)/', $word, $matches)) {
     $word = trim($matches[1]);
     $pos  = $matches[2];
+  }
+
+  if (module_exists('context')) {
+    context_set('lingwo_dictionary', 'search_word', $word);
+    context_set('lingwo_dictionary', 'search_language', $lang_pair);
   }
 
   # lookup the appropriate node or nodes
