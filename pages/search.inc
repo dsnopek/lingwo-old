@@ -93,7 +93,7 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
       $url_args['pos'] = $pos;
     }
 
-    $output = drupal_get_form('lingwo_dictionary_search_form', $lang_pair, $word);
+    //$output = drupal_get_form('lingwo_dictionary_search_form', $lang_pair, $word);
 
     if ($target_lang && !empty($source_nids)) {
       // we are translating an existing entry
@@ -120,9 +120,12 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
     return lingwo_dictionary_lookup_page_node($nids[0]);
   }
 
+  /*
   $output = drupal_get_form('lingwo_dictionary_search_form', $lang_pair, $word);
   $output .= lingwo_dictionary_lookup_page_list($nids);
   return $output;
+  */
+  return lingwo_dictionary_lookup_page_list($nids);
 }
 
 function lingwo_dictionary_lookup_page_node($nid) {
