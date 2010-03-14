@@ -115,7 +115,7 @@ function lingwo_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
       return $blocks;
 
     case 'view':
-      if ($delta == 0) {
+      if ($delta == 0 && user_access('access content')) {
         module_load_include('inc', 'lingwo_dictionary', 'pages/search');
         $block['subject'] = t('Search Dictionary');
         $block['content'] = drupal_get_form('lingwo_dictionary_search_form');
