@@ -425,7 +425,7 @@ function lingwo_senses_get_translations(&$node, $field_name, $items) {
 
   return $senses;
 }
- 
+
 function _lingwo_senses_from_form($form, &$form_state) {
   $node = _ld_form_to_node($form, $form_state);
   $field_name = $form_state['clicked_button']['#field_name'];

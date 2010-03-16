@@ -66,9 +66,9 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function doSingleToMultipleSenses($nid, $tnid, $orig_trans) {
-	$orig_sense_id = node_load($nid)->field_senses[0]['id'];
+    $orig_sense_id = node_load($nid)->field_senses[0]['id'];
     $this->drupalPost("node/$nid/edit", array(), 'Setup multiple senses');
-	$this->assertFieldByName('field_senses[0][id]', $orig_sense_id);
+    $this->assertFieldByName('field_senses[0][id]', $orig_sense_id);
 
     $diffs = array();
     $trans = array();
@@ -88,13 +88,13 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
       'field_senses[2][data][difference]' => $diffs[1]
     ), 'Add another sense');
 
-	// fill in the last sense and remove the original
+    // fill in the last sense and remove the original
     $this->drupalPost(NULL, array(
       'field_senses[3][data][difference]' => $diffs[2]
     ), 'Remove Sense #1');
 
-	// save
-	$this->drupalPost(NULL, array(), 'Save');
+    // save
+    $this->drupalPost(NULL, array(), 'Save');
 
     // check that they are all on there
     foreach ($diffs as $diff) {
@@ -177,10 +177,10 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
     // Delete senses from source entry
     $this->drupalPost("node/$nid/edit", array(), 'Remove Sense #2');
     $this->drupalPost(NULL, array(), 'Save');
-	// The differences should be gone!
-	foreach($diffs as $d) {
-	  $this->assertNoText($d);
-	}
+    // The differences should be gone!
+    foreach($diffs as $d) {
+      $this->assertNoText($d);
+    }
 
     // Check that the UI is right for editing the translation:
     $this->drupalGet("node/$tnid/edit");
