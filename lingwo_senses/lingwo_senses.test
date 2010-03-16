@@ -66,7 +66,9 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function doSingleToMultipleSenses($nid, $tnid, $orig_trans) {
+	$orig_sense_id = node_load($nid)->field_senses[0]['id'];
     $this->drupalPost("node/$nid/edit", array(), 'Setup multiple senses');
+	$this->assertFieldByName('field_senses[0][id]', $orig_sense_id);
 
     $diffs = array();
     $trans = array();
@@ -77,14 +79,22 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
 
     // add two of the senses and then add a third
     $this->drupalPost(NULL, array(
-      'field_senses[0][data][difference]' => $diffs[0],
-      'field_senses[1][data][difference]' => $diffs[1]
-    ), 'Add Another Sense');
+      'field_senses[0][data][difference]' => '',
+      'field_senses[1][data][difference]' => $diffs[0]
+    ), 'Add another sense');
 
-    // fill in the last sense
+    // another sense
     $this->drupalPost(NULL, array(
-      'field_senses[2][data][difference]' => $diffs[2]
-    ), 'Save');
+      'field_senses[2][data][difference]' => $diffs[1]
+    ), 'Add another sense');
+
+	// fill in the last sense and remove the original
+    $this->drupalPost(NULL, array(
+      'field_senses[3][data][difference]' => $diffs[2]
+    ), 'Remove Sense #1');
+
+	// save
+	$this->drupalPost(NULL, array(), 'Save');
 
     // check that they are all on there
     foreach ($diffs as $diff) {
@@ -94,7 +104,7 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
     // Check that the UI is right for editing the translation:
     $this->drupalGet("node/$tnid/edit");
     //   (1a) Original translation should be last,
-    $this->assertFieldByName('field_senses[3][data][id]', '*');
+    $this->assertFieldByName('field_senses[3][id]', $orig_sense_id);
     //   (1b) and should have the obsolete checkbox.
     $this->assertFieldByName('field_senses[3][retire_sense]');
     //   (2a) New senses are displayed first (empty trans),
@@ -205,8 +215,8 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
 
   public function testWorkflow() {
     list($nid, $tnid, $orig_trans) = $this->doSingleSense();
-    //list($diffs, $trans) = $this->doSingleToMultipleSenses($nid, $tnid, $orig_trans);
-    ////list($diffs, $trans) = $this->doMultipleSensesRemoveOne($nid, $tnid, $diffs, $trans);
+    list($diffs, $trans) = $this->doSingleToMultipleSenses($nid, $tnid, $orig_trans);
+    //list($diffs, $trans) = $this->doMultipleSensesRemoveOne($nid, $tnid, $diffs, $trans);
     //$orig_trans = $this->doMultipleToSingleSenses($nid, $tnid, $diffs, $trans);
   }
 }

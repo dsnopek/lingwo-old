@@ -257,7 +257,7 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
     }
     else {
       $row['message'] = array(
-        '#value' => t('This entry has only one sense.'),
+        '#value' => "<p><em>". t('This entry has only one sense.') ."</em></p>",
       );
       if ($sense['data']['difference']) {
         $row['data']['difference'] = array(
@@ -296,7 +296,7 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
   }
   $element['wrapper']['add_sense'] = array(
     '#type' => 'submit',
-    '#value' => t('Add Another Sense'),
+    '#value' => count($items) > 1 ? t('Add another sense') : t('Setup multiple senses'),
     '#submit' => array('lingwo_senses_add_submit'),
     '#field_name' => $field_name,
     /*
