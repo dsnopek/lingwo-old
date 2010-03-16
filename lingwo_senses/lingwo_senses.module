@@ -100,7 +100,19 @@ function lingwo_senses_field_formatter_info() {
 function lingwo_senses_field_settings($op, $field) {
   switch ($op) {
     case 'database columns':
-      $columns['data'] = array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => FALSE, 'serialize' => TRUE);
+      $columns['id'] = array(
+        'type' => 'varchar',
+        'length' => '36',
+        'not null' => FALSE,
+        'sortable' => FALSE
+      );
+      $columns['data'] = array(
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'sortable' => FALSE,
+        'serialize' => TRUE
+      );
       return $columns;
   }
 }
@@ -128,10 +140,6 @@ function lingwo_senses_field($op, &$node, $field, &$items, $teaser, $page) {
 
     case 'presave':
       // remove some cruft that sneaks into the data
-      foreach ($items as &$item) {
-        unset($item['data']['remove_sense']);
-        unset($item['data']['weight']);
-      }
       unset($items['wrapper']);
       break;
 
@@ -147,23 +155,12 @@ function lingwo_senses_content_is_empty($item, $field=NULL) {
   if ($item['retire_sense']) {
     return TRUE;
   }
-  if (isset($item['data']['difference'])) {
-    // for originals
-    if (empty($item['data']['difference']) && empty($item['data']['example'])) {
-      return TRUE;
-    }
-  }
-  else if (empty($item['data']['clue']) && empty($item['data']['trans'])) {
-    // for translations
-    return TRUE;
-  }
   return FALSE;
 }
 
-// TODO: Hold over because we can use Fn::not() on PHP 5.2
-function lingwo_senses_content_not_empty($item, $field=NULL) {
-  return !lingwo_senses_content_is_empty($item, $field);
-};
+function lingwo_senses_not_marker_row($item, $field=NULL) {
+  return !empty($item['id']);
+}
 
 function lingwo_senses_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   $node = $form['#node'];
@@ -197,59 +194,80 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
     '#parents' => array($field['field_name']),
   );
 
-  // filter out empty items
-  //require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/Fn.php');
-  //$items = Fn::filter(Fn::not('lingwo_senses_content_is_empty')), $items);
-  $items = array_filter($items, 'lingwo_senses_content_not_empty');
+  // filter out marker rows
+  $items = array_filter($items, 'lingwo_senses_not_marker_row');
+  if (count($items) == 0) {
+    $items[] = array('data' => array());
+  }
 
   // we count it as empty if there is less than 2 senses!
-  if (!empty($items) && count($items) > 1) {
-    $index = 0;
-    foreach ($items as $sense) {
-      $sense = $sense['data'];
+  $index = 0;
+  foreach ($items as $sense) {
+    if (!isset($sense['id'])) {
+      $sense['id'] = _ld_make_uuid();
+    }
 
-      if (!isset($sense['id'])) {
-        $sense['id'] = _ld_make_uuid();
-      }
+    $row['id'] = array(
+      '#type' => 'hidden',
+      '#value' => $sense['id'],
+    );
 
-      $row['id'] = array(
-        '#type' => 'hidden',
-        '#value' => $sense['id'],
-      );
-
-      $row['difference'] = array(
+    if (count($items) > 1) {
+      $row['data']['difference'] = array(
         '#title' => 'Difference',
         '#type' => 'textfield',
-        '#default_value' => $sense['difference'],
+        '#default_value' => $sense['data']['difference'],
         '#maxlength' => 255,
       );
-      $row['example'] = array(
+      $row['data']['example'] = array(
         '#title' => 'Example',
         '#type' => 'textfield',
-        '#default_value' => $sense['example'],
+        '#default_value' => $sense['data']['example'],
         '#maxlength' => 255,
       );
-      $row['weight'] = array(
-        '#type' => 'weight',
-        // TODO: Delta should probably be equal to the number of definitions?
-        '#delta' => 50,
-        '#default_value' => $index,
+    }
+    else {
+      $row['message'] = array(
+        '#value' => "<p><em>". t('This entry has only one sense.') ."</em></p>",
       );
-      if (count($items) > 2) {
-        $row['remove_sense'] = array(
-          '#type' => 'submit',
-          '#value' => t('Remove Sense #!num', array('!num' => $index + 1)),
-          '#submit' => array('lingwo_senses_remove_submit'),
-          '#field_name' => $field_name,
+      if ($sense['data']['difference']) {
+        $row['data']['difference'] = array(
+          '#title' => 'Difference',
+          '#type' => 'item',
+          '#value' => $sense['data']['difference'],
         );
       }
-      $element['wrapper']['senses'][$index]['data'] = $row;
-      $index ++;
+      if ($sense['data']['example']) {
+        $row['data']['example'] = array(
+          '#title' => 'Example',
+          '#type' => 'item',
+          '#value' => $sense['data']['example']
+        );
+      }
     }
+
+    $row['weight'] = array(
+      '#type' => 'weight',
+      // TODO: Delta should probably be equal to the number of definitions?
+      '#delta' => 50,
+      '#default_value' => $index,
+    );
+
+    if (count($items) > 1) {
+      $row['remove_sense'] = array(
+        '#type' => 'submit',
+        '#value' => t('Remove Sense #!num', array('!num' => $index + 1)),
+        '#submit' => array('lingwo_senses_remove_submit'),
+        '#field_name' => $field_name,
+      );
+    }
+
+    $element['wrapper']['senses'][$index] = $row;
+    $index ++;
   }
   $element['wrapper']['add_sense'] = array(
     '#type' => 'submit',
-    '#value' => count($items) == 1 ? t('Setup multiple senses') : t('Add Another Sense'),
+    '#value' => count($items) > 1 ? t('Add another sense') : t('Setup multiple senses'),
     '#submit' => array('lingwo_senses_add_submit'),
     '#field_name' => $field_name,
     /*
@@ -261,14 +279,6 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
     ),
     */
   );
-  if (count($items) == 2) {
-    $element['wrapper']['remove_sense'] = array(
-      '#type' => 'submit',
-      '#value' => t('Delete Senses'),
-      '#submit' => array('lingwo_senses_remove_submit'),
-      '#field_name' => $field_name,
-    );
-  }
 
   return $element;
 }
@@ -282,10 +292,6 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
   $field_name = $field['field_name'];
 
   $senses = lingwo_senses_get_translations($node, $field_name, $items);
-  $orig_senses = $node->translation_source->$field_name;
-  if (count($orig_senses) == 1 && empty($orig_senses[0]['data'])) {
-    $orig_senses = array();
-  }
 
   $element = array(
     '#type' => 'fieldset',
@@ -298,27 +304,27 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
     $orig_sense = $sense['orig_sense'];
 
     $sense_form = array();
-    $sense_form['data']['id'] = array(
+    $sense_form['id'] = array(
       '#type' => 'hidden',
-      '#value' => $sense['data']['id'],
+      '#value' => $sense['id'],
     );
     if ($orig_sense) {
-      if ($orig_sense['difference']) {
+      if ($orig_sense['data']['difference']) {
         $sense_form['data']['difference'] = array(
           '#type' => 'item',
           '#title' => t('Difference'),
-          '#value' => $orig_sense['difference'],
+          '#value' => $orig_sense['data']['difference'],
         );
       }
-      if ($orig_sense['example']) {
+      if ($orig_sense['data']['example']) {
         $sense_form['data']['example'] = array(
           '#type' => 'item',
           '#title' => t('Example'),
-          '#value' => $orig_sense['example'],
+          '#value' => $orig_sense['data']['example'],
         );
       }
     }
-    if ($sense['data']['id'] != '*') {
+    if (count($senses) > 1) {
       $sense_form['data']['clue'] = array(
         '#type' => 'textfield',
         '#title' => t('Clue'),
@@ -327,7 +333,7 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
         '#maxlength' => 255,
       );
     }
-    if (!$orig_sense && !($sense['data']['id'] == '*' && count($orig_senses) == 0)) {
+    if (!$orig_sense) {
       $sense_form['old_sense_message'] = array(
         '#prefix' => '<div class="lingwo-sense-old-message">* ',
         '#value' => t('This translation is for a sense that has been removed from the entry.'),
@@ -351,8 +357,8 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
       $same_as_options = array('' => '-');
       $same_as_count = 1;
       foreach ($senses as $sense2) {
-        if (!empty($sense2['data']['id']) && $sense2['data']['id'] != $sense['data']['id']) {
-          $same_as_options[$sense2['data']['id']] = t('Sense #!sense_num', array('!sense_num' => $same_as_count));
+        if (!empty($sense2['id']) && $sense2['id'] != $sense['id']) {
+          $same_as_options[$sense2['id']] = t('Sense #!sense_num', array('!sense_num' => $same_as_count));
         }
         $same_as_count++;
       }
@@ -375,53 +381,45 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
  * order, connected to the entry senses if one exists.
  */
 function lingwo_senses_get_translations(&$node, $field_name, $items) {
-  if (empty($node->translation_source)) {
-    $node->translation_source = node_load($node->tnid);
-  }
-
-  $orig = $node->translation_source;
+  $orig = lingwo_dictionary_entry_load_translation_source($node);
+  // TODO: does this make sense?  Why support not having a translation source??
   $orig_senses = isset($orig) ? $orig->$field_name : array();
-  if (count($orig_senses) == 1 && empty($orig_senses[0]['data'])) {
-    $orig_senses = array();
-  }
+  $orig_senses = array_filter($orig_senses, 'lingwo_senses_not_marker_row');
 
   $trans_map = array();
-  $trans_senses = $node->nid ? $items : NULL;
-  if (count($trans_senses) == 1 && empty($trans_senses[0]['data'])) {
-    $trans_senses = array();
-  }
-  if (!empty($trans_senses)) {
-    foreach ($trans_senses as $trans_sense) {
-      $trans_map[$trans_sense['data']['id']] = $trans_sense;
-    }
+  $trans_senses = $node->nid ? $items : array();
+  $trans_senses = array_filter($trans_senses, 'lingwo_senses_not_marker_row');
+
+  foreach ($trans_senses as $trans_sense) {
+    $trans_map[$trans_sense['id']] = $trans_sense;
   }
 
   $senses = array();
 
-  if (isset($orig_senses) && count($orig_senses) > 0) {
-    foreach ($orig_senses as $sense) {
-      $trans_sense = $trans_map[$sense['data']['id']];
-      $trans_sense['orig_sense'] = $sense['data'];
-      $trans_sense['data']['id'] = $sense['data']['id'];
-      
-      $senses[] = $trans_sense;
-      unset($trans_map[$sense['data']['id']]);
+  foreach ($orig_senses as $sense) {
+    $trans_sense = $trans_map[$sense['id']];
+    if (!isset($trans_sense)) {
+      $trans_sense = array('id' => $sense['id']);
     }
+    $trans_sense['orig_sense'] = $sense;
+    
+    $senses[] = $trans_sense;
+    unset($trans_map[$sense['id']]);
   }
 
+  // TODO: do we still need this?  Source entries without senses is no longer our thing.
   if (count($senses) == 0) {
     if ($trans_map && isset($trans_map['*'])) {
       $only_sense = $trans_map['*'];
     }
     else {
-      $only_sense = array('data' => array('id' => '*'));
+      $only_sense = array('id' => '*', 'data' => array());
     }
     $senses[] = $only_sense;
     unset($trans_map['*']);
   }
 
   foreach ($trans_map as $id => $trans_sense) {
-    $trans_sense['data']['id'] = $id;
     $senses[] = $trans_sense;
   }
 
@@ -436,8 +434,8 @@ function _lingwo_senses_from_form($form, &$form_state) {
   if ($senses) {
     foreach ($senses as $index => $sense) {
       if (is_numeric($index)) {
-        $weight[] = $sense['data']['weight'];
-        unset($sense['data']['weight'], $sense['data']['remove_sense']);
+        $weight[] = $sense['weight'];
+        unset($sense['weight'], $sense['remove_sense']);
         $values[] = $sense;
       }
     }
@@ -458,25 +456,18 @@ function lingwo_senses_add_submit($form, &$form_state) {
   $senses = _lingwo_senses_from_form($form, $form_state);
   $field_name = $form_state['clicked_button']['#field_name'];
   
-  if (count($senses) > 1) {
-    $form_state[$field_name]['senses'][] = array();
-  }
-  else {
-    $form_state[$field_name]['senses'] = array( array(), array() );
-  }
+  $form_state[$field_name]['senses'][] = array('id' => _ld_make_uuid());
 }
 
 function lingwo_senses_remove_submit($form, &$form_state) {
-  $senses = _lingwo_senses_from_form($form, $form_state);
+  // We have to remove first, so that changing the order doesn't change
+  // which item gets removed.
   $field_name = $form_state['clicked_button']['#field_name'];
-  
-  if (count($senses) == 2) {
-    $form_state[$field_name]['senses'] = array();
-  }
-  else {
-    $delta = $form_state['clicked_button']['#parents'][1];
-    unset($form_state[$field_name]['senses'][$delta]);
-  }
+  $delta = $form_state['clicked_button']['#parents'][1];
+  unset($form_state['values'][$field_name][$delta]);
+
+  // get the senses onto the $form_state.
+  _lingwo_senses_from_form($form, $form_state);
 }
 
 function lingwo_senses_ahah($field_name) {
@@ -519,13 +510,13 @@ function theme_lingwo_senses_original_form($form) {
     t('Weight'),
   );
 
-  if (count($elements) > 2) {
+  if (count($elements) > 1) {
     $header[] = t('Operations');
   }
 
   $rows = array();
   foreach (element_children($form) as $key) {
-    $element = &$form[$key]['data'];
+    $element = &$form[$key];
     $element['weight']['#attributes']['class'] = 'sense-weight';
 
     $weight = drupal_render($element['weight']);
@@ -536,7 +527,7 @@ function theme_lingwo_senses_original_form($form) {
     $row[] = drupal_render($element);
     $row[] = $weight;
 
-    if (count($elements) > 2) {
+    if (count($elements) > 1) {
       $row[] = $delete;
     }
 
@@ -593,7 +584,7 @@ function theme_lingwo_senses_formatter_default($element) {
   // filter out empty items
   //require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/Fn.php');
   //$items = Fn::filter(Fn::not('lingwo_senses_content_is_empty')), $items);
-  $items = array_filter($items, 'lingwo_senses_content_not_empty');
+  $items = array_filter($items, 'lingwo_senses_not_marker_row');
 
   return theme($theme, $node, $items);
 }

@@ -6,7 +6,12 @@
  * Pages related to search and lookup.
  */
 
-function lingwo_dictionary_search_form(&$form_state, $lang_pair=NULL, $word=NULL) {
+function lingwo_dictionary_search_form(&$form_state) {
+  if (module_exists('context')) {
+    $word = context_get('lingwo_dictionary', 'search_word');
+    $lang_pair = context_get('lingwo_dictionary', 'search_language');
+  }
+
   $language_options = array();
   $languages = language_list('enabled');
   foreach ($languages[1] as $lang1_code => $lang1) {
@@ -64,6 +69,11 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
     $pos  = $matches[2];
   }
 
+  if (module_exists('context')) {
+    context_set('lingwo_dictionary', 'search_word', $word);
+    context_set('lingwo_dictionary', 'search_language', $lang_pair);
+  }
+
   # lookup the appropriate node or nodes
   $nids = array();
   if ($source_nids = lingwo_dictionary_entry_lookup($word, $source_lang, $pos)) {
@@ -93,7 +103,7 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
       $url_args['pos'] = $pos;
     }
 
-    $output = drupal_get_form('lingwo_dictionary_search_form', $lang_pair, $word);
+    //$output = drupal_get_form('lingwo_dictionary_search_form', $lang_pair, $word);
 
     if ($target_lang && !empty($source_nids)) {
       // we are translating an existing entry
@@ -120,9 +130,12 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
     return lingwo_dictionary_lookup_page_node($nids[0]);
   }
 
+  /*
   $output = drupal_get_form('lingwo_dictionary_search_form', $lang_pair, $word);
   $output .= lingwo_dictionary_lookup_page_list($nids);
   return $output;
+  */
+  return lingwo_dictionary_lookup_page_list($nids);
 }
 
 function lingwo_dictionary_lookup_page_node($nid) {

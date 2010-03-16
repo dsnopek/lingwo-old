@@ -453,8 +453,10 @@ function theme_lingwo_fields_formatter_default($element) {
     $field_name = $element['#field_name'];
     // build element list as if it came from the formatter
     $element = array('#node' => $node);
-    foreach($node->$field_name as $item) {
-      $element[] = array('#item' => $item);
+    if (!empty($node->$field_name)) {
+      foreach($node->$field_name as $item) {
+        $element[] = array('#item' => $item);
+      }
     }
   }
 

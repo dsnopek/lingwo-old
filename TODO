@@ -5,17 +5,20 @@
 
    - When an Entry has only one sense, that sense should still get an ID (rather than '*')
      so that adding a sense to the entry doesn't invalidate all the existing annotated texts.
-	 Some UI would be required saying "The original sense" or something until the entry is
-	 finally saved.
+     Some UI would be required saying "The original sense" or something until the entry is
+     finally saved.
 
    - We need a "Same As: [_______]" field translatations with multiple senses.  This would
      allow merging them when languages share the same sense divisions for the some words.
 
    - It would also be good to store a big table somewhere, with senses stored according to
      their IDs.  Columns like: sense_id, source_lang, target_lang, data.  This would allow
-	 us to simply refer to a sense_id (is source_lang necessary since they are unique??) 
-	 and be able to look-up the sense data.  There might be a way to leverage this to make
-	 the annotation look-up faster (maybe).
+     us to simply refer to a sense_id (is source_lang necessary since they are unique??) 
+     and be able to look-up the sense data.  There might be a way to leverage this to make
+     the annotation look-up faster (maybe).
+
+   - We should move the sense ID from being inside the serialized 'data' field into its
+     own database column.
 
 == 2010-03-07 ==
 
