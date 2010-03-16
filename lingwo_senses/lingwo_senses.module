@@ -628,6 +628,9 @@ function theme_lingwo_senses_translation($node, $items) {
 
   $without_translations = 0;
   foreach ($items as $sense) {
+    if (!empty($sense['data']['same_as'])) {
+      continue;
+    }
     $orig_sense = $sense['orig_sense'];
     $sense = $sense['data'];
     
@@ -654,8 +657,8 @@ function theme_lingwo_senses_translation($node, $items) {
 
     $output .= join(', ', $values);
 
-    if (!empty($orig_sense['example'])) {
-      $output .= ': <blockquote class="lingwo-example">"'. $orig_sense['example'] .'"</blockquote>';
+    if (!empty($orig_sense['data']['example'])) {
+      $output .= ': <blockquote class="lingwo-example">"'. $orig_sense['data']['example'] .'"</blockquote>';
     }
     $output .= '</li>';
   };
