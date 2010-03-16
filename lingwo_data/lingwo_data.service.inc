@@ -245,6 +245,10 @@ function _lingwo_data_import_set_field_value(&$field, $value, $type) {
 
     case 'lingwo_senses':
       $field['data'] = $value;
+      if (empty($field['id'])) {
+        // senses are treated as invalid, unless they have a UUID!
+        $field['id'] = _ld_make_uuid();
+      }
       break;
 
     default:
