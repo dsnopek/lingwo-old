@@ -214,6 +214,21 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
         }
         */
 
+        function reduceTranslations(senses) {
+            var i, x, sense1, sense2;
+            for(i = 0; i < senses.length; i++) {
+                sense1 = senses[i];
+                for(x = 0; x < i; x++) {
+                    sense2 = senses[x];
+                    if (sense1 && sense2 && sense1.trans && sense2.trans &&
+                        sense1.trans.join('-') == sense2.trans.join('-'))
+                    {
+                        senses[i] = {'same_as': x};
+                    }
+                }
+            }
+        };
+
         function parseSensesAndTranslations(entry, text) {
             var input = new LineReader(text), line, matches, langCode, tmp
                 senseIndex = 0, inSense = false;
@@ -266,6 +281,10 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
 
                     entry.translations[langCode].senses[senseIndex] = {trans: tmp};
                 }
+            }
+
+            for(langCode in entry.translations) {
+                reduceTranslations(entry.translations[langCode].senses);
             }
         }
 

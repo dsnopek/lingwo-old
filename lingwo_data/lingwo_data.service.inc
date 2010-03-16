@@ -257,6 +257,19 @@ function _lingwo_data_import_set_field_value(&$field, $value, $type) {
   }
 }
 
+function _lingwo_data_import_process_field_values(&$values, $type) {
+  switch ($type) {
+    case 'lingwo_senses':
+      # convert the 'same_as' field to id rather than indexes
+      foreach ($values as &$value) {
+        if (isset($value['data']['same_as'])) {
+          $value['data']['same_as'] = $values[$value['data']['same_as']]['id'];
+        }
+      }
+      break;
+  };
+}
+
 function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
   $field_name = lingwo_data_settings('field_'. $field_alias);
   if (empty($field_name)) {
@@ -274,6 +287,8 @@ function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
   for($i = 0; $i < count($values); $i++) {
     _lingwo_data_import_set_field_value($field[$i], $values[$i], $field_type['type']);
   }
+
+  _lingwo_data_import_process_field_values($field, $field_type['type']);
 }
 
 function _lingwo_data_import_set_fields(&$node, $fields) {
@@ -353,6 +368,14 @@ function lingwo_data_service_update_entry($data) {
         array('language' => $lang, 'taxonomy' => $taxonomy));
       if (empty($tnode->nid)) {
         $tnode->translation_source = node_load($nid);
+
+        # we need to put the original sense ids on the translation, otherwise
+        # the importer will make up IDs!!
+        $field_senses = lingwo_data_settings('field_senses');
+        $tnode->$field_senses = array();
+        foreach ($tnode->translation_source->$field_senses as $sense) {
+          array_push($tnode->$field_senses, array('id' => $sense['id']));
+        }
       }
 
       // Process $trans creating an array holding the data which will be put on our node
