@@ -140,12 +140,6 @@ function lingwo_senses_field($op, &$node, $field, &$items, $teaser, $page) {
 
     case 'presave':
       // remove some cruft that sneaks into the data
-      /*
-      foreach ($items as &$item) {
-        unset($item['data']['remove_sense']);
-        unset($item['data']['weight']);
-      }
-      */
       unset($items['wrapper']);
       break;
 
@@ -162,28 +156,7 @@ function lingwo_senses_content_is_empty($item, $field=NULL) {
     return TRUE;
   }
   return FALSE;
-
-  /*
-  if (isset($item['data']['difference'])) {
-    // for originals
-    if (empty($item['data']['difference']) && empty($item['data']['example'])) {
-      return TRUE;
-    }
-  }
-  else if (empty($item['data']['clue']) && empty($item['data']['trans'])) {
-    // for translations
-    return TRUE;
-  }
-  return FALSE;
-  */
 }
-
-/*
-// TODO: Hold over because we can use Fn::not() on PHP 5.2
-function lingwo_senses_content_not_empty($item, $field=NULL) {
-  return !lingwo_senses_content_is_empty($item, $field);
-};
-*/
 
 function lingwo_senses_not_marker_row($item, $field=NULL) {
   return !empty($item['id']);
@@ -221,9 +194,7 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
     '#parents' => array($field['field_name']),
   );
 
-  // filter out empty items
-  //require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/Fn.php');
-  //$items = Fn::filter(Fn::not('lingwo_senses_content_is_empty')), $items);
+  // filter out marker rows
   $items = array_filter($items, 'lingwo_senses_not_marker_row');
   if (count($items) == 0) {
     $items[] = array('data' => array());
