@@ -162,7 +162,8 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                     tmp = tmp.replace(/{{[mf]}}/g, '');
                     if (entry.pos == 'adjective') {
                         // We don't need all the genders, we're too cool for that.
-                        tmp = tmp.replace(/{{t[+-]?\|[^|]*\|[^|]*\|[fn]}}/g, '');
+                        tmp = tmp.replace(/{{t[+-]?\|[^|]*\|[^|]*\|[^m]}}/g, '');
+                        tmp = tmp.replace(/{{t[+-]?\|[^|]*\|[^|]*\|[^|]*\|[^m]}}/g, '');
                     }
                     tmp = tmp.replace(/{{t[+-]?\|([^}]+)}}/g, function (s, p1) {
                         if (p1) {
@@ -179,6 +180,7 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                     tmp = WikiText.clean(tmp);
                     tmp = tmp.split(/,\s*/);
                     tmp = tmp.map(trim);
+                    tmp = tmp.filter(function (item) { return !!item; });
 
                     entry.translations[langCode].senses[senseIndex] = {trans: tmp};
                 }
