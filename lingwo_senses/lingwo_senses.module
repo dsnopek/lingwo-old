@@ -141,6 +141,13 @@ function lingwo_senses_field($op, &$node, $field, &$items, $teaser, $page) {
     case 'presave':
       // remove some cruft that sneaks into the data
       unset($items['wrapper']);
+      foreach ($items as &$item) {
+        // if 'same_as' is set, then we clear the other fields
+        if (!empty($item['data']['same_as'])) {
+          unset($item['data']['trans']);
+          unset($item['data']['clue']);
+        }
+      }
       break;
 
     case 'validate':
