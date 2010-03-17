@@ -297,6 +297,7 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
   }
 
   $field_name = $field['field_name'];
+  $field_id = preg_replace('/_/', '-', $field_name);
 
   $senses = lingwo_senses_get_translations($node, $field_name, $items);
 
@@ -331,8 +332,14 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
         );
       }
     }
+
+    $sense_form['data']['translation'] = array(
+      '#parents' => array($field_name, $index, 'data'),
+      '#prefix' => "<div id=\"edit-$field_id-$index-data-translation\">",
+      '#suffix' => '</div>',
+    );
     if (count($senses) > 1) {
-      $sense_form['data']['clue'] = array(
+      $sense_form['data']['translation']['clue'] = array(
         '#type' => 'textfield',
         '#title' => t('Clue'),
         '#description' => t('A couple words that will clue the reader to how this sense is different.'),
@@ -340,25 +347,14 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
         '#maxlength' => 255,
       );
     }
-    if (!$orig_sense) {
-      $sense_form['old_sense_message'] = array(
-        '#prefix' => '<div class="lingwo-sense-old-message">* ',
-        '#value' => t('This translation is for a sense that has been removed from the entry.'),
-        '#suffix' => '</div>',
-      );
-      $sense_form['retire_sense'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('Retire this obsolete sense.'),
-      );
-    }
-    $sense_form['data']['trans'] = array();
-    for ($t = 0; $t < max(3, count($sense['values'])); $t++) {
-      $sense_form['data']['trans'][$t] = array(
+    $sense_form['data']['translation']['trans'] = array();
+    for ($t = 0; $t < max(3, count($sense['data']['trans'])); $t++) {
+      $sense_form['data']['translation']['trans'][$t] = array(
         '#type' => 'textfield',
         '#default_value' => $sense['data']['trans'][$t]
       );
     }
-    $sense_form['data']['trans']['0']['#title'] = t('Translation');
+    $sense_form['data']['translation']['trans']['0']['#title'] = t('Translation');
 
     if (count($senses) > 1) {
       $same_as_options = array('' => '-');
@@ -375,6 +371,18 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
         '#type' => 'select',
         '#options' => $same_as_options,
         '#default_value' => !empty($sense['data']['same_as']) ? $sense['data']['same_as'] : '',
+      );
+    }
+
+    if (!$orig_sense) {
+      $sense_form['old_sense_message'] = array(
+        '#prefix' => '<div class="lingwo-sense-old-message">* ',
+        '#value' => t('This translation is for a sense that has been removed from the entry.'),
+        '#suffix' => '</div>',
+      );
+      $sense_form['retire_sense'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Retire this obsolete sense.'),
       );
     }
 
@@ -549,7 +557,7 @@ function theme_lingwo_senses_original_form($form) {
 function theme_lingwo_senses_translation_form($form) {
   $header = array(
     t('No.'),
-    array('data' => t('Sense'), 'colspan' => 2),
+    t('Sense'),
   );
 
   $rows = array();
@@ -557,16 +565,7 @@ function theme_lingwo_senses_translation_form($form) {
   foreach ($elements as $key) {
     $row = array();
     $row[] = ($key + 1);
-
-    if (count($elements) > 1) {
-      // split into trans in column 2 and everything else in column 1
-      $trans = drupal_render($form[$key]['trans']);
-      $row[] = drupal_render($form[$key]);
-      $row[] = $trans;
-    }
-    else {
-      $row[] = array('data' => drupal_render($form[$key]), 'colspan' => 2);
-    }
+    $row[] = drupal_render($form[$key]);
 
     $rows[] = $row;
   }
