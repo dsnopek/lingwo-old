@@ -115,105 +115,6 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             return line;
         }
 
-        // TODO: These functions are more technically correct and lets us take more from the 
-        // wiktionary data, but unfortunately, the data isn't clean and consistent enough
-        // allow this..
-        /*
-        function parseSenses(entry, text) {
-            var input = new LineReader(text), line, parsing = false,
-                sense;
-
-            entry.senses = [];
-
-            while (!input.eof()) {
-                line = input.readline();
-                
-                // we start parsing on encountering the first '===' section
-                if (!parsing) {
-                    if (/^===[^=]/.exec(line)) {
-                        parsing = true;
-                    }
-                    continue;
-                }
-
-                // we stop parsing when we encounter another wikitext section
-                if (/^=/.exec(line)) {
-                    break;
-                }
-                // we find a difference, on a line marked '#'
-                else if (/^#[^:*]/.exec(line)) {
-                    sense = {
-                        difference: clean(line, 255),
-                    };
-                    
-                    // If its followed by an example, read that too.
-                    if (/^#:/.exec(input.peekline())) {
-                        sense.example = clean(input.readline());
-                    }
-
-                    entry.senses.push(sense);
-                }
-            }
-        }
-
-        function parseTranslations(entry, text) {
-            var input = new LineReader(text), line, matches, sensesMap, senseIndex, langCode, tmp;
-
-            entry.translations = {};
-
-            // normalize to just the bare text bits
-            function normalize(s) {
-                s = WikiText.clean(s);
-                s = s.replace(/[.,;:()"]/g, '');
-                s = s.toLowerCase();
-                return s;
-            };
-
-            // index the sense differences so that we can connect them to translations
-            sensesMap = {};
-            entry.senses.forEach(function (sense, i) {
-                sensesMap[normalize(sense.difference)] = i;
-            });
-
-            while (!input.eof()) {
-                line = input.readline();
-
-                if (matches = /^{{trans-top\|([^}]+)}}/.exec(line)) {
-                    // look for the sense in our map
-                    senseIndex = sensesMap[normalize(matches[1])];
-                    if (typeof senseIndex == 'undefined') {
-                        senseIndex = null;
-                        print ('Unable to connect translation to sense: '+matches[1]);
-                    }
-                }
-                else if (/^{{trans-bottom}}/.exec(line)) {
-                    senseIndex = null;
-                }
-                else if (senseIndex != null && (matches = /^\* ([^:]+): (.*)$/.exec(line))) {
-                    langCode = WikiText.clean(matches[1]);
-                    langCode = langCodes[langCode] || langCode;
-                    if (typeof entry.translations[langCode] == 'undefined') {
-                        entry.translations[langCode] = {senses: []};
-                    }
-
-                    // parse the actual translation string
-                    tmp = matches[2];
-                    tmp = tmp.replace(/{{[mf]}}/g, '');
-                    tmp = tmp.replace(/{{t[+-]?\|([^}]+)}}/g, function (s, p1) {
-                        if (p1) {
-                            return p1.split('|')[1];
-                        }
-                        return '';
-                    });
-                    tmp = WikiText.clean(tmp);
-                    tmp = tmp.split(/,\s?/);
-
-                    entry.translations[langCode].senses[senseIndex] = {trans: tmp};
-                }
-            }
-        }
-        */
-
         function reduceTranslations(senses) {
             var i, x, sense1, sense2;
             for(i = 0; i < senses.length; i++) {
@@ -229,9 +130,9 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             }
         };
 
-        function parseSensesAndTranslations(entry, text) {
-            var input = new LineReader(text), line, matches, langCode, tmp
-                senseIndex = 0, inSense = false;
+        function parseTranslations(entry, text) {
+            var input = new LineReader((new WikiText(text)).getSection('Translations', 3)),
+                line, matches, langCode, tmp, senseIndex = 0, inSense = false;
 
             entry.senses = [];
             entry.translations = {};
@@ -288,6 +189,69 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             }
         }
 
+        function parseSenses(entry, text) {
+            var input = new LineReader(text), line, parsing = false,
+                sense, sensesMap = {};
+
+            // normalize to just the bare text bits
+            function normalize(s) {
+                s = WikiText.clean(s);
+                s = s.replace(/[.,;:()"]/g, '');
+                s = s.toLowerCase();
+                return s;
+            };
+
+            // first we read in the main senses
+            while (!input.eof()) {
+                line = input.readline();
+                
+                // we start parsing on encountering the first '===' section
+                if (!parsing) {
+                    if (/^===[^=]/.exec(line)) {
+                        parsing = true;
+                    }
+                    continue;
+                }
+
+                // we stop parsing when we encounter another wikitext section
+                if (/^=/.exec(line)) {
+                    break;
+                }
+                // we find a difference, on a line marked '#'
+                else if (/^#[^:*]/.exec(line)) {
+                    sense = {
+                        difference: clean(line, 255),
+                    };
+                    
+                    // If its followed by an example, read that too.
+                    if (/^#:/.exec(input.peekline())) {
+                        sense.example = clean(input.readline());
+                    }
+
+                    sensesMap[normalize(sense.difference)] = sense;
+                }
+            }
+
+            // then we try to match them with existing senses and fill in the
+            // missing data.
+            entry.senses.forEach(function (sense) {
+                var senseKey = normalize(sense.difference), mainSenseKey, mainSense;
+                for (mainSenseKey in sensesMap) {
+                    // if its found anywhere in the string, we call it a match.
+                    if (mainSenseKey.indexOf(senseKey) != -1) {
+                        mainSense = sensesMap[mainSenseKey];
+                        sense.difference = mainSense.difference;
+                        sense.example = mainSense.example;
+                    }
+                }
+            });
+        }
+
+        function parseSensesAndTranslations(entry, text) {
+            parseTranslations(entry, text);
+            parseSenses(entry, text);
+        }
+
         return {
             Producer: declare({
                 _constructor: function (args) {
@@ -337,12 +301,9 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
 
             parsers: {
                 'en': function (entry) {
-                    var raw = entry.getSource('en.wiktionary.org').raw,
-                        wikitext = new WikiText(raw);
+                    var raw = entry.getSource('en.wiktionary.org').raw;
 
-                    //parseSenses(entry, raw);
-                    //parseTranslations(entry, wikitext.getSection('Translations', 3));
-                    parseSensesAndTranslations(entry, wikitext.getSection('Translations', 3));
+                    parseSensesAndTranslations(entry, raw);
                 }
             }
         };
