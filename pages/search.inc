@@ -7,36 +7,27 @@
  */
 
 function lingwo_dictionary_search_form(&$form_state) {
+  global $language;
+
   if (module_exists('context')) {
-    $word = context_get('lingwo_dictionary', 'search_word');
-    $lang_pair = context_get('lingwo_dictionary', 'search_language');
+    $search_word = context_get('lingwo_dictionary', 'search_word');
+    $search_language = context_get('lingwo_dictionary', 'search_language');
   }
 
-  $language_options = array();
-  $languages = language_list('enabled');
-  foreach ($languages[1] as $lang1_code => $lang1) {
-    foreach ($languages[1] as $lang2_code => $lang2) {
-      $name = $lang1->name;
-      if ($lang1_code != $lang2_code) {
-        $name = $name .' => '. $lang2->name;
-        // TODO: we should allow the pure dictionaries, but for now, we will
-        // limit to just the translations.
-        $language_options["$lang1_code-$lang2_code"] = $name .' '. t('Dictionary');
-      }
-    }
-  }
+  $language_options = locale_language_list();
+  unset($language_options[$language->language]);
 
-  $form['search'] = array(
+  $form['search_word'] = array(
     '#title' => t('Find word/phrase'),
     '#type' => 'textfield',
-    '#default_value' => $word,
+    '#default_value' => $search_word,
     '#attributes' => array('title' => t('Enter the terms you wish to search for.')),
   );
-  $form['lang_pair'] = array(
-    '#title' => t('Languages'),
+  $form['search_language'] = array(
+    '#title' => t('Language'),
     '#type' => 'select',
     '#options' => $language_options,
-    '#default_value' => $lang_pair,
+    '#default_value' => $search_language,
   );
 
   // TODO: we should write some JavaScript that will do the redirect straight
@@ -47,10 +38,12 @@ function lingwo_dictionary_search_form(&$form_state) {
 }
 
 function lingwo_dictionary_search_form_submit($form, &$form_state) {
+  global $language;
+
   $form_state['redirect'] = implode('/', array(
     lingwo_dictionary_settings('lookup_path'),
-    $form_state['values']['lang_pair'],
-    $form_state['values']['search']
+    $form_state['values']['search_language'] .'-'. $language->language,
+    $form_state['values']['search_word']
   ));
 }
 
