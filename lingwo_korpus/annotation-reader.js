@@ -41,6 +41,7 @@
                 $.getJSON('/lingwo_korpus/lookup_entry', {'url': target.attr('href')},
                     function (res) {
                         bubble.html(res.content);
+                        $('div.node', bubble).removeClass('clear-block');
                     }
                 );
             }
