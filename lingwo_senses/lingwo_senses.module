@@ -371,6 +371,7 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
         '#type' => 'select',
         '#options' => $same_as_options,
         '#default_value' => !empty($sense['data']['same_as']) ? $sense['data']['same_as'] : '',
+        '#attributes' => array('class' => 'same-as-select'),
       );
     }
 
@@ -388,6 +389,8 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
 
     $element[$index++] = $sense_form;
   }
+
+  drupal_add_js(drupal_get_path('module', 'lingwo_senses') .'/lingwo_senses.js');
 
   return $element;
 }
