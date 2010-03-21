@@ -200,7 +200,6 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
         return NULL;
 
       $pos = lingwo_dictionary_entry_get_pos($node);
-      print_r($pos);
       if (empty($pos)) {
         form_set_error(lingwo_dictionary_settings('pos_vocabulary'),
           t("Couldn't derive Part of Speech from node!"));

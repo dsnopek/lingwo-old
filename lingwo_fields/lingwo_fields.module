@@ -160,6 +160,14 @@ function lingwo_fields_content_is_empty($item, $field) {
   return FALSE;
 }
 
+function _lingwo_fields_setup_pos_ahah($element) {
+  $element['value']['#ahah'] = $element['#ahah'];
+  unset($element['#ahah']);
+  form_expand_ahah($element['value']);
+
+  return $element;
+}
+
 /**
  * Implementation of hook_widget
  */
@@ -175,7 +183,6 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
 
   ahah_helper_register($form, $form_state);
 
-  $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
   $pos = lingwo_dictionary_entry_get_pos($node);
 
   $default_values = array();
@@ -203,13 +210,9 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
     );
     $form['language']['#ahah'] = $ahah; // + array('event' => 'change');
 
-    if (isset($form['taxonomy'][$pos_vid])) {
-      $form['taxonomy'][$pos_vid]['#ahah'] = $ahah;
-      // DRS: hack to make sure the ahah stuff gets added even if i18ntaxonomy
-      // is going to rebuild the taxonomy form elements in a form_alter hook.
-      $form['taxonomy'][$pos_vid]['#id'] = 'edit-taxonomy-'. $pos_vid;
-      form_expand_ahah($form['taxonomy'][$pos_vid]);
-    }
+    $field_pos = lingwo_dictionary_settings('field_pos');
+    $form[$field_pos]['#ahah'] = $ahah;
+    $form[$field_pos]['#after_build'][] = '_lingwo_fields_setup_pos_ahah';
 
     $element['refresh'] = array(
       '#type' => 'submit',
@@ -338,17 +341,18 @@ function theme_lingwo_fields_widget_form_wrapper($element) {
   drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/js/require.js');
 
   // get a map of all the pos values
-  $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
-  $pos_values = array();
-  foreach (taxonomy_get_tree($pos_vid) as $term) {
-    $pos_values[$term->tid] = strtolower($term->name);
-  }
+  //$field_pos = content_fields(lingwo_dictionary_settings('field_pos'));
+  //$pos_values = content_allowed_values($field_pos);
+
+  $field_pos_name = lingwo_dictionary_settings('field_pos');
+  $field_pos_name = preg_replace('/_/', '-', $field_pos_name);
+  $field_pos_name = 'edit-'. $field_pos_name .'-value';
 
   drupal_add_js(array('lingwo_fields' => array(
     'field_name' => $element['#field_name_enc'],
     'is_new' => $node->nid == 0,
-    'pos_vid' => $pos_vid,
-    'pos_values' => $pos_values,
+    'pos_field' => $field_pos_name,
+    //'pos_values' => $pos_values,
     'lang' => $node->language,
     'pos' => $element['#pos'],
   )), 'setting');
