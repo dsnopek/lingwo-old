@@ -47,38 +47,11 @@ function lingwo_dictionary_entry_get_languages($node, $for_humans=FALSE) {
 }
 
 // Gets the Part of Speech from a node
-function lingwo_dictionary_entry_get_pos($node, $is_new = FALSE) {
-  $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
-
-  if (isset($node->taxonomy)) {
-    //if (is_int($node->taxonomy[$pos_vid])) {
-    //if (!$node->nid || $is_new) {
-    /*
-    $a = array_values($node->taxonomy);
-    if (0+$a[0] != 0) {
-    */
-    if (is_numeric($node->taxonomy[$pos_vid]) || is_numeric($node->taxonomy[$pos_vid][0])) {
-      $pos_tid = $node->taxonomy[$pos_vid];
-      if (is_array($pos_tid)) {
-        $pos_tid = $pos_tid[0];
-      }
-
-      // This means the term object's haven't been loaded yet because we are
-      // coming directly off the node form.  So load 'em!
-      $pos = taxonomy_get_term($pos_tid);
-    }
-    else {
-      foreach ($node->taxonomy as $term) {
-        if ($term->vid == $pos_vid) {
-          $pos = $term;
-          break;
-        }
-      }
-    }
-  }
-
-  if (isset($pos)) {
-    return drupal_strtolower($pos->name);
+function lingwo_dictionary_entry_get_pos($node) {
+  $field_pos = lingwo_dictionary_settings('field_pos');
+  if ($field_pos) {
+    $values = $node->$field_pos;
+    return $values[0]['value'];
   }
 
   return NULL;

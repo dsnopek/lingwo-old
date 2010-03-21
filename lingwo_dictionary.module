@@ -30,6 +30,11 @@ function _ld_disable_validation(&$form) {
   }
 }
 
+function _ld_element_process(&$element, $process_func) {
+  $element += _element_info($element['#type']);
+  $element['#process'][] = $process_func;
+}
+
 // Helper for implementing AHAH
 // TODO: now that we are using ahah_helper, this should be removed
 function _ld_form_to_node(&$form, &$form_state) {
@@ -37,7 +42,7 @@ function _ld_form_to_node(&$form, &$form_state) {
   $node = node_form_submit_build_node($form, $form_state);
 
   // hack to stop taxonomy from resetting when the form is rebuilt
-  $form_state['node']['taxonomy'] = taxonomy_preview_terms($node);
+  //$form_state['node']['taxonomy'] = taxonomy_preview_terms($node);
 
   return $node;
 }
@@ -125,6 +130,25 @@ function lingwo_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
   }
 }
 
+function _lingwo_dictionary_disable_edit($form) {
+  // make title uneditable
+  $form['title']['#name'] = 'title-disabled';
+  //$form['title']['#disabled'] = TRUE;
+  $form['title']['#attributes']['disabled'] = 'disabled';
+  $form['title-hidden'] = array(
+    '#type' => 'hidden',
+    '#name' => 'title',
+    '#value' => $form['title']['#default_value'],
+  );
+
+  // make language uneditable
+  $form['language']['#disabled'] = TRUE;
+  //$form['language']['#attributes']['disabled'] = 'disabled';
+
+  $form[lingwo_dictionary_settings('field_pos')]['value']['#attributes']['disabled'] = 'disabled';
+  return $form;
+}
+
 /**
  * Implementation of hook_form_alter().
  */
@@ -141,17 +165,9 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
         $form['language']['#default_value'] = $_GET['language'];
       }
       if (isset($_GET['pos'])) {
-        // copied from lingwo_data.service.inc
-        // TODO: probably needs to be in an API function
-        $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
-        if ($pos_vid) {
-          foreach (taxonomy_get_tree($pos_vid) as $term) {
-            if (drupal_strtolower($term->name) == $_GET['pos']) {
-              $form['taxonomy'][$pos_vid]['#default_value'] = $term->tid;
-              break;
-            }
-          }
-        }
+        $form[lingwo_dictionary_settings('field_pos')]['#default_value'] =
+          array(array('value' => $_GET['pos']));
+
         // TODO: we need to set the POS on the node too, so that the form loads the
         // fields immediately.
       }
@@ -163,20 +179,7 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
 
     // when editting a translation or existing node...
     if (isset($node->nid) || isset($node->translation_source)) {
-      // make title uneditable
-      $form['title']['#name'] = 'title-disabled';
-      $form['title']['#disabled'] = TRUE;
-      $form['title-hidden'] = array(
-        '#type' => 'hidden',
-        '#name' => 'title',
-        '#value' => $form['title']['#default_value'],
-      );
-
-      // make language uneditable
-      $form['language']['#disabled'] = TRUE;
-
-      // make the "Part of Speech" taxonomy uneditable
-      $form['taxonomy'][lingwo_dictionary_settings('pos_vocabulary')]['#disabled'] = TRUE;
+      $form['#after_build'][] = '_lingwo_dictionary_disable_edit';
     }
   }
 }
@@ -197,8 +200,9 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
         return NULL;
 
       $pos = lingwo_dictionary_entry_get_pos($node);
+      print_r($pos);
       if (empty($pos)) {
-        form_set_error('taxnomony['. lingwo_dictionary_settings('pos_vocabulary') .']',
+        form_set_error(lingwo_dictionary_settings('pos_vocabulary'),
           t("Couldn't derive Part of Speech from node!"));
         return;
       }
@@ -250,7 +254,7 @@ function lingwo_dictionary_settings($name, $value = NULL) {
     'lookup_path' => 'lookup',
     'redirect_node' => FALSE,
     'entry_content_type' => NULL,
-    'pos_vocabulary' => NULL,
+    'field_pos' => NULL,
   );
 
   if (is_null($name)) {

@@ -40,16 +40,20 @@ function lingwo_dictionary_admin_settings() {
     '#required' => TRUE,
   );
 
-  foreach (taxonomy_get_vocabularies() as $voc) {
-    $pos_options[$voc->vid] = $voc->name;
+  // get information from CCK about our type
+  $pos_options = array();
+  foreach (content_fields() as $field_name => $field) {
+    if ($field['type'] == 'text') {
+      $pos_options[$field_name] = $field['widget']['label'];
+    }
   }
 
-  $form['lingwo_dictionary_pos_vocabulary'] = array(
+  $form['lingwo_dictionary_field_pos'] = array(
     '#type' => 'select',
-    '#title' => t('Part of Speech Vocabulary'),
-    '#default_value' => lingwo_dictionary_settings('pos_vocabulary'),
+    '#title' => t('Part of Speech Field'),
+    '#default_value' => lingwo_dictionary_settings('field_pos'),
     '#options' => $pos_options,
-    '#description' => t('The taxonomy vocabulary used to denote part of speech (pos), ie: verb, noun, adjective, etc.'),
+    '#description' => t('The CCK field used to denote part of speech (pos), ie: verb, noun, adjective, etc.'),
     '#required' => TRUE,
   );
 
