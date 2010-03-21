@@ -35,6 +35,8 @@ function lingwo_korpus_menu() {
  * Our entry lookup AJAX callback.
  */
 function lingwo_korpus_lookup_entry() {
+  global $user;
+
   // get the "Lingwo ID" out of the 'url' GET argument
   $url = urldecode($_GET['url']);
   $url = preg_replace(':^'.base_path().':', '', $url);
@@ -43,10 +45,30 @@ function lingwo_korpus_lookup_entry() {
   // load the node with this ID
   $node = node_load(lingwo_dictionary_entry_from_id($url));
 
+  if (module_exists('rules')) {
+    rules_invoke_event('lingwo_korpus_lookup', $user, $node);
+  }
+
   // return the HTML to the Ajax caller
   drupal_json(array(
     'content' => node_view($node, TRUE)
   ));
+}
+
+/*
+ * Implementation of hook_rules_event_info().
+ */
+function lingwo_korpus_rules_event_info() {
+  return array(
+    'lingwo_korpus_lookup' => array(
+      'label' => t('User looks up an entry using the annotation reader.'),
+      'module' => 'Lingwo Korpus',
+      'arguments' => array(
+        'user' => array('type' => 'user', 'label' => t('User which looks up the entry.')),
+        'node' => array('type' => 'node', 'label' => t('The node looked up.'))
+      ),
+    )
+  );
 }
 
 /*
