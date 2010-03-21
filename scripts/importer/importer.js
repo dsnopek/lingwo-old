@@ -125,7 +125,7 @@ require([
             // pass into the language specific parser
             parser(entry);
 
-            print(service.update_entry(entry));
+            print(service.update_entry(entry, OPTS['force-changed'] == 'true'));
         }
 
         if (OPTS['source'] && OPTS['input-staging']) {

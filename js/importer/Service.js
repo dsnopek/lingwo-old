@@ -126,9 +126,10 @@ require.def('lingwo_dictionary/importer/Service',
                 return res;
             },
 
-            update_entry: function (entry) {
+            update_entry: function (entry, force_changed) {
                 var params = this._getDefaultParams('lingwo_data.update_entry');
                 params.add(xmlSafe(entry.serialize()));
+                params.add(!!force_changed);
                 return this._client.execute('lingwo_data.update_entry', params);
             }
         });

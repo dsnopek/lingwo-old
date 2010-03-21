@@ -42,6 +42,13 @@ function lingwo_data_service() {
           '#type' => 'string',
           '#description' => t('A JSON string representing an entry.')
         ),
+        array(
+          '#name' => 'force_changed',
+          '#type' => 'boolean',
+          '#optional' => TRUE,
+          '#default value' => FALSE,
+          '#description' => t('Set to True to update entry even if it hasn\'t changed'),
+        ),
       ),
       '#return' => 'string',
       '#help' => t('Update an entry in the database.'),

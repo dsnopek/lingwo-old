@@ -315,7 +315,7 @@ function _lingwo_data_import_set_fields_multigroup(&$node, $values) {
 /*
  * Updates an entry based on JSON data from the importer.
  */
-function lingwo_data_service_update_entry($data) {
+function lingwo_data_service_update_entry($data, $force_changed) {
   $entry = json_decode($data, TRUE);
 
   try {
@@ -340,7 +340,7 @@ function lingwo_data_service_update_entry($data) {
     $entry_original = _lingwo_data_import_process_original($entry);
 
     // Only bother filling the node and saving it if it has changed.
-    if (_lingwo_data_entry_has_changed($node, $entry_original)) {
+    if ($force_changed || _lingwo_data_entry_has_changed($node, $entry_original)) {
       // Copy fields onto $node.
       _lingwo_data_import_set_fields($node, $entry_original);
 
@@ -382,7 +382,7 @@ function lingwo_data_service_update_entry($data) {
       $entry_translation = _lingwo_data_import_process_translation($trans);
 
       // Only bother filling the node and saving it if it has changed.
-      if (_lingwo_data_entry_has_changed($tnode, $entry_translation)) {
+      if ($force_changed || _lingwo_data_entry_has_changed($tnode, $entry_translation)) {
         // Copy fields onto $tnode.
         _lingwo_data_import_set_fields($tnode, $entry_translation);
 
