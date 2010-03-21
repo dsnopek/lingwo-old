@@ -159,7 +159,7 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
 
                     // parse the actual translation string
                     tmp = matches[2];
-                    tmp = tmp.replace(/{{[mf]}}/g, '');
+                    tmp = tmp.replace(/{{[mfn]}}/g, '');
                     if (entry.pos == 'adjective') {
                         // We don't need all the genders, we're too cool for that.
                         tmp = tmp.replace(/{{t[+-]?\|[^|]*\|[^|]*\|[^m]}}/g, '');
