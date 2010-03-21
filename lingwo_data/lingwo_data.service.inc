@@ -86,27 +86,6 @@ function _lingwo_data_import_process_language($entry) {
   return $languages;
 }
 
-function _lingwo_data_import_process_taxonomy($entry) {
-  // check that pos is valid and build a taxonomy array to put
-  // on to the node object
-  $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
-  $taxonomy = NULL;
-  foreach (taxonomy_get_tree($pos_vid) as $term) {
-    if (drupal_strtolower($term->name) == $entry['pos']) {
-      // we set it up like on a new entry form, because it will only really
-      // be used to create an entry since POS can't be changed.
-      $taxonomy = array($pos_vid => $term->tid);
-      break;
-    }
-  }
-  if (is_null($taxonomy)) {
-    throw new LingwoDataServiceException(
-      t('Couldn\'t find the given pos in our list: @pos', 
-      array('@pos' => $entry['pos'])), 400);
-  }
-  return $taxonomy;
-}
-
 function _lingwo_data_import_process_simple_field($entry, $field_name) {
   $value = $entry[$field_name];
   if (!is_array($value)) {
@@ -193,20 +172,10 @@ function _lingwo_data_import_setup_node($nid, $entry, $newExtras=array()) {
       'type' => lingwo_dictionary_settings('entry_content_type'),
       'title' => $entry['headword'],
       'language' => $entry['language'],
+      lingwo_dictionary_settings('field_pos') => array('value' => $entry['pos']),
     );
-    //$node = (object)array_merge_recursive($node, $newExtras);
-    // We implement a custom 2-level merge, because array_merge_recursive() doesn't do
-    // what we want.
-    foreach ($newExtras as $n1 => $v1) {
-      if (is_array($v1)) {
-        $f = &$node->$n1;
-        foreach ($v1 as $n2 => $v2) {
-          $f[$n2] = $v2;
-        }
-      }
-      else {
-        $node->$n1 = $v1;
-      }
+    foreach ($newExtras as $key => $value) {
+      $node->$key = $value;
     }
   }
   else {
@@ -321,9 +290,6 @@ function lingwo_data_service_update_entry($data, $force_changed) {
   try {
     // Get the list of available languages and check the language given in $entry is on it.
     $languages = _lingwo_data_import_process_language($entry);
-    // From the $entry, look-up the pos (checking that its valid) and make an array suitable
-    // for setting $node->taxonomy on a new node.
-    $taxonomy = _lingwo_data_import_process_taxonomy($entry);
 
     // Try to find if the already entry exists.
     $nid = lingwo_dictionary_entry_lookup($entry['headword'], $entry['language'], $entry['pos']);
@@ -333,8 +299,7 @@ function lingwo_data_service_update_entry($data, $force_changed) {
     $sources = _lingwo_data_import_process_sources($entry);
 
     // Setup a $node to hold the original (not translated) entry
-    $node = _lingwo_data_import_setup_node($nid, $entry, 
-      array('taxonomy' => $taxonomy));
+    $node = _lingwo_data_import_setup_node($nid, $entry); 
 
     // Process the $entry creating an array holding the data which will be put on our node
     $entry_original = _lingwo_data_import_process_original($entry);
@@ -365,7 +330,7 @@ function lingwo_data_service_update_entry($data, $force_changed) {
 
       // Setup a $tnode to hold the translated node
       $tnode = _lingwo_data_import_setup_node($tnid_list[$lang]->nid, $entry,
-        array('language' => $lang, 'taxonomy' => $taxonomy));
+        array('language' => $lang));
       if (empty($tnode->nid)) {
         $tnode->translation_source = node_load($nid);
 
