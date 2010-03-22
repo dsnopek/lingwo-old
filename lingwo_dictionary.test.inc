@@ -41,18 +41,6 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       ))
     );
 
-    // Add POS field
-    $this->createField(array(
-      'label'       => 'Part of Speech',
-      'field_name'  => 'pos',
-      'type'        => 'text',
-      'widget_type' => 'optionwidgets_select',
-      'multiple'    => 0,
-      'required'    => 1,
-      'allowed_values' => "noun|Noun\nverb|Verb\nadjective|Adjective",
-    ));
-    lingwo_dictionary_settings('field_pos', 'field_pos');
-
     // Add some languages
     include_once './includes/locale.inc';
     locale_add_language('pl', 'Polish', 'Polski');
@@ -94,11 +82,10 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       $values['headword'] = $this->randomName(8);
     }
 
-    $field_pos = lingwo_dictionary_settings('field_pos');
     $edit = array(
       'title'    => $values['headword'],
       'language' => $values['language'],
-      $field_pos .'[value]' => $values['pos'],
+      'pos'      => $values['pos'],
     );
     
     // remove the ones we have used

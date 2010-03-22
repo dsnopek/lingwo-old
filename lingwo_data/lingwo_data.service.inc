@@ -46,7 +46,7 @@ function _lingwo_data_node_save($node) {
     // the old node object.
     $form_state['node'] = (array) $node;
 
-    $ret = drupal_execute($entry_type .'_node_form', $form_state, (object)$node);
+    $ret = drupal_execute($entry_type .'_node_form', $form_state, $node);
 
     // If the node is immediately reloaded after update, it will
     // load the OLD cached version.
@@ -172,7 +172,7 @@ function _lingwo_data_import_setup_node($nid, $entry, $newExtras=array()) {
       'type' => lingwo_dictionary_settings('entry_content_type'),
       'title' => $entry['headword'],
       'language' => $entry['language'],
-      lingwo_dictionary_settings('field_pos') => array(array('value' => $entry['pos'])),
+      'pos' => $entry['pos'],
     );
     foreach ($newExtras as $key => $value) {
       $node->$key = $value;

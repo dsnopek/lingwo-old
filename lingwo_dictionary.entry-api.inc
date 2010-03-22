@@ -48,18 +48,8 @@ function lingwo_dictionary_entry_get_languages($node, $for_humans=FALSE) {
 
 // Gets the Part of Speech from a node
 function lingwo_dictionary_entry_get_pos($node) {
-  $field_pos = lingwo_dictionary_settings('field_pos');
-  if ($field_pos) {
-    $values = $node->$field_pos;
-    // for new nodes
-    if (isset($values['value'])) {
-      return $values['value'];
-    }
-    // for nodes from the database
-    return $values[0]['value'];
-  }
-
-  return NULL;
+  // TODO: this function is not that necessary!
+  return $node->pos;
 }
 
 // Makes a "Lingwo ID" for the entry

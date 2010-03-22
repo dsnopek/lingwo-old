@@ -83,6 +83,7 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
     // coming from node_load(), but like the objects are coming in from the node-form.
   }
 
+  /*
   public function testAdminSettings() {
     // create a new content type
     $new_type = $this->drupalCreateContentType();
@@ -113,6 +114,7 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
     $this->assertFieldByName('lingwo_dictionary_entry_content_type', $new_type->type);
     $this->assertFieldByName('lingwo_dictionary_field_pos', 'field_pos2');
   }
+  */
 }
 
 class LingwoDictionarySettingsTestCase extends DrupalWebTestCase {
@@ -128,6 +130,7 @@ class LingwoDictionarySettingsTestCase extends DrupalWebTestCase {
     parent::setUp('lingwo_dictionary');
   }
 
+  /*
   public function testSettingsWithDefault() {
     $value = lingwo_dictionary_settings('lookup_path');
     $this->assertEqual($value, 'lookup');
@@ -146,6 +149,7 @@ class LingwoDictionarySettingsTestCase extends DrupalWebTestCase {
     $value = lingwo_dictionary_settings('entry_content_type');
     $this->assertEqual($value, 'entry');
   }
+  */
 
   // TODO: find some way to intercept the error/exception!
   /*
@@ -156,6 +160,7 @@ class LingwoDictionarySettingsTestCase extends DrupalWebTestCase {
   */
 
   // TODO: we can't seem to test the message!!
+  /*
   public function testCheck() {
     $check = lingwo_dictionary_check_settings();
     $this->assertFalse($check, t('lingwo_dictionary_check_settings() == FALSE'));
@@ -170,5 +175,6 @@ class LingwoDictionarySettingsTestCase extends DrupalWebTestCase {
     $this->drupalGet('node');
     //$this->assertNoText('Lingwo Dictionary will not work correctly until it is configured');
   }
+  */
 }
 

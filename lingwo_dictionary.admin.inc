@@ -48,12 +48,11 @@ function lingwo_dictionary_admin_settings() {
     }
   }
 
-  $form['lingwo_dictionary_field_pos'] = array(
-    '#type' => 'select',
-    '#title' => t('Part of Speech Field'),
-    '#default_value' => lingwo_dictionary_settings('field_pos'),
-    '#options' => $pos_options,
-    '#description' => t('The CCK field used to denote part of speech (pos), ie: verb, noun, adjective, etc.'),
+  $form['lingwo_dictionary_pos_allowed_values'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Part of Speech Allowed Values'),
+    '#default_value' => lingwo_dictionary_settings('pos_allowed_values'),
+    '#description' => t('A list of allowed values for the "Part of Speech" field.'),
     '#required' => TRUE,
   );
 
