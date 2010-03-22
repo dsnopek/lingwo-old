@@ -30,7 +30,7 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
     $this->createEntry(array(
       'headword' => 'czerwony',
       'language' => 'pl',
-      'pos' => 'Adjective'
+      'pos' => 'adjective'
     ));
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
 

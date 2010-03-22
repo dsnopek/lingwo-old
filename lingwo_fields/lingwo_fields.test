@@ -24,22 +24,19 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
   }
 
   # Checks that we can load the fields for a language/pos and save them normally.
-  # Also checks for the presense of two bugs that existed in early implementations:
-  #  (1) One caused taxonomy to do strange things (not appear on the form, throw warnings)
-  #  (2) CCK would attempt to save empty fields causing database errors.
+  # Also checks for the presense of a bug that existed in early implementations:
+  #  (1) CCK would attempt to save empty fields causing database errors.
   public function testCreate() {
     $entry_type = lingwo_dictionary_settings('entry_content_type');
-    $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
 
     // get that the create page is all good
     $this->drupalGet('node/add/'. $entry_type);
-    $this->assertFieldByName("taxonomy[$pos_vid]");
 
     // set the language and pos, then refresh the fields
     $edit = $this->getEntryEdit(array(
         'headword' => 'czerwony',
         'language' => 'pl',
-        'pos' => 'Adjective',
+        'pos' => 'adjective',
     ));
     $this->drupalPost(NULL, $edit, 'Refresh');
     // check that the fields have appeared
@@ -55,23 +52,16 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
     // check for the field!!!
     $this->assertText("*stem: \n czerwonXYZ");
-    // taxonomy related bug!
-    $this->assertNoText('Illegal offset');
 
     // go to the edit page again
     $nid = lingwo_dictionary_entry_lookup('czerwony', 'pl', 'adjective');
     $this->drupalGet("node/$nid/edit");
     $this->assertFieldByName('field_fields[1][value]', 'czerwonXYZ');
     $this->assertFieldByName('field_fields[1][automatic]', FALSE);
-    // taxonomy field should be there
-    $this->assertFieldByName("taxonomy[$pos_vid]");
-    // taxonomy related bug!
-    $this->assertNoText('Illegal offset');
   }
 
   public function testCreateEmpty() {
     $entry_type = lingwo_dictionary_settings('entry_content_type');
-    $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
 
     // get that the create page is all good
     $this->drupalGet('node/add/'. $entry_type);
@@ -80,7 +70,7 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
     $entry = array(
       'headword' => 'test',
       'language' => 'zzz',
-      'pos' => 'Adjective',
+      'pos' => 'adjective',
     );
     $this->createEntry($entry);
     $this->assertText(t('@type test has been created.', array('@type' => $entry_type)));
@@ -98,7 +88,7 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
     $entry = array(
       'headword' => 'czerwony',
       'language' => 'pl',
-      'pos' => 'Adjective',
+      'pos' => 'adjective',
     );
 
     // Create the first time
@@ -110,7 +100,7 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
     $this->assertText(t('Entry with this language, part of speech and headword combination already exists: @name', array('@name' => $entry['name'])));
 
     // Modifying the part of speech should be enough to allow it to be created
-    $entry['pos'] = 'Noun';
+    $entry['pos'] = 'noun';
     $this->createEntry($entry);
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
   }
