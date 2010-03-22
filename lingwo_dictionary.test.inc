@@ -9,8 +9,9 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       'locale',
       'translation',
       'i18n',
-      'i18ntaxonomy',
       'content',
+      'text',
+      'optionwidgets',
     );
     $args = func_get_args();
     $modules = array_merge($modules, $args);
@@ -41,15 +42,17 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       ))
     );
 
-    // Add POS vocabulary
-    $voc = $this->createVocabulary(array(
-      'name' => 'Part Of Speech',
-      'nodes' => array(
-        $entry_type->type => TRUE
-      ),
-      'terms' => array('Noun', 'Verb', 'Adjective'),
+    // Add POS field
+    $this->createField(array(
+      'label'       => 'Part of Speech',
+      'field_name'  => 'pos',
+      'type'        => 'text',
+      'widget_type' => 'optionwidgets_select',
+      'multiple'    => 0,
+      'required'    => 1,
+      'allowed_values' => "noun|Noun\nverb|Verb\nadjective|Adjective",
     ));
-    lingwo_dictionary_settings('pos_vocabulary', $voc->vid);
+    lingwo_dictionary_settings('field_pos', 'field_pos');
 
     // Add some languages
     include_once './includes/locale.inc';
@@ -88,22 +91,15 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
   }
 
   protected function getEntryEdit($values) {
-    $pos_vid = lingwo_dictionary_settings('pos_vocabulary');
-
     if (!isset($values['headword'])) {
       $values['headword'] = $this->randomName(8);
     }
 
-    // make a map from pos term names to tid
-    $pos_terms = array();
-    foreach (taxonomy_get_tree($pos_vid) as $term) {
-      $pos_terms[$term->name] = $term->tid;
-    }
-
+    $field_pos = lingwo_dictionary_settings('field_pos');
     $edit = array(
       'title'    => $values['headword'],
       'language' => $values['language'],
-      "taxonomy[$pos_vid]" => $pos_terms[$values['pos']],
+      $field_pos .'[value]' => $values['pos'],
     );
     
     // remove the ones we have used
@@ -111,7 +107,7 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
     unset($values['language']);
     unset($values['pos']);
 
-	  return $edit + $values;
+    return $edit + $values;
   }
 
   protected function createEntry($values) {

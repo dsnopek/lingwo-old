@@ -17,7 +17,7 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
     $edit = array(
       'headword' => 'czerwony',
       'language' => 'pl',
-      'pos' => 'Adjective',
+      'pos' => 'adjective',
     );
 
     // Create the first time
@@ -29,7 +29,7 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
     $this->assertText(t('Entry with this language, part of speech and headword combination already exists: @name', array('@name' => $entry['name'])));
 
     // Modifying the part of speech should be enough to allow it to be created
-    $edit['pos'] = 'Noun';
+    $edit['pos'] = 'noun';
     $this->createEntry($edit);
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
   }
@@ -41,7 +41,7 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
     $edit = array(
       'headword' => 'czerwony',
       'language' => 'pl',
-      'pos' => 'Adjective',
+      'pos' => 'adjective',
     );
     $this->createEntry($edit);
     $this->assertText(t('@type czerwony has been created.', array('@type' => $entry_type)));
@@ -88,25 +88,30 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
     $new_type = $this->drupalCreateContentType();
 
     // create a new taxonomy vocabulary
-    $new_voc = $this->createVocabulary();
+    $this->createField(array(
+      'label'       => 'blah',
+      'field_name'  => 'pos2',
+      'type'        => 'text',
+      'widget_type' => 'text_textfield',
+    ));
 
     // load page, verify the current settings
     $this->drupalGet('admin/settings/lingwo_dictionary');
     $this->assertFieldByName('lingwo_dictionary_lookup_path', lingwo_dictionary_settings('lookup_path'));
     $this->assertFieldByName('lingwo_dictionary_entry_content_type', lingwo_dictionary_settings('entry_content_type'));
-    $this->assertFieldByName('lingwo_dictionary_pos_vocabulary', lingwo_dictionary_settings('pos_vocabulary'));
+    $this->assertFieldByName('lingwo_dictionary_field_pos', lingwo_dictionary_settings('field_pos'));
 
     // save new settings.
     $this->drupalPost(NULL, array(
       'lingwo_dictionary_lookup_path' => 'test',
       'lingwo_dictionary_entry_content_type' => $new_type->type,
-      'lingwo_dictionary_pos_vocabulary' => $new_voc->vid,
+      'lingwo_dictionary_field_pos' => 'field_pos2',
     ), 'Save configuration');
     $this->assertText('The configuration options have been saved');
     // verify that they took
     $this->assertFieldByName('lingwo_dictionary_lookup_path', 'test');
     $this->assertFieldByName('lingwo_dictionary_entry_content_type', $new_type->type);
-    $this->assertFieldByName('lingwo_dictionary_pos_vocabulary', $new_voc->vid);
+    $this->assertFieldByName('lingwo_dictionary_field_pos', 'field_pos2');
   }
 }
 
@@ -158,7 +163,7 @@ class LingwoDictionarySettingsTestCase extends DrupalWebTestCase {
     //$this->assertText('Lingwo Dictionary will not work correctly until it is configured');
 
     lingwo_dictionary_settings('entry_content_type', 'entry');
-    lingwo_dictionary_settings('pos_vocabulary', 6);
+    lingwo_dictionary_settings('field_pos', 6);
 
     $check = lingwo_dictionary_check_settings();
     $this->assertTrue($check, t('lingwo_dictionary_check_settings() == TRUE'));

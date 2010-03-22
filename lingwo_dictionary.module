@@ -201,7 +201,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
 
       $pos = lingwo_dictionary_entry_get_pos($node);
       if (empty($pos)) {
-        form_set_error(lingwo_dictionary_settings('pos_vocabulary'),
+        form_set_error(lingwo_dictionary_settings('field_pos'),
           t("Couldn't derive Part of Speech from node!"));
         return;
       }
@@ -210,14 +210,14 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
 
       if ($existing && $existing != $node->nid) {
         form_set_error('title', 
-          t('Entry with this language, part of speech and headword combination already exists: @link',
-            array('@link' => l($node->title, 'node/'.$existing->nid))));
+          t('Entry with this language, part of speech and headword combination already exists: !link',
+            array('!link' => l($node->title, 'node/'.$existing))));
       }
       break;
     case 'insert':
       $object = (object)array(
         'language' => $node->language,
-        'pos' => lingwo_dictionary_entry_get_pos($node, TRUE),
+        'pos' => lingwo_dictionary_entry_get_pos($node),
         'title' => $node->title,
         'nid' => $node->nid,
       );
