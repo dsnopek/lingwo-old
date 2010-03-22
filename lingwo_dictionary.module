@@ -142,8 +142,8 @@ function _lingwo_dictionary_disable_edit($form) {
   );
 
   // make language uneditable
-  $form['language']['#disabled'] = TRUE;
-  //$form['language']['#attributes']['disabled'] = 'disabled';
+  //$form['language']['#disabled'] = TRUE;
+  $form['language']['#attributes']['disabled'] = 'disabled';
 
   $form[lingwo_dictionary_settings('field_pos')]['value']['#attributes']['disabled'] = 'disabled';
   return $form;

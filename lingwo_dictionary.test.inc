@@ -8,7 +8,6 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       'lingwo_dictionary',
       'locale',
       'translation',
-      'i18n',
       'content',
       'text',
       'optionwidgets',

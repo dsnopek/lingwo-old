@@ -172,7 +172,7 @@ function _lingwo_data_import_setup_node($nid, $entry, $newExtras=array()) {
       'type' => lingwo_dictionary_settings('entry_content_type'),
       'title' => $entry['headword'],
       'language' => $entry['language'],
-      lingwo_dictionary_settings('field_pos') => array('value' => $entry['pos']),
+      lingwo_dictionary_settings('field_pos') => array(array('value' => $entry['pos'])),
     );
     foreach ($newExtras as $key => $value) {
       $node->$key = $value;
@@ -284,7 +284,7 @@ function _lingwo_data_import_set_fields_multigroup(&$node, $values) {
 /*
  * Updates an entry based on JSON data from the importer.
  */
-function lingwo_data_service_update_entry($data, $force_changed) {
+function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
   $entry = json_decode($data, TRUE);
 
   try {

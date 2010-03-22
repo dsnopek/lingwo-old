@@ -15,7 +15,6 @@ class LingwoDataImportUnitTestCase extends DrupalUnitTestCase {
 
   public function setUp() {
     parent::setUp('lingwo_data', 'lingwo_senses', 'lingwo_fields', 'lingwo_language');
-    
   }
 
   public function tearDown() {
@@ -44,35 +43,6 @@ class LingwoDataImportUnitTestCase extends DrupalUnitTestCase {
     ));
 
     $this->assertEqual($languages, array('zzz' => TRUE));
-  }
-
-  public function testProcessTaxonomy() {
-    $pos_vid = 27;
-
-    $lingwo_dictionary_settings = PHPMockFunction::mock('lingwo_dictionary_settings');
-    $lingwo_dictionary_settings->expects(InvocationRestriction::once())
-      ->with('pos_vocabulary')
-      ->will(WillAction::returnValue($pos_vid));
-
-    $taxonomy_get_tree = PHPMockFunction::mock('taxonomy_get_tree');
-    $taxonomy_get_tree->expects(InvocationRestriction::once())
-      ->with($pos_vid)
-      ->will(WillAction::returnValue(array(
-        (object)array(
-          'name' => 'Verb',
-          'tid'  => 1
-        ),
-        (object)array(
-          'name' => 'Noun',
-          'tid'  => 2
-        )
-    )));
-
-    $taxonomy = _lingwo_data_import_process_taxonomy(array(
-      'pos' => 'noun',
-    ));
-
-    $this->assertEqual($taxonomy, array($pos_vid => 2));
   }
 
   public function testProcessSources() {

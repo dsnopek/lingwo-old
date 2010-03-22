@@ -267,11 +267,12 @@ class LingwoDataImportWebTestCase extends LingwoDictionaryWebTestCase {
     // verify translations
     $tnid_list = translation_node_get_translations($nid);
     $tnode = node_load($tnid_list['en']->nid);
+    //$this->fail(print_r($tnode, TRUE));
+    $this->assertEqual($tnode->field_pos, 'verb');
     $this->assertEqual($tnode->imported, TRUE);
     $this->assertEqual($tnode->field_senses[0]['data']['trans'], array('read', '', ''));
     $this->assertEqual($tnode->field_senses[0]['data']['clue'], 'you know, reading books, maps and stuff');
-    $this->assertEqual($tnode->field_senses[1]['data']['trans'], array('', '', ''));
-    $this->assertEqual($tnode->field_senses[1]['data']['clue'], '');
+    $this->assertEqual($tnode->field_senses[1]['data']['same_as'], $tnode->field_senses[0]['id']);
     $this->assertEqual($tnode->field_senses[2]['data']['trans'], array('read','decode','load'));
     $this->assertEqual($tnode->field_senses[2]['data']['clue'], 'when a computer "reads" something');
 
