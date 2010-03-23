@@ -10,6 +10,7 @@
  * Implementation of hook_install().
  */
 function lingwo_senses_install() {
+  variable_set('lingwo_senses_schema_version', 6000);
   drupal_load('module', 'content');
   content_notify('install', 'lingwo_senses');
 }
@@ -20,6 +21,7 @@ function lingwo_senses_install() {
 function lingwo_senses_uninstall() {
   drupal_load('module', 'content');
   content_notify('uninstall', 'lingwo_senses');
+  variable_del('lingwo_senses_schema_version');
 }
 
 /**

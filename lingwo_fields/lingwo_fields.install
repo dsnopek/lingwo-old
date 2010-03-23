@@ -10,6 +10,7 @@
  * Implementation of hook_install().
  */
 function lingwo_fields_install() {
+  variable_set('lingwo_fields_schema_version', 6000);
   drupal_load('module', 'content');
   content_notify('install', 'lingwo_fields');
 }
@@ -20,6 +21,7 @@ function lingwo_fields_install() {
 function lingwo_fields_uninstall() {
   drupal_load('module', 'content');
   content_notify('uninstall', 'lingwo_fields');
+  variable_del('lingwo_fields_schema_version');
 }
 
 /**

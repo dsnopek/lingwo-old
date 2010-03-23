@@ -47,8 +47,11 @@ function lingwo_dictionary_entry_get_languages($node, $for_humans=FALSE) {
 }
 
 // Gets the Part of Speech from a node
-function lingwo_dictionary_entry_get_pos($node) {
-  // TODO: this function is not that necessary!
+function lingwo_dictionary_entry_get_pos($node, $human_readable=FALSE) {
+  if ($human_readable) {
+  	return lingwo_dictionary_pos_options(TRUE, $node->pos);
+  }
+
   return $node->pos;
 }
 
