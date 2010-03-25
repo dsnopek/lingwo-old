@@ -8,9 +8,6 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
       'lingwo_dictionary',
       'locale',
       'translation',
-      'content',
-      'text',
-      'optionwidgets',
     );
     $args = func_get_args();
     $modules = array_merge($modules, $args);
