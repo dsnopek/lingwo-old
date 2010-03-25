@@ -524,7 +524,10 @@ function theme_lingwo_senses_original_form($form) {
 
   $header = array(
     '',
-    t('Sense'),
+    array(
+      'data' => t('Sense'),
+      'width' => '100%',
+    ),
     t('Weight'),
   );
 
