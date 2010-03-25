@@ -745,7 +745,7 @@ require.def('lingwo_dictionary/languages/pl',
                 options: {
                     'first': 'First',
                     'second': 'Second',
-                    'third': 'Third',
+                    'third': 'Third'
                 },
                 automatic: function (entry) {
                     // Here we attempt to guess the conjugation class, which has the highest

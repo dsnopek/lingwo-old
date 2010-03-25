@@ -44,7 +44,7 @@ require.def('lingwo_dictionary/Entry',
                         fields[name] = {
                             type: def.type,
                             value: this.getField(name),
-                            automatic: this.isAutomatic(name),
+                            automatic: this.isAutomatic(name)
                         };
                     }
                 }
@@ -206,7 +206,7 @@ require.def('lingwo_dictionary/Entry',
                     }
                     return value;
                 });
-            },
+            }
         });
 
         Entry.deserialize = function (text) {
