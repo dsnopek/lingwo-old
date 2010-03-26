@@ -56,6 +56,20 @@ function lingwo_korpus_lookup_entry() {
 }
 
 /*
+ * Implementation of hook_theme().
+ */
+function lingwo_korpus_theme() {
+  return array(
+    'lingwo_korpus_annotation_reader_block' => array(
+      'arguments' => array(
+        'footer_id' => NULL,
+        'footer_margin' => NULL,
+      )
+    )
+  );
+}
+
+/*
  * Implementation of hook_rules_event_info().
  */
 function lingwo_korpus_rules_event_info() {
@@ -185,6 +199,48 @@ function lingwo_korpus_text_entry_list($text, $lang) {
   }
 
   return $entries;
+}
+
+/*
+ * Implementation of hook_block().
+ */
+function lingwo_korpus_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $blocks[0] = array(
+        'info' => t('Lingwo Korpus: Annotation Reader block'),
+      );
+      return $blocks;
+    case 'configure':
+      if ($delta == 0) {
+        $form['footer_id'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Footer ID'),
+          '#default_value' => variable_get('lingwo_korpus_annotation_reader_block_footer_id', 'footer')
+        );
+        $form['footer_margin'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Footer Margin'),
+          '#default_value' => variable_get('lingwo_korpus_annotation_reader_block_footer_margin', '0')
+        );
+        return $form;
+      }
+    case 'save':
+      if ($delta == 0) {
+        variable_set('lingwo_korpus_annotation_reader_block_footer_id', $edit['footer_id']);
+        variable_set('lingwo_korpus_annotation_reader_block_footer_margin', $edit['footer_margin']);
+      }
+    case 'view':
+      $footer_id = variable_get('lingwo_korpus_annotation_reader_block_footer_id', 'footer');
+      $footer_margin = variable_get('lingwo_korpus_annotation_reader_block_footer_margin', '0');
+
+      $block['content'] = theme('lingwo_korpus_annotation_reader_block', $footer_id, $footer_margin);
+      return $block;
+  }
+}
+
+function theme_lingwo_korpus_annotation_reader_block($footer_id, $footer_margin) {
+  return '<div id="lingwo-korpus-dock" data-footer-id="'.$footer_id.'" data-footer-margin="'.$footer_margin.'"></div>';
 }
 
 /*

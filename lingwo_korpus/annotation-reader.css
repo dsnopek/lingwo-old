@@ -16,12 +16,20 @@ a.anno.selected {
     color: white;
 }
 
-#lingwo-korpus-entry-view {
-    position: fixed;
+#lingwo-korpus-entry-view-wrapper {
     background-color: white;
+    position: absolute;
     border: 1px solid black;
-    /* DRS: We subtract 2px for the border. */
     width: 298px;
     overflow: auto;
 }
+#lingwo-korpus-entry-view-wrapper.popup {
+    display: none;
+}
+#lingwo-korpus-entry-view-wrapper.docked {
+    position: fixed;
+}
+#lingwo-korpus-entry-view {
+}
+
 
