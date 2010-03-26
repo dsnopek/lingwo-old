@@ -127,12 +127,14 @@
                         }
                     }
                 );
+
+                return false;
             }
             else if (popup) {
                 bubble.hide();
             }
 
-            return false;
+            return true;
         });
     };
 })();
