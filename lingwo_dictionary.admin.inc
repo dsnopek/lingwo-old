@@ -42,9 +42,11 @@ function lingwo_dictionary_admin_settings() {
 
   // get information from CCK about our type
   $pos_options = array();
-  foreach (content_fields() as $field_name => $field) {
-    if ($field['type'] == 'text') {
-      $pos_options[$field_name] = $field['widget']['label'];
+  if (module_exists('content')) {
+    foreach (content_fields() as $field_name => $field) {
+      if ($field['type'] == 'text') {
+        $pos_options[$field_name] = $field['widget']['label'];
+      }
     }
   }
 
