@@ -24,7 +24,7 @@ a.anno.selected {
     overflow: auto;
 }
 #lingwo-korpus-entry-view-wrapper.popup {
-    display: none;
+    max-height: 200px;
 }
 #lingwo-korpus-entry-view-wrapper.docked {
     position: fixed;

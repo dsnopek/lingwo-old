@@ -1,7 +1,12 @@
 
 (function () {
-    var bubble, contentArea, dock, footer, popup = false, setGlobalEvents = false,
+    var bubble, contentArea, dock, footer, popup = true, setGlobalEvents = false,
         footerId, footerMargin;
+
+    // IE6 doesn't play well with our docked version..
+    if (/MSIE 6/i.test(navigator.userAgent)) {
+        popup = true;
+    }
 
     function clobber(obj, old_fn_name, new_fn) {
         old_fn = obj[old_fn_name];
@@ -16,7 +21,8 @@
             bubble = $('<div></div>')
                 .attr('id', 'lingwo-korpus-entry-view-wrapper')
                 .addClass(popup ? 'popup' : 'docked')
-                .appendTo($('body'));
+                .appendTo($('body'))
+                .hide();
         }
         if (!contentArea) {
             contentArea = $('<div></div>')
@@ -34,6 +40,8 @@
 
         function positionBubble() {
             if (popup) return;
+
+            bubble.show();
 
             var offset = dock.offset(),
                 footerTop = footer.offset().top,
@@ -64,7 +72,10 @@
             // Special support for the 'admin' module.
             if (Drupal.adminToolbar) {
                 clobber(Drupal.adminToolbar, 'setState', function () {
-                    setTimeout(positionBubble, 500);
+                    if (!popup) {
+                        bubble.hide();
+                        setTimeout(positionBubble, 500);
+                    }
                 });
             }
             setGlobalEvents = true;
@@ -72,7 +83,7 @@
 
         // handle clicks on the annotations
         var selected = null;
-        $('#main-content', context).click(function (evt) {
+        $('body', context).click(function (evt) {
             var target = $(evt.target), offset;
 
             if (selected) {
@@ -83,13 +94,18 @@
             if (target.hasClass('anno')) {
                 offset = target.offset();
                 if (popup) {
-                    bubble.show()
-                        // X-centered and 40px down
-                        // TODO: we really should limit it to existing inside the viewable
-                        // area.  We don't want it going outside and forcing scrollbars to appear.
-                        .css({
-                            left: (offset.left + (target.width() / 2) - 150) + 'px',
-                            top: (offset.top + target.height() + 40) + 'px' });
+                    // X-centered and 40px down
+                    var left = offset.left + (target.width() / 2) - 150,
+                        top  = offset.top + target.height() + 40,
+                        maxWidth = $(document).width();
+
+                    // clip to our width
+                    if (left + 300 > maxWidth) {
+                        left = maxWidth - 300;
+                    }
+                    if (left < 0) { left = 0; };
+
+                    bubble.show().css({ left: left, top: top, height: '' });
                 }
 
                 pos = target.attr('data-pos');
@@ -104,6 +120,11 @@
                     function (res) {
                         contentArea.html(res.content);
                         $('div.node', contentArea).removeClass('clear-block');
+
+                        // For browsers that don't correctly support max-height
+                        if (bubble.height() > 200) {
+                            bubble.css({ height: 200 });
+                        }
                     }
                 );
             }
