@@ -40,16 +40,6 @@ function lingwo_dictionary_admin_settings() {
     '#required' => TRUE,
   );
 
-  // get information from CCK about our type
-  $pos_options = array();
-  if (module_exists('content')) {
-    foreach (content_fields() as $field_name => $field) {
-      if ($field['type'] == 'text') {
-        $pos_options[$field_name] = $field['widget']['label'];
-      }
-    }
-  }
-
   $form['lingwo_dictionary_pos_allowed_values'] = array(
     '#type' => 'textarea',
     '#title' => t('Part of Speech Allowed Values'),
