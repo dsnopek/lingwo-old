@@ -1,0 +1,12 @@
+
+ * Create a 'lingwo' directory.
+
+ * Check out all our required bzr repo's:
+
+    - drupal/mainline
+	- ahah_helper/mainline
+	- i18n/mainline
+    - lingwo_dictionary/mainline
+	- lingwoorg/mainline
+	- lingwoorg_theme/mainline
+
