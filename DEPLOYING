@@ -21,4 +21,14 @@
 
  * Import the translations: /admin/build/translate
    (this might happen automatically based on the data in lingwo/lingwoorg/translations)
+ 
+ * Create a key for the importer at: /admin/build/services/keys/add
+   Be sure to select the following methods:
+
+     - linwgo_data.update_entry
+	 - system.connect
+	 - user.login
+
+ * And create user for the importer here: /admin/user/user/create
+   Be sure to make them an "editor"!
 

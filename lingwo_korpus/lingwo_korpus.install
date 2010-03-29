@@ -70,6 +70,8 @@ function lingwo_korpus_schema() {
 function lingwo_korpus_install() {
   variable_set('lingwo_korpus_schema_version', 6000);
   drupal_install_schema('lingwo_korpus');
+
+  update_sql("UPDATE {system} SET weight = 50 WHERE name = 'lingwo_korpus'");
 }
 
 /**

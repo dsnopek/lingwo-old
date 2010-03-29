@@ -156,7 +156,13 @@ require([
 
         // set-up "outputs"
         if (OPTS['service']) {
-            service = connectToService(OPTS);
+            try {
+                service = connectToService(OPTS);
+            }
+            catch (e) {
+                print (e);
+                quit(1);
+            }
             parser  = importer.makeParser();
             handler = sendToService;
         }

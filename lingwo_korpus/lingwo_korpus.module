@@ -201,6 +201,18 @@ function lingwo_korpus_text_entry_list($text, $lang) {
   return $entries;
 }
 
+/**
+ * Implementation of hook_form_alter().
+ */
+function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == (lingwo_korpus_text_content_type() .'_node_form')) {
+    // remove language neutral and set language as required (for asthetic purposes)
+    unset($form['language']['#options']['']);
+    $form['language']['#required'] = TRUE;
+  }
+}
+
+
 /*
  * Implementation of hook_block().
  */
