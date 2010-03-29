@@ -4,9 +4,21 @@
  * Check out all our required bzr repo's:
 
     - drupal/mainline
-	- ahah_helper/mainline
-	- i18n/mainline
+    - ahah_helper/mainline
+    - i18n/mainline
     - lingwo_dictionary/mainline
-	- lingwoorg/mainline
-	- lingwoorg_theme/mainline
+    - lingwoorg/mainline
+    - lingwoorg_theme/mainline
+
+ * Enable the following modules:
+ 
+    - lingwoorg_dictionary
+    - lingwoorg_content
+    - lingwoorg_wial
+    - lingwoorg_login
+
+ * Enable the required languages at: /admin/settings/language
+
+ * Import the translations: /admin/build/translate
+   (this might happen automatically based on the data in lingwo/lingwoorg/translations)
 
