@@ -12,7 +12,7 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function setUp() {
-    parent::setUp('ahah_helper', 'lingwo_language', 'lingwo_fields');
+    parent::setUp('content', 'ahah_helper', 'lingwo_language', 'lingwo_fields');
 
     $this->createField(array(
       'label'       => 'Fields',

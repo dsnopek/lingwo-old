@@ -12,7 +12,7 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function setUp() {
-    parent::setUp('lingwo_senses');
+    parent::setUp('content', 'lingwo_senses');
 
     $this->createField(array(
       'label'       => 'Senses',

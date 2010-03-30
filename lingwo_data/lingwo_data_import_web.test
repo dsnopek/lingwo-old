@@ -115,10 +115,11 @@ class LingwoDataImportWebTestCase extends LingwoDictionaryWebTestCase {
   public function setUp() {
     parent::setUp(
       // just new deps for these tests
-      'lingwo_data',
+      'content',
       'text',
       'fieldgroup',
       'content_multigroup',
+      'lingwo_data',
 
       // deps for lingwo_fields
       'ahah_helper',
