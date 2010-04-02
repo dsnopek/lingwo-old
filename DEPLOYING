@@ -6,6 +6,7 @@
     - drupal/mainline
     - ahah_helper/mainline
     - i18n/mainline
+    - logintoboggan/mainline
     - lingwo_dictionary/mainline
     - lingwoorg/mainline
     - lingwoorg_theme/mainline
@@ -16,8 +17,8 @@
     - lingwoorg_content
     - lingwoorg_wial
     - lingwoorg_login
-	- admin
-	- adminrole
+    - admin
+    - adminrole
 
  * Set the administrator role at: /admin/user/settings
 
@@ -32,8 +33,8 @@
    Be sure to select the following methods:
 
      - linwgo_data.update_entry
-	 - system.connect
-	 - user.login
+     - system.connect
+     - user.login
 
  * And create user for the importer here: /admin/user/user/create
    Be sure to make them an "editor"!
