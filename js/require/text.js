@@ -6,7 +6,9 @@
 /*jslint regexp: false, nomen: false, plusplus: false */
 /*global require: false, XMLHttpRequest: false, ActiveXObject: false */
 
+//>>includeStart("useStrict", pragmas.useStrict);
 "use strict";
+//>>includeEnd("useStrict");
 
 (function () {
     var progIds = ['Msxml2.XMLHTTP', 'Microsoft.XMLHTTP', 'Msxml2.XMLHTTP.4.0'],
@@ -110,7 +112,7 @@
             //removing the <?xml ...?> declarations so the content can be inserted
             //into the current doc without problems.
             //If text is present, it is the actual text of the file.
-            var strip = false, text = null, key, url, index = name.indexOf("!"),
+            var strip = false, text = null, key, url, index = name.indexOf("."),
                 modName = name.substring(0, index), fullKey,
                 ext = name.substring(index + 1, name.length),
                 context = require.s.contexts[contextName],
@@ -123,7 +125,7 @@
                 ext = ext.substring(0, index);
                 index = strip.indexOf("!");
                 if (index !== -1 && strip.substring(0, index) === "strip") {
-                    //Pul off the text.
+                    //Pull off the text.
                     text = strip.substring(index + 1, strip.length);
                     strip = "strip";
                 } else if (strip !== "strip") {
