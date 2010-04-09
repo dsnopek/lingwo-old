@@ -45,8 +45,8 @@ function lingwo_korpus_lookup_entry() {
   // load the node with this ID
   $nid = lingwo_dictionary_entry_from_id($url);
   if (is_null($nid)) {
-    // This should be slicker!
-    $content = 'Entry not found.';
+    // This should be slicker!  Probably themed, provide a link for creating the entry.
+    $content = t('Entry not found.');
   }
   else {
     $node = node_load($nid);
