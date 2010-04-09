@@ -84,7 +84,7 @@
         // handle clicks on the annotations
         var selected = null;
         $('body', context).click(function (evt) {
-            var target = $(evt.target), offset;
+            var target = $(evt.target), offset, sense_id;
 
             if (selected) {
                 selected.removeClass('selected');
@@ -108,7 +108,7 @@
                     bubble.show().css({ left: left, top: top, height: '' });
                 }
 
-                pos = target.attr('data-pos');
+                sense_id = target.attr('data-sense');
                 contentArea.html('Loading ...');
 
                 // mark as selected
@@ -120,6 +120,10 @@
                     function (res) {
                         contentArea.html(res.content);
                         $('div.node', contentArea).removeClass('clear-block');
+
+                        if (sense_id) {
+                          $('.lingwo-sense-id-'+sense_id, contentArea).addClass('selected');
+                        }
 
                         // For browsers that don't correctly support max-height
                         if (bubble.height() > 200) {

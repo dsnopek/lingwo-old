@@ -32,4 +32,8 @@ a.anno.selected {
 #lingwo-korpus-entry-view {
 }
 
+.lingwo-sense.selected {
+	background-color: yellow;
+}
+
 
