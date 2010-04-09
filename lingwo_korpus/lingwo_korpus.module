@@ -46,7 +46,7 @@ function lingwo_korpus_lookup_entry() {
   $nid = lingwo_dictionary_entry_from_id($url);
   if (is_null($nid)) {
     // This should be slicker!
-    $content = '<p>Entry not found.</p>';
+    $content = 'Entry not found.';
   }
   else {
     $node = node_load($nid);
