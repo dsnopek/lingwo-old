@@ -1,4 +1,11 @@
 
+== 2010-04-08 ==
+
+ * Explore using CoffeeScript to implement the language definitions, rather than JavaScript
+   because it is way more user friendly and concise!
+
+   http://jashkenas.github.com/coffee-script/
+
 == 2010-03-14 ==
 
  * Senses:

@@ -43,16 +43,23 @@ function lingwo_korpus_lookup_entry() {
   $url = preg_replace(':^'.lingwo_dictionary_settings('lookup_path').'/:', '', $url);
 
   // load the node with this ID
-  $node = node_load(lingwo_dictionary_entry_from_id($url));
+  $nid = lingwo_dictionary_entry_from_id($url);
+  if (is_null($nid)) {
+    // This should be slicker!
+    $content = '<p>Entry not found.</p>';
+  }
+  else {
+    $node = node_load($nid);
 
-  if (module_exists('rules')) {
-    rules_invoke_event('lingwo_korpus_lookup', $user, $node);
+    if (module_exists('rules')) {
+      rules_invoke_event('lingwo_korpus_lookup', $user, $node);
+    }
+
+    $content = node_view($node, TRUE);
   }
 
   // return the HTML to the Ajax caller
-  drupal_json(array(
-    'content' => node_view($node, TRUE)
-  ));
+  drupal_json(array('content' => $content));
 }
 
 /*

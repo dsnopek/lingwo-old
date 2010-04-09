@@ -79,6 +79,9 @@ function lingwo_dictionary_entry_from_id($id) {
     if ($trans[$target_lang]) {
       $nid = $trans[$target_lang]->nid;
     }
+    else {
+      $nid = NULL;
+    }
   }
 
   return $nid;
