@@ -347,7 +347,11 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
         '#maxlength' => 255,
       );
     }
-    $sense_form['data']['translation']['trans'] = array();
+
+    $sense_form['data']['translation']['trans'] = array(
+      '#prefix' => "<div id=\"edit-$field_id-$index-data-translation-trans\">",
+      '#suffix' => "</div>",
+    );
     for ($t = 0; $t < max(3, count($sense['data']['trans'])); $t++) {
       $sense_form['data']['translation']['trans'][$t] = array(
         '#type' => 'textfield',
@@ -355,6 +359,13 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
       );
     }
     $sense_form['data']['translation']['trans']['0']['#title'] = t('Translation');
+
+    $sense_form['data']['translation']['no_equivalent'] = array(
+      '#title' => t('No equivalent in this language'),
+      '#type'  => 'checkbox',
+      '#default_value' => $sense['data']['no_equivalent'],
+      '#attributes' => array('class' => 'no-equivalent-checkbox'),
+    );
 
     if (count($senses) > 1) {
       $same_as_options = array('' => '-');
@@ -660,7 +671,10 @@ function theme_lingwo_senses_translation($node, $items) {
     $sense = $sense['data'];
     
     $values = array();
-    if (!empty($sense['trans'])) {
+    if ($sense['no_equivalent']) {
+      $values[] = '<strong><span class="lingwo-sense-no-equivalent">'. t('No equivalent in this language') .'</span></strong>';
+    }
+    else if (!empty($sense['trans'])) {
       foreach ($sense['trans'] as $value) {
         if (!empty($value)) {
           // TODO: re-instate this!
@@ -689,7 +703,7 @@ function theme_lingwo_senses_translation($node, $items) {
     $output .= join(', ', $values);
 
     if (!empty($orig_sense['data']['example'])) {
-      $output .= ': <blockquote class="lingwo-example">"'. $orig_sense['data']['example'] .'"</blockquote>';
+      $output .= '<blockquote class="lingwo-example">"'. $orig_sense['data']['example'] .'"</blockquote>';
     }
     $output .= '</li>';
   };
