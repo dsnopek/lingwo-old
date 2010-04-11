@@ -1,0 +1,19 @@
+
+/* Yo! */
+
+word {
+    background-color: blue;
+    color: white;
+    border: 1px solid white;
+    padding: 0 1px;
+    cursor: pointer;
+}
+
+#lingwo-korpus-annotator-dialog {
+    position: fixed;
+    background-color: white;
+    border: 1px solid black;
+    top: 100px;
+    padding: 20px;
+}
+
