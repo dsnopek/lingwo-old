@@ -8,6 +8,7 @@ def main():
     text = text.replace('\x92', "'")
     text = text.replace('\x93', '"')
     text = text.replace('\x94', '"')
+    text = text.replace('\x97', '--')
     file(fn, 'wt').write(text)
 
 if __name__ == '__main__': main()
