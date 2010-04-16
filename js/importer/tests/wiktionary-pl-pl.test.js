@@ -42,6 +42,7 @@ require(
                 var entry = new Entry();
                 entry.headword = 'pies';
                 entry.language = pl;
+                entry.pos = 'noun';
                 entry.setSource('pl.wiktionary.org', {raw: text});
 
                 var parser = wiktionary_pl.parsers.pl;

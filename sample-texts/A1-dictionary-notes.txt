@@ -1,0 +1,31 @@
+
+== translation probably needs custom editing ==
+
+ * you
+ * they
+
+== pl.wiktionary.org import required ==
+
+ * award
+ * notice
+ * parent
+ * lesson
+
+== opendictionary import required ==
+
+ * ceremony
+ * recipient
+ * parenting
+
+== Etymology 1/2 not parsed right ==
+
+ * like
+ * thank
+ * how
+
+== Misc ==
+
+ * the: should be marked as "No equivalent"
+ * their: unknown problem, en.wiktionary.org should get it fine
+ * important: we need to remove the excessively gendered translations (ważny, ważna, ważne)
+
