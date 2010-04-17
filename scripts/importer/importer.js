@@ -66,7 +66,7 @@ require([
         'lingwo_dictionary/importer/languages/'+OPTS['lang'],
     ],
     function (Database, Service, DatabaseProducer, importer) {
-        var source, service, db, handler, limit, producer, parser, entryList;
+        var source, service, db, handler, limit, producer, parser, entryList, x;
 
         function connectToService(args) {
             var service, res;
@@ -128,10 +128,25 @@ require([
             print(service.update_entry(entry, OPTS['force-changed'] == 'true'));
         }
 
-        if (OPTS['source'] && OPTS['input-staging']) {
+        // parse the source arguments into a straight up object
+        source = OPTS['source'];
+        if (typeof source == 'string') {
+            source = { 'default': source };
+        }
+        for (x in OPTS) {
+            if (x.indexOf('source:') == 0) {
+                // create on demand (so if there are no sources its never created)
+                if (!source) {
+                    source = {};
+                }
+                source[x.substr(7)] = OPTS[x];
+            }
+        }
+
+        if (source && OPTS['input-staging']) {
             die ('Can\'t pass both --source and --input-staging');
         }
-        if (!OPTS['source'] && !OPTS['input-staging']) {
+        if (!source && !OPTS['input-staging']) {
             die ('Must pass either --source or --input-staging');
         }
         if (OPTS['service'] && OPTS['output-staging']) {
@@ -148,7 +163,6 @@ require([
             entryList = readEntryList(OPTS['entry-list']);
         }
 
-        source = OPTS['source'];
         limit = OPTS['limit'];
         if (typeof limit != 'undefined') {
             limit = parseInt(limit);

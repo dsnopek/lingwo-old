@@ -14,8 +14,7 @@ require.def('lingwo_dictionary/importer/languages/en',
                 return new MultiProducer({
                     modules: [wiktionary_en, wiktionary_pl],
                     code: "en",
-                    // TODO: should be 'source'!
-                    filename: source
+                    source: source
                 });
             },
 

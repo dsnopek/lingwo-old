@@ -264,7 +264,7 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
 
             Producer: declare({
                 _constructor: function (args) {
-                    var fn = args.filename['en.wiktionary.org'] || args.filename;
+                    var fn = args.source['en.wiktionary.org'] || args.source['default'];
                     this.producer = new MediawikiProducer(fn);
                     this.code = args.code;
                     this.lang_name = langNames[args.code];

@@ -10,7 +10,7 @@ require.def('lingwo_dictionary/importer/languages/pl',
         return {
             makeProducer: function (source) {
                 return new wiktionary_pl.Producer({
-                    filename: source,
+                    source: source,
                     code: "pl"
                 });
             },

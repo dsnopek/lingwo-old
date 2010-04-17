@@ -723,7 +723,7 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
             Producer: declare({
                 '_constructor': function (args) {
                     this.code = args.code;
-                    var fn = args.filename['pl.wiktionary.org'] || args.filename;
+                    var fn = args.source['pl.wiktionary.org'] || args.source['default'];
                     this.producer = new MediawikiProducer(fn);
                 },
 
