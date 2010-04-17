@@ -681,6 +681,9 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                         line = line.replace(/\(\d\.\d\)/g, '');
                         line = WikiText.clean(line);
 
+                        // drop translations of the examples!
+                        line = line.replace(/\u2192.*$/, '');
+
                         map[name].example = text_utils.limitString(line, 255);
                     });
                 }
