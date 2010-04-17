@@ -50,7 +50,7 @@ require.def('lingwo_dictionary/importer/Database',
                 prep.setString(3, headword);
                 var rs = prep.executeQuery();
                 if (rs.next()) {
-                    return Entry.deserialize(rs.getString("data"));
+                    return Entry.deserialize(''+rs.getString("data"));
                 }
                 return null;
             },
@@ -69,9 +69,10 @@ require.def('lingwo_dictionary/importer/Database',
                 return ret;
             },
             commit: function () {
-                this._conn.setAutoCommit(false);
+                // NOTE: messing with AutoCommit causes some weird SQL exception
+                //this._conn.setAutoCommit(false);
                 this._insert_stmt.executeBatch();
-                this._conn.setAutoCommit(true);
+                //this._conn.setAutoCommit(true);
             }
         });
     }

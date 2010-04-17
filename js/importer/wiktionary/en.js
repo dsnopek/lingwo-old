@@ -260,9 +260,12 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
         }
 
         return {
+            name: 'en.wiktionary.org',
+
             Producer: declare({
                 _constructor: function (args) {
-                    this.producer = new MediawikiProducer(args.filename);
+                    var fn = args.filename['en.wiktionary.org'] || args.filename;
+                    this.producer = new MediawikiProducer(fn);
                     this.code = args.code;
                     this.lang_name = langNames[args.code];
                 },
@@ -306,12 +309,9 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                 }
             }),
 
-            parsers: {
-                'en': function (entry) {
-                    var raw = entry.getSource('en.wiktionary.org').raw;
-
-                    parseSensesAndTranslations(entry, raw);
-                }
+            parser: function (entry) {
+                var raw = entry.getSource('en.wiktionary.org').raw;
+                parseSensesAndTranslations(entry, raw);
             }
         };
     }

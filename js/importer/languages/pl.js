@@ -16,7 +16,7 @@ require.def('lingwo_dictionary/importer/languages/pl',
             },
 
             makeParser: function () {
-                return wiktionary_pl.parsers["pl"];
+                return wiktionary_pl.parser;
             }
         };
     }

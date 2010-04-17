@@ -719,10 +719,12 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
         ];
 
         return {
+            name: 'pl.wiktionary.org',
             Producer: declare({
                 '_constructor': function (args) {
                     this.code = args.code;
-                    this.producer = new MediawikiProducer(args.filename);
+                    var fn = args.filename['pl.wiktionary.org'] || args.filename;
+                    this.producer = new MediawikiProducer(fn);
                 },
 
                 run: function (args) {
@@ -769,11 +771,7 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                 }
             }),
 
-            parsers: {
-                pl: makeStructureExtractor('pl.wiktionary.org', entryStructure),
-                // TODO: we shouldn't have to duplicate this for every language!
-                en: makeStructureExtractor('pl.wiktionary.org', entryStructure)
-            }
+            parser: makeStructureExtractor('pl.wiktionary.org', entryStructure),
         };
     }
 );
