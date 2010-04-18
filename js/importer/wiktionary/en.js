@@ -260,9 +260,9 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
         }
 
         return {
-            name: 'en.wiktionary.org',
-
             Producer: declare({
+                name: 'en.wiktionary.org',
+
                 _constructor: function (args) {
                     var fn = args.source['en.wiktionary.org'] || args.source['default'];
                     this.producer = new MediawikiProducer(fn);

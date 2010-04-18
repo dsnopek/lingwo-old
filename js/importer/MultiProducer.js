@@ -24,8 +24,7 @@ require.def('lingwo_dictionary/importer/MultiProducer',
                 this.producers = [];
                 modules.forEach(function (module) {
                     var producer = new module.Producer(args);
-                    producer.name = module.name;
-                    self.producers.push(producer);
+                    self.producers.push([producer, module.name]);
                 });
 
                 this.code = args.code;
@@ -57,7 +56,13 @@ require.def('lingwo_dictionary/importer/MultiProducer',
                             }
 
                             // store the result
-                            self.db.setEntry(entry);
+                            try {
+                                self.db.setEntry(entry);
+                            }
+                            catch (e) {
+                                print ('Unable to setEntry(): ' + name + ': ' + self.code + ' / ' + entry.pos + ' / ' + entry.headword);
+                                return;
+                            }
 
                             // commit every so many entries
                             counter++;
@@ -70,9 +75,11 @@ require.def('lingwo_dictionary/importer/MultiProducer',
                 }
 
                 // run each producer, putting the entries into the database
-                this.producers.forEach(function (producer) {
+                this.producers.forEach(function (spec) {
+                    var producer = spec[0], name = spec[1];
+
                     counter = 0;
-                    args['handler'] = generateHandler(producer.name);
+                    args['handler'] = generateHandler(name);
                     producer.run(args);
                     self.db.commit();
                 });

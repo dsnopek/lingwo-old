@@ -25,6 +25,15 @@ require.def('lingwo_dictionary/Entry',
                 this.clearCache();
             },
 
+            copyFrom: function (entry) {
+                this.senses = entry.senses;
+                this.translations = entry.translations;
+                this.pron = entry.pron;
+                this.like = entry.like;
+                this.fields = entry.fields;
+                this.clearCache();
+            },
+
             clearCache: function () {
                 this._cachedFields = {};
                 this._cachedWords = {};

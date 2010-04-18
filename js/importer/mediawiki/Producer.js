@@ -79,7 +79,9 @@ require.def('lingwo_dictionary/importer/mediawiki/Producer',
                 // TODO: maybe we should re-package this, because we really don't need the whole
                 // XML document, really just the title and the text data...
                 var pageXml = new XML(this._readPage());
-                args.handler(pageXml);
+                if (!/^\S+:/.exec(pageXml.title.toString())) {
+                    args.handler(pageXml);
+                }
             },
 
             run: function (args) {
@@ -87,15 +89,21 @@ require.def('lingwo_dictionary/importer/mediawiki/Producer',
 
                 var i = 0;
                 // TODO: report progress
-                if (typeof args.limit == 'undefined') {
-                    while (true) {
-                        this._runOne(args);
+                try {
+                    if (typeof args.limit == 'undefined') {
+                        while (true) {
+                            this._runOne(args);
+                        }
+                    }
+                    else {
+                        for (i = 0; i < args.limit; i++) {
+                            this._runOne(args);
+                        }
                     }
                 }
-                else {
-                    for (i = 0; i < args.limit; i++) {
-                        this._runOne(args);
-                    }
+                catch (e) {
+                    if (e == 'EOF') return;
+                    throw(e);
                 }
             }
         });

@@ -719,8 +719,9 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
         ];
 
         return {
-            name: 'pl.wiktionary.org',
             Producer: declare({
+                name: 'pl.wiktionary.org',
+
                 '_constructor': function (args) {
                     this.code = args.code;
                     var fn = args.source['pl.wiktionary.org'] || args.source['default'];

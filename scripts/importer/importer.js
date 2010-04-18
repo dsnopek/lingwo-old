@@ -63,9 +63,10 @@ require([
         'lingwo_dictionary/importer/Database',
         'lingwo_dictionary/importer/Service',
         'lingwo_dictionary/importer/DatabaseProducer',
+        'lingwo_dictionary/importer/MultiProducer',
         'lingwo_dictionary/importer/languages/'+OPTS['lang'],
     ],
-    function (Database, Service, DatabaseProducer, importer) {
+    function (Database, Service, DatabaseProducer, MultiProducer, importer) {
         var source, service, db, handler, limit, producer, parser, entryList, x;
 
         function connectToService(args) {
@@ -186,10 +187,20 @@ require([
 
         // set-up "inputs"
         if (source) {
-            producer = importer.makeProducer(source);
+            producer = importer.makeProducer({
+                source: source,
+                _staging_db: db
+            });
         }
         else {
             producer = new DatabaseProducer(db, OPTS['lang']);
+        }
+
+        // If we are saving to the staging database and our producer is a MultiProducer
+        // than we are using a sly (yet ugly) hack where the producer is writing directly
+        // to the staging db, so we give a null handler.
+        if (handler === saveToDatabase && producer instanceof MultiProducer) {
+            hander = function () { };
         }
 
         // run
