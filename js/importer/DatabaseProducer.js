@@ -11,14 +11,15 @@ require.def('lingwo_dictionary/importer/DatabaseProducer',
      'lingwo_dictionary/Entry'],
     function (declare, Entry) {
         return declare({
-            _constructor: function (db, lang) {
+            _constructor: function (db, lang, entry_list) {
                 this.db = db;
                 this.lang = lang;
+                this.entry_list = entry_list;
             },
 
             PAGE_SIZE: 10,
 
-            run: function (args) {
+            _runAll: function (args) {
                 var handler = args.handler;
                 var limit = args.limit || 0;
                 var offset = 0, entry, self = this, _limit = 10;
@@ -51,6 +52,38 @@ require.def('lingwo_dictionary/importer/DatabaseProducer',
                     offset += this.PAGE_SIZE;
                 }
             },
+
+            _runList: function (args) {
+                var handler = args.handler,
+                    limit = args.limit || 0,
+                    entry, counter = 0,
+                    spec, headword, lang, pos;
+
+                for (spec in this.entry_list) {
+                    [lang, pos, headword] = spec.split(':');
+                    if (lang != this.lang) continue;
+
+                    entry = this.db.getEntry(lang, pos, headword);
+                    if (entry) {
+                        handler(entry);
+                        counter++;
+                    }
+                    else {
+                        print ('Database has no such entry: '+spec);
+                    }
+
+                    if (limit && counter >= limit) break;
+                }
+            },
+
+            run: function (args) {
+                if (this.entry_list) {
+                    this._runList(args);
+                }
+                else {
+                    this._runAll(args);
+                }
+            }
         });
     }
 );

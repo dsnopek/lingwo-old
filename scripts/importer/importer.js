@@ -196,7 +196,7 @@ require([
             });
         }
         else {
-            producer = new DatabaseProducer(db, OPTS['lang']);
+            producer = new DatabaseProducer(db, OPTS['lang'], entryList);
         }
 
         // If we are saving to the staging database and our producer is a MultiProducer
