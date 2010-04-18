@@ -609,7 +609,7 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                 var map = {};
                 var idx = {};
                 var res = [];
-                var senses, curPos, i;
+                var curPos, i;
 
                 if (entry.language.name != 'pl' || sections['translations']) {
                     entry.translations = {};
@@ -671,7 +671,6 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
 
                 if (sections['examples']) {
                     sections['examples'].forEach(function (line) {
-                        //var name = extractRegex(line, /\((\d\.\d)\)/, 1);
                         var name = getName(line);
                         if (name === null) {
                             return;
@@ -719,10 +718,10 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
         ];
 
         return {
-            Producer: declare({
-                name: 'pl.wiktionary.org',
+            name: 'pl.wiktionary.org',
 
-                '_constructor': function (args) {
+            Producer: declare({
+                _constructor: function (args) {
                     this.code = args.code;
                     var fn = args.source['pl.wiktionary.org'] || args.source['default'];
                     this.producer = new MediawikiProducer(fn);
@@ -741,8 +740,10 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                                 entry;
 
                             if (pos_list == null) {
-                                print('posTrans: cant map POS: '+sections['meaning'][0]);
+                                print('posTrans: cant map POS: '+page.title.toString());
+                                return;
                             }
+
                             pos_list.forEach(function (pos) {
                                 entry = new Entry({
                                     headword: page.title.toString(),
