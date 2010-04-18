@@ -259,6 +259,27 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             parseSenses(entry, text);
         }
 
+        function getData(text, pos, type) {
+            var data = text.getSection(pos, type == 1 ? 2 : 3), lines;
+            // if this is buried in an "Etymology 1" style heading, we need to adjust the headings
+            // such that the text appears like it isn't
+            if (type == 2) {
+                lines = [];
+                data.split('\n').forEach(function (line) {
+                    var match, i, sep = '';
+                    if (match = /^(===+)([^=]+)===+/.exec(line)) {
+                        for(i = 0; i < match[1].length - 1; i++) {
+                            sep += '=';
+                        }
+                        line = sep + match[2] + sep;
+                    }
+                    lines.push(line);
+                });
+                data = lines.join('\n');
+            }
+            return data;
+        }
+
         return {
             name: 'en.wiktionary.org',
 
@@ -274,21 +295,22 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                     var self = this, handler = args.handler;
                     args.handler = function (page) {
                         var text = new WikiText(page.revision.text),
-                            entry, found, pos;
+                            entry, found, pos, type;
 
                         if (text.hasSection(self.lang_name)) {
                             text.text = text.getSection(self.lang_name);
                             found = false;
 
                             for(pos in posMap) {
-                                if (text.hasSection(pos, 2)) {
+                                type = text.hasSection(pos, 2) ? 1 : (text.hasSection(pos, 3) ? 2 : 0);
+                                if (type) {
                                     entry = new Entry({
                                         headword: page.title.toString(),
                                         language: Language.languages[self.code],
                                         pos: posMap[pos],
                                     });
                                     entry.setSource('en.wiktionary.org', {
-                                        raw: '=='+self.lang_name+'==\n\n'+text.getSection(pos, 2)+'\n\n'+text.getSection('Pronunciation', 2),
+                                        raw: '=='+self.lang_name+'==\n\n'+getData(text, pos, type)+'\n\n'+text.getSection('Pronunciation', 2),
                                         url: 'http://en.wiktionary.org/wiki/'+entry.headword,
                                         license: 'CC-BY-SA-3.0',
                                         timestamp: page.revision.timestamp.toString()

@@ -189,7 +189,10 @@ require([
         if (source) {
             producer = importer.makeProducer({
                 source: source,
-                _staging_db: db
+                // others might accept this one later, but for now, only for MultiProducer
+                entry_list: entryList,
+                // only for MultiProducer
+                _staging_db: db,
             });
         }
         else {

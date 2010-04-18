@@ -29,6 +29,9 @@ require.def('lingwo_dictionary/importer/MultiProducer',
 
                 this.code = args.code;
 
+                // take the entry list if its given
+                this.entry_list = args.entry_list;
+
                 // create our database (using the _staging_db if passed)
                 this._staging_db = !!db;
                 this._db_fn = db ? null : tempfn();
@@ -45,6 +48,10 @@ require.def('lingwo_dictionary/importer/MultiProducer',
                         var oldEntry;
 
                         if (entry.pos) {
+                            // check our entry list (if we have one)
+                            if (self.entry_list && !self.entry_list[[entry.language.name, entry.pos, entry.headword].join(':')])
+                                return;
+
                             // for testing
                             print (name + ': ' + self.code + ' / ' + entry.pos + ' / ' + entry.headword);
 
