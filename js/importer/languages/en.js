@@ -26,39 +26,66 @@ require.def('lingwo_dictionary/importer/languages/en',
             },
 
             makeParser: function () {
-                return makeMultiParser(modules, function (entry) {
-                    var source;
+                // Reduces all of an entries translations to a single list
+                function getTranslations(entry, langCode) {
+                    var trans = [];
 
-                    // copy from the first module in the preferred order
-                    try {
-                        modules.forEach(function (module) {
-                            var source;
-                            if (source = entry.getSource(module.name)) {
-                                entry.copyFrom(source._parsed);
-                                throw StopIteration;
+                    if (entry.translations && entry.translations[langCode] &&
+                        entry.translations[langCode].senses)
+                    {
+                        entry.translations[langCode].senses.forEach(function (sense) {
+                            if (sense.trans) {
+                                trans = trans.concat(sense.trans);
                             }
                         });
                     }
-                    catch (e) {
-                        if (e != StopIteration) throw e;
-                    }
 
-                    // if there are no Polish translations, then we try to dig them out of lower
-                    // quality modules.
-                    // TODO: maybe we should make an Entry.hasTranslations(lang) function to be exhaustive about the translations.
-                    if (!entry.translations.pl || !entry.translation.pl.senses || !entry.translations.pl.senses.length == 0) {
-                        if (source = entry.getSource(wiktionary_pl.name)) {
-                            if (source._parsed.translations.pl) {
-                                // TODO: get all the translations and put them on the first sense
+                    return trans;
+                }
+
+                function copyTranslations(to_entry, from_entry) {
+                    var langCode;
+                    if (from_entry.translations) {
+                        for (langCode in from_entry.translations) {
+                            if (!to_entry.translations || !to_entry.translations[langCode]) {
+                                if (!to_entry.translations) {
+                                    to_entry.translations = {};
+                                }
+                                to_entry.translations[langCode] = {
+                                    'senses': [{'trans': getTranslations(from_entry, langCode)}]
+                                };
                             }
                         }
-                        else if (source = entry.getSource(opendictionaries_en_pl.name)) {
-                            // TODO: get all the translations and put them on the first sense
-                        }
                     }
+                }
+
+                return makeMultiParser(modules, function (entry) {
+                    var copied = false;
+
+                    // copy from the first module in the preferred order
+                    modules.forEach(function (module) {
+                        var source, sourceEntry;
+                        if (source = entry.getSource(module.name)) {
+                            sourceEntry = source._parsed;
+                            if (!copied) {
+                                // this entry forms the basis of the entry
+                                entry.copyFrom(sourceEntry);
+                                copied = true;
+                            }
+                            else {
+                                // if the entry lacks Polish translations, but the sourceEntry
+                                // has them, then we pull them in.
+                                copyTranslations(entry, sourceEntry);
+
+                                // same deal, but for pron.
+                                if (!entry.pron && sourceEntry.pron) {
+                                    entry.pron = sourceEntry.pron;
+                                }
+                            }
+                        }
+                    });
 
                     //print (entry.serialize());
-
                 });
             }
         };
