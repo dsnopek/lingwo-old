@@ -4,6 +4,7 @@
  * you
  * they
  * of
+ * like (adverb)
 
 == needs an adjective-ization ==
 
@@ -11,9 +12,6 @@
 
 == Etymology 1/2 not parsed right ==
 
- * like
- * thank
- * how
  * or
 
 == Misc ==
