@@ -1,14 +1,15 @@
 
-== translation probably needs custom editing ==
+== needs custom translation or customizing of existing ==
 
  * you
  * they
  * of
  * like (adverb)
+ * awards ceremony
+ * such as
+ * involved (current trans is "zawiły" [tricky, intricate] but it should be "zaangażowany")
+ * 
 
-== needs an adjective-ization ==
-
- * award
 
 == Etymology 1/2 not parsed right ==
 
