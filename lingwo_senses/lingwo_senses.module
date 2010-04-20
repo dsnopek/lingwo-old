@@ -416,7 +416,7 @@ function lingwo_senses_get_translations(&$node, $field_name, $items) {
   $orig_senses = array_filter($orig_senses, 'lingwo_senses_not_marker_row');
 
   $trans_map = array();
-  $trans_senses = $node->nid ? $items : array();
+  $trans_senses = empty($items) ? array() : $items;
   $trans_senses = array_filter($trans_senses, 'lingwo_senses_not_marker_row');
 
   foreach ($trans_senses as $trans_sense) {
