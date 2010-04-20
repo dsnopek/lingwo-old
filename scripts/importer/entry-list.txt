@@ -65,7 +65,7 @@ en:noun:success
 en:noun:teens
 en:noun:test
 en:noun:thing
-en:phrase:by the time
+en:adverb:by the time
 en:phrase:such as
 en:preposition:at
 en:preposition:for

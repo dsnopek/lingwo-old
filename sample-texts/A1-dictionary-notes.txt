@@ -23,7 +23,7 @@
  * early on
  * this
  * teens
- * by (przy is not right, maybe even "by the time" should be a phrase)
+ * by the time
  * got (spread the translations to the different senses)
  * more
  * so
@@ -32,15 +32,9 @@
  * forget (clean up)
  * looks (should be "wygląd" and not "rozglądanie")
 
-== Etymology 1/2 not parsed right ==
-
- * or
-
 == Misc ==
 
  * the: should be marked as "No equivalent"
  * important: we need to remove the excessively gendered translations (ważny, ważna, ważne)
  * great: we need to remove the excessively gendered translations (wielki, wielka, wielkie)
- * reading: senses should come from en.wiktionary.com (but they aren't!!)
- * got: only takes three translations!  Should take all of them.
 
