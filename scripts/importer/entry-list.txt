@@ -8,7 +8,6 @@ en:adjective:next
 en:adjective:parental
 en:adjective:same
 en:adjective:similar
-en:adjective:test
 en:adjective:total
 en:adverb:about
 en:adverb:almost
@@ -25,14 +24,13 @@ en:adverb:very
 en:article:the
 en:auxilary verb:can
 en:auxilary verb:should
-en:auxilary verb:wouldn't
-en:conjuction:and
-en:conjugation:or
+en:auxilary verb:would
 en:conjunction:although
 en:conjunction:and
 en:conjunction:as
 en:conjunction:however
 en:conjunction:if
+en:conjunction:or
 en:conjunction:than
 en:conjunction:that
 en:determiner:all
@@ -43,7 +41,7 @@ en:determiner:more
 en:determiner:no
 en:determiner:this
 en:exclamation:oh yeah
-en:interjection:so
+en:exclamation:so
 en:noun:award
 en:noun:awards ceremony
 en:noun:children
@@ -65,19 +63,17 @@ en:noun:stranger
 en:noun:study
 en:noun:success
 en:noun:teens
-en:noun:thanking
+en:noun:test
 en:noun:thing
-en:noun:time
+en:phrase:by the time
 en:phrase:such as
-en:preposition:Without
 en:preposition:at
-en:preposition:by
 en:preposition:for
 en:preposition:instead of
 en:preposition:of
 en:preposition:on
-en:preposition:they
 en:preposition:to
+en:preposition:without
 en:pronoun:I
 en:pronoun:my
 en:pronoun:our
