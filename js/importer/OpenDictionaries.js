@@ -20,6 +20,8 @@ require.def('lingwo_dictionary/importer/OpenDictionaries',
             'przymiotnik': 'adjective',
             'przysłówek': 'adverb',
             'przyimek': 'preposition',
+            'spójnik': 'conjunction',
+            'wykrzyknik': 'exclamation',
         };
 
         function getPos(s) {

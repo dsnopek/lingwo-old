@@ -41,13 +41,14 @@ function _lingwo_data_node_save($node) {
   $form_state['values'] = (array) $node;
   $form_state['values']['op'] = t('Save');
 
+  // Later on in the chain node_form seems to expect a copy of
+  // the old node object.
+  $form_state['node'] = (array) $node;
+
+  // execute the form
+  $ret = drupal_execute($entry_type .'_node_form', $form_state, $node);
+
   if ($node->nid) {
-    // Later on in the chain node_form seems to expect a copy of
-    // the old node object.
-    $form_state['node'] = (array) $node;
-
-    $ret = drupal_execute($entry_type .'_node_form', $form_state, $node);
-
     // If the node is immediately reloaded after update, it will
     // load the OLD cached version.
     node_load(0, NULL, TRUE);
@@ -56,8 +57,6 @@ function _lingwo_data_node_save($node) {
     $nid = $node->nid;
   }
   else {
-    $ret = drupal_execute($entry_type .'_node_form', $form_state, $node);
-
     // Fetch $nid out of $form_state
     $nid = $form_state['nid'];
   }

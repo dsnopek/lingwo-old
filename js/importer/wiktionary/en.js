@@ -136,6 +136,8 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
         };
 
         function parseTranslations(entry, text) {
+            // sometimes Translations are entered with 5 equal signs, fix that ...
+            text = text.replace(new RegExp('^====+\s*Translations\s*====+$', 'm'), '====Translations====\n');
             var input = new LineReader((new WikiText(text)).getSection('Translations', 3)),
                 line, matches, langCode, tmp, senseIndex = 0, inSense = false;
 

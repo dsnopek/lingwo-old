@@ -65,8 +65,9 @@ require([
         'lingwo_dictionary/importer/DatabaseProducer',
         'lingwo_dictionary/importer/MultiProducer',
         'lingwo_dictionary/importer/languages/'+OPTS['lang'],
+        'lingwo_dictionary/util/json2',
     ],
-    function (Database, Service, DatabaseProducer, MultiProducer, importer) {
+    function (Database, Service, DatabaseProducer, MultiProducer, importer, JSON) {
         var source, service, db, handler, limit, producer, parser, entryList, x;
 
         function connectToService(args) {
@@ -125,6 +126,7 @@ require([
 
             // pass into the language specific parser
             parser(entry);
+            //print (JSON.stringify(entry.translations.pl));
 
             print(service.update_entry(entry, OPTS['force-changed'] == 'true'));
         }

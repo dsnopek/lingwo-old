@@ -1,17 +1,11 @@
-en:adjective:adopted
 en:adjective:adoptive
-en:adjective:award
 en:adjective:biological
 en:adjective:future
 en:adjective:great
 en:adjective:grownup
 en:adjective:important
-en:adjective:involved
-en:adjective:involving
-en:adjective:math
 en:adjective:next
 en:adjective:parental
-en:adjective:reading
 en:adjective:same
 en:adjective:similar
 en:adjective:test
@@ -51,7 +45,7 @@ en:determiner:this
 en:exclamation:oh yeah
 en:interjection:so
 en:noun:award
-en:noun:ceremony
+en:noun:awards ceremony
 en:noun:children
 en:noun:college
 en:noun:connection
@@ -60,9 +54,11 @@ en:noun:gene
 en:noun:involvement
 en:noun:lesson
 en:noun:looks
+en:noun:math
 en:noun:parent
 en:noun:parenting
 en:noun:puberty
+en:noun:reading
 en:noun:recipient
 en:noun:score
 en:noun:stranger
@@ -90,6 +86,7 @@ en:pronoun:they
 en:pronoun:we
 en:pronoun:who
 en:pronoun:you
+en:verb:adopt
 en:verb:be
 en:verb:become
 en:verb:enter
@@ -99,6 +96,7 @@ en:verb:get
 en:verb:have
 en:verb:help
 en:verb:improve
+en:verb:involve
 en:verb:know
 en:verb:notice
 en:verb:seem
