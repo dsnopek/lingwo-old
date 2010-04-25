@@ -1,33 +1,63 @@
+en:abverb:only
+en:adjective:abstract
 en:adjective:adoptive
+en:adjective:arthritic
 en:adjective:biological
+en:adjective:concrete
+en:adjective:direct
+en:adjective:elderly
+en:adjective:fine
 en:adjective:future
+en:adjective:good
 en:adjective:great
 en:adjective:grownup
+en:adjective:human
 en:adjective:important
 en:adjective:next
 en:adjective:parental
 en:adjective:same
 en:adjective:similar
 en:adjective:total
+en:adjective:true
+en:adjective:unbearable
+en:adjective:wasting
 en:adverb:about
 en:adverb:almost
+en:adverb:by the time
+en:adverb:carefully
 en:adverb:early on
 en:adverb:equally
+en:adverb:for example
 en:adverb:here
 en:adverb:how
 en:adverb:less
 en:adverb:like
+en:adverb:long
 en:adverb:maybe
+en:adverb:normally
 en:adverb:now
 en:adverb:often
+en:adverb:on
+en:adverb:pretty much
+en:adverb:sometimes
+en:adverb:specially
+en:adverb:still
+en:adverb:too
 en:adverb:very
+en:adverb:what if
+en:adverb:when
+en:article:a
 en:article:the
 en:auxilary verb:can
+en:auxilary verb:have
+en:auxilary verb:let's
 en:auxilary verb:should
 en:auxilary verb:would
 en:conjunction:although
 en:conjunction:and
 en:conjunction:as
+en:conjunction:but
+en:conjunction:even though
 en:conjunction:however
 en:conjunction:if
 en:conjunction:or
@@ -42,61 +72,121 @@ en:determiner:no
 en:determiner:this
 en:exclamation:oh yeah
 en:exclamation:so
+en:noun:age
 en:noun:award
 en:noun:awards ceremony
+en:noun:biologist
+en:noun:body
+en:noun:book
+en:noun:century
+en:noun:chance
 en:noun:children
 en:noun:college
+en:noun:computer
 en:noun:connection
+en:noun:contact
+en:noun:detail
+en:noun:devil
 en:noun:effect
+en:noun:family
+en:noun:food
+en:noun:frailty
+en:noun:friend
 en:noun:gene
+en:noun:germ
+en:noun:hearing
 en:noun:involvement
+en:noun:joint
 en:noun:lesson
+en:noun:life
 en:noun:looks
 en:noun:math
+en:noun:offer
+en:noun:opportunity
+en:noun:pain
 en:noun:parent
 en:noun:parenting
+en:noun:print
+en:noun:prisoner
 en:noun:puberty
 en:noun:reading
 en:noun:recipient
+en:noun:room
+en:noun:scenario
 en:noun:score
+en:noun:screen
+en:noun:spine
 en:noun:stranger
 en:noun:study
+en:noun:substance
 en:noun:success
 en:noun:teens
+en:noun:television
 en:noun:test
 en:noun:thing
-en:adverb:by the time
+en:noun:time
+en:noun:vision
+en:noun:year
 en:phrase:such as
 en:preposition:at
 en:preposition:for
+en:preposition:from
+en:preposition:in
 en:preposition:instead of
+en:preposition:into
+en:preposition:like
 en:preposition:of
 en:preposition:on
 en:preposition:to
+en:preposition:via
+en:preposition:with
 en:preposition:without
+en:preposition:you
+en:preposition:your
 en:pronoun:I
 en:pronoun:my
 en:pronoun:our
+en:pronoun:someone
 en:pronoun:their
 en:pronoun:they
+en:pronoun:us
 en:pronoun:we
 en:pronoun:who
 en:pronoun:you
+en:pronoun:your
+en:suffix:-free
 en:verb:adopt
+en:verb:age
+en:verb:allow
 en:verb:be
+en:verb:be able
 en:verb:become
+en:verb:communicate
+en:verb:curve
+en:verb:dim
+en:verb:discover
 en:verb:enter
 en:verb:fade
+en:verb:fail
 en:verb:forget
 en:verb:get
 en:verb:have
 en:verb:help
+en:verb:hobble
 en:verb:improve
 en:verb:involve
+en:verb:jump
 en:verb:know
+en:verb:live
+en:verb:look
+en:verb:made
+en:verb:make
 en:verb:notice
+en:verb:render
+en:verb:say
 en:verb:seem
 en:verb:show
+en:verb:take
 en:verb:teach
 en:verb:thank
 en:verb:watch
