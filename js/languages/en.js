@@ -21,6 +21,18 @@ require.def('lingwo_dictionary/languages/en',
             }
         );
 
+        // some punctuation for the alphabet
+        function addPunctuation(v) {
+            lang.alphabet[v] = {
+                'classes': ['punctuation'],
+                'default_form': 'default',
+                'forms': {
+                    'default': v,
+                }
+            };
+        }
+        "'-".split('').forEach(addPunctuation);
+
         function append_s (word) {
             if (word.hasEnding([Language.cls('consonant'), 'y'])) {
                 return word.ending(1).replace('ies');

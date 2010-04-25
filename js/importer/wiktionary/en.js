@@ -13,27 +13,32 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
      'lingwo_dictionary/util/json2',
     ],
     function (declare, Entry, Language, WikiText, MediawikiProducer, text_utils, JSON) {
-        var posList = ['Noun','Adjective','Verb','Proper noun','Interjection','Conjunction','Preposition','Pronoun',
-            'Prefix','Initialism','Phrase','Adverb','Cardinal number','Ordinal number','Suffix','Idiom','Numeral'];
-
         var posMap = {
-            'Noun': 'noun',
-            'Adjective': 'adjective',
-            'Verb': 'verb',
-            'Proper noun': 'noun',
-            'Interjection': 'exclamation',
-            'Conjunction': 'conjunction',
-            'Preposition': 'preposition',
-            'Pronoun': 'pronoun',
-            'Prefix': 'prefix',
+            'Abbreviation': 'abbreviation',
             'Initialism': 'abbreviation',
-            'Phrase': 'phrase',
+            'Adjective': 'adjective',
             'Adverb': 'adverb',
+            'Article': 'article',
+            'Conjunction': 'conjunction',
+            'Determiner': 'determiner',
+            'Interjection': 'exclamation',
+            'Noun': 'noun',
+            'Proper noun': 'noun',
             'Cardinal number': 'noun',
             'Ordinal number': 'noun',
-            'Suffix': 'suffix',
-            'Idiom': 'phrase',
             'Numeral': 'noun',
+            'Onomatopoeia': 'onomatopoeia',
+            'Particle': 'particle',
+            'Phrase': 'phrase',
+            'Idiom': 'phrase',
+            'Prefix': 'prefix',
+            'Preposition': 'preposition',
+            'Pronoun': 'pronoun',
+            'Suffix': 'suffix',
+            'Symbol': 'symbol',
+            'Title': 'title',
+            'Verb': 'verb',
+            'Phrase': 'phrase',
         };
 
         var langNames = {
@@ -131,6 +136,8 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
         };
 
         function parseTranslations(entry, text) {
+            // sometimes Translations are entered with 5 equal signs, fix that ...
+            text = text.replace(new RegExp('^====+\s*Translations\s*====+$', 'm'), '====Translations====\n');
             var input = new LineReader((new WikiText(text)).getSection('Translations', 3)),
                 line, matches, langCode, tmp, senseIndex = 0, inSense = false;
 
@@ -254,10 +261,34 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             parseSenses(entry, text);
         }
 
+        function getData(text, pos, type) {
+            var data = text.getSection(pos, type == 1 ? 2 : 3), lines;
+            // if this is buried in an "Etymology 1" style heading, we need to adjust the headings
+            // such that the text appears like it isn't
+            if (type == 2) {
+                lines = [];
+                data.split('\n').forEach(function (line) {
+                    var match, i, sep = '';
+                    if (match = /^(===+)([^=]+)===+/.exec(line)) {
+                        for(i = 0; i < match[1].length - 1; i++) {
+                            sep += '=';
+                        }
+                        line = sep + match[2] + sep;
+                    }
+                    lines.push(line);
+                });
+                data = lines.join('\n');
+            }
+            return data;
+        }
+
         return {
+            name: 'en.wiktionary.org',
+
             Producer: declare({
                 _constructor: function (args) {
-                    this.producer = new MediawikiProducer(args.filename);
+                    var fn = args.source['en.wiktionary.org'] || args.source['default'];
+                    this.producer = new MediawikiProducer(fn);
                     this.code = args.code;
                     this.lang_name = langNames[args.code];
                 },
@@ -266,21 +297,22 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                     var self = this, handler = args.handler;
                     args.handler = function (page) {
                         var text = new WikiText(page.revision.text),
-                            entry, found, pos;
+                            entry, found, pos, type;
 
                         if (text.hasSection(self.lang_name)) {
                             text.text = text.getSection(self.lang_name);
                             found = false;
 
                             for(pos in posMap) {
-                                if (text.hasSection(pos, 2)) {
+                                type = text.hasSection(pos, 2) ? 1 : (text.hasSection(pos, 3) ? 2 : 0);
+                                if (type) {
                                     entry = new Entry({
                                         headword: page.title.toString(),
                                         language: Language.languages[self.code],
                                         pos: posMap[pos],
                                     });
                                     entry.setSource('en.wiktionary.org', {
-                                        raw: '=='+self.lang_name+'==\n\n'+text.getSection(pos, 2)+'\n\n'+text.getSection('Pronunciation', 2),
+                                        raw: '=='+self.lang_name+'==\n\n'+getData(text, pos, type)+'\n\n'+text.getSection('Pronunciation', 2),
                                         url: 'http://en.wiktionary.org/wiki/'+entry.headword,
                                         license: 'CC-BY-SA-3.0',
                                         timestamp: page.revision.timestamp.toString()
@@ -301,12 +333,9 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                 }
             }),
 
-            parsers: {
-                'en': function (entry) {
-                    var raw = entry.getSource('en.wiktionary.org').raw;
-
-                    parseSensesAndTranslations(entry, raw);
-                }
+            parser: function (entry) {
+                var raw = entry.getSource('en.wiktionary.org').raw;
+                parseSensesAndTranslations(entry, raw);
             }
         };
     }

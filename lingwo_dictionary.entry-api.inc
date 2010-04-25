@@ -67,7 +67,7 @@ function lingwo_dictionary_entry_get_id($node) {
 function lingwo_dictionary_entry_from_id($id) {
   list($source_lang, $headword) = explode('/', $id);
   list($source_lang, $target_lang) = explode('-', $source_lang);
-  if (preg_match('/([^\(]+)\((\S+)\)/', $headword, $matches)) {
+  if (preg_match('/([^\(]+)\(([^\)]+)\)/', $headword, $matches)) {
     $headword = trim($matches[1]);
     $pos  = $matches[2];
   }

@@ -470,12 +470,26 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
             };
         };
 
-        var getPos = function (sections) {
+        var getPosList = function (sections) {
+            var pos_list = [], pos;
+
             if (!sections['meaning']) {
-                return null;
+                return null
             }
 
-            var s = sections['meaning'][0];
+            sections['meaning'].forEach(function (line) {
+                if (pos = getPos(line)) {
+                    pos_list.push(pos);
+                }
+            });
+
+            if (pos_list.length == 0) {
+                return null;
+            }
+            return pos_list;
+        };
+
+        var getPos = function (s) {
             // remove periods from pos (strange data inconsistency)
             s = s.replace(/\./g, '');
             //var pos = extractRegex(s, /^''([^\<,'$]+)/, 1, posTrans, 'posTrans');
@@ -544,16 +558,14 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                 pos = 'symbol';
             }
             else {
-                print('posTrans: cant map POS: '+pos);
                 pos = null;
             };
 
             return pos;
         };
 
-        var polishStructure = [
-            ['pron', makeRegexExtractor('pron', /\{\{IPA3\|([^\}]+)\}\}/, 1)],
-            ['fields', function (entry, sections) {
+        var fieldsExtractor = {
+            pl: function (entry, sections) {
                 if (!sections['meaning']) {
                     return;
                 }
@@ -574,24 +586,20 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                     else if (/nijaki/.exec(type)) {
                         res.gender = 'neuter';
                     }
-
-                    if (!res.gender) {
-                        // TODO: should this be done with the morphology engine instead??
-                        // we attempt to guess!
-                        if (/a|i$/.exec(entry.headword)) {
-                            res.gender = 'feminine';
-                        }
-                        else if (/e|o$/.exec(entry.headword)) {
-                            res.gender = 'neuter';
-                        }
-                        else {
-                            res.gender = 'masculine';
-                        }
-                    }
                 }
                 // TODO: load up the forms!!
 
                 return res;
+            },
+            
+            en: function (entry, sections) {
+            }
+        };
+
+        var entryStructure = [
+            ['pron', makeRegexExtractor('pron', /\{\{IPA3?\|([^\}]+)\}\}/, 1)],
+            ['fields', function (entry, sections) {
+                return fieldsExtractor[entry.language.name](entry, sections);
             }],
             ['senses', function (entry, sections) {
                 if (!sections['meaning']) {
@@ -601,21 +609,48 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                 var map = {};
                 var idx = {};
                 var res = [];
+                var curPos, i;
 
-                sections['meaning'].slice(1).forEach(function (line, i) {
-                    var name = extractRegex(line, /\((\d\.\d)\)/, 1);
+                if (entry.language.name != 'pl' || sections['translations']) {
+                    entry.translations = {};
+                    if (entry.language.name != 'pl') {
+                        entry.translations.pl = {'senses':[]};
+                    }
+                }
+
+                i = 0;
+                sections['meaning'].forEach(function (line) {
+                    var tmpPos, name, sense;
+
+                    // only take meaning from the correct pos
+                    if (tmpPos = getPos(line)) {
+                        curPos = tmpPos;
+                        return;
+                    }
+                    if (curPos != entry.pos) return;
+
+                    name = extractRegex(line, /\((\d\.\d)\)/, 1);
 
                     // Remove the sense numbers
                     line = line.replace(/\(\d\.\d\)/g, '');
                     line = WikiText.clean(line);
 
-                    // stash the difference
-                    var sense = {
-                        difference: text_utils.limitString(line, 255),
-                    };
+                    if (entry.language.name == 'pl') {
+                        // stash the difference
+                        sense = {
+                            difference: text_utils.limitString(line, 255),
+                        };
+                    }
+                    else {
+                        // stash the translation
+                        sense = {};   
+                        entry.translations.pl.senses[i] = {'trans': line.split(/,\s*/)};
+                    }
+
                     res.push(sense);
                     map[name] = sense;
                     idx[name] = i;
+                    i++;
                 });
 
                 var getName = function (line) {
@@ -636,23 +671,23 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
 
                 if (sections['examples']) {
                     sections['examples'].forEach(function (line) {
-                        //var name = extractRegex(line, /\((\d\.\d)\)/, 1);
                         var name = getName(line);
                         if (name === null) {
                             return;
                         }
 
-
                         // Remove the sense numbers
                         line = line.replace(/\(\d\.\d\)/g, '');
                         line = WikiText.clean(line);
+
+                        // drop translations of the examples!
+                        line = line.replace(/\u2192.*$/, '');
 
                         map[name].example = text_utils.limitString(line, 255);
                     });
                 }
 
                 if (sections['translations']) {
-                    entry.translations = {};
                     sections['translations'].forEach(function (line) {
                         var lang = extractRegex(line, /^\* ([^:]+):/, 1, langCodes, 'langCodes');
                         var senses = [];
@@ -683,10 +718,13 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
         ];
 
         return {
+            name: 'pl.wiktionary.org',
+
             Producer: declare({
-                '_constructor': function (args) {
+                _constructor: function (args) {
                     this.code = args.code;
-                    this.producer = new MediawikiProducer(args.filename);
+                    var fn = args.source['pl.wiktionary.org'] || args.source['default'];
+                    this.producer = new MediawikiProducer(fn);
                 },
 
                 run: function (args) {
@@ -698,26 +736,36 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                         if (text.hasSection(sec)) {
                             var raw = text.getSection(sec),
                                 sections = splitSections(raw),
+                                pos_list = getPosList(sections),
+                                entry;
+
+                            if (pos_list == null) {
+                                print('posTrans: cant map POS: '+page.title.toString());
+                                return;
+                            }
+
+                            pos_list.forEach(function (pos) {
                                 entry = new Entry({
                                     headword: page.title.toString(),
                                     language: Language.languages[self.code],
-                                    pos: getPos(sections)
+                                    pos: pos
                                 });
 
-                            entry.setSource('pl.wiktionary.org', {
-                                raw: raw,
-                                url: 'http://pl.wiktionary.org/wiki/'+entry.headword,
-                                license: 'CC-BY-SA-3.0',
-                                // what is the copyright for this?
-                                //copyright: '',
-                                timestamp: page.revision.timestamp.toString(),
+                                entry.setSource('pl.wiktionary.org', {
+                                    raw: raw,
+                                    url: 'http://pl.wiktionary.org/wiki/'+entry.headword,
+                                    license: 'CC-BY-SA-3.0',
+                                    // what is the copyright for this?
+                                    //copyright: '',
+                                    timestamp: page.revision.timestamp.toString(),
 
-                                // We stash this here for if we are doing a complete
-                                // run.  If the Entry is serialized() this will be discarded.
-                                _sections: sections
+                                    // We stash this here for if we are doing a complete
+                                    // run.  If the Entry is serialized() this will be discarded.
+                                    _sections: sections
+                                });
+
+                                handler(entry);
                             });
-
-                            handler(entry);
                         }
                     };
 
@@ -725,9 +773,7 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                 }
             }),
 
-            parsers: {
-                pl: makeStructureExtractor('pl.wiktionary.org', polishStructure)
-            }
+            parser: makeStructureExtractor('pl.wiktionary.org', entryStructure),
         };
     }
 );

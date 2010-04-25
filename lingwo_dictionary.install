@@ -23,7 +23,7 @@ function lingwo_dictionary_schema() {
       'pos' => array(
         'description' => 'Part of speech',
         'type' => 'varchar',
-        'length' => 12,
+        'length' => 24,
         'not null' => TRUE,
         'default' => '',
       ),
@@ -52,6 +52,12 @@ function lingwo_dictionary_schema() {
   );
 
   return $schema;
+}
+
+function lingwo_dictionary_update_6001() {
+  $ret = array();
+  $ret[] = update_sql("ALTER TABLE {lingwo_dictionary_entry} MODIFY COLUMN pos VARCHAR(24) NOT NULL DEFAULT ''");
+  return $ret;
 }
 
 /**

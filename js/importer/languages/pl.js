@@ -8,15 +8,13 @@ require.def('lingwo_dictionary/importer/languages/pl',
      'lingwo_dictionary/languages/pl'],
     function (wiktionary_pl, pl) {
         return {
-            makeProducer: function (source) {
-                return new wiktionary_pl.Producer({
-                    filename: source,
-                    code: "pl"
-                });
+            makeProducer: function (args) {
+                args['code'] = 'pl';
+                return new wiktionary_pl.Producer(args);
             },
 
             makeParser: function () {
-                return wiktionary_pl.parsers["pl"];
+                return wiktionary_pl.parser;
             }
         };
     }

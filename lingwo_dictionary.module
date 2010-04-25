@@ -254,7 +254,10 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
     $nid = lingwo_dictionary_entry_is_translation($node) ? $node->tnid : $node->nid;
     $row = db_fetch_object(db_query("SELECT pos FROM {lingwo_dictionary_entry} WHERE nid = %d", $nid));
     if (!$row) {
-      trigger_error(t('Unable to pos value for this entry: !nid', array('!nid' => $nid)), E_USER_ERROR);
+      // TODO: this should really be a watchdog message because it appears to happen normally when
+      // mass deleting entries.
+      watchdog('lingwo_dictionary', 'Unable to get pos value for this entry: !nid', array('!nid' => $nid), WATCHDOG_WARNING);
+      return NULL;
     }
     return array('pos' => $row->pos);
   }

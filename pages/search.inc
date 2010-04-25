@@ -57,7 +57,7 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
 
   // bust the pos out of $word if its there (ie. /lookup/en-pl/file[verb])
   $pos = NULL;
-  if (preg_match('/([^\(]+)\((\S+)\)/', $word, $matches)) {
+  if (preg_match('/([^\(]+)\(([^\)]+)\)/', $word, $matches)) {
     $word = trim($matches[1]);
     $pos  = $matches[2];
   }

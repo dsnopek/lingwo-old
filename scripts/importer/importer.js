@@ -63,10 +63,12 @@ require([
         'lingwo_dictionary/importer/Database',
         'lingwo_dictionary/importer/Service',
         'lingwo_dictionary/importer/DatabaseProducer',
+        'lingwo_dictionary/importer/MultiProducer',
         'lingwo_dictionary/importer/languages/'+OPTS['lang'],
+        'lingwo_dictionary/util/json2',
     ],
-    function (Database, Service, DatabaseProducer, importer) {
-        var source, service, db, handler, limit, producer, parser, entryList;
+    function (Database, Service, DatabaseProducer, MultiProducer, importer, JSON) {
+        var source, service, db, handler, limit, producer, parser, entryList, x;
 
         function connectToService(args) {
             var service, res;
@@ -124,14 +126,30 @@ require([
 
             // pass into the language specific parser
             parser(entry);
+            //print (JSON.stringify(entry.translations.pl));
 
             print(service.update_entry(entry, OPTS['force-changed'] == 'true'));
         }
 
-        if (OPTS['source'] && OPTS['input-staging']) {
+        // parse the source arguments into a straight up object
+        source = OPTS['source'];
+        if (typeof source == 'string') {
+            source = { 'default': source };
+        }
+        for (x in OPTS) {
+            if (x.indexOf('source:') == 0) {
+                // create on demand (so if there are no sources its never created)
+                if (!source) {
+                    source = {};
+                }
+                source[x.substr(7)] = OPTS[x];
+            }
+        }
+
+        if (source && OPTS['input-staging']) {
             die ('Can\'t pass both --source and --input-staging');
         }
-        if (!OPTS['source'] && !OPTS['input-staging']) {
+        if (!source && !OPTS['input-staging']) {
             die ('Must pass either --source or --input-staging');
         }
         if (OPTS['service'] && OPTS['output-staging']) {
@@ -148,7 +166,6 @@ require([
             entryList = readEntryList(OPTS['entry-list']);
         }
 
-        source = OPTS['source'];
         limit = OPTS['limit'];
         if (typeof limit != 'undefined') {
             limit = parseInt(limit);
@@ -172,10 +189,23 @@ require([
 
         // set-up "inputs"
         if (source) {
-            producer = importer.makeProducer(source);
+            producer = importer.makeProducer({
+                source: source,
+                // others might accept this one later, but for now, only for MultiProducer
+                entry_list: entryList,
+                // only for MultiProducer
+                _staging_db: db,
+            });
         }
         else {
-            producer = new DatabaseProducer(db, OPTS['lang']);
+            producer = new DatabaseProducer(db, OPTS['lang'], entryList);
+        }
+
+        // If we are saving to the staging database and our producer is a MultiProducer
+        // than we are using a sly (yet ugly) hack where the producer is writing directly
+        // to the staging db, so we give a null handler.
+        if (handler === saveToDatabase && producer instanceof MultiProducer) {
+            hander = function () { };
         }
 
         // run

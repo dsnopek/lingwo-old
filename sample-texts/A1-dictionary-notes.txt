@@ -1,0 +1,40 @@
+
+== needs custom source entry or customizing of existing ==
+
+ * involvement (break into more senses)
+ * can
+ * should
+ * would
+
+== needs custom translation or customizing of existing ==
+
+ * you
+ * they
+ * both (clean up)
+ * of (probably completely custom based on the source data we have)
+ * like (adverb)
+ * awards ceremony
+ * such as
+ * involve (all the correct translations are in the open-dictionaries.com data, but they need to be distributed to the right senses).
+ * adopt (move the translations to the correct senses)
+ * involvement (spread translations across senses -- after breaking them up)
+ * improve (I'm not sure "poprawić" is the right translation, "polepszyć się" seems better)
+ * score (check the meaning of "kreska" and "nacięcie" because I don't know them)
+ * early on
+ * this
+ * teens
+ * by the time
+ * got (spread the translations to the different senses)
+ * more
+ * so
+ * gene (check that its correct, I don't know "gen")
+ * oh yeah
+ * forget (clean up)
+ * looks (should be "wygląd" and not "rozglądanie")
+
+== Misc ==
+
+ * the: should be marked as "No equivalent"
+ * important: we need to remove the excessively gendered translations (ważny, ważna, ważne)
+ * great: we need to remove the excessively gendered translations (wielki, wielka, wielkie)
+

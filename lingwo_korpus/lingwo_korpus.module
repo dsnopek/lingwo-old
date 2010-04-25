@@ -164,7 +164,7 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
     db_query('DELETE FROM {lingwo_korpus_entry} WHERE nid = %d', $node->nid);
   }
 
-  if ($op == 'create' || $op == 'update') {
+  if ($op == 'insert' || $op == 'update') {
     // record all the entries used in this corpus text
     foreach (lingwo_korpus_text_entry_list($node->body, $node->language) as $entry) {
       $entry->nid = $node->nid;
