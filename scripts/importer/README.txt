@@ -1,7 +1,7 @@
 
 We generate the entry-list.txt using the following command in the Drupal root:
 
-  drush sql-query "SELECT DISTINCT CONCAT_WS(':', language, pos, headword) FROM lingwo_korpus_entry"
+  drush sql-query "SELECT DISTINCT CONCAT_WS(':', language, pos, headword) FROM lingwo_korpus_entry ORDER BY language, pos, headword"
 
 You have to delete the first line (its the column header).
 

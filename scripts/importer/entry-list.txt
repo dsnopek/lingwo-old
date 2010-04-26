@@ -1,4 +1,3 @@
-en:abverb:only
 en:adjective:abstract
 en:adjective:adoptive
 en:adjective:arthritic
@@ -30,6 +29,7 @@ en:adverb:equally
 en:adverb:for example
 en:adverb:here
 en:adverb:how
+en:adverb:inside
 en:adverb:less
 en:adverb:like
 en:adverb:long
@@ -38,6 +38,7 @@ en:adverb:normally
 en:adverb:now
 en:adverb:often
 en:adverb:on
+en:adverb:only
 en:adverb:pretty much
 en:adverb:sometimes
 en:adverb:specially
@@ -68,6 +69,7 @@ en:determiner:any
 en:determiner:both
 en:determiner:many
 en:determiner:more
+en:determiner:most
 en:determiner:no
 en:determiner:this
 en:exclamation:oh yeah
@@ -141,8 +143,6 @@ en:preposition:to
 en:preposition:via
 en:preposition:with
 en:preposition:without
-en:preposition:you
-en:preposition:your
 en:pronoun:I
 en:pronoun:my
 en:pronoun:our
@@ -159,7 +159,7 @@ en:verb:adopt
 en:verb:age
 en:verb:allow
 en:verb:be
-en:verb:be able
+en:verb:be able to
 en:verb:become
 en:verb:communicate
 en:verb:curve
@@ -179,7 +179,6 @@ en:verb:jump
 en:verb:know
 en:verb:live
 en:verb:look
-en:verb:made
 en:verb:make
 en:verb:notice
 en:verb:render

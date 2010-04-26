@@ -1,4 +1,35 @@
 
- * inside of: I don't know how to classify the part of speech!
- * germ-free: Do I do it as one word?  Or a word plus suffix?
+== needs full entry ==
+
+ * have (auxilary verb)
+ * let's (auxilary verb)
+
+== translation needs to be created / changed ===
+
+ * unbearable (clean-up!)
+ * render (find correct translations for the various senses and put them in the right place)
+ * take:
+   - "brać / wziąć" should be made same as "brać, wziąć"
+   - sense should really be for "na przykład" (not sure how to put that into Polish)
+ * a (no translation)
+ * discover (clean-up!)
+ * what if (no translation)
+ * -free (no translation)
+ * on (no translation)
+ * book (shouldn't it be "księga" and not "księgi"??)
+ * pretty much (no translation)
+ * even though (no translation)
+ * your (clean-up!)
+ * dim (spread translations out)
+ * fail (spread translations out)
+ * all (clean-up!)
+ * joint (clean-up!)
+ * wasting (no translation)
+ * make (needs more translations!  We have "someone makes you" which needs to be like "zmuszać")
+ * fine (break up definitions, we don't have one for "fine print")
+ * devil (clean-up!)
+
+== misc. ==
+
+ * jump at the chance: should this be its own phrase?
 

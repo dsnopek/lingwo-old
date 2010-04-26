@@ -351,8 +351,15 @@ function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
       }
 
       // Setup a $tnode to hold the translated node
-      $tnode = _lingwo_data_import_setup_node($tnid_list[$lang]->nid, $entry,
-        array('language' => $lang));
+      try {
+        $tnode = _lingwo_data_import_setup_node($tnid_list[$lang]->nid, $entry,
+          array('language' => $lang));
+      }
+      catch (LingwoDataServiceException $e) {
+        // if a translation is created by humans, thats not a total failure, keep going to
+        // other translations.
+        continue;
+      }
       if (empty($tnode->nid)) {
         $tnode->translation_source = node_load($nid);
 
