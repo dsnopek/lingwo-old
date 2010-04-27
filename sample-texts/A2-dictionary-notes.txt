@@ -28,6 +28,7 @@
  * make (needs more translations!  We have "someone makes you" which needs to be like "zmuszać")
  * fine (break up definitions, we don't have one for "fine print")
  * devil (clean-up!)
+ * most (no translation)
 
 == misc. ==
 
