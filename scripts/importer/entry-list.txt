@@ -50,7 +50,7 @@ en:adverb:when
 en:article:a
 en:article:the
 en:auxilary verb:can
-en:auxilary verb:have
+en:auxilary verb:have to
 en:auxilary verb:let's
 en:auxilary verb:should
 en:auxilary verb:would
