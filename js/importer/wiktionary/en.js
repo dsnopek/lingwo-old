@@ -15,6 +15,7 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
     function (declare, Entry, Language, WikiText, MediawikiProducer, text_utils, JSON) {
         var posMap = {
             'Abbreviation': 'abbreviation',
+            'Acronym': 'abbreviation',
             'Initialism': 'abbreviation',
             'Adjective': 'adjective',
             'Adverb': 'adverb',
@@ -25,11 +26,12 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             'Noun': 'noun',
             'Proper noun': 'noun',
             'Cardinal number': 'noun',
-            'Ordinal number': 'noun',
+            'Ordinal number': 'adjective',
             'Numeral': 'noun',
             'Onomatopoeia': 'onomatopoeia',
             'Particle': 'particle',
             'Phrase': 'phrase',
+            'Proverb': 'phrase',
             'Idiom': 'phrase',
             'Prefix': 'prefix',
             'Preposition': 'preposition',
@@ -282,6 +284,15 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             return data;
         }
 
+        // takes funky templatized headings like "==={{initialism}}==" and converts
+        // it into "===Initialism===" with WikiText.getSection() can work with.
+        function _fixHeadings(text) {
+            return text.replace(new RegExp('^(==+)\\{\\{(.+?)\\}\\}==+$', 'm'), function (s, p1, p2) {
+                p2 = p2.substr(0, 1).toUpperCase() + p2.substr(1);
+                return p1+p2+p1;
+            });
+        }
+
         return {
             name: 'en.wiktionary.org',
 
@@ -301,6 +312,8 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
 
                         if (text.hasSection(self.lang_name)) {
                             text.text = text.getSection(self.lang_name);
+                            // normalize some of the very UN-normal data
+                            text.text = _fixHeadings(text.text);
                             found = false;
 
                             for(pos in posMap) {

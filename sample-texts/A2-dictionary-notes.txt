@@ -1,9 +1,4 @@
 
-== need numerical equivalents ==
-
- * two
- * hundred
-
 == need help from native speakers ==
 
  * dim

@@ -97,6 +97,7 @@ en:noun:friend
 en:noun:gene
 en:noun:germ
 en:noun:hearing
+en:noun:hundred
 en:noun:involvement
 en:noun:joint
 en:noun:lesson
@@ -127,6 +128,7 @@ en:noun:television
 en:noun:test
 en:noun:thing
 en:noun:time
+en:noun:two
 en:noun:vision
 en:noun:year
 en:phrase:such as
