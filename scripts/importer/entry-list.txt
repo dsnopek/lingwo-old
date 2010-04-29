@@ -1,6 +1,8 @@
 en:adjective:abstract
 en:adjective:adoptive
+en:adjective:afraid
 en:adjective:arthritic
+en:adjective:bad
 en:adjective:biological
 en:adjective:concrete
 en:adjective:direct
@@ -12,29 +14,36 @@ en:adjective:great
 en:adjective:grownup
 en:adjective:human
 en:adjective:important
+en:adjective:individual
+en:adjective:long
 en:adjective:next
 en:adjective:parental
 en:adjective:same
 en:adjective:similar
+en:adjective:strange
 en:adjective:total
 en:adjective:true
 en:adjective:unbearable
+en:adjective:unique
 en:adjective:wasting
 en:adverb:about
 en:adverb:almost
 en:adverb:by the time
 en:adverb:carefully
+en:adverb:clearly
 en:adverb:early on
 en:adverb:equally
 en:adverb:for example
 en:adverb:here
 en:adverb:how
 en:adverb:inside
+en:adverb:just about
 en:adverb:less
 en:adverb:like
 en:adverb:long
 en:adverb:maybe
 en:adverb:normally
+en:adverb:not
 en:adverb:now
 en:adverb:often
 en:adverb:on
@@ -44,7 +53,10 @@ en:adverb:sometimes
 en:adverb:specially
 en:adverb:still
 en:adverb:too
+en:adverb:up
+en:adverb:usually
 en:adverb:very
+en:adverb:what about
 en:adverb:what if
 en:adverb:when
 en:article:a
@@ -52,6 +64,7 @@ en:article:the
 en:auxilary verb:can
 en:auxilary verb:have to
 en:auxilary verb:let's
+en:auxilary verb:might
 en:auxilary verb:should
 en:auxilary verb:would
 en:conjunction:although
@@ -64,57 +77,89 @@ en:conjunction:if
 en:conjunction:or
 en:conjunction:than
 en:conjunction:that
+en:conjunction:while
 en:determiner:all
 en:determiner:any
 en:determiner:both
+en:determiner:each
+en:determiner:every
 en:determiner:many
 en:determiner:more
 en:determiner:most
 en:determiner:no
+en:determiner:some
 en:determiner:this
 en:exclamation:oh yeah
 en:exclamation:so
 en:noun:age
+en:noun:alphabet
+en:noun:anablephobia
 en:noun:award
 en:noun:awards ceremony
+en:noun:balloon
 en:noun:biologist
 en:noun:body
 en:noun:book
+en:noun:bump
 en:noun:century
 en:noun:chance
+en:noun:childhood
 en:noun:children
+en:noun:chopstick
+en:noun:clown
 en:noun:college
 en:noun:computer
 en:noun:connection
+en:noun:consecotaleophobia
 en:noun:contact
+en:noun:coulrophobia
 en:noun:detail
 en:noun:devil
 en:noun:effect
+en:noun:experience
 en:noun:family
+en:noun:fear
 en:noun:food
+en:noun:foot
 en:noun:frailty
 en:noun:friend
 en:noun:gene
 en:noun:germ
+en:noun:globophobia
 en:noun:hearing
+en:noun:hippopotomonstrosesquipedaliophobia
 en:noun:hundred
 en:noun:involvement
 en:noun:joint
+en:noun:kathisophobia
+en:noun:kid
 en:noun:lesson
+en:noun:letter
 en:noun:life
 en:noun:looks
 en:noun:math
+en:noun:name
+en:noun:night
+en:noun:number
 en:noun:offer
 en:noun:opportunity
+en:noun:other
 en:noun:pain
 en:noun:parent
 en:noun:parenting
+en:noun:people
+en:noun:phobia
+en:noun:pop
 en:noun:print
 en:noun:prisoner
+en:noun:psychologist
 en:noun:puberty
+en:noun:pupaphobe
+en:noun:puppet
 en:noun:reading
 en:noun:recipient
 en:noun:room
+en:noun:sadist
 en:noun:scenario
 en:noun:score
 en:noun:screen
@@ -130,6 +175,7 @@ en:noun:thing
 en:noun:time
 en:noun:two
 en:noun:vision
+en:noun:word
 en:noun:year
 en:phrase:such as
 en:preposition:at
@@ -146,9 +192,12 @@ en:preposition:via
 en:preposition:with
 en:preposition:without
 en:pronoun:I
+en:pronoun:it
 en:pronoun:my
+en:pronoun:one
 en:pronoun:our
 en:pronoun:someone
+en:pronoun:that
 en:pronoun:their
 en:pronoun:they
 en:pronoun:us
@@ -163,6 +212,8 @@ en:verb:allow
 en:verb:be
 en:verb:be able to
 en:verb:become
+en:verb:believe
+en:verb:coin
 en:verb:communicate
 en:verb:curve
 en:verb:dim
@@ -170,24 +221,36 @@ en:verb:discover
 en:verb:enter
 en:verb:fade
 en:verb:fail
+en:verb:fear
 en:verb:forget
 en:verb:get
+en:verb:go
 en:verb:have
 en:verb:help
 en:verb:hobble
+en:verb:imagine
 en:verb:improve
 en:verb:involve
 en:verb:jump
+en:verb:keep
 en:verb:know
 en:verb:live
 en:verb:look
 en:verb:make
+en:verb:manipulate
 en:verb:notice
+en:verb:pop
 en:verb:render
 en:verb:say
 en:verb:seem
 en:verb:show
+en:verb:sit
+en:verb:stem
+en:verb:suffer
 en:verb:take
 en:verb:teach
+en:verb:term
+en:verb:terrify
 en:verb:thank
+en:verb:think
 en:verb:watch
