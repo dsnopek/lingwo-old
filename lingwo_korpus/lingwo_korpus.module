@@ -92,6 +92,7 @@ function lingwo_korpus_annotator_access($node) {
 function lingwo_korpus_annotator_form(&$form_state, $node) {
   $text = $node->body;
 
+  $form['#node'] = $node;
   $form['edit-mode'] = array(
     '#type' => 'radios',
     '#title' => t('Edit Mode'),
@@ -106,7 +107,6 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
   );
   $form['korpus-text-value'] = array(
     '#type' => 'hidden',
-    '#value' => $text,
   );
 
   // the annotation form that pops up
@@ -149,6 +149,23 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
   drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotator.css');
 
   return $form;
+}
+
+function lingwo_korpus_annotator_form_submit($form, &$form_state) {
+  require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
+
+  $node = $form['#node'];
+  $text = $form_state['values']['korpus-text-value'];
+
+  if (str_get_html($text)->plaintext != str_get_html($node->body)->plaintext) {
+    drupal_set_message(t('Annotator modified the content of the text'), 'error');
+    return;
+  }
+
+  $node->body = $text;
+  node_save($node);
+
+  drupal_set_message(t('Annotation saved.'));
 }
 
 /*

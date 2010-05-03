@@ -191,6 +191,11 @@
         }
     }
 
+    function onSubmit(evt) {
+        $('#edit-korpus-text-value').val(selector.getText());
+        return true;
+    }
+
     Drupal.behaviors.lingwo_korpus = function (context) {
         require([
             'lingwo_dictionary/annotation/Reader',
@@ -233,6 +238,9 @@
                 function handleMode() { setEditMode($('input[name=edit-mode]:checked').val()); };
                 $('input[name=edit-mode]:radio', context).click(handleMode);
                 handleMode();
+
+                // setup the code to save
+                $('#lingwo-korpus-annotator-form').bind('submit', onSubmit);
             }
         );
     };

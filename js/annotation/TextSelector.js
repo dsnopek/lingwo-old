@@ -77,6 +77,23 @@ require.def('lingwo_dictionary/annotation/TextSelector',
                 splitChars(this.node);
             },
 
+            getText: function () {
+                var clone = $(this.node).clone();
+                // a poor man's unwrap()
+                $('.c', clone).each(function (i, node) {
+                    var parentNode = node.parentNode,
+                        childNode = node.firstChild;
+                    if (childNode) {
+                        node.removeChild(childNode);
+                        parentNode.insertBefore(childNode, node);
+                    }
+                    parentNode.removeChild(node);
+                });
+                // get rid of all the classes
+                $('word', clone).removeAttr('class');
+                return clone.html();
+            },
+
             activate: function (val) {
                 if (!val) {
                     this.clearSelection();
