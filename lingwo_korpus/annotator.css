@@ -1,6 +1,10 @@
 
 /* Yo! */
 
+.c.selected {
+    background-color: lightBlue;
+}
+
 word {
     background-color: blue;
     color: white;
