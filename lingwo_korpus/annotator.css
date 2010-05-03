@@ -8,6 +8,9 @@
     background-color: lightBlue;
     */
 }
+.selection-error .c.selected {
+    background-color: red;
+}
 
 #lingwo-korpus-entry-view input {
   width: 270px;
@@ -28,7 +31,9 @@ word {
     background-color: red;
 }
 
-.mode-edit word.changed, word.added {
+.mode-edit word.changed,
+.mode-edit word.added,
+.mode-add  word.added {
     color: white;
     background-color: green;
 }

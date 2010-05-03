@@ -3,12 +3,9 @@ require.def('lingwo_dictionary/annotation/TextSelector',
     ['lingwo_dictionary/util/declare'],
     function (declare) {
         function getCharIndex(node) {
-            var classes = node.className.split(' '), id, i, match;
-            for (i = 0; i < classes.length; i++) {
-                if (match = /c-(\d+)/.exec(classes[i])) {
-                    id = parseInt(match[1]);
-                    break;
-                }
+            var id, match;
+            if (node.id && (match = /c-(\d+)/.exec(node.id))) {
+                id = parseInt(match[1]);
             }
             return id;
         };
@@ -55,7 +52,8 @@ require.def('lingwo_dictionary/annotation/TextSelector',
                             text = childNode.data;
                             for(i = 0; i < text.length; i++) {
                                 charNode = document.createElement('span');
-                                charNode.className = 'c c-'+charIndex;
+                                charNode.className = 'c';
+                                charNode.id = 'c-'+charIndex;
                                 charNode.innerHTML = text.substr(i, 1);
 
                                 charIndex++;
@@ -95,6 +93,9 @@ require.def('lingwo_dictionary/annotation/TextSelector',
                 this.selEnd = null;
             },
 
+            onSelectionStart: function () {},
+            onSelectionStop: function () {},
+
             _onMouseDown: function (evt) {
                 var target = $(evt.target);
 
@@ -103,8 +104,9 @@ require.def('lingwo_dictionary/annotation/TextSelector',
                 if (target.hasClass('c')) {
                     target.addClass('selected');
                     this.clickedNode = evt.target;
-                    this.selStart = getCharIndex(evt.target);
-                    this.selEnd = getCharIndex(evt.target);
+                    this.selStart = this.selEnd = getCharIndex(evt.target);
+
+                    this.onSelectionStart(evt.target);
                 };
 
                 return false;
@@ -113,6 +115,11 @@ require.def('lingwo_dictionary/annotation/TextSelector',
             _onMouseUp: function (evt) {
                 this.clickedNode = null;
                 this.clicked = false;
+
+                // call our callback
+                var selStart = document.getElementById('c-'+this.selStart),
+                    selEnd = document.getElementById('c-'+this.selEnd);
+                this.onSelectionStop(selStart, selEnd);
             },
 
             _onMouseOver: function (evt) {

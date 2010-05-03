@@ -31,9 +31,17 @@
                 reader.hideDialog();
                 curAnno = null;
             });
-            $('#edit-anno-form-cancel').click(function (evt) {
-                curAnno = null;
+            $('#edit-anno-form-delete').click(function (evt) {
+                deleteAnnotation();
                 reader.hideDialog();
+                curAnno = null;
+            });
+            $('#edit-anno-form-cancel').click(function (evt) {
+                if (mode == 'add') {
+                    deleteAnnotation();
+                }
+                reader.hideDialog();
+                curAnno = null;
             });
 
             formMoved = true;
@@ -48,7 +56,7 @@
     }
 
     function saveAnnotation() {
-        var headword;
+        var headword, changed = false;
 
         if (curAnno === null) {
             return;
@@ -75,10 +83,30 @@
         }
 
         // show that it is changed to the user
-        curAnno.addClass('changed');
+        curAnno.addClass(mode == 'edit' ? 'changed' : 'added');
     }
 
-    function findWordParent(node) {
+    function deleteAnnotation () {
+        if (!curAnno) return;
+
+        var curAnnoNode = curAnno.get(0),
+            parentNode = curAnnoNode.parentNode,
+            node = curAnnoNode.firstChild, next;
+
+        while(node) {
+            next = node.nextSibling;
+
+            curAnnoNode.removeChild(node);
+            parentNode.insertBefore(node, curAnnoNode);
+
+            node = next;
+        }
+
+        parentNode.removeChild(curAnnoNode);
+        curAnno = null;
+    }
+
+    function findParentWord(node) {
         var name;
         while (node = node.parentNode) {
             if (!node.tagName) return null;
@@ -102,6 +130,67 @@
         return false;
     }
 
+    function areSiblings(start, end) {
+        if (start == end) return true;
+        while (start = start.nextSibling) {
+            if (start == end) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // accepts any two siblings as arguments
+    function createNode(start, end) {
+        // TODO: double check that they are siblings
+        if (!areSiblings(start, end)) {
+            throw ("Cannot create a node between two points that aren't siblings");
+        }
+
+        var parentNode = start.parentNode,
+            newNode = document.createElement('word'),
+            node = start, next;
+
+        parentNode.insertBefore(newNode, start);
+        while(node) {
+            next = node.nextSibling;
+
+            parentNode.removeChild(node);
+            newNode.appendChild(node);
+
+            if (node == end) break;
+            node = next;
+        }
+
+        return newNode;
+    }
+
+    function onSelectionStart(selStart) {
+        $('#edit-korpus-text').removeClass('selection-error');
+    }
+
+    function onSelectionStop(selStart, selEnd) {
+        if (selStart === null || selEnd === null) {
+            reader.hideDialog();
+            curAnno = null;
+            return;
+        }
+
+        var startWord = findParentWord(selStart),
+            endWord = findParentWord(selEnd);
+
+        // TODO: determine if the selection can work
+        
+        if ((startWord && endWord && startWord == endWord) ||
+            (startWord === null && endWord === null))
+        {
+            reader.showDialog(createNode(selStart, selEnd));
+        }
+        else {
+            $('#edit-korpus-text').addClass('selection-error');
+        }
+    }
+
     Drupal.behaviors.lingwo_korpus = function (context) {
         require([
             'lingwo_dictionary/annotation/Reader',
@@ -115,7 +204,7 @@
                     $('body', context).click(function (evt) {
                         var wordParent;
                         if (reader.activated) {
-                            if (wordParent = findWordParent(evt.target)) {
+                            if (wordParent = findParentWord(evt.target)) {
                                 if (curAnno !== null) {
                                     saveAnnotation();
                                 }
@@ -128,7 +217,6 @@
                                     curAnno = null;
                                 }
                                 reader.hideDialog();
-                                reader.clearSelection();
                             }
                             return true;
                         }
@@ -137,6 +225,8 @@
                 // setup the text selector
                 if (typeof selector === 'undefined') {
                     selector = new TextSelector(document.getElementById('edit-korpus-text'));
+                    selector.onSelectionStart = onSelectionStart;
+                    selector.onSelectionStop = onSelectionStop;
                 }
 
                 // setup the mode controls

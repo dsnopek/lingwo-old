@@ -131,6 +131,9 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
   $form['anno-form']['save'] = array(
     '#value' => '<button id="edit-anno-form-save">'. t('Save Annotation') .'</button>',
   );
+  $form['anno-form']['delete'] = array(
+    '#value' => '<button id="edit-anno-form-delete">'. t('Delete') .'</button>',
+  );
   $form['anno-form']['cancel'] = array(
     '#value' => '<button id="edit-anno-form-cancel">'. t('Cancel') .'</button>',
   );
