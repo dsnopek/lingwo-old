@@ -9,6 +9,10 @@
     */
 }
 
+#lingwo-korpus-entry-view input {
+  width: 270px;
+}
+
 word {
     border: 1px solid white;
     padding: 0 1px;
@@ -18,6 +22,15 @@ word {
     background-color: blue;
     color: white;
     cursor: pointer;
+}
+
+.mode-edit word.selected {
+    background-color: red;
+}
+
+.mode-edit word.changed, word.added {
+    color: white;
+    background-color: green;
 }
 
 .mode-add word {

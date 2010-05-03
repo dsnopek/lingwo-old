@@ -108,6 +108,33 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
     '#type' => 'hidden',
     '#value' => $text,
   );
+
+  // the annotation form that pops up
+  $form['anno-form'] = array(
+    '#prefix' => '<div id="edit-anno-form" style="display: none;">',
+    '#suffix' => '</div>',
+    '#tree' => TRUE,
+  );
+  $form['anno-form']['headword'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Headword'),
+  );
+  $form['anno-form']['pos'] = array(
+    '#type' => 'select',
+    '#title' => t('Part of Speech'),
+    '#options' => lingwo_dictionary_pos_options(TRUE),
+  );
+  $form['anno-form']['attributive'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Attributive'),
+  );
+  $form['anno-form']['save'] = array(
+    '#value' => '<button id="edit-anno-form-save">'. t('Save Annotation') .'</button>',
+  );
+  $form['anno-form']['cancel'] = array(
+    '#value' => '<button id="edit-anno-form-cancel">'. t('Cancel') .'</button>',
+  );
+
   $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),

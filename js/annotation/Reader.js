@@ -16,6 +16,7 @@ require.def('lingwo_dictionary/annotation/Reader', [],
             callback: function () { },
             popup: true,
             activated: true,
+            shown: false,
             
             setup: function (context, callback, popup) {
                 this.callback = callback;
@@ -111,10 +112,14 @@ require.def('lingwo_dictionary/annotation/Reader', [],
                 if (this.popup) {
                     bubble.hide();
                 }
+                this.shown = false;
+                this.clearSelection();
             },
 
             showDialog: function (targetNode) {
                 var target = $(targetNode), offset, self = this;
+
+                this.clearSelection();
 
                 offset = target.offset();
                 if (this.popup) {
@@ -132,21 +137,22 @@ require.def('lingwo_dictionary/annotation/Reader', [],
                     bubble.show().css({ left: left, top: top, height: '' });
                 }
 
-                contentArea.html('Loading ...');
-
                 // mark as selected
                 selected = target;
                 target.addClass('selected');
 
+                this.shown = true;
+
                 this.callback(target, contentArea, function (content) {
-                    contentArea.html(content);
+                    if (content !== null && typeof content !== 'undefined') {
+                      contentArea.html(content);
+                    }
 
                     // For browsers that don't correctly support max-height
                     if (this.popup && bubble.height() > 200) {
                         bubble.css({ height: 200 });
                     }
                 });
-
             },
 
             // handle clicks on the annotations

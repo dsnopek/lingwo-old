@@ -10,6 +10,8 @@
     function loadEntry(target, contentArea, setContentFunc) {
         var sense_id = target.attr('data-sense');
 
+        setContentFunc('Loading ...');
+
         // lookup the entry on the server
         $.getJSON('/lingwo_korpus/lookup_entry', {'url': target.attr('href')},
             function (res) {
