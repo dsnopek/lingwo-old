@@ -115,6 +115,7 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
 
   lingwo_dictionary_add_require_js();
   drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotator.js');
+  drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.css');
   drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotator.css');
 
   return $form;

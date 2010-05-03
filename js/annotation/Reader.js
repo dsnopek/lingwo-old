@@ -15,6 +15,7 @@ require.def('lingwo_dictionary/annotation/Reader', [],
         return {
             callback: function () { },
             popup: true,
+            activated: true,
             
             setup: function (context, callback, popup) {
                 this.callback = callback;
@@ -92,6 +93,13 @@ require.def('lingwo_dictionary/annotation/Reader', [],
                 }
             },
 
+            activate: function (val) {
+                if (!val) {
+                    this.clearSelection();
+                }
+                this.activated = val;
+            },
+
             clearSelection: function () {
                 if (selected) {
                     selected.removeClass('selected');
@@ -143,6 +151,8 @@ require.def('lingwo_dictionary/annotation/Reader', [],
 
             // handle clicks on the annotations
             onClick: function (evt) {
+                if (!this.activated) return true;
+
                 var target = $(evt.target);
 
                 this.clearSelection();

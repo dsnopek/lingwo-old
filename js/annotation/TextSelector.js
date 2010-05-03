@@ -29,14 +29,15 @@ require.def('lingwo_dictionary/annotation/TextSelector',
                 }
 
                 $(node)
-                    .bind('mousedown', function (evt) { self._onMouseDown(evt); })
-                    .bind('mouseup', function (evt) { self._onMouseUp(evt); })
-                    .bind('mouseover', function (evt) { self._onMouseOver(evt); });
+                    .bind('mousedown', function (evt) { if (self.activated) { self._onMouseDown(evt); }})
+                    .bind('mouseup', function (evt) { if (self.activated) { self._onMouseUp(evt); }})
+                    .bind('mouseover', function (evt) { if (self.activated) { self._onMouseOver(evt); }});
 
                 $('body').bind('mousedown', function (evt) {
-                    if (!$(evt.target).hasClass('c')) self.clearSelection();
+                    if (self.activated && !$(evt.target).hasClass('c')) self.clearSelection();
                 });
 
+                this.activated = true;
                 this.clickedNode = null;
                 this.selStart = null;
                 this.selEnd = null;
@@ -76,6 +77,13 @@ require.def('lingwo_dictionary/annotation/TextSelector',
 
                 // put every character into its own span
                 splitChars(this.node);
+            },
+
+            activate: function (val) {
+                if (!val) {
+                    this.clearSelection();
+                }
+                this.activated = val;
             },
 
             clearSelection: function () {
