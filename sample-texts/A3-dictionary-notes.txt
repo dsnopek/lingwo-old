@@ -1,0 +1,34 @@
+
+== create or modify source entry ==
+
+ * might
+ * globophobia
+ * coulrophobia
+ * pupaphobes
+ * consecotaleophobia
+ * anablephobia
+ * kathisophobia
+ * hippopotomonstrosesquipedaliophobia
+
+== create or modify translation entry ==
+
+ * bump: its the wrong kind of bump, here we need the sound
+ * what about: needs translation
+ * pop: spread translations
+ * go: needs the sense of "say" or "make a sound"
+ * some: add "niektórzy" to the translations, maybe spread them out some
+ * stem: spread senses out
+ * pop: spread senses out
+ * name: add "nazwa" it "tytuł"
+ * just about: add translation
+ * other (noun): add translation
+ * puppet: clean up
+ * up: clean up
+ * one (pronoun): clean up
+ * coin (verb): clean up
+
+== misc ==
+
+ * things that go bump in the night: should be its own phrase
+ * 
+

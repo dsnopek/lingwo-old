@@ -128,7 +128,17 @@ require([
             parser(entry);
             //print (JSON.stringify(entry.translations.pl));
 
-            print(service.update_entry(entry, OPTS['force-changed'] == 'true'));
+            try {
+                print(service.update_entry(entry, OPTS['force-changed'] == 'true'));
+            }
+            catch (e) {
+                if (/created by humans/.exec(e.message)) {
+                    print ('** Changed or created by humans, not importing.');
+                }
+                else {
+                    throw(e);
+                }
+            }
         }
 
         // parse the source arguments into a straight up object
