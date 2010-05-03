@@ -177,17 +177,54 @@
         }
 
         var startWord = findParentWord(selStart),
-            endWord = findParentWord(selEnd);
+            endWord = findParentWord(selEnd),
+            error = true, climbTheTree = false;
 
-        // TODO: determine if the selection can work
-        
         if ((startWord && endWord && startWord == endWord) ||
             (startWord === null && endWord === null))
         {
-            reader.showDialog(createNode(selStart, selEnd));
+            // the simplest case, it will just work
+            error = false;
         }
         else {
+            // if they are on the word boundries, then we include the whole words
+            if (startWord && startWord.firstChild == selStart) {
+                selStart = startWord;
+            }
+            if (endWord && endWord.lastChild == selEnd) {
+                selEnd = endWord;
+                
+                // if we are dealing with the selection ending on a word boundry,
+                // then we need to climb the tree to find the proper sibling in the
+                // case where multiple words end in the same spot.
+                climbTheTree = true;
+            }
+
+            // try to determine if these are siblings
+            while (selEnd) {
+                if (areSiblings(selStart, selEnd))
+                    break;
+
+                if (climbTheTree) {
+                    selEnd = findParentWord(selEnd);
+                }
+                else {
+                    // no good!
+                    selEnd = null;
+                }
+            }
+
+            // if selEnd avoids getting wiped out, then we are good
+            if (selEnd) {
+                error = false;
+            }
+        }
+
+        if (error) {
             $('#edit-korpus-text').addClass('selection-error');
+        }
+        else {
+            reader.showDialog(createNode(selStart, selEnd));
         }
     }
 
