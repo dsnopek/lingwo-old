@@ -92,6 +92,15 @@ function lingwo_korpus_annotator_access($node) {
 function lingwo_korpus_annotator_form(&$form_state, $node) {
   $text = $node->body;
 
+  $form['edit-mode'] = array(
+    '#type' => 'radios',
+    '#title' => t('Edit Mode'),
+    '#default_value' => 'edit',
+    '#options' => array(
+        'edit' => t('Edit existing'),
+        'add'  => t('Add new')
+    ),
+  );
   $form['korpus-text'] = array(
     '#value' => '<div id="edit-korpus-text">'. $text .'</div>',
   );

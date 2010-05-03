@@ -2,15 +2,26 @@
 /* Yo! */
 
 .c.selected {
+    color: white;
+    background-color: blue;
+    /*
     background-color: lightBlue;
+    */
 }
 
 word {
-    background-color: blue;
-    color: white;
     border: 1px solid white;
     padding: 0 1px;
+}
+
+.mode-edit word {
+    background-color: blue;
+    color: white;
     cursor: pointer;
+}
+
+.mode-add word {
+    background-color: LightGrey;
 }
 
 #lingwo-korpus-annotator-dialog {
