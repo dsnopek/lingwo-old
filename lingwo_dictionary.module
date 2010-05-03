@@ -170,6 +170,8 @@ function lingwo_dictionary_pos_options($translate = FALSE, $option_name = NULL) 
     $options[$key] = $value;
   }
 
+  asort($options);
+
   return $options;
 }
 
