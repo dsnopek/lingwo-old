@@ -163,6 +163,7 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
   }
 
   $node->body = $text;
+  $node->teaser = node_teaser($node->body, $node->format);
   node_save($node);
 
   drupal_set_message(t('Annotation saved.'));
