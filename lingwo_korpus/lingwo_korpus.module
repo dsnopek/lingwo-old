@@ -7,6 +7,13 @@
  */
 
 /**
+ * Implementation of hook_perm().
+ */
+function lingwo_korpus_perm() {
+  return array('annotate lingwo_korpus texts');
+}
+
+/**
  * Implementation of hook_menu().
  */
 function lingwo_korpus_menu() {
@@ -26,6 +33,14 @@ function lingwo_korpus_menu() {
     'page callback' => 'lingwo_korpus_lookup_entry',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
+  );
+  $items['node/%node/annotate'] = array(
+    'title' => 'Annotate',
+    'page arguments' => array('lingwo_korpus_annotator_form', 1),
+    'page callback' => 'drupal_get_form',
+    'access callback' => 'lingwo_korpus_annotator_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
   );
 
   return $items;
@@ -60,6 +75,98 @@ function lingwo_korpus_lookup_entry() {
 
   // return the HTML to the Ajax caller
   drupal_json(array('content' => $content));
+}
+
+/* 
+ * Check if the user can annotate texts.
+ */
+function lingwo_korpus_annotator_access($node) {
+  return user_access('access content') &&
+         user_access('annotate lingwo_korpus texts') &&
+         lingwo_korpus_text_content_type() == $node->type;
+}
+
+/*
+ * Show the annotator.
+ */
+function lingwo_korpus_annotator_form(&$form_state, $node) {
+  $text = $node->body;
+
+  $form['#node'] = $node;
+  $form['edit-mode'] = array(
+    '#type' => 'radios',
+    '#title' => t('Edit Mode'),
+    '#default_value' => 'edit',
+    '#options' => array(
+        'edit' => t('Edit existing'),
+        'add'  => t('Add new')
+    ),
+  );
+  $form['korpus-text'] = array(
+    '#value' => '<div id="edit-korpus-text">'. $text .'</div>',
+  );
+  $form['korpus-text-value'] = array(
+    '#type' => 'hidden',
+  );
+
+  // the annotation form that pops up
+  $form['anno-form'] = array(
+    '#prefix' => '<div id="edit-anno-form" style="display: none;">',
+    '#suffix' => '</div>',
+    '#tree' => TRUE,
+  );
+  $form['anno-form']['headword'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Headword'),
+  );
+  $form['anno-form']['pos'] = array(
+    '#type' => 'select',
+    '#title' => t('Part of Speech'),
+    '#options' => lingwo_dictionary_pos_options(TRUE),
+  );
+  $form['anno-form']['attributive'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Attributive'),
+  );
+  $form['anno-form']['save'] = array(
+    '#value' => '<button id="edit-anno-form-save">'. t('Save Annotation') .'</button>',
+  );
+  $form['anno-form']['delete'] = array(
+    '#value' => '<button id="edit-anno-form-delete">'. t('Delete') .'</button>',
+  );
+  $form['anno-form']['cancel'] = array(
+    '#value' => '<button id="edit-anno-form-cancel">'. t('Cancel') .'</button>',
+  );
+
+  $form['save'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+
+  lingwo_dictionary_add_require_js();
+  drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotator.js');
+  drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.css');
+  drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotator.css');
+
+  return $form;
+}
+
+function lingwo_korpus_annotator_form_submit($form, &$form_state) {
+  require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
+
+  $node = $form['#node'];
+  $text = $form_state['values']['korpus-text-value'];
+
+  if (str_get_html($text)->plaintext != str_get_html($node->body)->plaintext) {
+    drupal_set_message(t('Annotator modified the content of the text'), 'error');
+    return;
+  }
+
+  $node->body = $text;
+  $node->teaser = node_teaser($node->body, $node->format);
+  node_save($node);
+
+  drupal_set_message(t('Annotation saved.'));
 }
 
 /*
@@ -147,6 +254,7 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
       }
       $node->content['body']['#value'] = $data;
 
+      lingwo_dictionary_add_require_js();
       drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.js');
       drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.css');
       drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.css');
@@ -218,7 +326,6 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
     $form['language']['#required'] = TRUE;
   }
 }
-
 
 /*
  * Implementation of hook_block().

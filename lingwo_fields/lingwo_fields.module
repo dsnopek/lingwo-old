@@ -327,9 +327,7 @@ function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) 
 function theme_lingwo_fields_widget_form_wrapper($element) {
   $node = $element['#node'];
 
-  // add require.js to the page
-  drupal_add_js('require({paths:{lingwo_dictionary:"/'. drupal_get_path('module', 'lingwo_dictionary') .'/js"}});', 'inline');
-  drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/js/require.js');
+  lingwo_dictionary_add_require_js();
 
   drupal_add_js(array('lingwo_fields' => array(
     'field_name' => $element['#field_name_enc'],
