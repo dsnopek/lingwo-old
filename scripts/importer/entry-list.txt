@@ -49,7 +49,7 @@ en:adjective:unseen
 en:adjective:up in arms
 en:adjective:warring
 en:adjective:wasting
-en:adjective:wider
+en:adjective:wide
 en:adjective:worldly
 en:adverb:about
 en:adverb:actually
@@ -286,6 +286,7 @@ en:noun:word
 en:noun:year
 en:phrase:such as
 en:prefix:pseudo-
+en:preposition:as
 en:preposition:at
 en:preposition:by
 en:preposition:for

@@ -1,5 +1,32 @@
 
-== misc ==
+== translations to add/edit ==
 
- * as: I don't know what POS it should be.
+ * slice: clean-up
+ * public: clean-up
+ * identify: clean-up (divide translation among senses)
+ * themselves: clean-up (divide translations among senses)
+ * board: clean-up (divide translations among senses)
+ * urge: clean-up (divide translations among senses)
+ * prominent: clean-up (divide translations among senses)
+ * trespass: clean-up
+ * integrity: clean-up (divide translations among senses)
+ * undermine: clean-up (divide translations among senses)
+ * impression: clean-up (divide translations among senses)
+ * by: clean-up (divide translations among senses)
+ * before: clean-up (divide translations among senses)
+ * that: clean-up
+ * Christian: clean-up
+ * view: part of speech is verb, but translation is a noun!
+ * there: no translation (check sources)
+ * comes to: no translation
+ * warring: no translation
+ * underpinning: no translation
+ * take over: no translation
+ * high school: no translation
+ * up in arms: no translation
+
+== needs to imported and checked ==
+
+ * wide
+ * as (preposition)
 
