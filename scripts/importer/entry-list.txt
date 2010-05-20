@@ -40,7 +40,9 @@ en:adjective:next
 en:adjective:obsolete
 en:adjective:parental
 en:adjective:past
+en:adjective:private
 en:adjective:prominent
+en:adjective:public
 en:adjective:puritan
 en:adjective:religious
 en:adjective:runaway
@@ -290,7 +292,6 @@ en:noun:portion
 en:noun:president
 en:noun:print
 en:noun:prisoner
-en:noun:private
 en:noun:proclamation
 en:noun:profession
 en:noun:progress
@@ -403,6 +404,7 @@ en:verb:become
 en:verb:believe
 en:verb:bless
 en:verb:blur
+en:verb:change
 en:verb:choose
 en:verb:coin
 en:verb:comes to

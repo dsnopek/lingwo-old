@@ -1,0 +1,46 @@
+
+== source entry ==
+
+ * have (auxilary verb): doesn't exist (probably has no equivalent in this language)
+ * lightning fast: doesn't exist
+ * just as: doesn't exist
+
+== translations that need updating/adding ==
+
+ * increase: check and clean-up
+ * mobility: check and clean-up
+ * scatter: check and clean-up (remove some translations)
+ * across: check and clean-up
+ * expect: check and clean-up
+ * lifetime: check and clean-up
+ * then: check and clean-up
+ * worker: check and clean-up
+ * educate: check and clean-up
+ * connect: check and clean-up
+ * cubicle: check and clean-up
+ * communication: check and clean-up
+ * die: clean-up
+ * city: clean-up
+ * define: clean-up
+ * where (conjunction): clean-up
+ * there (pronoun): I think this should really be "no equivalent"
+ * once (adverb): divide between senses and remove excess ones
+ * out of thin air: no translation
+ * take up: no translation
+ * workplace: no translation
+ * increasingly: no translation
+ * market: no translation
+ * re-: no translation
+ * keep up: no translation
+ * double-edged sword: no translation
+ * leave behind: no translation
+ * at the same time: no translation
+ * coworker: no translation
+
+== misc ==
+
+ * change (verb): need to import and check
+ * public (adjective): need to import and check
+ * private (adjective): need to import and check
+
+
