@@ -185,10 +185,12 @@ en:exclamation:so
 en:noun:American
 en:noun:China
 en:noun:Christian
+en:noun:France
 en:noun:God
 en:noun:Internet
 en:noun:Japan
 en:noun:Protestant
+en:noun:United States
 en:noun:act
 en:noun:age
 en:noun:alphabet
@@ -451,7 +453,6 @@ en:pronoun:our
 en:pronoun:someone
 en:pronoun:that
 en:pronoun:their
-en:pronoun:them
 en:pronoun:themselves
 en:pronoun:there
 en:pronoun:they
@@ -550,6 +551,7 @@ en:verb:say
 en:verb:scatter
 en:verb:see
 en:verb:seem
+en:verb:service
 en:verb:show
 en:verb:sit
 en:verb:smear
