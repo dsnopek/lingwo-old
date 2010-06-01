@@ -1,42 +1,11 @@
 
 == translations ==
 
- * apparent: check & clean-up (I don't know if any of those are correct and 4 is probably too many)
- * require: check & clean-up (divide amoung senses)
- * figure: check (it should have a meaning like calculate, does it?)
- * extra: check and clean-up (divide among senses if possible)
- * look: check and seperate (patrzyć and oglądać are very different senses)
- * remain: check and clean-up
- * pay: check and clean-up
- * file: check and clean-up
- * form: check and clean-up
- * tip: check and clean-up (piwka needs to be in there!)
- * insult: check and clean-up
- * Japonese: check and clean-up
- * percieve: check and clean-up
- * charity: check and clean-up
- * feeling: check and clean-up
- * until: check and clean-up
- * variations: check and clean-up
- * chase: check and clean-up (dogonić should be in there too, I think)
- * after: check and clean-up (the sense of "chase after" should "za", I think?)
- * like (przysłówek): "jak" should be included
- * state (rzeczownik): should have "kraj" and "rząd" added.
- * around: no translation
- * follow suit: no translation
- * tipping: no translation
- * mandated: no translation
- * untaxed: no translation
- * matter of course: no translation
- * underreport: no translation
- * westerner: no translation
- * given: no translation
+None.
 
 == source ==
 
- * in expectation: no source (w ociekiwaniu)
- * will (auxilary verb): no source (no equivalent in this language)
- * may (auxilary verb): no source (może)
+None.
 
 == import and check ==
 
@@ -47,3 +16,4 @@
 == misc ==
 
  * to have: "only to have East Asian waiters chase after them" ?? How to handle this?
+
