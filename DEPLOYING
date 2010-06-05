@@ -1,4 +1,6 @@
 
+== From Scratch ==
+
  * Create a 'lingwo' directory.
 
  * Check out all our required bzr repo's:
@@ -38,4 +40,34 @@
 
  * And create user for the importer here: /admin/user/user/create
    Be sure to make them an "editor"!
+ 
+== Updates ==
+
+  * Put the site offline: /admin/settings/site-maintenance
+
+  * Backup the database: /admin/content/backup_migrate
+    (Send to "Manual Backups Directory", which is $HOME/prj/lingwo_backups/manual)
+
+  * Backup the code:
+
+    cd ~/prj
+	tar -cjvpf lingwo-2010-XX-XX.tar.bz2 lingwo
+
+  * Check out all the new code
+
+    cd ~/prj
+	for d in *; do if [ -d $d ]; then (cd $d && bzr up); fi; done
+
+  * Update database: /update.php
+
+  * Save the modules page: /admin/build/modules
+
+    (What I want to happen, is for new dependencies to get enabled..  I'm not yet sure
+	 if this step accomplishes that.)
+
+  * Check if features are overridden: /admin/build/features
+
+  * TODO: Clear the views cache??
+
+  * TODO: Clear some other caches??
 
