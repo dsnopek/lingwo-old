@@ -24,6 +24,7 @@ en:adjective:direct
 en:adjective:divine
 en:adjective:educated
 en:adjective:elderly
+en:adjective:elegant
 en:adjective:equal
 en:adjective:extra
 en:adjective:federal
@@ -35,8 +36,11 @@ en:adjective:future
 en:adjective:good
 en:adjective:grammatical
 en:adjective:great
+en:adjective:green
 en:adjective:grownup
+en:adjective:hard
 en:adjective:healthy
+en:adjective:historical
 en:adjective:holy
 en:adjective:human
 en:adjective:illegal
@@ -44,6 +48,7 @@ en:adjective:important
 en:adjective:individual
 en:adjective:ingrained
 en:adjective:lightning fast
+en:adjective:like
 en:adjective:likely
 en:adjective:literal
 en:adjective:loath
@@ -62,6 +67,7 @@ en:adjective:old
 en:adjective:parental
 en:adjective:particular
 en:adjective:past
+en:adjective:pneumonic
 en:adjective:political
 en:adjective:popular
 en:adjective:private
@@ -69,13 +75,16 @@ en:adjective:prominent
 en:adjective:public
 en:adjective:puritan
 en:adjective:religious
+en:adjective:remaining
 en:adjective:runaway
 en:adjective:same
 en:adjective:scientific
 en:adjective:serious
 en:adjective:significant
 en:adjective:similar
+en:adjective:simple
 en:adjective:spiritual
+en:adjective:standard
 en:adjective:strange
 en:adjective:such
 en:adjective:superb
@@ -86,6 +95,7 @@ en:adjective:unique
 en:adjective:unseen
 en:adjective:untaxed
 en:adjective:up in arms
+en:adjective:used to
 en:adjective:warring
 en:adjective:wasting
 en:adjective:western
@@ -103,6 +113,7 @@ en:adverb:at least
 en:adverb:at the same time
 en:adverb:back
 en:adverb:before
+en:adverb:by heart
 en:adverb:by the time
 en:adverb:carefully
 en:adverb:clearly
@@ -130,13 +141,17 @@ en:adverb:maybe
 en:adverb:more
 en:adverb:most
 en:adverb:naturally
+en:adverb:no longer
 en:adverb:normally
 en:adverb:not
 en:adverb:now
+en:adverb:off
+en:adverb:off the top of one's head
 en:adverb:often
 en:adverb:on
 en:adverb:once
 en:adverb:only
+en:adverb:out
 en:adverb:out of thin air
 en:adverb:pretty much
 en:adverb:quickly
@@ -149,6 +164,7 @@ en:adverb:specially
 en:adverb:still
 en:adverb:then
 en:adverb:thus
+en:adverb:today
 en:adverb:too
 en:adverb:up
 en:adverb:usually
@@ -244,10 +260,12 @@ en:noun:century
 en:noun:chance
 en:noun:change
 en:noun:charity
+en:noun:cheese
 en:noun:childhood
 en:noun:children
 en:noun:chopstick
 en:noun:city
+en:noun:class
 en:noun:classroom
 en:noun:clown
 en:noun:college
@@ -269,6 +287,7 @@ en:noun:cubicle
 en:noun:curriculum
 en:noun:detail
 en:noun:development
+en:noun:device
 en:noun:devil
 en:noun:dispute
 en:noun:double-edged sword
@@ -280,12 +299,14 @@ en:noun:effect
 en:noun:election
 en:noun:emphasis
 en:noun:employer
+en:noun:energy
 en:noun:environment
 en:noun:evolution
 en:noun:example
 en:noun:existence
 en:noun:experience
 en:noun:fabric
+en:noun:fact
 en:noun:faith
 en:noun:fall
 en:noun:family
@@ -304,9 +325,11 @@ en:noun:frailty
 en:noun:friend
 en:noun:fundamentalist
 en:noun:gene
+en:noun:genus
 en:noun:germ
 en:noun:globophobia
 en:noun:grammar
+en:noun:grandparent
 en:noun:half
 en:noun:hearing
 en:noun:heaven
@@ -320,6 +343,7 @@ en:noun:hypothesis
 en:noun:ideal
 en:noun:ignorance
 en:noun:impression
+en:noun:information
 en:noun:insecurity
 en:noun:instructor
 en:noun:insult
@@ -330,6 +354,7 @@ en:noun:job
 en:noun:joint
 en:noun:kathisophobia
 en:noun:kid
+en:noun:kingdom
 en:noun:language
 en:noun:law
 en:noun:learner
@@ -339,30 +364,39 @@ en:noun:level
 en:noun:life
 en:noun:lifetime
 en:noun:line
+en:noun:list
 en:noun:looks
 en:noun:math
 en:noun:matter of course
 en:noun:meal
 en:noun:meaning
 en:noun:means
+en:noun:memorization
+en:noun:memory
 en:noun:men
 en:noun:menu
 en:noun:method
+en:noun:mind
 en:noun:minimum
 en:noun:miracle
 en:noun:mobility
 en:noun:modem
 en:noun:money
+en:noun:more
+en:noun:mother
+en:noun:much
 en:noun:name
 en:noun:nation
 en:noun:night
 en:noun:notion
 en:noun:number
+en:noun:nut
 en:noun:offer
 en:noun:omen
 en:noun:one
 en:noun:opportunity
 en:noun:option
+en:noun:order
 en:noun:other
 en:noun:owner
 en:noun:pace
@@ -373,6 +407,11 @@ en:noun:part
 en:noun:pattern
 en:noun:people
 en:noun:phobia
+en:noun:phrase
+en:noun:phylum
+en:noun:planet
+en:noun:pneumonic
+en:noun:poem
 en:noun:poll
 en:noun:pop
 en:noun:population
@@ -393,7 +432,9 @@ en:noun:puppet
 en:noun:quarter
 en:noun:reading
 en:noun:recipient
+en:noun:relationship
 en:noun:restaurant
+en:noun:rhyme
 en:noun:role
 en:noun:room
 en:noun:rule
@@ -405,10 +446,15 @@ en:noun:science
 en:noun:scientist
 en:noun:score
 en:noun:screen
+en:noun:sequence
 en:noun:service
 en:noun:skill
 en:noun:slice
 en:noun:society
+en:noun:song
+en:noun:sound
+en:noun:species
+en:noun:spinach
 en:noun:spine
 en:noun:stage
 en:noun:standard
@@ -420,11 +466,13 @@ en:noun:student
 en:noun:study
 en:noun:substance
 en:noun:success
+en:noun:sun
 en:noun:superiority
 en:noun:survey
 en:noun:table
 en:noun:target language
 en:noun:tax
+en:noun:taxonomy
 en:noun:teacher
 en:noun:technology
 en:noun:teens
@@ -446,6 +494,7 @@ en:noun:triumph
 en:noun:two
 en:noun:underpinning
 en:noun:university
+en:noun:upbringing
 en:noun:user
 en:noun:value
 en:noun:variation
@@ -489,6 +538,7 @@ en:preposition:near
 en:preposition:next to
 en:preposition:of
 en:preposition:on
+en:preposition:onto
 en:preposition:out of
 en:preposition:over
 en:preposition:to
@@ -540,7 +590,9 @@ en:verb:change
 en:verb:chase
 en:verb:choose
 en:verb:coin
+en:verb:come up with
 en:verb:comes to
+en:verb:commit
 en:verb:communicate
 en:verb:connect
 en:verb:continue
@@ -560,9 +612,12 @@ en:verb:fail
 en:verb:fear
 en:verb:figure
 en:verb:file
+en:verb:fix
 en:verb:focus
 en:verb:follow suit
 en:verb:forget
+en:verb:free up
+en:verb:fry
 en:verb:garner
 en:verb:gear
 en:verb:get
@@ -606,8 +661,10 @@ en:verb:perceive
 en:verb:picture
 en:verb:play
 en:verb:pop
+en:verb:prefer
 en:verb:profess
 en:verb:receive
+en:verb:recite
 en:verb:remain
 en:verb:render
 en:verb:require
@@ -619,8 +676,10 @@ en:verb:scatter
 en:verb:see
 en:verb:seek
 en:verb:seem
+en:verb:serve
 en:verb:service
 en:verb:show
+en:verb:siphon
 en:verb:sit
 en:verb:smear
 en:verb:speak
@@ -638,11 +697,13 @@ en:verb:thank
 en:verb:think
 en:verb:trace
 en:verb:trespass
+en:verb:try
 en:verb:undermine
 en:verb:underreport
 en:verb:update
 en:verb:urge
 en:verb:use
+en:verb:value
 en:verb:view
 en:verb:vow
 en:verb:want
