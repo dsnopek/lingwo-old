@@ -1,0 +1,22 @@
+
+== translations ==
+
+ * foreign - check & clean-up (mainly, "cudzoziemiec" should be "cudzoziemski")
+ * language - check & clean-up (is "mowa" appropriate?)
+ * level - check & clean-up (what is "poziomica"?)
+ * over - check & clean-up
+   - should it have "ponad"?
+   - need a sense for "dispute over"
+ * dispute - check & clean-up
+ * approach - check & clean-up
+ * drill - check & clean-up (split amoung multiple senses)
+
+ * best - clean-up (remove gendered forms)
+ * most - clean-up (remove extra junk)
+
+ * a great deal - no translation
+
+== source ==
+
+ * 
+
