@@ -10,13 +10,35 @@
  * dispute - check & clean-up
  * approach - check & clean-up
  * drill - check & clean-up (split amoung multiple senses)
+ * learn - check & clean-up (split amoung multiple senses, if possible)
+ * learn - check & clean-up (split amoung multiple senses, if possible)
+ * emphasis - check & clean-up
+ * particular - check & clean-up (too many translations!)
+ * rule - check & clean-up (should "zasada" also be in there?)
+ * acquisition - check & clean-up (too many translations!)
+ * argue - check & clean-up (too many translations!)
+ * track - check & clean-up (too many translations!)
+ * acquire - check & clean-up (too many translations!)
+ * toddler - check & clean-up (too many translations!)
+ * student - check & clean-up (should include "uczeń" shouldn't have "studentka")
+ * capture - check & clean-up (too many translations!)
+ * focus - check & clean-up (split amoung multiple senses, if possible)
+ * stretch - check & clean-up (too many translations!)
+ * user - check & clean-up ("użytkowniczka" isn't necessary)
 
  * best - clean-up (remove gendered forms)
  * most - clean-up (remove extra junk)
 
  * a great deal - no translation
+ * target language - no translation
+ * rather than - no translation
+ * gear - no translation
 
 == source ==
 
- * 
+ * low-stress - no entry!
+
+== misc ==
+
+ * make the case - should be its own phrase!
 
