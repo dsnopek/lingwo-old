@@ -1,0 +1,35 @@
+
+== translation ==
+
+ * poem: check & clean-up ("wiersz" is repeated in every sense!)
+ * value: check & clean-up (we don't need both "ocenić" and "oceniać")
+ * commit: check & clean-up (too many translations)
+ * phylum: check & clean-up
+ * genus: check & clean-up
+ * class: check & clean-up (get the biological meaning in there!)
+ * order: check & clean-up (get the biological meaning in there!)
+ * out: check & clean-up (need to get a sense meaning moving outward)
+ * serve: check & clean-up (too many translations)
+ * sequence: check
+ * simple: check & clean-up (remove the "(noun)" from the sense")
+
+ * fix: add a sense for "to stick"
+ * work: add a sense for "działać się"
+ * off: add a sense for "removing"
+
+ * memorization: check
+
+ * by heart: no translation
+ * off the top of one's head: no translation
+ * no longer: no translation ("już nie")
+ * used to: no translation
+ * pnuemonic (adj & noun): no translation
+ * siphon: no translation
+ * free up: no translation
+ * remaining: no translation
+ * come up with: no translation
+
+== source ==
+
+ * much (noun): should be "dużo"
+
