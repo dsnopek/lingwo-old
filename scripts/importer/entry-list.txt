@@ -57,6 +57,7 @@ en:adjective:low-stress
 en:adjective:major
 en:adjective:mandated
 en:adjective:materialistic
+en:adjective:mnemonic
 en:adjective:monetary
 en:adjective:moral
 en:adjective:natural
@@ -67,7 +68,6 @@ en:adjective:old
 en:adjective:parental
 en:adjective:particular
 en:adjective:past
-en:adjective:pneumonic
 en:adjective:political
 en:adjective:popular
 en:adjective:private
@@ -379,6 +379,7 @@ en:noun:method
 en:noun:mind
 en:noun:minimum
 en:noun:miracle
+en:noun:mnemonic
 en:noun:mobility
 en:noun:modem
 en:noun:money
@@ -410,7 +411,6 @@ en:noun:phobia
 en:noun:phrase
 en:noun:phylum
 en:noun:planet
-en:noun:pneumonic
 en:noun:poem
 en:noun:poll
 en:noun:pop
