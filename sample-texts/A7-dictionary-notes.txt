@@ -1,5 +1,6 @@
 
-== import & check ==
+== misc ==
 
- * mnemonic (adj & noun): no translation
+ * mnemonic (adj & noun): import and check
+ * commit to memory: should it be its own verb?
 
