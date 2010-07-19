@@ -34,6 +34,13 @@ function lingwo_korpus_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  $items['lingwo_korpus/admin/list_entries'] = array(
+    'title' => 'List Entries',
+    'page arguments' => array('lingwo_korpus_admin_list_entries'),
+    'page callback' => 'drupal_get_form',
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_CALLBACK,
+  );
   $items['node/%node/annotate'] = array(
     'title' => 'Annotate',
     'page arguments' => array('lingwo_korpus_annotator_form', 1),
@@ -278,6 +285,7 @@ function lingwo_korpus_filter_text($text, $lang_pair) {
     // convert to a link
     $el->tag = 'a';
     $el->class = 'anno';
+    # TODO: this should be a library function somewhere
     $el->href = url(lingwo_dictionary_settings('lookup_path').'/'.$lang_pair.'/'.$headword.'('.$attrs['pos'].')');
     $el->setAttribute('data-form', $attrs['form']);
     $el->setAttribute('data-sense', $attrs['sense']);
@@ -314,6 +322,72 @@ function lingwo_korpus_text_entry_list($text, $lang) {
   }
 
   return $entries;
+}
+
+function lingwo_korpus_admin_list_entries(&$form_state) {
+  $form['input'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Korpus Text'),
+    '#default_value' => $form_state['values']['input'],
+  );
+
+  # TODO: this should be a library function, probably.
+  $language_list = language_list('enabled');
+  foreach ($language_list[1] as $lang_name => $lang) {
+    $language_options[$lang_name] = $lang->name;
+  }
+  $form['from_lang'] = array(
+    '#type' => 'select',
+    '#title' => t('From Language'),
+    '#options' => $language_options,
+    '#default_value' => $form_state['values']['from_lang'],
+  );
+  $form['to_lang'] = array(
+    '#type' => 'select',
+    '#title' => t('To Language'),
+    '#options' => array('' => '-') + $language_options,
+    '#default_value' => $form_state['values']['to_lang'],
+  );
+  $form['as_nid'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('As Nid'),
+    '#default_value' => $form_state['values']['as_nid']
+  );
+
+  if ($form_state['values']['input']) {
+    $links = array();
+    foreach (lingwo_korpus_text_entry_list($form_state['values']['input'], $form_state['values']['from_lang']) as $entry) {
+      $nid = lingwo_dictionary_entry_lookup($entry->headword, $entry->language, $entry->pos);
+
+      if (!empty($form_state['values']['to_lang'])) {
+        $trans = translation_node_get_translations($nid);
+        if ($trans[$form_state['values']['to_lang']]) {
+          $nid = $trans[$form_state['values']['to_lang']]->nid;
+        }
+      }
+
+      if ($form_state['values']['as_nid']) {
+        $links[] = $nid;
+      }
+      else {
+        $links[] = url('node/'. $nid, array('absolute' => TRUE));
+      }
+    }
+
+    $form['output'] = array(
+      '#type' => 'textarea',
+      '#value' => implode("\n", $links)
+    );
+  }
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+  return $form;
+}
+
+function lingwo_korpus_admin_list_entries_submit($form, &$form_state) {
+  $form_state['rebuild'] = TRUE;
 }
 
 /**
