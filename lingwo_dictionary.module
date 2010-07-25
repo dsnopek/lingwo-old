@@ -301,7 +301,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       $object = (object)array(
         'language' => $node->language,
         'pos' => lingwo_dictionary_entry_get_pos($node),
-        'title' => $node->title,
+        'headword' => $node->title,
         'nid' => $node->nid,
       );
       drupal_write_record('lingwo_dictionary_entry', $object);
