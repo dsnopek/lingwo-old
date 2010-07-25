@@ -27,8 +27,8 @@ function lingwo_dictionary_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
-      'title' => array(
-        'description' => 'The title of this node.',
+      'headword' => array(
+        'description' => 'The headword of this entry.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
@@ -40,10 +40,21 @@ function lingwo_dictionary_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE
       ),
+      'entry_hash' => array(
+        'description' => 'A SHA-1 hash of language, pos and headword',
+        'type' => 'char',
+        'length'   => '40',
+        'not null' => TRUE,
+        'default' => '',
+      ),
     ),
-    'primary key' => array('language', 'pos', 'title'),
+    'primary key' => array('language', 'pos', 'headword'),
     'unique keys' => array(
       'node' => array('nid'),
+    ),
+    'index' => array(
+      // probably should be unique, but I don't want to risk it right now
+      'entry_hash_index' => array('entry_hash'),
     ),
     // The default collation (utf8_general_ci) treats accented characters (like: ó, ą, ę, ń)
     // as equivalent to their unaccented counter-parts.  Also, we want entry titles to be
@@ -60,11 +71,27 @@ function lingwo_dictionary_update_6001() {
   return $ret;
 }
 
+function lingwo_dictionary_update_6002() {
+  $ret = array();
+  $ret[] = update_sql("ALTER TABLE {lingwo_dictionary_entry} CHANGE COLUMN title headword VARCHAR(255) NOT NULL DEFAULT ''");
+  $ret[] = update_sql("ALTER TABLE {lingwo_dictionary_entry} ADD COLUMN entry_hash CHAR(40) NOT NULL DEFAULT ''");
+
+  $res = db_query('SELECT language, pos, headword, nid FROM {lingwo_dictionary_entry}');
+  while ($entry = db_fetch_object($res)) {
+    lingwo_dictionary_entry_generate_hash($entry);
+    drupal_write_record('lingwo_dictionary_entry', $entry,
+      array('language', 'pos', 'headword'));
+  }
+
+  $ret[] = update_sql("CREATE INDEX entry_hash_index ON {lingwo_korpus_entry} (entry_hash)");
+
+  return $ret;
+}
+
 /**
  * Implementation of hook_install().
  */
 function lingwo_dictionary_install() {
-  variable_set('lingwo_dictionary_schema_version', 6000);
   drupal_install_schema('lingwo_dictionary');
 
   // we need to happen after the "locale" module (which we would if the module name was
@@ -77,6 +104,5 @@ function lingwo_dictionary_install() {
  */
 function lingwo_dictionary_uninstall() {
   drupal_uninstall_schema('lingwo_dictionary');
-  variable_del('lingwo_dictionary_schema_version');
 }
 

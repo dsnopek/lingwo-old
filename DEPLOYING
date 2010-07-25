@@ -55,7 +55,7 @@
 
   * Check out all the new code
 
-    cd ~/prj
+    cd ~/prj/lingwo
 	for d in *; do if [ -d $d ]; then (cd $d && bzr up); fi; done
 
   * Update database: /update.php

@@ -87,6 +87,10 @@ function lingwo_dictionary_entry_from_id($id) {
   return $nid;
 }
 
+function lingwo_dictionary_entry_generate_hash(&$entry) {
+  $entry->entry_hash =
+    sha1(join(':', array($entry->language, $entry->pos, $entry->headword)));
+}
 
 // Lookup an entry based on its headword, language and pos
 function lingwo_dictionary_entry_lookup($headword, $language, $pos = NULL) {

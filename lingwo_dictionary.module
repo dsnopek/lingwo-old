@@ -335,6 +335,16 @@ function lingwo_dictionary_locale_refresh() {
 }
 
 /**
+ * Implementation of hook_views_api().
+ */
+function lingwo_dictionary_views_api() {
+  return array(
+    'api'  => 2,
+    'path' => drupal_get_path('module', 'lingwo_dictionary'),
+  );
+}
+
+/**
  * Implementation of hook_theme().
  */
 function lingwo_dictionary_theme() {
