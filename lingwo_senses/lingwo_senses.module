@@ -330,6 +330,12 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
           '#title' => t('Example'),
           '#value' => $orig_sense['data']['example'],
         );
+        $sense_form['data']['example_translation'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Translation of Example'),
+          '#default_value' => $sense['data']['example_translation'],
+          '#maxlength' => 255,
+        );
       }
     }
 
@@ -703,7 +709,13 @@ function theme_lingwo_senses_translation($node, $items) {
     $output .= join(', ', $values);
 
     if (!empty($orig_sense['data']['example'])) {
-      $output .= '<blockquote class="lingwo-example">"'. $orig_sense['data']['example'] .'"</blockquote>';
+      $output .= '<blockquote class="lingwo-example">"'. $orig_sense['data']['example'] .'"';
+      
+      if (!empty($sense['example_translation'])) {
+        //$output .= ' &rarr; "'. $sense['example_translation'] .'"';
+        $output .= ' -&gt; "'. $sense['example_translation'] .'"';
+      }
+      $output .= '</blockquote>';
     }
     $output .= '</li>';
   };
