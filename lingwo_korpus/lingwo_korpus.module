@@ -61,9 +61,8 @@ function lingwo_korpus_lookup_entry() {
 
   // get the "Lingwo ID" out of the 'url' GET argument
   $url = urldecode($_GET['url']);
-  $url = preg_replace(':^'.base_path().':', '', $url);
-  $url = preg_replace(':^'.lingwo_dictionary_settings('lookup_path').'/:', '', $url);
-
+  $url = preg_replace(':.*?'.lingwo_dictionary_settings('lookup_path').'/(.*):', '$1', $url);
+  
   // load the node with this ID
   $nid = lingwo_dictionary_entry_from_id($url);
   if (is_null($nid)) {
