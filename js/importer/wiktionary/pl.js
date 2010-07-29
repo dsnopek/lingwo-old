@@ -606,6 +606,8 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                     return;
                 }
 
+                //var JSON = require.get('lingwo_dictionary/util/json2');
+
                 var map = {};
                 var idx = {};
                 var res = [];
@@ -629,10 +631,10 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                     }
                     if (curPos != entry.pos) return;
 
-                    name = extractRegex(line, /\((\d\.\d)\)/, 1);
+                    name = extractRegex(line, /\((\d\.\d\d?)\)/, 1);
 
                     // Remove the sense numbers
-                    line = line.replace(/\(\d\.\d\)/g, '');
+                    line = line.replace(/\(\d\.\d\d?\)/g, '');
                     line = WikiText.clean(line);
 
                     if (entry.language.name == 'pl') {
@@ -671,22 +673,28 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
 
                 if (sections['examples']) {
                     sections['examples'].forEach(function (line) {
-                        var name = getName(line);
+                        var name = getName(line), example_parts;
                         if (name === null) {
                             return;
                         }
 
                         // Remove the sense numbers
-                        line = line.replace(/\(\d\.\d\)/g, '');
-                        line = WikiText.clean(line);
+                        line = line.replace(/\(\d\.\d\d?\)/g, '');
 
-                        // drop translations of the examples!
-                        line = line.replace(/\u2192.*$/, '');
-
-                        map[name].example = text_utils.limitString(line, 255);
+                        // break up the example and its translation
+                        example_parts = line.split('\u2192');
+                        map[name].example = text_utils.limitString(WikiText.clean(example_parts[0]), 255);
+                        if (example_parts[1] && entry.language.name != 'pl') {
+                            // store the example translation
+                            entry.translations.pl.senses[idx[name]].example_translation =
+                                text_utils.limitString(WikiText.clean(example_parts[1]), 255);
+                        }
                     });
                 }
 
+                // The translations section is only present when we are importing Polish words!  This
+                // would contain the Polish -> * translations.  When its a * -> Polish words, it happens
+                // above in the "meaning" section.
                 if (sections['translations']) {
                     sections['translations'].forEach(function (line) {
                         var lang = extractRegex(line, /^\* ([^:]+):/, 1, langCodes, 'langCodes');

@@ -126,6 +126,7 @@ require([
 
             // pass into the language specific parser
             parser(entry);
+            //print (JSON.stringify(entry.senses));
             //print (JSON.stringify(entry.translations.pl));
 
             try {
