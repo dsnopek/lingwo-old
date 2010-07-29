@@ -19,7 +19,12 @@
                 $('.node', contentArea).removeClass('clear-block');
 
                 if (sense_id) {
-                  $('.lingwo-sense-id-'+sense_id, contentArea).addClass('selected');
+                    $('.lingwo-sense-id-'+sense_id, contentArea).addClass('selected');
+                }
+
+                // hack to integrate the flag module
+                if (Drupal.flagLink) {
+                    Drupal.flagLink(contentArea);
                 }
             }
         );
