@@ -41,11 +41,27 @@ function lingwo_dictionary_views_data() {
         # TODO: we need to do something to get the values for arguments
 
         'field' => array(
-          'handler' => 'views_handler_field',
+          'handler' => 'lingwo_dictionary_views_handler_field_pos',
           'click sortable' => TRUE,
         ),
       ),
     )
+  );
+}
+
+/**
+ * Implementation of hook_views_handlers().
+ */
+function lingwo_dictionary_views_handlers() {
+  return array(
+    'info' => array(
+      'path' => drupal_get_path('module', 'lingwo_dictionary'),
+    ),
+    'handlers' => array(
+      'lingwo_dictionary_views_handler_field_pos' => array(
+        'parent' => 'views_handler_field',
+      ),
+    ),
   );
 }
 

@@ -48,6 +48,7 @@ function lingwo_korpus_views_data() {
         'help' => t('The headword of this entry'),
         'field' => array(
           'handler' => 'views_handler_field',
+          'click sortable' => TRUE,
         ),
         'sort' => array(
           'handler' => 'views_handler_sort',
@@ -60,6 +61,10 @@ function lingwo_korpus_views_data() {
         'field' => array(
           # TODO: we might want to make a custom one of these
           'handler' => 'views_handler_field_locale_language',
+          'click sortable' => TRUE,
+        ),
+        'sort' => array(
+          'handler' => 'views_handler_sort',
         ),
       ),
 
@@ -67,9 +72,12 @@ function lingwo_korpus_views_data() {
         'title' => t('Part Of Speech'),
         'help' => t('The part of speech of this entry'),
         'field' => array(
-          # TODO: we should show in the human readable form
-          'handler' => 'views_handler_field',
-        )
+          'handler' => 'lingwo_dictionary_views_handler_field_pos',
+          'click sortable' => TRUE,
+        ),
+        'sort' => array(
+          'handler' => 'views_handler_sort',
+        ),
       ),
 
       'sense' => array(

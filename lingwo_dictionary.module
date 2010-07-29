@@ -170,6 +170,11 @@ function lingwo_dictionary_pos_options($translate = FALSE, $option_name = NULL) 
     $options[$key] = $value;
   }
 
+  if (!is_null($option_name)) {
+    // we requested an option but it isn't here!  Return the original.
+    return $option_name;
+  }
+
   asort($options);
 
   return $options;
