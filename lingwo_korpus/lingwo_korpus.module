@@ -234,7 +234,7 @@ function lingwo_korpus_generate_hash(&$item) {
  * Implementation of hook_nodeapi().
  */
 function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
-  global $user;
+  global $user, $language;
 
   if ($node->type != lingwo_korpus_text_content_type())
     return;
@@ -260,12 +260,12 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
     // display the text with the reader
     if ($a4) {
       $node_language = $node->language ? $node->language : language_default();
-      if ($node_language == $user->language) {
+      if ($node_language == $language->language) {
         drupal_set_message(t('You are reading a text written in the same language as your language!  Please set "My Language" to your correct native language or find a different text.'), 'error');
         return;
       }
 
-      $lang_pair =  $node_language .'-'. $user->language;
+      $lang_pair =  $node_language .'-'. $language->language;
       $cid = $node->nid .'-'. $lang_pair;
 
       // get from the cache or process the data
