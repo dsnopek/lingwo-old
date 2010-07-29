@@ -83,7 +83,7 @@ function lingwo_dictionary_update_6002() {
       array('language', 'pos', 'headword'));
   }
 
-  $ret[] = update_sql("CREATE INDEX entry_hash_index ON {lingwo_korpus_entry} (entry_hash)");
+  $ret[] = update_sql("CREATE INDEX entry_hash_index ON {lingwo_dictionary_entry} (entry_hash)");
 
   return $ret;
 }
