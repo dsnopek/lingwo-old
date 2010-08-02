@@ -50,3 +50,35 @@ word {
     padding: 20px;
 }
 
+.anno-form-button {
+    margin-right: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    color: blue;
+}
+
+#edit-anno-form-select-senses {
+  position: absolute;
+  right: 0;
+}
+
+#sense-selector-return {
+  display: block;
+  text-align: right;
+}
+
+.sense-selector-data-item {
+}
+
+.sense-selector-data-item input {
+  display: block;
+  float: left;
+  width: 20px;
+  margin-right: 10px;
+}
+
+.sense-selector-data-item-label {
+  float: left;
+  width: 200px;
+}
+

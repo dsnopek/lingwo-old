@@ -30,11 +30,13 @@
                 saveAnnotation();
                 reader.hideDialog();
                 curAnno = null;
+                return false;
             });
             $('#edit-anno-form-delete').click(function (evt) {
                 deleteAnnotation();
                 reader.hideDialog();
                 curAnno = null;
+                return false;
             });
             $('#edit-anno-form-cancel').click(function (evt) {
                 if (mode == 'add') {
@@ -42,10 +44,71 @@
                 }
                 reader.hideDialog();
                 curAnno = null;
+                return false;
+            });
+
+            // setup a seperate section for holding the senses
+            $('<div id="sense-selector"><div id="sense-selector-data"></div><a href="#" id="sense-selector-return" class="anno-form-button"></a></div>')
+                .css('display', 'none')
+                .appendTo(contentArea);
+            $('#sense-selector-return')
+                .text(Drupal.t('Return to annotation...'))
+                .click(function (evt) {
+                    $('#sense-selector').hide();
+                    $('#edit-anno-form').show();
+                    return false;
+                });
+            $('#edit-anno-form-select-senses').click(function (evt) {
+                $('#sense-selector').show();
+                $('#edit-anno-form').hide();
+
+                // load the senses
+                $('#sense-selector-data').text(Drupal.t('Loading...'));
+
+                $.getJSON('/lingwo_korpus/lookup_senses', {
+                    'language': Drupal.settings.lingwo_korpus.text.language,
+                    'headword': $('#edit-anno-form-headword').val(),
+                    'pos': $('#edit-anno-form-pos :selected').val()
+                }, function (res) {
+                    var sense_id, data = $('#sense-selector-data'), sense;
+                    data.html('');
+                    if (res.senses) {
+                        $('<div class="sense-selector-data-item clear-block"></div>')
+                            .append(
+                                $('<input type="radio" name="sense-selector-value" value=""></input>')
+                                .attr('checked', !curAnno.attr('sense') ? 'checked' : null))
+                            .append('<div class="sense-selector-data-item-label><b>'+Drupal.t('None')+'</b></div>')
+                            .appendTo(data);
+
+                        for (sense_id in res.senses) {
+                            sense = res.senses[sense_id];
+                            $('<div class="sense-selector-data-item clear-block"></div>')
+                                .append(
+                                    $('<input type="radio" name="sense-selector-value"></input>')
+                                    .attr('checked', curAnno.attr('sense') == sense_id ? 'checked' : null)
+                                    .val(sense_id))
+                                .append(
+                                    '<div class="sense-selector-data-item-label">' +
+                                    ((!sense.difference && !sense.example) ? sense_id : (
+                                      (sense.difference ? ('<div><b>'+Drupal.t('Difference')+'</b>: '+sense.difference+'</div>') : '') +
+                                      (sense.example    ? ('<div><b>'+Drupal.t('Example')+'</b>: '+sense.example+'</div>') : ''))) +
+                                    '</div>')
+                                .appendTo(data);
+                        }
+                    }
+                    else {
+                        data.html('<i>'+Drupal.t('No entry found.')+'</i>');
+                    }
+                });
+
+                return false;
             });
 
             formMoved = true;
         }
+
+        $('#edit-anno-form').show();
+        $('#sense-selector').hide();
 
         $('#edit-anno-form-headword').val(target.attr('headword') || target.text());
         $('#edit-anno-form-pos').val(target.attr('pos'));
@@ -56,7 +119,7 @@
     }
 
     function saveAnnotation() {
-        var headword, changed = false;
+        var headword, changed = false, sense;
 
         if (curAnno === null) {
             return;
@@ -80,6 +143,15 @@
         }
         else {
             curAnno.removeAttr('attributive');
+        }
+
+        // sense
+        sense = $("input[@name='sense-selector-value']:checked").val();
+        if (sense) {
+            curAnno.attr('sense', sense);
+        }
+        else {
+            curAnno.removeAttr('sense');
         }
 
         // show that it is changed to the user

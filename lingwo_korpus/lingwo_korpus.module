@@ -34,6 +34,12 @@ function lingwo_korpus_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  $items['lingwo_korpus/lookup_senses'] = array(
+    'title' => 'Lookup Senses',
+    'page callback' => 'lingwo_korpus_lookup_senses',
+    'access arguments' => array('annotate lingwo_korpus texts'),
+    'type' => MENU_CALLBACK,
+  );
   $items['lingwo_korpus/admin/list_entries'] = array(
     'title' => 'List Entries',
     'page arguments' => array('lingwo_korpus_admin_list_entries'),
@@ -81,6 +87,32 @@ function lingwo_korpus_lookup_entry() {
 
   // return the HTML to the Ajax caller
   drupal_json(array('content' => $content));
+}
+
+/*
+ * Our senses lookup AJAX callback.
+ */
+function lingwo_korpus_lookup_senses() {
+  $language = urldecode($_GET['language']);
+  $pos = urldecode($_GET['pos']);
+  $headword = urldecode($_GET['headword']);
+
+  $nid = lingwo_dictionary_entry_lookup($headword, $language, $pos);
+  if (!empty($nid)) {
+    $node = node_load($nid);
+    # HACK: This has no way of knowing this is the field!  We really need to
+    # change the storage mechanizm of lingwo_senses away from CCK.
+    $field_senses = 'field_senses';
+    $senses = array();
+    foreach ($node->$field_senses as $sense) {
+      $senses[$sense['id']] = array(
+        'example'    => $sense['data']['example'],
+        'difference' => $sense['data']['difference'],
+      );
+    }
+  }
+
+  drupal_json(array('senses' => $senses));
 }
 
 /* 
@@ -134,20 +166,35 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
     '#type' => 'checkbox',
     '#title' => t('Attributive'),
   );
+
   $form['anno-form']['save'] = array(
-    '#value' => '<button id="edit-anno-form-save">'. t('Save Annotation') .'</button>',
+    '#value' => '<a href="#" class="anno-form-button" id="edit-anno-form-save">'. t('Save') .'</a>',
   );
   $form['anno-form']['delete'] = array(
-    '#value' => '<button id="edit-anno-form-delete">'. t('Delete') .'</button>',
+    '#value' => '<a href="#" class="anno-form-button" id="edit-anno-form-delete">'. t('Delete') .'</a>',
   );
   $form['anno-form']['cancel'] = array(
-    '#value' => '<button id="edit-anno-form-cancel">'. t('Cancel') .'</button>',
+    '#value' => '<a href="#" class="anno-form-button" id="edit-anno-form-cancel">'. t('Cancel') .'</a>',
+  );
+
+  $form['anno-form']['select-senses'] = array(
+    '#value' => '<a href="#" class="anno-form-button" id="edit-anno-form-select-senses">'.
+      t('Select Senses...') .'</a>',
   );
 
   $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
   );
+
+  drupal_add_js(array(
+    'lingwo_korpus' => array(
+      'text' => array(
+        'nid'      => $node->nid,
+        'language' => $node->language,
+      ),
+    ),
+  ), 'setting');
 
   lingwo_dictionary_add_require_js();
   drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotator.js');
