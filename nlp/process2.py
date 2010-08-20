@@ -1,5 +1,5 @@
 
-import html5lib
+import html5lib, re
 from xml.dom import Node
 import nltk
 
@@ -65,10 +65,10 @@ class ElementString(object):
     def _splitEndPoint(self, index, which):
         lookupIndex, (pos, elem), localIndex = self._find(index)
         if which == ElementString._SPLIT_END and localIndex == 0:
-            # we really want the previous element because we are before the edge
+            # we really want the previous element because we are past the edge
             lookupIndex, (pos, elem), localIndex = self._find(index-1)
         elif which == ElementString._SPLIT_START and localIndex == len(elem.nodeValue)-1:
-            # we really want the next element because we are past the edge
+            # we really want the next element because we are before the edge
             lookupIndex, (pos, elem), localIndex = self._find(index+1)
 
         # we move up the tree if we are on the very edge of a word annotation
@@ -101,16 +101,16 @@ class ElementString(object):
         parts = [elem, sibling]
         return parts[which]
 
-    def make_sentence(self, startIndex, endIndex):
+    def wrap_in_element(self, elemName, startIndex, endIndex):
         startElem = self._splitEndPoint(startIndex, ElementString._SPLIT_START)
         endElem = self._splitEndPoint(endIndex, ElementString._SPLIT_END)
-        #print startElem, endElem
         if startElem.parentNode != endElem.parentNode:
-            #print self._lookup
+            print startElem, endElem
+            print self._lookup
             raise "(for now) the sentence can only exist where the start and end point have the same parent"
 
         doc = startElem.ownerDocument
-        sentenceElem = doc.createElement('s')
+        sentenceElem = doc.createElement(elemName)
         parent = startElem.parentNode
         parent.insertBefore(sentenceElem, startElem)
         child = startElem
@@ -125,21 +125,36 @@ class ElementString(object):
                 break
             child = nextChild
 
-class SentenceSegmenter(object):
-    ELEMENTS_BLOCK = ['div','p']
+class Segmenter(object):
+    # These elements don't strictly have to be "block" elements, they simply are elements
+    # which sentences and words cannot cross, ie:
+    #
+    #   <p>This paragraph cannot be a sentence</p> with this text.
+    #
+    BLOCK_ELEMENTS = ['div','p','li','td','th','dt','dd','blockquote','center','h1','h2','h3','h4','h5','h6','address','del','ins','pre']
+
+    # These are elements so problematic, that we simply ignore them if they happen to wander
+    # into our innocent HTML document.
+    SKIP_ELEMENTS = ['input','button','label','legend','option','textarea','iframe']
     
-    def __init__(self, tokenize=nltk.sent_tokenize):
+    def __init__(self, elemName, tokenize):
+        self._elemName = elemName
         self._tokenize = tokenize
 
     def _doInner(self, parent):
         child = parent.firstChild
         while child:
             if child.nodeType == Node.ELEMENT_NODE:
-                if child.tagName in SentenceSegmenter.ELEMENTS_BLOCK:
+                if child.tagName in Segmenter.BLOCK_ELEMENTS:
                     # if we encounter a block element, we have to segment what we have so
                     # far and then start over
                     self._doSegment()
                     self._doOuter(child)
+                elif child.tagName == self._elemName or child.tagName in Segmenter.SKIP_ELEMENTS:
+                    # if we encounter one of the same type of segments we are building, then
+                    # we segment what we have so far and skip it.
+                    self._doSegment()
+                    pass
                 else:
                     self._doInner(child)
             elif child.nodeType in (Node.TEXT_NODE, Node.CDATA_SECTION_NODE):
@@ -153,13 +168,20 @@ class SentenceSegmenter(object):
     def _doSegment(self):
         if not self._elemStr.is_empty():
             raw_text = str(self._elemStr)
-            sents = self._tokenize(raw_text)
-            for sent in sents:
-                startIndex = raw_text.find(sent)
-                endIndex = startIndex + len(sent)
+            segments = self._tokenize(raw_text)
+            endIndex = 0
+            for seg in segments:
+                #if not re.match(r'\w', seg):
+                #    # if this segment has no "word" characters in it, we don't
+                #    # really want it
+                #    continue
+                print seg
+                startIndex = raw_text.find(seg, endIndex)
+                endIndex = startIndex + len(seg)
+                print startIndex, endIndex
 
                 #print startIndex, endIndex, sent
-                self._elemStr.make_sentence(startIndex, endIndex)
+                self._elemStr.wrap_in_element(self._elemName, startIndex, endIndex)
 
         self._elemStr.reset()
 
@@ -167,13 +189,26 @@ class SentenceSegmenter(object):
         self._elemStr = ElementString()
         self._doOuter(elem)
 
+class SentenceSegmenter(Segmenter):
+    def __init__(self, tokenize=nltk.sent_tokenize):
+        Segmenter.__init__(self, 's', tokenize)
+
+class WordSegmenter(Segmenter):
+    def __init__(self, tokenize=nltk.word_tokenize):
+        Segmenter.__init__(self, 'word', tokenize)
+
 def main():
-    fd = open('text1.txt', 'rt')
+    fd = open('text1-clean.txt', 'rt')
     doc = html5lib.parse(fd, treebuilder="dom")
     #buildOuter(doc.getElementsByTagName('body')[0])
     #segmentSentences(s)
-    segmenter = SentenceSegmenter()
-    segmenter.run(doc.getElementsByTagName('body')[0])
+    sent_segmenter = SentenceSegmenter()
+    sent_segmenter.run(doc.getElementsByTagName('body')[0])
+
+    #word_segmenter = WordSegmenter()
+    #for sent in doc.getElementsByTagName('s'):
+    #    word_segmenter.run(sent)
+
     print doc.toxml()
 
 if __name__ == '__main__': main()

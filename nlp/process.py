@@ -22,6 +22,10 @@ def clean_html(html):
     cleaned = re.sub(r"  ", " ", cleaned)
     return cleaned.strip()
 
+def clean_text(html):
+    cleaned = re.sub(r"(?s)</?word.*?>", "", html)
+    return cleaned
+
 def tokenize(tree):
     l = []
     for elem in tree.getiterator():
