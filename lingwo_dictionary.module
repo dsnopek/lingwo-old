@@ -37,14 +37,14 @@ function _ld_element_process(&$element, $process_func) {
 
 // Helper for implementing AHAH
 // TODO: now that we are using ahah_helper, this should be removed
-function _ld_form_to_node(&$form, &$form_state) {
+function &_ld_form_to_node(&$form, &$form_state) {
   $form['#submit'] = array('');
   $node = node_form_submit_build_node($form, $form_state);
 
   // hack to stop taxonomy from resetting when the form is rebuilt
   //$form_state['node']['taxonomy'] = taxonomy_preview_terms($node);
 
-  return $node;
+  return $form_state['node'];
 }
 
 function lingwo_dictionary_add_require_js() {

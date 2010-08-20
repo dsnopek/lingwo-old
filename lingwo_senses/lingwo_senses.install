@@ -52,14 +52,14 @@ function _lingwo_senses_insert_new_sense($senses) {
   );
 
   foreach ($senses as $sense) {
-    # TODO: we should run some kind of clean up on the senses (ie. throw out empty trans,
-    # same_as and no_equivalent).  This would need to be moved into the module as well so
-    # that we get it on the edit pages.
     array_push($new->data, array(
       'id' => $sense->id,
       'data' => is_null($sense->data) ? NULL : unserialize($sense->data),
     ));
   }
+
+  # clean up the data
+  _lingwo_senses_clean($new->data);
 
   drupal_write_record('lingwo_senses_revisions', $new);
 }
@@ -129,8 +129,8 @@ function lingwo_senses_update_6001() {
         }
         _lingwo_senses_insert_new_sense($senses);
 
-		// remove the CCK field
-		content_field_instance_delete($field_name, $entry_content_type);
+        // remove the CCK field
+        content_field_instance_delete($field_name, $entry_content_type);
       }
     }
   }

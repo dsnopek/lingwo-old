@@ -51,61 +51,6 @@ function lingwo_senses_theme() {
 }
 
 /**
- * Implementation of hook_field().
- */
-# TODO: remove this!
-function lingwo_senses_field($op, &$node, $field, &$items, $teaser, $page) {
-  switch ($op) {
-    case 'load':
-      // Content_storage does serialize each field item's columns (if the 
-      // 'serialize' key for that column is set) upon writing to the db,
-      // but does not unserialize when reading from the db. Hopefully,
-      // this will be fixed in the future, but for now, we have to 
-      // explicitly unserialize.
-      if (is_array($items)) {
-        foreach ($items as &$item) {
-          if (is_string($item['data'])) {
-            $item['data'] = unserialize($item['data']);
-          }
-        }
-        return (array($field['field_name'] => $items));
-      }
-      break;
-
-    case 'presave':
-      // remove some cruft that sneaks into the data
-      unset($items['wrapper']);
-      foreach ($items as &$item) {
-        // if 'same_as' is set, then we clear the other fields
-        if (!empty($item['data']['same_as'])) {
-          unset($item['data']['trans']);
-          unset($item['data']['clue']);
-        }
-      }
-      break;
-
-    case 'validate':
-      return $items;
-  }
-}
-
-/**
- * Implementation of hook_content_is_empty().
- */
-# TODO: remove this!
-function lingwo_senses_content_is_empty($item, $field=NULL) {
-  if ($item['retire_sense']) {
-    return TRUE;
-  }
-  return FALSE;
-}
-
-# TODO: remove this!
-function lingwo_senses_not_marker_row($item, $field=NULL) {
-  return !empty($item['id']);
-}
-
-/**
  * Implementation of hook_form_alter().
  */
 function lingwo_senses_form_alter(&$form, $form_state, $form_id) {
@@ -131,6 +76,61 @@ function lingwo_senses_content_extra_fields($type_name) {
   return $extra;
 }
 
+function _lingwo_senses_retire_helper($item) {
+  if ($item['retire_sense']) {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+function _lingwo_senses_clean(&$senses) {
+  unset($senses['wrapper']);
+
+  // retire senses
+  $senses = array_filter($senses, '_lingwo_senses_retire_helper');
+
+  $weight = array();
+  foreach ($senses as &$sense) {
+    // weight and some other extra stuff..
+    if (isset($sense['weight'])) {
+      $weight[] = $sense['weight'];
+    }
+    unset($sense['weight'], $sense['remove_sense']);
+
+    // if 'same_as' is set, then we clear the other fields
+    if (!empty($sense['data']['same_as'])) {
+      unset($sense['data']['trans']);
+      unset($sense['data']['clue']);
+    }
+    else {
+      unset($sense['data']['same_as']);
+    }
+    // clear translations on no_equivalent
+    if ($sense['data']['no_equivalent']) {
+      $sense['data']['trans'] = array();
+    }
+    else {
+      unset($sense['data']['no_equivalent']);
+    }
+    // remove empty translations
+    if (isset($sense['data']['trans'])) {
+      $sense['data']['trans'] = array_filter($sense['data']['trans']);
+    }
+
+    // remove empty fields
+    foreach (array('example','example_translation','clue') as $name) {
+      if (empty($sense['data'][$name])) {
+        unset($sense['data'][$name]);
+      }
+    }
+  }
+
+  if (!empty($weight) && count($weight) == count($senses)) {
+    // put in the order by weight (but only if it was given)
+    array_multisort($weight, SORT_ASC, $senses);
+  }
+}
+
 /**
  * Implementation of hook_nodeapi().
  */
@@ -145,15 +145,32 @@ function lingwo_senses_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
         return array('lingwo_senses' => unserialize($row->data));
       }
       break;
-    case 'insert':
-      $object = (object)array(
-        'language' => $node->language,
-        'pos' => lingwo_dictionary_entry_get_pos($node),
-        'headword' => $node->title,
-        'nid' => $node->nid,
-      );
-      drupal_write_record('lingwo_dictionary_entry', $object);
+
+    case 'presave':
+    case 'prepare':
+      # prepare: an unclean $node->lingwo_senses can mess up the edit form
+      # presave: clean the senses before save
+      if (!empty($node->lingwo_senses)) {
+        _lingwo_senses_clean($node->lingwo_senses);
+      }
       break;
+
+    case 'insert':
+    case 'update':
+      $object = (object)array(
+        'nid'  => $node->nid,
+        'vid'  => $node->vid,
+        'data' => $node->lingwo_senses,
+      );
+
+      if (!empty($node->revision) || $op == 'insert' ) {
+        drupal_write_record('lingwo_senses_revisions', $object);
+      }
+      else {
+        drupal_write_record('lingwo_senses_revisions', $object, 'vid');
+      }
+      break;
+
     case 'view':
       $theme = 'lingwo_senses' .
         (lingwo_dictionary_entry_is_translation($node) ? '_translation' : '_original');
@@ -162,9 +179,11 @@ function lingwo_senses_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
         '#value' => theme($theme, $node),
       );
       break;
+
     case 'delete revision':
       db_query("DELETE FROM {lingwo_senses_revsions} WHERE vid = %s", $node->vid);
       break;
+
     case 'delete':
       db_query("DELETE FROM {lingwo_senses_revsions} WHERE nid = %s", $node->nid);
       break;
@@ -179,14 +198,11 @@ function lingwo_senses_widget(&$form, &$form_state) {
 
   $func = 'lingwo_senses_widget_'.
     (lingwo_dictionary_entry_is_translation($node) ? 'translation' : 'original');
-  return $func($form, $form_state);
+  return $func($form, $form_state, $node);
 }
 
-function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $delta = 0) {
-  $field_name = $field['field_name'];
-  if (isset($form_state[$field_name]['senses'])) {
-    $items = $form_state[$field_name]['senses'];
-  }
+function lingwo_senses_widget_original(&$form, &$form_state, $node) {
+  $items = $node->lingwo_senses;
 
   $element = array(
     '#type' => 'fieldset',
@@ -194,7 +210,7 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
   );
 
   $element['wrapper'] = array(
-    '#prefix' => '<div id="'. $field_name .'-wrapper">',
+    '#prefix' => '<div id="edit-lingwo_senses-wrapper">',
     '#suffix' => '</div>',
   );
 
@@ -203,8 +219,7 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
     '#parents' => array('lingwo_senses'),
   );
 
-  // filter out marker rows
-  $items = array_filter($items, 'lingwo_senses_not_marker_row');
+  # if there are no items..
   if (count($items) == 0) {
     $items[] = array('data' => array());
   }
@@ -267,7 +282,6 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
         '#type' => 'submit',
         '#value' => t('Remove Sense #!num', array('!num' => $index + 1)),
         '#submit' => array('lingwo_senses_remove_submit'),
-        '#field_name' => $field_name,
       );
     }
 
@@ -278,7 +292,6 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
     '#type' => 'submit',
     '#value' => count($items) > 1 ? t('Add another sense') : t('Setup multiple senses'),
     '#submit' => array('lingwo_senses_add_submit'),
-    '#field_name' => $field_name,
     /*
     '#ahah' => array(
       'event' => 'click',
@@ -292,15 +305,7 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
   return $element;
 }
 
-function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, $delta = 0) {
-  $node = $form['#node'];
-  if (!isset($node)) {
-    $node = (object)$form_state['node'];
-  }
-
-  $field_name = $field['field_name'];
-  $field_id = preg_replace('/_/', '-', $field_name);
-
+function lingwo_senses_widget_translation(&$form, &$form_state, $node) {
   $senses = lingwo_senses_get_translations($node);
 
   $element = array(
@@ -342,8 +347,8 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
     }
 
     $sense_form['data']['translation'] = array(
-      '#parents' => array($field_name, $index, 'data'),
-      '#prefix' => "<div id=\"edit-$field_id-$index-data-translation\">",
+      '#parents' => array('lingwo_senses', $index, 'data'),
+      '#prefix' => "<div id=\"edit-lingwo-senses-$index-data-translation\">",
       '#suffix' => '</div>',
     );
     if (count($senses) > 1) {
@@ -357,7 +362,7 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
     }
 
     $sense_form['data']['translation']['trans'] = array(
-      '#prefix' => "<div id=\"edit-$field_id-$index-data-translation-trans\">",
+      '#prefix' => "<div id=\"edit-lingwo-senses-$index-data-translation-trans\">",
       '#suffix' => "</div>",
     );
     for ($t = 0; $t < max(3, count($sense['data']['trans'])); $t++) {
@@ -461,48 +466,19 @@ function lingwo_senses_get_translations(&$node) {
   return $senses;
 }
 
-function _lingwo_senses_from_form($form, &$form_state) {
-  $node = _ld_form_to_node($form, $form_state);
-  $field_name = $form_state['clicked_button']['#field_name'];
-
-  $senses = $form_state['values'][$field_name];
-  if ($senses) {
-    foreach ($senses as $index => $sense) {
-      if (is_numeric($index)) {
-        $weight[] = $sense['weight'];
-        unset($sense['weight'], $sense['remove_sense']);
-        $values[] = $sense;
-      }
-    }
-    if (!empty($values)) {
-      array_multisort($weight, SORT_ASC, $values);
-    }
-    $senses = $values;
-  }
-  else {
-    $senses = array();
-  }
-
-  $form_state[$field_name]['senses'] = $senses;
-  return $senses;
-}
-
 function lingwo_senses_add_submit($form, &$form_state) {
-  $senses = _lingwo_senses_from_form($form, $form_state);
-  $field_name = $form_state['clicked_button']['#field_name'];
-  
-  $form_state[$field_name]['senses'][] = array('id' => _ld_make_uuid());
+  $node = &_ld_form_to_node($form, $form_state);
+  array_push($node['lingwo_senses'], array('data' => array()));
 }
 
 function lingwo_senses_remove_submit($form, &$form_state) {
   // We have to remove first, so that changing the order doesn't change
   // which item gets removed.
-  $field_name = $form_state['clicked_button']['#field_name'];
   $delta = $form_state['clicked_button']['#parents'][1];
-  unset($form_state['values'][$field_name][$delta]);
+  array_splice($form_state['values']['lingwo_senses'], $delta, 1);
 
   // get the senses onto the $form_state.
-  _lingwo_senses_from_form($form, $form_state);
+  _ld_form_to_node($form, $form_state);
 }
 
 function lingwo_senses_ahah($field_name) {
