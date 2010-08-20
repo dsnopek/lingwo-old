@@ -51,75 +51,9 @@ function lingwo_senses_theme() {
 }
 
 /**
- * CCK hooks
- */
-
-/**
- * Implementation of hook_field_info().
- */
-function lingwo_senses_field_info() {
-  return array(
-    'lingwo_senses' => array(
-      'label' => t('Lingwo Dictionary Senses'),
-      'description' => t('Store dictionary senses in the database.'),
-    ),
-  );
-}
-
-/**
- * Implementation of hook_widget_info().
- */
-function lingwo_senses_widget_info() {
-  return array(
-    'lingwo_senses_widget' => array(
-      'label' => 'Lingwo Dictionary Senses Widget',
-      'field types' => array('lingwo_senses'),
-      'multiple values' => CONTENT_HANDLE_MODULE,
-      //'multiple values' => CONTENT_HANDLE_CORE,
-      'description' => t('Widget for editing senses for a dictionary entry .'),
-    ),
-  );
-}
-
-/**
- * Implementation of hook_field_formatter_info().
- */
-function lingwo_senses_field_formatter_info() {
-  return array(
-    'default' => array(
-      'label' => t('Lingwo Dictionary Senses Formatter'),
-      'field types' => array('lingwo_senses'),
-      'multiple values' => CONTENT_HANDLE_MODULE,
-    ),
-  );
-}
-
-/**
- * Implementation of hook_field_settings().
- */
-function lingwo_senses_field_settings($op, $field) {
-  switch ($op) {
-    case 'database columns':
-      $columns['id'] = array(
-        'type' => 'varchar',
-        'length' => '36',
-        'not null' => FALSE,
-        'sortable' => FALSE
-      );
-      $columns['data'] = array(
-        'type' => 'text',
-        'size' => 'big',
-        'not null' => FALSE,
-        'sortable' => FALSE,
-        'serialize' => TRUE
-      );
-      return $columns;
-  }
-}
-
-/**
  * Implementation of hook_field().
  */
+# TODO: remove this!
 function lingwo_senses_field($op, &$node, $field, &$items, $teaser, $page) {
   switch ($op) {
     case 'load':
@@ -158,6 +92,7 @@ function lingwo_senses_field($op, &$node, $field, &$items, $teaser, $page) {
 /**
  * Implementation of hook_content_is_empty().
  */
+# TODO: remove this!
 function lingwo_senses_content_is_empty($item, $field=NULL) {
   if ($item['retire_sense']) {
     return TRUE;
@@ -165,11 +100,78 @@ function lingwo_senses_content_is_empty($item, $field=NULL) {
   return FALSE;
 }
 
+# TODO: remove this!
 function lingwo_senses_not_marker_row($item, $field=NULL) {
   return !empty($item['id']);
 }
 
-function lingwo_senses_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+/**
+ * Implementation of hook_form_alter().
+ */
+function lingwo_senses_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == (lingwo_dictionary_settings('entry_content_type') .'_node_form')) {
+    $form['lingwo_senses'] = lingwo_senses_widget($form, $form_state);
+  }
+}
+
+/**
+ * Implementation of hook_content_extra_fields().
+ */
+function lingwo_senses_content_extra_fields($type_name) {
+  $extra = array();
+
+  if (lingwo_dictionary_settings('entry_content_type') == $type_name) {
+    $extra['lingwo_senses'] = array(
+      'label' => t('Lingwo Dictionary Senses'),
+      'description' => t('Dictionary Entry senses'),
+      'weight' => 1,
+    );
+  }
+
+  return $extra;
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function lingwo_senses_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
+  if ($node->type != lingwo_dictionary_settings('entry_content_type'))
+    return NULL;
+
+  switch ($op) {
+    case 'load':
+      $res = db_query("SELECT data FROM {lingwo_senses_revisions} WHERE vid = %d", $node->vid);
+      if ($row = db_fetch_object($res)) {
+        return array('lingwo_senses' => unserialize($row->data));
+      }
+      break;
+    case 'insert':
+      $object = (object)array(
+        'language' => $node->language,
+        'pos' => lingwo_dictionary_entry_get_pos($node),
+        'headword' => $node->title,
+        'nid' => $node->nid,
+      );
+      drupal_write_record('lingwo_dictionary_entry', $object);
+      break;
+    case 'view':
+      $theme = 'lingwo_senses' .
+        (lingwo_dictionary_entry_is_translation($node) ? '_translation' : '_original');
+
+      $node->content['lingwo_senses'] = array(
+        '#value' => theme($theme, $node),
+      );
+      break;
+    case 'delete revision':
+      db_query("DELETE FROM {lingwo_senses_revsions} WHERE vid = %s", $node->vid);
+      break;
+    case 'delete':
+      db_query("DELETE FROM {lingwo_senses_revsions} WHERE nid = %s", $node->nid);
+      break;
+  }
+}
+
+function lingwo_senses_widget(&$form, &$form_state) {
   $node = $form['#node'];
   if (!isset($node)) {
     $node = (object)$form_state['node'];
@@ -177,7 +179,7 @@ function lingwo_senses_widget(&$form, &$form_state, $field, $items, $delta = 0) 
 
   $func = 'lingwo_senses_widget_'.
     (lingwo_dictionary_entry_is_translation($node) ? 'translation' : 'original');
-  return $func($form, $form_state, $field, $items, $delta);
+  return $func($form, $form_state);
 }
 
 function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $delta = 0) {
@@ -198,7 +200,7 @@ function lingwo_senses_widget_original(&$form, &$form_state, $field, $items, $de
 
   $element['wrapper']['senses'] = array(
     '#theme' => 'lingwo_senses_original_form',
-    '#parents' => array($field['field_name']),
+    '#parents' => array('lingwo_senses'),
   );
 
   // filter out marker rows
@@ -299,7 +301,7 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
   $field_name = $field['field_name'];
   $field_id = preg_replace('/_/', '-', $field_name);
 
-  $senses = lingwo_senses_get_translations($node, $field_name, $items);
+  $senses = lingwo_senses_get_translations($node);
 
   $element = array(
     '#type' => 'fieldset',
@@ -415,15 +417,13 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $field, $items, 
 /* Takes an entry and a trans and makes a list of trans senses in the appropriate
  * order, connected to the entry senses if one exists.
  */
-function lingwo_senses_get_translations(&$node, $field_name, $items) {
+function lingwo_senses_get_translations(&$node) {
   $orig = lingwo_dictionary_entry_load_translation_source($node);
   // TODO: does this make sense?  Why support not having a translation source??
-  $orig_senses = isset($orig) ? $orig->$field_name : array();
-  $orig_senses = array_filter($orig_senses, 'lingwo_senses_not_marker_row');
+  $orig_senses = isset($orig) ? $orig->lingwo_senses : array();
 
   $trans_map = array();
-  $trans_senses = empty($items) ? array() : $items;
-  $trans_senses = array_filter($trans_senses, 'lingwo_senses_not_marker_row');
+  $trans_senses = $node->lingwo_senses;
 
   foreach ($trans_senses as $trans_sense) {
     $trans_map[$trans_sense['id']] = $trans_sense;
@@ -596,29 +596,8 @@ function theme_lingwo_senses_translation_form($form) {
   return theme('table', $header, $rows);
 }
 
-function theme_lingwo_senses_formatter_default($element) {
-  $field_name = $element['#field_name'];
-  $node = $element['#node'];
-  $items = $node->$field_name;
-
-  $theme = 'lingwo_senses';
-  if (isset($node->translation_source) || ($node->nid && $node->tnid && $node->nid != $node->tnid)) {
-    $items = lingwo_senses_get_translations($node, $field_name, $items);
-    $theme = $theme .'_translation';
-  }
-  else {
-    $theme = $theme .'_original';
-  }
-
-  // filter out empty items
-  //require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/Fn.php');
-  //$items = Fn::filter(Fn::not('lingwo_senses_content_is_empty')), $items);
-  $items = array_filter($items, 'lingwo_senses_not_marker_row');
-
-  return theme($theme, $node, $items);
-}
-
-function theme_lingwo_senses_original($node, $items) {
+function theme_lingwo_senses_original($node) {
+  $items = $node->lingwo_senses;
   if (!empty($items)) {
     $output .= '<div class="lingwo-entry">';
     $output .= '<ol class="lingwo-sense-list">';
@@ -651,13 +630,14 @@ function theme_lingwo_senses_original($node, $items) {
   return $output;
 }
 
-function theme_lingwo_senses_translation($node, $items) {
+function theme_lingwo_senses_translation($node) {
   $output = '';
   $output .= '<div class="lingwo-entry">';
   $output .= '<ol class="lingwo-sense-list">';
 
   # group the ids together
   $ids = array();
+  $items = lingwo_senses_get_translations($node);
   foreach ($items as $sense) {
     if ($sense['data']['same_as']) {
       $ids[$sense['data']['same_as']][] = $sense['id'];
