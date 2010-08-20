@@ -18,6 +18,16 @@ def Text_split(node, index):
     node.nodeValue = node.nodeValue[:index]
     return sibling
 
+# A generally useful DOM extension
+def Element_text(node):
+    s = ""
+    for child in node.childNodes:
+        if child.nodeType in (XmlNode.TEXT_NODE, XmlNode.CDATA_SECTION_NODE):
+            s += child.nodeValue
+        elif child.nodeType == XmlNode.ELEMENT_NODE:
+            s += Element_text(child)
+    return s
+
 class _DomWrapper(object):
     def __init__(self, dom):
         self._dom = dom
@@ -35,7 +45,7 @@ class Document(_DomWrapper):
             raise DocumentError('Document must be based around a Document node')
         _DomWrapper.__init__(self, dom)
 
-    def segment(self):
+    def segmentize(self):
         from LingwoNLP.segment import segmentDocument
         segmentDocument(self._dom)
 
@@ -54,6 +64,9 @@ class Token(_DomWrapper):
             raise DocumentError('Token must wrap around a <word> element')
         _DomWrapper.__init__(self, dom)
 
+    def __str__(self):
+        return Element_text(self._dom)
+
 class TokenStream(_DomWrapper):
     def __init__(self, dom):
         if dom.nodeType != XmlNode.ELEMENT_NODE or dom.tagName != 's':
@@ -62,7 +75,7 @@ class TokenStream(_DomWrapper):
 
         self.tokens = []
         for child in dom.childNodes:
-            if child.nodeType == XmlNode.ELEMENT_NODE and node.tagName == 'word':
+            if child.nodeType == XmlNode.ELEMENT_NODE and child.tagName == 'word':
                 self.tokens.append(Token(child))
 
 def parse(fd):
