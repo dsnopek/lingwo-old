@@ -1,24 +1,9 @@
 
-import html5lib, re
+import re
 import cPickle as pickle
 from xml.dom import Node
 import nltk
-
-# A generally useful DOM extension
-def Node_insertAfter(parent, newElem, refElem):
-    if parent.lastChild == refElem:
-        parent.appendChild(newElem)
-    else:
-        parent.insertBefore(newElem, refElem.nextSibling)
-
-# Missing in minidom!
-def Text_split(node, index):
-    doc = node.ownerDocument
-    parent = node.parentNode
-    sibling = doc.createTextNode(node.nodeValue[index:])
-    Node_insertAfter(parent, sibling, node)
-    node.nodeValue = node.nodeValue[:index]
-    return sibling
+from LingwoNLP.document import parse, parseString, Text_split
 
 from nltk.tokenize.punkt import PunktLanguageVars
 class MyPunktLanguageVars(PunktLanguageVars):
@@ -273,13 +258,6 @@ class WordSegmenter(Segmenter):
     def __init__(self, tokenize=_word_tokenize):
         Segmenter.__init__(self, 'word', tokenize)
 
-def parse(fd):
-    return html5lib.parse(fd, treebuilder='dom')
-
-def parseString(s):
-    from StringIO import StringIO
-    return parse(StringIO(s))
-
 def segmentDocument(doc, sent_segmenter=None, word_segmenter=None):
     # segment the sentences
     if sent_segmenter is None:
@@ -297,7 +275,7 @@ def main():
     #punkt_tokenizer = pickle.load(open('punkt.pickle','rt'))
     #sent_tokenize = lambda x: punkt_tokenizer.tokenize(x, True)
 
-    doc = parse(open('text1-clean.txt', 'rt'))
+    doc = parse(open('text1-clean.txt', 'rt')).dom
     #segmentDocument(doc, SentenceSegmenter(sent_tokenize))
     segmentDocument(doc)
     print doc.toxml()

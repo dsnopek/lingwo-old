@@ -2,7 +2,7 @@
 import unittest
 from xml.dom.minidom import parseString as minidom_parseString
 from xml.dom import Node
-from process2 import ElementString, SentenceSegmenter, WordSegmenter
+from LingwoNLP.segment import ElementString, SentenceSegmenter, WordSegmenter
 
 def parseString(t):
     return minidom_parseString('<body>'+t+'</body>').documentElement
