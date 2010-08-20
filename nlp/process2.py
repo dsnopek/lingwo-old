@@ -174,6 +174,7 @@ class Segmenter(object):
         if not self._elemStr.is_empty():
             raw_text = str(self._elemStr)
             segments = self._tokenize(raw_text)
+            #print raw_text, segments
             endIndex = 0
             for seg in segments:
                 if not re.search(r'\w', seg):
@@ -195,6 +196,64 @@ class Segmenter(object):
         self._elemStr = ElementString()
         self._doOuter(elem)
 
+# Copied from NLTK, so that we could modify it
+from nltk.tokenize.api import TokenizerI
+class MyTreebankWordTokenizer(TokenizerI):
+    """
+    A word tokenizer that tokenizes sentences using the conventions
+    used by the Penn Treebank.  Contractions, such as "can't", are
+    split in to two tokens.  E.g.:
+
+      - can't S{->} ca n't
+      - he'll S{->} he 'll
+      - weren't S{-} were n't
+
+    This tokenizer assumes that the text has already been segmented into
+    sentences.  Any periods -- apart from those at the end of a string --
+    are assumed to be part of the word they are attached to (e.g. for
+    abbreviations, etc), and are not separately tokenized. 
+    """
+    # List of contractions adapted from Robert MacIntyre's tokenizer.
+    CONTRACTIONS2 = [re.compile(r"(?i)(.)('ll|'re|'ve|n't|'s|'m|'d)\b"),
+                     re.compile(r"(?i)\b(can)(not)\b"),
+                     re.compile(r"(?i)\b(D)('ye)\b"),
+                     re.compile(r"(?i)\b(Gim)(me)\b"),
+                     re.compile(r"(?i)\b(Gon)(na)\b"),
+                     re.compile(r"(?i)\b(Got)(ta)\b"),
+                     re.compile(r"(?i)\b(Lem)(me)\b"),
+                     re.compile(r"(?i)\b(Mor)('n)\b"),
+                     re.compile(r"(?i)\b(T)(is)\b"),
+                     re.compile(r"(?i)\b(T)(was)\b"),
+                     re.compile(r"(?i)\b(Wan)(na)\b")]
+    CONTRACTIONS3 = [re.compile(r"(?i)\b(Whad)(dd)(ya)\b"),
+                     re.compile(r"(?i)\b(Wha)(t)(cha)\b")]
+    
+    def tokenize(self, text):
+        # DRS: Hack so that "can't" comes out as "can 't" instead of the default
+        text = re.sub(r"(?i)\b(can)('t)\b", r'\1 \2', text)
+
+        for regexp in self.CONTRACTIONS2:
+            text = regexp.sub(r'\1 \2', text)
+        for regexp in self.CONTRACTIONS3:
+            text = regexp.sub(r'\1 \2 \3', text)
+
+        # Separate most punctuation
+        text = re.sub(r"([^\w\.\'\-\/,&])", r' \1 ', text)
+
+        # Separate commas if they're followed by space.
+        # (E.g., don't separate 2,500)
+        text = re.sub(r"(,\s)", r' \1', text)
+
+        # Separate single quotes if they're followed by a space.
+        text = re.sub(r"('\s)", r' \1', text)
+
+        # Separate periods that come before newline or end of string.
+        #text = re.sub('\. *(\n|$)', ' . ', text)
+        # DRS: We add the possibility that the period can come inside of quotes
+        text = re.sub('\. *(\n|"|$)', r' . \1', text)
+
+        return text.split()
+
 # A replacement for nltk.sent_tokenize() because we want to pass
 # realign_boundaries=True to .tokenize()
 def _sent_tokenize(text):
@@ -205,8 +264,13 @@ class SentenceSegmenter(Segmenter):
     def __init__(self, tokenize=_sent_tokenize):
         Segmenter.__init__(self, 's', tokenize)
 
+# A replacement for nltk.word_tokenize() that uses our modified MyTreebankWordTokenizer()
+def _word_tokenize(text):
+    treebank_tokenizer = MyTreebankWordTokenizer()
+    return treebank_tokenizer.tokenize(text)
+
 class WordSegmenter(Segmenter):
-    def __init__(self, tokenize=nltk.word_tokenize):
+    def __init__(self, tokenize=_word_tokenize):
         Segmenter.__init__(self, 'word', tokenize)
 
 def parse(fd):
