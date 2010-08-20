@@ -47,8 +47,8 @@ class ElementString(object):
                 break
             i += 1
         if res is None:
-            # we return the last element on the last character
-            return len(self._lookup)-1, (pos, elem), len(elem.nodeValue)-1
+            # we return the last element past the last character
+            return len(self._lookup)-1, (pos, elem), len(elem.nodeValue)
 
         return i, res, (index-pos+len(elem.nodeValue))
 
@@ -67,9 +67,9 @@ class ElementString(object):
         if which == ElementString._SPLIT_END and localIndex == 0:
             # we really want the previous element because we are past the edge
             lookupIndex, (pos, elem), localIndex = self._find(index-1)
-        elif which == ElementString._SPLIT_START and localIndex == len(elem.nodeValue)-1:
-            # we really want the next element because we are before the edge
-            lookupIndex, (pos, elem), localIndex = self._find(index+1)
+#        elif which == ElementString._SPLIT_START and localIndex == len(elem.nodeValue)-1:
+#            # we really want the next element because we are before the edge
+#            lookupIndex, (pos, elem), localIndex = self._find(index+1)
 
         # we move up the tree if we are on the very edge of a word annotation
         def walkUpParent(elem):
@@ -86,7 +86,7 @@ class ElementString(object):
             if localIndex == 0:
                 return walkUpParent(elem)
         elif which == ElementString._SPLIT_END:
-            if localIndex == len(elem.nodeValue) - 1:
+            if localIndex == len(elem.nodeValue):
                 return walkUpParent(elem)
         #print "-> split", which
         #print "localIndex:", localIndex, "textLen:", len(elem.nodeValue)
@@ -171,14 +171,14 @@ class Segmenter(object):
             segments = self._tokenize(raw_text)
             endIndex = 0
             for seg in segments:
-                #if not re.match(r'\w', seg):
-                #    # if this segment has no "word" characters in it, we don't
-                #    # really want it
-                #    continue
-                print seg
+                if not re.search(r'\w', seg):
+                    # if this segment has no "word" characters in it, we don't
+                    # really want it
+                    continue
+                #print seg
                 startIndex = raw_text.find(seg, endIndex)
                 endIndex = startIndex + len(seg)
-                print startIndex, endIndex
+                #print startIndex, endIndex
 
                 #print startIndex, endIndex, sent
                 self._elemStr.wrap_in_element(self._elemName, startIndex, endIndex)
@@ -197,18 +197,24 @@ class WordSegmenter(Segmenter):
     def __init__(self, tokenize=nltk.word_tokenize):
         Segmenter.__init__(self, 'word', tokenize)
 
-def main():
-    fd = open('text1-clean.txt', 'rt')
-    doc = html5lib.parse(fd, treebuilder="dom")
-    #buildOuter(doc.getElementsByTagName('body')[0])
-    #segmentSentences(s)
+def parse(fd):
+    return html5lib.parse(fd, treebuilder='dom')
+
+def parseString(s):
+    from StringIO import StringIO
+    return parse(StringIO(s))
+
+def segmentDocument(doc):
     sent_segmenter = SentenceSegmenter()
     sent_segmenter.run(doc.getElementsByTagName('body')[0])
 
-    #word_segmenter = WordSegmenter()
-    #for sent in doc.getElementsByTagName('s'):
-    #    word_segmenter.run(sent)
+    word_segmenter = WordSegmenter()
+    for sent in doc.getElementsByTagName('s'):
+        word_segmenter.run(sent)
 
+def main():
+    doc = parse(open('text1-clean.txt', 'rt'))
+    segmentDocument(doc)
     print doc.toxml()
 
 if __name__ == '__main__': main()
