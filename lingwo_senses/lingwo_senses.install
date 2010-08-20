@@ -68,6 +68,8 @@ function _lingwo_senses_insert_new_sense($senses) {
  * In this version is where we move from CCK to a raw database table.
  */
 function lingwo_senses_update_6001() {
+  module_load_include('inc', 'content', 'includes/content.crud');
+
   $schema['lingwo_senses_revisions'] = array(
     'description' => 'Stores the sense data for a revision of a given entry',
     'fields' => array(
@@ -111,7 +113,6 @@ function lingwo_senses_update_6001() {
     foreach (content_fields(NULL, $entry_content_type) as $field_name => $field) {
       // dsm()
       if ($field['module'] == 'lingwo_senses') {
-        $field_name = $field['field_name'];
         $senses = array();
         $last = NULL;
         $res = db_query('SELECT nid, vid, delta, '. $field_name .'_id as id, '. $field_name .'_data as data FROM {content_'. $field_name .'} ORDER BY nid, vid, delta');
@@ -127,6 +128,9 @@ function lingwo_senses_update_6001() {
           $senses[] = $row;
         }
         _lingwo_senses_insert_new_sense($senses);
+
+		// remove the CCK field
+		content_field_instance_delete($field_name, $entry_content_type);
       }
     }
   }
