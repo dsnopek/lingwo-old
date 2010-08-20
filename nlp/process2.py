@@ -1,5 +1,6 @@
 
 import html5lib, re
+import cPickle as pickle
 from xml.dom import Node
 import nltk
 
@@ -18,6 +19,10 @@ def Text_split(node, index):
     Node_insertAfter(parent, sibling, node)
     node.nodeValue = node.nodeValue[:index]
     return sibling
+
+from nltk.tokenize.punkt import PunktLanguageVars
+class MyPunktLanguageVars(PunktLanguageVars):
+   sent_end_chars = ('.', '?', '!', '"', '\'')
 
 class ElementString(object):
     def __init__(self):
@@ -174,6 +179,7 @@ class Segmenter(object):
                 if not re.search(r'\w', seg):
                     # if this segment has no "word" characters in it, we don't
                     # really want it
+                    endIndex += len(seg)
                     continue
                 #print seg
                 startIndex = raw_text.find(seg, endIndex)
@@ -189,8 +195,14 @@ class Segmenter(object):
         self._elemStr = ElementString()
         self._doOuter(elem)
 
+# A replacement for nltk.sent_tokenize() because we want to pass
+# realign_boundaries=True to .tokenize()
+def _sent_tokenize(text):
+    punkt_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+    return punkt_tokenizer.tokenize(text, realign_boundaries=True)
+
 class SentenceSegmenter(Segmenter):
-    def __init__(self, tokenize=nltk.sent_tokenize):
+    def __init__(self, tokenize=_sent_tokenize):
         Segmenter.__init__(self, 's', tokenize)
 
 class WordSegmenter(Segmenter):
@@ -204,16 +216,25 @@ def parseString(s):
     from StringIO import StringIO
     return parse(StringIO(s))
 
-def segmentDocument(doc):
-    sent_segmenter = SentenceSegmenter()
+def segmentDocument(doc, sent_segmenter=None, word_segmenter=None):
+    # segment the sentences
+    if sent_segmenter is None:
+        sent_segmenter = SentenceSegmenter()
     sent_segmenter.run(doc.getElementsByTagName('body')[0])
 
-    word_segmenter = WordSegmenter()
+    # segment the words
+    if word_segmenter is None:
+        word_segmenter = WordSegmenter()
     for sent in doc.getElementsByTagName('s'):
         word_segmenter.run(sent)
 
 def main():
+    # using our custom trained PunktTokenizer
+    #punkt_tokenizer = pickle.load(open('punkt.pickle','rt'))
+    #sent_tokenize = lambda x: punkt_tokenizer.tokenize(x, True)
+
     doc = parse(open('text1-clean.txt', 'rt'))
+    #segmentDocument(doc, SentenceSegmenter(sent_tokenize))
     segmentDocument(doc)
     print doc.toxml()
 
