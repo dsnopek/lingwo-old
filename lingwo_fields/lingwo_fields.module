@@ -32,17 +32,17 @@ function lingwo_fields_menu() {
 function lingwo_fields_search_forms($text, $options=array()) {
   $results = array();
 
-  $sql = "SELECT f.nid, f.form_name FROM {lingwo_fields_forms} f";
+  $sql = "SELECT f.nid, f.form_name, e.headword, e.pos, e.language FROM {lingwo_fields_forms} f ".
+         "INNER JOIN {lingwo_dictionary_entry} e ON f.nid = e.nid";
   $where = " WHERE form = '%s'";
   $args = array($text);
 
   if (!empty($options['language'])) {
-    $sql .= " INNER JOIN {node} n ON f.nid = n.nid";
-    $where .= " AND n.language = '%s'";
+    #$sql .= " INNER JOIN {node} n ON f.nid = n.nid";
+    $where .= " AND e.language = '%s'";
     $args[] = $options['language'];
   }
   if (!empty($options['pos'])) {
-    $sql .= " INNER JOIN {lingwo_dictionary_entry} e ON f.nid = e.nid";
     $where .= " AND e.pos = '%s'";
     $args[] = $options['pos'];
   }

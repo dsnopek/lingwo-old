@@ -133,6 +133,7 @@ function lingwo_dictionary_service() {
           '#name' => 'options',
           '#type' => 'struct',
           '#description' => t('A struct representing search options.'),
+          '#optional' => TRUE,
         ),
       ),
       '#return' => 'array',

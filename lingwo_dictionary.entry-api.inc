@@ -104,7 +104,7 @@ function lingwo_dictionary_entry_lookup($language, $pos, $headword) {
 }
 
 function _lingwo_dictionary_search_entries($text, $options=array()) {
-  $sql = "SELECT nid FROM {lingwo_dictionary_entry}";
+  $sql = "SELECT nid, headword, pos, language FROM {lingwo_dictionary_entry}";
   $where = " WHERE headword = '%s'";
   $args = array($text);
 
@@ -120,10 +120,8 @@ function _lingwo_dictionary_search_entries($text, $options=array()) {
   $results = array();
   $res = db_query($sql . $where, $args);
   while ($obj = db_fetch_object($res)) {
-    $results[] = (object)array(
-      'nid'   => $obj->nid,
-      'exact' => TRUE,
-    );
+    $obj->exact = TRUE;
+    $results[] = $obj;
   }
 
   return $results;
