@@ -169,7 +169,7 @@
                 });
 
                 // remove the Refresh button, AHAH will handle the reloading
-                $('#edit-'+settings.field_name+'-refresh', context).remove();
+                $('#edit-lingwo-fields-refresh', context).remove();
 
                 $('#edit-title', context).bind('keyup', function (evt) {
                     entry.headword = evt.target.value;
@@ -183,7 +183,7 @@
                 });
 
                 field_map = {};
-                $('.'+settings.field_name+'-control', context).each(function (i) {
+                $('.lingwo-fields-control', context).each(function (i) {
                     var control = new Control(this);
                     field_map[control.name] = control;
                 });

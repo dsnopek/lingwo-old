@@ -13,6 +13,7 @@ function lingwo_fields_menu() {
   $items = array();
 
   // TODO: now that we are using ahah_helper, this should be removed
+  /*
   $items['lingwo_fields/ahah/%'] = array(
     'title' => 'Lingwo Dictionary Fields AHAH',
     'page callback' => 'lingwo_fields_ahah',
@@ -21,6 +22,7 @@ function lingwo_fields_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK
   );
+  */
 
   return $items;
 }
@@ -112,14 +114,24 @@ function _lingwo_fields_write_record($fields, $is_update) {
   }
 }
 
-
 /**
  * Implementation of hook_nodeapi().
  */
 function lingwo_fields_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
-  // lingwo_fields only applies to entries that aren't translations
-  if ($node->type != lingwo_dictionary_settings('entry_content_type') ||
-      lingwo_dictionary_entry_is_translation($node)) return NULL;
+  // only applies to entries
+  if ($node->type != lingwo_dictionary_settings('entry_content_type'))
+    return NULL;
+
+  // view should happen for both sources and translations
+  if ($op == 'view') {
+    $node->content['lingwo_fields'] = array(
+      '#value' => theme('lingwo_fields_formatter_default', $node),
+    );
+  }
+
+  // the rest only apply to sources
+  if (lingwo_dictionary_entry_is_translation($node))
+    return NULL;
 
   switch ($op) {
     case 'load':
@@ -147,12 +159,6 @@ function lingwo_fields_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
       _lingwo_fields_write_record($object, empty($node->revision) && $op == 'update');
       break;
 
-    case 'view':
-      $node->content['lingwo_fields'] = array(
-        '#value' => theme('lingwo_fields_formatter_default', $node),
-      );
-      break;
-
     case 'delete revision':
       db_query("DELETE FROM {lingwo_fields_revisions} WHERE vid = %s", $node->vid);
       break;
@@ -176,18 +182,20 @@ function lingwo_fields_widget(&$form, &$form_state) {
   ahah_helper_register($form, $form_state);
 
   $pos = lingwo_dictionary_entry_get_pos($node);
+  $items = $node->lingwo_fields;
 
   $default_values = array();
-  foreach ($items as $item) {
-    $default_values[$item['name']] = $item;
+  if (!empty($items)) {
+    foreach ($items as $item) {
+      $default_values[$item['name']] = $item;
+    }
   }
 
-  $field_name = $field['field_name'];
-
   $element = array(
-    '#type' => 'fieldset',
-    '#title' => $field['field_label'],
-    '#theme' => 'lingwo_fields_widget_form_wrapper'
+    '#type'  => 'fieldset',
+    '#title' => t('Fields'),
+    '#theme' => 'lingwo_fields_widget_form_wrapper',
+    '#tree'  => TRUE,
   );
 
   // If this node is new, then add the AHAH and 'Refresh' button that allows
@@ -195,28 +203,24 @@ function lingwo_fields_widget(&$form, &$form_state) {
   if (!$node->nid) {
     $ahah = array(
       //'event' => 'change',
-      'path' => ahah_helper_path(array($field_name, 'wrapper')),
+      'path' => ahah_helper_path(array('lingwo_fields', 'wrapper')),
       //'path' => 'lingwo_fields/ahah/'. $field_name,
-      'wrapper' => $field_name .'-wrapper',
+      'wrapper' => 'lingwo_fields-wrapper',
       'effect' => 'fade',
     );
     $form['language']['#ahah'] = $ahah; // + array('event' => 'change');
-    // TODO: this won't work because lingwo_dictionary hasn't had a chance to alter the
-    // node form yet.  This is yet another reason to stop using CCK for this!
     $form['pos']['#ahah'] = $ahah;
 
     $element['refresh'] = array(
       '#type' => 'submit',
       '#value' => t('Refresh'),
       '#submit' => array('lingwo_fields_change_pos_submit'),
-      // TODO: do we need this?
-      '#field_name' => $field_name,
       '#ahah' => $ahah + array('event' => 'click')
     );
   }
 
   $element['wrapper'] = array(
-    '#prefix' => '<div id="'. $field_name .'-wrapper">',
+    '#prefix' => '<div id="lingwo_fields-wrapper">',
     '#suffix' => '</div>',
   );
   $element['wrapper']['fields'] = array(
@@ -225,11 +229,9 @@ function lingwo_fields_widget(&$form, &$form_state) {
       'lingwo_fields_widget_form_'. $node->language, 
       'lingwo_fields_widget_form'
     ),
-
-    '#parents' => array($field_name),
+    '#parents' => array('lingwo_fields'),
   );
 
-  $field_name_enc = str_replace('_', '-', $field_name);
   $field_map = array(
     'classes' => array(),
     'options' => array(),
@@ -267,7 +269,7 @@ function lingwo_fields_widget(&$form, &$form_state) {
       // TODO: we need to enforce required with select boxes
       '#required' => $field['required'] ? TRUE : FALSE,
       '#attributes' => array(
-        'class' => $field_name_enc .'-control',
+        'class' => 'lingwo-fields-control',
         'data-type' => $field['type'],
         'data-name' => $name,
       ),
@@ -319,7 +321,6 @@ function lingwo_fields_widget(&$form, &$form_state) {
   // for the theme function
   $element['#node'] = $node;
   $element['#pos'] = $pos;
-  $element['#field_name_enc'] = $field_name_enc;
 
   return $element;
 }
@@ -330,7 +331,6 @@ function theme_lingwo_fields_widget_form_wrapper($element) {
   lingwo_dictionary_add_require_js();
 
   drupal_add_js(array('lingwo_fields' => array(
-    'field_name' => $element['#field_name_enc'],
     'is_new' => $node->nid == 0,
     // TODO: do we really need this now that it is static?
     'pos_field' => 'edit-pos',
@@ -343,6 +343,7 @@ function theme_lingwo_fields_widget_form_wrapper($element) {
 }
 
 // TODO: now that we are using ahah_helper, this should be removed
+/*
 function lingwo_fields_ahah($field_name) {
   module_load_include('inc', 'node', 'node.pages');
   $form_state = array('storage' => NULL, 'submitted' => FALSE);
@@ -372,11 +373,11 @@ function lingwo_fields_ahah($field_name) {
 
   drupal_json(array('status' => TRUE, 'data' => $output));
 }
+*/
 
 function lingwo_fields_change_pos_submit($form, &$form_state) {
   // TODO: should we really do this?
   $node = _ld_form_to_node($form, $form_state);
-  $field_name = $form_state['clicked_button']['#field_name'];
 }
 
 /*
@@ -391,15 +392,17 @@ function lingwo_fields_map_items(&$items, $fapi = FALSE) {
 
   foreach (element_children($items) as $index) {
     // From the formatter them function we get $items[$index]['#item'] but if we just toss
-    // $node->$field_name in here, we get $items[$index] -- both modes are supported.
+    // $node->lingwo_fields in here, we get $items[$index] -- both modes are supported.
     $item_info = $items[$index];
+    /*
     if ($fapi) {
       if (empty($item_info['#item'])) {
-        // This isn't a CCK item, so skip it
+        // This isn't an item, so skip it
         continue;
       }
       $item_info = $item_info['#item'];
     }
+    */
 
     $item_info = $items[$index]['#item'] ? $items[$index]['#item'] : $items[$index];
     $type = $item_info['type'];
@@ -433,28 +436,22 @@ function theme_lingwo_fields_formatter_default($node) {
     // display the fields as if this were the source node (with the source nodes
     // language) and not a member of this language
     $node = $node->translation_source;
-    $field_name = $element['#field_name'];
-    // build element list as if it came from the formatter
-    $element = array('#node' => $node);
-    if (!empty($node->$field_name)) {
-      foreach($node->$field_name as $item) {
-        $element[] = array('#item' => $item);
-      }
-    }
   }
+  $items = $node->lingwo_fields;
 
   $fdef = lingwo_language_fields($node->language, lingwo_dictionary_entry_get_pos($node));
 
   // fill element with real FAPI elements that simple display the item
-  foreach (element_children($element) as $index) {
-    $item = $element[$index]['#item'];
+  $element = array();
+  foreach ($items as $item) {
     $name = $item['name'];
     $label = isset($fdef[$name]['label']) ? $fdef[$name]['label'] : $name;
 
-    $element[$index] += array(
+    $element[] = array(
       '#type' => 'item',
       '#title' => $label,
       '#value' => $item['value'],
+      '#item'  => $item,
     );
   }
 
