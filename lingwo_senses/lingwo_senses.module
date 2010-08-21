@@ -181,11 +181,11 @@ function lingwo_senses_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
       break;
 
     case 'delete revision':
-      db_query("DELETE FROM {lingwo_senses_revsions} WHERE vid = %s", $node->vid);
+      db_query("DELETE FROM {lingwo_senses_revisions} WHERE vid = %s", $node->vid);
       break;
 
     case 'delete':
-      db_query("DELETE FROM {lingwo_senses_revsions} WHERE nid = %s", $node->nid);
+      db_query("DELETE FROM {lingwo_senses_revisions} WHERE nid = %s", $node->nid);
       break;
   }
 }
@@ -430,8 +430,11 @@ function lingwo_senses_get_translations(&$node) {
   $trans_map = array();
   $trans_senses = $node->lingwo_senses;
 
-  foreach ($trans_senses as $trans_sense) {
-    $trans_map[$trans_sense['id']] = $trans_sense;
+  # build our internal map of id => sense
+  if (!empty($trans_senses)) {
+    foreach ($trans_senses as $trans_sense) {
+      $trans_map[$trans_sense['id']] = $trans_sense;
+    }
   }
 
   $senses = array();

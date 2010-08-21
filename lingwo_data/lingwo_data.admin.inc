@@ -18,30 +18,17 @@ function lingwo_data_admin_settings()
   $type = content_types(lingwo_dictionary_settings('entry_content_type'));
 
   // make some lists of the available CCK fields for the various settings
-  $available_senses_fields = array('');
   $available_fields_fields = array('');
   $available_generic_fields = array('');
   foreach ($type['fields'] as $field_name => $field) {
     if (preg_match('/^lingwo_/', $field['type'])) {
-      if ($field['type'] == 'lingwo_senses') {
-        $available_senses_fields[$field_name] = $field['widget']['label'];
-      }
-      else if ($field['type'] == 'lingwo_fields') {
+      if ($field['type'] == 'lingwo_fields') {
         $available_fields_fields[$field_name] = $field['widget']['label'];
       }
     }
     else {
       $available_generic_fields[$field_name] = $field['widget']['label'];
     }
-  }
-
-  if (module_exists('lingwo_senses')) {
-    $fields['lingwo_data_field_senses'] = array(
-      '#type' => 'select',
-      '#title' => t('Lingwo Senses Field'),
-      '#options' => $available_senses_fields,
-      '#default_value' => lingwo_data_settings('field_senses'),
-    );
   }
 
   if (module_exists('lingwo_fields')) {

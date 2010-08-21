@@ -129,7 +129,6 @@ function lingwo_data_form_alter(&$form, $form_state, $form_id) {
  */
 function lingwo_data_settings($name, $value = NULL) {
   static $_settings = array(
-    'field_senses'           => NULL,
     'field_fields'           => NULL,
     'field_pron'             => NULL,
     'field_source_name'      => NULL,

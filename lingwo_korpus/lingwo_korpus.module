@@ -100,11 +100,8 @@ function lingwo_korpus_lookup_senses() {
   $nid = lingwo_dictionary_entry_lookup($headword, $language, $pos);
   if (!empty($nid)) {
     $node = node_load($nid);
-    # HACK: This has no way of knowing this is the field!  We really need to
-    # change the storage mechanizm of lingwo_senses away from CCK.
-    $field_senses = 'field_senses';
     $senses = array();
-    foreach ($node->$field_senses as $sense) {
+    foreach ($node->lingwo_senses as $sense) {
       $senses[$sense['id']] = array(
         'example'    => $sense['data']['example'],
         'difference' => $sense['data']['difference'],
