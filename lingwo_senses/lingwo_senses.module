@@ -29,23 +29,17 @@ function lingwo_senses_menu() {
  */
 function lingwo_senses_theme() {
   return array(
-    'lingwo_senses_widget' => array(
-      'arguments' => array('element' => NULL),
-    ),
     'lingwo_senses_original_form' => array(
       'arguments' => array('form' => NULL),
     ),
     'lingwo_senses_translation_form' => array(
       'arguments' => array('form' => NULL),
     ),
-    'lingwo_senses_formatter_default' => array(
-      'arguments' => array('element' => NULL),
-    ),
     'lingwo_senses_original' => array(
-      'arguments' => array('node' => NULL, 'items' => NULL),
+      'arguments' => array('node' => NULL),
     ),
     'lingwo_senses_translation' => array(
-      'arguments' => array('node' => NULL, 'items' => NULL),
+      'arguments' => array('node' => NULL),
     ),
   );
 }
@@ -67,8 +61,8 @@ function lingwo_senses_content_extra_fields($type_name) {
 
   if (lingwo_dictionary_settings('entry_content_type') == $type_name) {
     $extra['lingwo_senses'] = array(
-      'label' => t('Lingwo Dictionary Senses'),
-      'description' => t('Dictionary Entry senses'),
+      'label' => t('Lingwo Senses'),
+      'description' => t('lingwo_senses module.'),
       'weight' => 1,
     );
   }

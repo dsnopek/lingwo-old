@@ -38,7 +38,7 @@ function lingwo_fields_theme() {
       'pattern' => 'lingwo_fields_widget_form_',
     ),
     'lingwo_fields_formatter_default' => array(
-      'arguments' => array('element' => NULL),
+      'arguments' => array('node' => NULL),
     ),
     'lingwo_fields_view' => array(
       'arguments' => array('element' => NULL),
@@ -47,130 +47,130 @@ function lingwo_fields_theme() {
   );
 }
 
-/**
- * CCK hooks
+/*
+ * Implementation of hook_form_alter().
  */
-
-/**
- * Implementation of hook_field_info().
- */
-function lingwo_fields_field_info() {
-  return array(
-    'lingwo_fields' => array(
-      'label' => t('Lingwo Dictionary Fields'),
-      'description' => t('Store dictionary fields in the database.'),
-    ),
-  );
-}
-
-/**
- * Implementation of hook_widget_info().
- */
-function lingwo_fields_widget_info() {
-  return array(
-    'lingwo_fields_widget' => array(
-      'label' => 'Lingwo Dictionary Fields Widget',
-      'field types' => array('lingwo_fields'),
-      'multiple values' => CONTENT_HANDLE_MODULE,
-      //'multiple values' => CONTENT_HANDLE_CORE,
-      'description' => t('Widget for editing fields for a dictionary entry .'),
-    ),
-  );
-}
-
-/**
- * Implementation of hook_field_formatter_info().
- */
-function lingwo_fields_field_formatter_info() {
-  return array(
-    'default' => array(
-      'label' => t('Lingwo Dictionary Fields Formatter'),
-      'field types' => array('lingwo_fields'),
-      'multiple values' => CONTENT_HANDLE_MODULE,
-    ),
-  );
-}
-
-/**
- * Implementation of hook_field_settings().
- */
-function lingwo_fields_field_settings($op, $field) {
-  switch ($op) {
-    case 'database columns':
-      $columns['type'] = array(
-        'type' => 'varchar',
-        'length' => 10,
-        'sortable' => TRUE,
-        'views' => TRUE,
-      );
-      $columns['name'] = array(
-        'type' => 'varchar',
-        'length' => 255,
-        'sortable' => TRUE,
-        'views' => TRUE
-      );
-      $columns['value'] = array(
-        'type' => 'varchar',
-        'length' => 255,
-        'sortable' => TRUE,
-        'views' => TRUE
-      );
-      $columns['automatic'] = array(
-        'description' => 'Boolean indicating whether this field was generated automatically or not',
-        'type' => 'int',
-        'default' => 1,
-        'views' => TRUE,
-      );
-      return $columns;
+function lingwo_fields_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == (lingwo_dictionary_settings('entry_content_type') .'_node_form')) {
+    $node = $form['#node'];
+    if (!lingwo_dictionary_entry_is_translation($node)) {
+      // only applies to entries that are not translations
+      $form['lingwo_fields'] = lingwo_fields_widget($form, $form_state);
+    }
   }
 }
 
 /**
- * Implementation of hook_field().
+ * Implementation of hook_content_extra_fields().
  */
-function lingwo_fields_field($op, &$node, $field, &$items, $teaser, $page) {
+function lingwo_fields_content_extra_fields($type_name) {
+  $extra = array();
+
+  if (lingwo_dictionary_settings('entry_content_type') == $type_name) {
+    $extra['lingwo_fields'] = array(
+      'label' => t('Lingwo Fields'),
+      'description' => t('lingwo_fields module.'),
+      'weight' => 1,
+    );
+  }
+
+  return $extra;
+}
+
+function _lingwo_fields_clean(&$items) {
+  unset($items['refresh']);
+
+  foreach ($items as &$item) {
+    if ($item['type'] == 'class') {
+      $item['value'] = intval($item['value']);
+    }
+    $item['automatic'] = (bool)$item['automatic'];
+  }
+}
+
+
+function _lingwo_fields_write_record($fields, $is_update) {
+  if ($is_update) {
+    drupal_write_record('lingwo_fields_revisions', $fields, 'vid');
+  }
+  else {
+    drupal_write_record('lingwo_fields_revisions', $fields);
+  }
+
+  # update our lookup table!
+  # TODO: in the future we will have many more lookup tables!
+  db_query('DELETE FROM {lingwo_fields_forms} WHERE nid = %d', $fields->nid);
+  foreach ($fields->data as $field) {
+    if ($field['type'] == 'form') {
+      $form = (object)array(
+        'nid'       => $fields->nid,
+        'form'      => $field['value'],
+        'form_name' => $field['name'],
+      );
+      drupal_write_record('lingwo_fields_forms', $form);
+    }
+  }
+}
+
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function lingwo_fields_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
+  // lingwo_fields only applies to entries that aren't translations
+  if ($node->type != lingwo_dictionary_settings('entry_content_type') ||
+      lingwo_dictionary_entry_is_translation($node)) return NULL;
+
   switch ($op) {
     case 'load':
-      foreach ($items as &$item) {
-        if ($item['type'] == 'class') {
-          $item['value'] = intval($item['value']);
-        }
+      $res = db_query("SELECT data FROM {lingwo_fields_revisions} WHERE vid = %d", $node->vid);
+      if ($row = db_fetch_object($res)) {
+        return array('lingwo_fields' => unserialize($row->data));
       }
       break;
+
     case 'presave':
-      # remove the phantom refresh button that tries to sneak in here occasionally.
-      if (isset($items['refresh'])) {
-        unset($items['refresh']);
+    case 'prepare':
+      if (!empty($node->lingwo_fields)) {
+        _lingwo_fields_clean($node->lingwo_fields);
       }
       break;
-    case 'validate':
-      # TODO: check for required items!
-      return $items;
-  }
-}
 
+    case 'insert':
+    case 'update':
+      $object = (object)array(
+        'nid'  => $node->nid,
+        'vid'  => $node->vid,
+        'data' => $node->lingwo_fields,
+      );
 
-/**
- * Implementation of hook_content_is_empty().
- */
-function lingwo_fields_content_is_empty($item, $field) {
-  if (empty($item['value'])) {
-    return TRUE;
+      _lingwo_fields_write_record($object, empty($node->revision) && $op == 'update');
+      break;
+
+    case 'view':
+      $node->content['lingwo_fields'] = array(
+        '#value' => theme('lingwo_fields_formatter_default', $node),
+      );
+      break;
+
+    case 'delete revision':
+      db_query("DELETE FROM {lingwo_fields_revisions} WHERE vid = %s", $node->vid);
+      break;
+
+    case 'delete':
+      db_query("DELETE FROM {lingwo_fields_revisions} WHERE nid = %s", $node->nid);
+      db_query("DELETE FROM {lingwo_fields_forms}     WHERE nid = %s", $node->nid);
+      break;
   }
-  return FALSE;
 }
 
 /**
  * Implementation of hook_widget
  */
-function lingwo_fields_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+function lingwo_fields_widget(&$form, &$form_state) {
   $node = $form['#node'];
   if (!isset($node)) {
     $node = (object)$form_state['node'];
-  }
-
-  if (lingwo_dictionary_entry_is_translation($node)) {
-    return NULL;
   }
 
   ahah_helper_register($form, $form_state);
@@ -427,9 +427,7 @@ function theme_lingwo_fields_widget_form($element) {
   return drupal_render($element);
 }
 
-function theme_lingwo_fields_formatter_default($element) {
-  $node = $element['#node'];
-
+function theme_lingwo_fields_formatter_default($node) {
   lingwo_dictionary_entry_load_translation_source($node);
   if ($node->translation_source) {
     // display the fields as if this were the source node (with the source nodes

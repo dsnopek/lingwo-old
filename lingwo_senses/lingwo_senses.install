@@ -142,14 +142,14 @@ function lingwo_senses_update_6001() {
  * Implementation of hook_install().
  */
 function lingwo_senses_install() {
-  drupal_install_schema('lingwo_dictionary');
+  drupal_install_schema('lingwo_senses');
 }
 
 /**
  * Implementation of hook_uninstall().
  */
 function lingwo_senses_uninstall() {
-  drupal_uninstall_schema('lingwo_dictionary');
+  drupal_uninstall_schema('lingwo_senses');
 }
 
 /**
