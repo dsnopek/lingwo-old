@@ -114,6 +114,33 @@ function lingwo_dictionary_menu() {
   return $items;
 }
 
+/*
+ * Implementation of hook_services()
+ */
+function lingwo_dictionary_service() {
+  return array(
+    array(
+      '#method' => 'lingwo_dictionary.search_entries',
+      '#callback' => 'lingwo_dictionary_search_entries',
+      '#access arguments' => array('access content'),
+      '#args' => array(
+        array(
+          '#name' => 'text',
+          '#type' => 'string',
+          '#description' => t('Text to lookup'),
+        ),
+        array(
+          '#name' => 'options',
+          '#type' => 'struct',
+          '#description' => t('A struct representing search options.'),
+        ),
+      ),
+      '#return' => 'array',
+      '#help' => t('An array of structs containing the "nid" of the entries and maybe some other things.'),
+    ),
+  );
+}
+
 /**
  * Implementation of hook_block().
  */
@@ -294,7 +321,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
         return;
       }
 
-      $existing = lingwo_dictionary_entry_lookup($node->title, $node->language, $pos);
+      $existing = lingwo_dictionary_entry_lookup($node->language, $pos, $node->title);
 
       if ($existing && $existing != $node->nid) {
         form_set_error('title', 

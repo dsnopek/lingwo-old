@@ -72,7 +72,7 @@ function lingwo_dictionary_entry_from_id($id) {
     $pos  = $matches[2];
   }
 
-  $nid = lingwo_dictionary_entry_lookup($headword, $source_lang, $pos);
+  $nid = lingwo_dictionary_entry_lookup($source_lang, $pos, $headword);
 
   if ($target_lang) {
     $trans = translation_node_get_translations($nid);
@@ -93,25 +93,53 @@ function lingwo_dictionary_entry_generate_hash(&$entry) {
 }
 
 // Lookup an entry based on its headword, language and pos
-function lingwo_dictionary_entry_lookup($headword, $language, $pos = NULL) {
-  if (is_null($pos)) {
-    $res = db_query("SELECT nid FROM {lingwo_dictionary_entry} WHERE headword = '%s' AND language = '%s'", $headword, $language);
-
-    $nids = NULL;
-    while($obj = db_fetch_object($res)) {
-      $nids[] = $obj->nid;
-    }
-    return $nids;
+function lingwo_dictionary_entry_lookup($language, $pos, $headword) {
+  $res = db_query("SELECT nid FROM {lingwo_dictionary_entry} ".
+    "WHERE language = '%s' AND pos = '%s' AND headword = '%s'",
+    $language, $pos, $headword);
+  if ($obj = db_fetch_object($res)) {
+    return $obj->nid;
   }
-  else {
-    $res = db_query("SELECT nid FROM {lingwo_dictionary_entry} WHERE headword = '%s' AND language = '%s' AND pos = '%s'", $headword, $language, $pos);
-    $obj = db_fetch_object($res);
-    if ($obj) {
-      return $obj->nid;
-    }
-  }
-  
   return NULL;
+}
+
+function _lingwo_dictionary_search_entries($text, $options=array()) {
+  $sql = "SELECT nid FROM {lingwo_dictionary_entry}";
+  $where = " WHERE headword = '%s'";
+  $args = array($text);
+
+  if (!empty($options['language'])) {
+    $where .= " AND language = '%s'";
+    $args[] = $options['language'];
+  }
+  if (!empty($options['pos'])) {
+    $where .= " AND pos = '%s'";
+    $args[] = $options['pos'];
+  }
+
+  $results = array();
+  $res = db_query($sql . $where, $args);
+  while ($obj = db_fetch_object($res)) {
+    $results[] = (object)array(
+      'nid'   => $obj->nid,
+      'exact' => TRUE,
+    );
+  }
+
+  return $results;
+}
+
+function lingwo_dictionary_search_entries($text, $options=array()) {
+  // first get all the headword matches
+  $results = _lingwo_dictionary_search_entries($text, $options);
+
+  // then get all the fields matches
+  if (module_exists('lingwo_fields')) {
+    $ret = lingwo_fields_search_forms($text, $options);
+    $results = array_merge($results, $ret);
+  }
+
+  return $results;
 }
 
 function lingwo_dictionary_entry_path($node) {

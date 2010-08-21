@@ -66,28 +66,37 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
     context_set('lingwo_dictionary', 'search_language', $source_lang);
   }
 
-  # lookup the appropriate node or nodes
-  $nids = array();
-  if ($source_nids = lingwo_dictionary_entry_lookup($word, $source_lang, $pos)) {
-    if (!is_array($source_nids)) {
-      $source_nids = array($source_nids);
-    }
-    if ($target_lang) {
-      foreach ($source_nids as $nid) {
-        // find translation nodes
-        $trans = translation_node_get_translations($nid);
-        if ($trans[$target_lang]) {
-          $nids[] = $trans[$target_lang]->nid;
-        }
-      }
-    }
-    else {
-      $nids = $source_nids;
+  // lookup the appropriate node or nodes
+  if (!empty($pos)) {
+    // ensure this is a single lookup with no magic extensions (forms, fuzzy, etc..)
+    if ($nid = lingwo_dictionary_entry_lookup($source_lang, $pos, $word)) {
+      $search = array((object)array('nid' => $nid));
     }
   }
+  else {
+    $search = lingwo_dictionary_search_entries($word, array('language' => $source_lang));
+  }
 
-  // if this is a single node
-  if (!empty($nids) && $pos) {
+  // translate if necessary
+  $nids = array();
+  foreach ($search as $result) {
+    $nid = $result->nid;
+    if ($target_lang) {
+      // find translation nodes
+      $trans = translation_node_get_translations($nid);
+      if ($trans[$target_lang]) {
+        $nid = $trans[$target_lang]->nid;
+      }
+    }
+
+	// don't add duplicates
+	if (!in_array($nid, $nids)) {
+      $nids[] = $nid;
+	}
+  }
+
+  // if this is a single node direct link, not a search
+  if (!empty($nids) && !empty($pos)) {
     return lingwo_dictionary_lookup_page_node($nids[0]);
   }
 

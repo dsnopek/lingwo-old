@@ -27,6 +27,35 @@ function lingwo_fields_menu() {
   return $items;
 }
 
+// API function to find all the entries which match this form.  This is a pair to
+// lingwo_dictionary_search_entries (it is, in fact, used by the function)
+function lingwo_fields_search_forms($text, $options=array()) {
+  $results = array();
+
+  $sql = "SELECT f.nid, f.form_name FROM {lingwo_fields_forms} f";
+  $where = " WHERE form = '%s'";
+  $args = array($text);
+
+  if (!empty($options['language'])) {
+    $sql .= " INNER JOIN {node} n ON f.nid = n.nid";
+    $where .= " AND n.language = '%s'";
+    $args[] = $options['language'];
+  }
+  if (!empty($options['pos'])) {
+    $sql .= " INNER JOIN {lingwo_dictionary_entry} e ON f.nid = e.nid";
+    $where .= " AND e.pos = '%s'";
+    $args[] = $options['pos'];
+  }
+
+  $res = db_query($sql . $where, $args);
+  while ($obj = db_fetch_object($res)) {
+    $obj->exact = TRUE;
+    $results[] = $obj;
+  }
+
+  return $results;
+}
+
 /**
  * Implementation of hook_theme().
  */

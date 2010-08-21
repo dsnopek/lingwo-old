@@ -9,7 +9,7 @@
 /*
 function lingwo_data_service_update_entry_access($data) {
   $data = json_decode($data);
-  $nid = lingwo_dictionary_entry_lookup($data->headword, $data->language, $data->pos);
+  $nid = lingwo_dictionary_entry_lookup($data->pos, $data->language, $data->headword);
 
   if (is_null($nid)) {
     $entry_type = lingwo_dictionary_settings('entry_content_type');
@@ -314,7 +314,7 @@ function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
     $languages = _lingwo_data_import_process_language($entry);
 
     // Try to find if the already entry exists.
-    $nid = lingwo_dictionary_entry_lookup($entry['headword'], $entry['language'], $entry['pos']);
+    $nid = lingwo_dictionary_entry_lookup($entry['language'], $entry['pos'], $entry['headword']);
     $is_new = $nid ? FALSE : TRUE;
 
     // Process the list of sources given by the $entry.

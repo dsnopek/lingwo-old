@@ -97,7 +97,7 @@ function lingwo_korpus_lookup_senses() {
   $pos = urldecode($_GET['pos']);
   $headword = urldecode($_GET['headword']);
 
-  $nid = lingwo_dictionary_entry_lookup($headword, $language, $pos);
+  $nid = lingwo_dictionary_entry_lookup($language, $pos, $headword);
   if (!empty($nid)) {
     $node = node_load($nid);
     $senses = array();
@@ -418,7 +418,7 @@ function lingwo_korpus_admin_list_entries(&$form_state) {
   if ($form_state['values']['input']) {
     $links = array();
     foreach (lingwo_korpus_text_entry_list($form_state['values']['input'], $form_state['values']['from_lang']) as $entry) {
-      $nid = lingwo_dictionary_entry_lookup($entry->headword, $entry->language, $entry->pos);
+      $nid = lingwo_dictionary_entry_lookup($entry->language, $entry->pos, $entry->headword);
 
       if (!empty($form_state['values']['to_lang'])) {
         $trans = translation_node_get_translations($nid);
