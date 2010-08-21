@@ -2,6 +2,11 @@
 from xml.dom import Node as XmlNode
 import html5lib
 
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
 # A generally useful DOM extension
 def Node_insertAfter(parent, newElem, refElem):
     if parent.lastChild == refElem:
@@ -49,6 +54,13 @@ class Document(_DomWrapper):
         from LingwoNLP.segment import segmentDocument
         segmentDocument(self._dom)
 
+    def __str__(self):
+        writer = StringIO()
+        body = self._dom.getElementsByTagName('body')[0]
+        for child in body.childNodes:
+            writer.write(child.toxml('utf-8'))
+        return writer.getvalue()
+
     @property
     def sents(self):
         for elem in self._dom.getElementsByTagName('s'):
@@ -82,7 +94,6 @@ def parse(fd):
     return Document(html5lib.parse(fd, treebuilder='dom'))
 
 def parseString(s):
-    from StringIO import StringIO
     return parse(StringIO(s))
 
 
