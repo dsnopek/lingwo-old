@@ -237,23 +237,16 @@ function lingwo_senses_widget_original(&$form, &$form_state, $node) {
     );
 
     if (count($items) > 1) {
+      # only edit the difference when there are multiple senses
       $row['data']['difference'] = array(
         '#title' => 'Difference',
         '#type' => 'textfield',
         '#default_value' => $sense['data']['difference'],
         '#maxlength' => 255,
       );
-      $row['data']['example'] = array(
-        '#title' => 'Example',
-        '#type' => 'textfield',
-        '#default_value' => $sense['data']['example'],
-        '#maxlength' => 255,
-      );
     }
     else {
-      $row['message'] = array(
-        '#value' => "<p><em>". t('This entry has only one sense.') ."</em></p>",
-      );
+      # but preserve the value for if we delete down to one sense
       if ($sense['data']['difference']) {
         $row['data']['difference'] = array(
           '#title' => 'Difference',
@@ -261,14 +254,14 @@ function lingwo_senses_widget_original(&$form, &$form_state, $node) {
           '#value' => $sense['data']['difference'],
         );
       }
-      if ($sense['data']['example']) {
-        $row['data']['example'] = array(
-          '#title' => 'Example',
-          '#type' => 'item',
-          '#value' => $sense['data']['example']
-        );
-      }
     }
+    # always have an example
+    $row['data']['example'] = array(
+      '#title' => 'Example',
+      '#type' => 'textfield',
+      '#default_value' => $sense['data']['example'],
+      '#maxlength' => 255,
+    );
 
     $row['weight'] = array(
       '#type' => 'weight',
@@ -282,6 +275,11 @@ function lingwo_senses_widget_original(&$form, &$form_state, $node) {
         '#type' => 'submit',
         '#value' => t('Remove Sense #!num', array('!num' => $index + 1)),
         '#submit' => array('lingwo_senses_remove_submit'),
+      );
+    }
+    else {
+      $row['message'] = array(
+        '#value' => "<em>* ". t('This entry has only one sense.') ."</em>",
       );
     }
 
