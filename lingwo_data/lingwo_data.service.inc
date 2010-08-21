@@ -127,9 +127,7 @@ function _lingwo_data_import_process_original($entry) {
   }
 
   // process fields
-  if (!empty($entry['fields']) && lingwo_data_settings('field_fields') &&
-      module_exists('lingwo_fields')) {
-
+  if (!empty($entry['fields']) && module_exists('lingwo_fields')) {
     // we have to add the fields in the same order as the form
     foreach (lingwo_language_fields($entry['language'], $entry['pos']) as $field_name => $field) {
       $auto = $entry['fields'][$field_name]['automatic'];
@@ -257,9 +255,9 @@ function _lingwo_data_import_process_field_values($node, &$items, $type, $values
 }
 
 function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
-  if ($field_alias == 'senses') {
-    // Not CCK, its special.
-    $field_name = $field_type = 'lingwo_senses';
+  if ($field_alias == 'senses' || $field_alias == 'fields') {
+    // Not CCK, these are special.
+    $field_name = $field_type = ('lingwo_'.$field_alias);
   }
   else {
     $field_name = lingwo_data_settings('field_'. $field_alias);
