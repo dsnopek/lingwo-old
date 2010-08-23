@@ -466,7 +466,7 @@ function theme_lingwo_fields_formatter_default($node) {
     // language) and not a member of this language
     $node = $node->translation_source;
   }
-  $items = $node->lingwo_fields;
+  $items = empty($node->lingwo_fields) ? array() : $node->lingwo_fields;
 
   $fdef = lingwo_language_fields($node->language, lingwo_dictionary_entry_get_pos($node));
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 from LingwoNLP.document import parseString
 from LingwoNLP.remote import ServerInterface

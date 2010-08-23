@@ -63,7 +63,7 @@ class Document(_DomWrapper):
 
     @property
     def sents(self):
-        for elem in self._dom.getElementsByTagName('s'):
+        for elem in self._dom.getElementsByTagName('sent'):
             yield TokenStream(elem)
 
     @property
@@ -81,8 +81,8 @@ class Token(_DomWrapper):
 
 class TokenStream(_DomWrapper):
     def __init__(self, dom):
-        if dom.nodeType != XmlNode.ELEMENT_NODE or dom.tagName != 's':
-            raise DocumentError('TokenStream must wrap around a <s> sentence element')
+        if dom.nodeType != XmlNode.ELEMENT_NODE or dom.tagName != 'sent':
+            raise DocumentError('TokenStream must wrap around a <sent> sentence element')
         _DomWrapper.__init__(self, dom)
 
         self.tokens = []
