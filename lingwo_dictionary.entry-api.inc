@@ -6,37 +6,43 @@
  * API functions for dealing with entries.  All of them start with "lingwo_dictionary_entry_".
  */
 
-// TODO: it would be pretty sweet to turn this into a class, rather these functions
-// with such HUGE names.  Yeah, work on that.
-
 require_once('includes/lingwo-entry.inc');
 
-// Let's us know if a node is a translation
+// TODO: this doesn't belong here, it isn't really an entry function
+// Returns TRUE if this entry is a translation.
 function lingwo_dictionary_entry_is_translation($node) {
-  return LingwoEntry::fromNode($node)->isTranslation();
+  return _ld_is_translation($node);
 }
 
 // Loads and returns a node's translation source
+// TODO: this doesn't belong here, it isn't really an entry function
 function lingwo_dictionary_entry_load_translation_source(&$node) {
-  $entry = LingwoEntry::fromNode($node);
-  $node->translation_source = $entry->getTranslationSource();
-  return $node->translation_source;
+  if ($entry = LingwoEntry::fromNode($node)) {
+    $node->translation_source = $entry->getTranslationSource();
+    return $node->translation_source;
+  }
 }
 
 // Returns an array of languages where the first is always the source language
 function lingwo_dictionary_entry_get_languages($node, $for_humans=FALSE) {
-  return LingwoEntry::fromNode($node)->getLanguages($for_humans);
+  if ($entry = LingwoEntry::fromNode($node)) {
+    return $entry->getLanguages($for_humans);
+  }
 }
 
 // Gets the Part of Speech from a node
 function lingwo_dictionary_entry_get_pos($node, $for_humans=FALSE) {
-  return LingwoEntry::fromNode($node)->getPos($for_humans);
+  if ($entry = LingwoEntry::fromNode($node)) {
+    return $entry->getPos($for_humans);
+  }
 }
 
 // Makes a "Lingwo ID" for the entry
 // TODO: we need a paired parse_id function!
 function lingwo_dictionary_entry_get_id($node) {
-  return LingwoEntry::fromNode($node)->getLingwoId();
+  if ($entry = LingwoEntry::fromNode($node)) {
+    return $entry->getLingwoId();
+  }
 }
 
 // Gets an nid from the "Lingwo ID"
@@ -45,7 +51,9 @@ function lingwo_dictionary_entry_from_id($id) {
 }
 
 function lingwo_dictionary_entry_path($node) {
-  return LingwoEntry::fromNode($node)->getPath();
+  if ($entry = LingwoEntry::fromNode($node)) {
+    return $entry->getPath();
+  }
 }
 
 // TODO: This isn't really an entry function!!  This is is the wrong 'namespace'

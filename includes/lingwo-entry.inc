@@ -1,7 +1,5 @@
 <?php
 
-class LingwoEntryException extends Exception { }
-
 class LingwoEntry {
   private $node;
   private $ifaces = array();
@@ -15,8 +13,8 @@ class LingwoEntry {
   }
 
   public static function fromNode(&$node) {
-    if (!LingwoEntry::isEntryNode($node)) {
-      throw new LingwoEntryException('node is not a dictionary entry');
+    if (!$node || !LingwoEntry::isEntryNode($node)) {
+      return NULL;
     }
     if (is_a($node, 'LingwoEntry')) {
       return $node;
@@ -25,26 +23,17 @@ class LingwoEntry {
   }
 
   public static function fromNid($nid) {
-    if ($nid == 0) {
-      throw new LingwoEntryException('nid invalid');
+    if ($nid) {
+      return LingwoEntry::fromNode(node_load($nid));
     }
-    return LingwoEntry::fromNode(node_load($nid));
   }
 
   public static function fromLingwoId($id) {
-    $nid = LingwoEntry::lingwo2nid($id);
-    if (!$nid) {
-      throw new LingwoEntryException("unable to find lingwo id '$id'");
-    }
-    return LingwoEntry::fromNid($nid);
+    return LingwoEntry::fromNid(LingwoEntry::lingwo2nid($id));
   }
 
   public static function fromKey($language, $pos, $headword) {
-    $nid = lingwo_dictionary_entry_lookup($language, $pos, $headword);
-    if (!$nid) {
-      throw new LingwoEntryException("unable to find key: $language, $pos, $headword");
-    }
-    return LingwoEntry::fromNid($nid);
+    return LingwoEntry::fromNid(lingwo_dictionary_entry_lookup($language, $pos, $headword));
   }
 
   public static function lingwo2nid($id) {
@@ -71,7 +60,7 @@ class LingwoEntry {
   }
 
   public function getNode() {
-    return $node;
+    return $this->node;
   }
 
   public static $MAP = array(
@@ -119,13 +108,11 @@ class LingwoEntry {
       return $iface;
     }
 
-    throw LingwoEntryException("Unable to get interface for '$module'");
+    return NULL;
   }
 
   public function isTranslation() {
-    $node = $this->node;
-    return isset($node->translation_source) ||
-      ($node->nid && $node->tnid != 0 && $node->nid != $node->tnid);
+    return _ld_is_translation($this->node);
   }
 
   public function getTranslationSource() {

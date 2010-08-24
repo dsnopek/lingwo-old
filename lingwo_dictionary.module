@@ -47,6 +47,12 @@ function &_ld_form_to_node(&$form, &$form_state) {
   return $form_state['node'];
 }
 
+// Helper: returns TRUE if the given node is a translation
+function _ld_is_translation($node) {
+  return isset($node->translation_source) ||
+    ($node->nid && $node->tnid != 0 && $node->nid != $node->tnid);
+}
+
 function lingwo_dictionary_add_require_js() {
   // add require.js to the page
   drupal_add_js('require({paths:{lingwo_dictionary:"/'. drupal_get_path('module', 'lingwo_dictionary') .'/js"}});', 'inline');
@@ -65,9 +71,8 @@ function lingwo_dictionary_add_require_js() {
 function lingwo_dictionary_init() {
   if (lingwo_dictionary_settings('redirect_node') && lingwo_dictionary_settings('lookup_path')) {
     if (preg_match('/^node\/(\d+)$/', $_GET['q'], $matches)) {
-      $node = node_load($matches[1]);
-      if ($node->type == lingwo_dictionary_settings('entry_content_type')) {
-        $redirect = lingwo_dictionary_entry_path($node);
+      if ($entry = LingwoEntry::fromNid($matches[1])) {
+        $redirect = $entry->getPath();
       }
     }
 
@@ -224,7 +229,7 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
         $form['language']['#default_value'] = $_GET['language'];
         $node->language = $_GET['language'];
       }
-      if (isset($_GET['pos']) && !lingwo_dictionary_entry_is_translation($node)) {
+      if (isset($_GET['pos']) && !_ld_is_translation($node)) {
         $node->pos = $_GET['pos'];
       }
     }
@@ -243,7 +248,7 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
     );
 
     // when editting a translation or existing node...
-    if (isset($node->nid) || lingwo_dictionary_entry_is_translation($node)) {
+    if (isset($node->nid) || _ld_is_translation($node)) {
       // make title uneditable
       $form['title']['#name'] = 'title-disabled';
       $form['title']['#disabled'] = TRUE;
@@ -292,7 +297,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       return array('pos' => $node->translation_source->pos);
     }
 
-    $nid = lingwo_dictionary_entry_is_translation($node) ? $node->tnid : $node->nid;
+    $nid = _ld_is_translation($node) ? $node->tnid : $node->nid;
     $row = db_fetch_object(db_query("SELECT pos FROM {lingwo_dictionary_entry} WHERE nid = %d", $nid));
     if (!$row) {
       // TODO: this should really be a watchdog message because it appears to happen normally when
@@ -308,7 +313,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
   }
 
   // The rest are only on sources
-  if (lingwo_dictionary_entry_is_translation($node))
+  if (_ld_is_translation($node))
     return NULL;
 
   switch ($op) {

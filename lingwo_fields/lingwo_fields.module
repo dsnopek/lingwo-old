@@ -84,9 +84,13 @@ function lingwo_fields_theme() {
 function lingwo_fields_form_alter(&$form, $form_state, $form_id) {
   if ($form_id == (lingwo_dictionary_settings('entry_content_type') .'_node_form')) {
     $node = $form['#node'];
-    if (!lingwo_dictionary_entry_is_translation($node)) {
+    if (!isset($node)) {
+      $node = (object)$form_state['node'];
+    }
+    $entry = LingwoEntry::fromNode($node);
+    if (!$entry->isTranslation()) {
       // only applies to entries that are not translations
-      $form['lingwo_fields'] = lingwo_fields_widget($form, $form_state);
+      $form['lingwo_fields'] = lingwo_fields_widget($form, $form_state, $entry);
     }
   }
 }
@@ -202,15 +206,11 @@ function lingwo_fields_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
 /**
  * Implementation of hook_widget
  */
-function lingwo_fields_widget(&$form, &$form_state) {
-  $node = $form['#node'];
-  if (!isset($node)) {
-    $node = (object)$form_state['node'];
-  }
-
+function lingwo_fields_widget(&$form, &$form_state, $entry) {
   ahah_helper_register($form, $form_state);
 
-  $pos = lingwo_dictionary_entry_get_pos($node);
+  $node = $entry->getNode();
+  $pos = $entry->getPos();
   $items = $node->lingwo_fields;
 
   $default_values = array();

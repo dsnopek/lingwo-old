@@ -69,20 +69,16 @@ function lingwo_korpus_lookup_entry() {
   $url = urldecode($_GET['url']);
   $url = preg_replace(':.*?'.lingwo_dictionary_settings('lookup_path').'/(.*):', '$1', $url);
   
-  // load the node with this ID
-  $nid = lingwo_dictionary_entry_from_id($url);
-  if (is_null($nid)) {
-    // This should be slicker!  Probably themed, provide a link for creating the entry.
-    $content = t('Entry not found.');
-  }
-  else {
-    $node = node_load($nid);
-
+  if ($entry = LingwoEntry::fromLingwoId($url)) {
     if (module_exists('rules')) {
-      rules_invoke_event('lingwo_korpus_lookup', $user, $node);
+      rules_invoke_event('lingwo_korpus_lookup', $user, $entry->getNode());
     }
 
-    $content = node_view($node, TRUE);
+    $content = node_view($entry->getNode(), TRUE);
+  }
+  else {
+    // This should be slicker!  Probably themed, provide a link for creating the entry.
+    $content = t('Entry not found.');
   }
 
   // return the HTML to the Ajax caller
