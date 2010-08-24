@@ -19,6 +19,13 @@ function lingwo_korpus_admin_settings()
     '#description' => t('The content type to use as a korpus text.'),
     '#default_value' => lingwo_korpus_text_content_type(),
   );
+  
+  $form['lingwo_korpus_python_exec'] = array(
+  	'#type' => 'textfield',
+	'#title' => t('Python Executable Path'),
+	'#description' => t('Path to the python executable.  Probably is a virtualenv specifically for running the automatic annotator.'),
+	'#default_value' => lingwo_korpus_python_exec(),
+  );
 
   return system_settings_form($form);
 }

@@ -6,13 +6,7 @@ try:
 except ImportError:
     import simplejson as json
 
-DOMAIN = 'nlp'
-KEY = '79f5235335085d792fb36c4f36c0d875'
-USERNAME = 'NLP'
-PASSWORD = 'tOhznZi4bE';
-
-# test server
-URL = 'http://localhost:35637/services/xmlrpc'
+from LingwoNLP.config import *
 
 class ServerInterface(object):
     def __init__(self, url=URL, log=None):

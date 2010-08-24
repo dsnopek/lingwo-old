@@ -1,6 +1,6 @@
 
 from xml.dom import Node as XmlNode
-import html5lib
+import html5lib, codecs
 
 try:
     from cStringIO import StringIO
@@ -44,6 +44,17 @@ class _DomWrapper(object):
 class DocumentError(Exception):
     pass
 
+def writeHtml(writer, nodeList):
+    from html5lib.treewalkers import getTreeWalker
+    #from html5lib.serializer.htmlserializer import HTMLSerializer
+    from html5lib.serializer.xhtmlserializer import XHTMLSerializer
+
+    walker = getTreeWalker('dom')
+    serializer = XHTMLSerializer()
+    for node in nodeList:
+        for item in serializer.serialize(walker(node)):
+            writer.write(item)
+
 class Document(_DomWrapper):
     def __init__(self, dom):
         if dom.nodeType != XmlNode.DOCUMENT_NODE:
@@ -55,11 +66,11 @@ class Document(_DomWrapper):
         segmentDocument(self._dom)
 
     def __str__(self):
-        writer = StringIO()
+        buffer = StringIO()
+        writer = codecs.getwriter('utf-8')(buffer)
         body = self._dom.getElementsByTagName('body')[0]
-        for child in body.childNodes:
-            writer.write(child.toxml('utf-8'))
-        return writer.getvalue()
+        writeHtml(writer, body.childNodes)
+        return buffer.getvalue()
 
     @property
     def sents(self):

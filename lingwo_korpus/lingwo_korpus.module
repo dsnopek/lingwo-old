@@ -176,8 +176,12 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
   );
 
   $form['save'] = array(
-    '#type' => 'submit',
+    '#type'  => 'submit',
     '#value' => t('Save'),
+  );
+  $form['auto'] = array(
+    '#type'  => 'submit',
+    '#value' => t('Auto Annotate'),
   );
 
   drupal_add_js(array(
@@ -202,6 +206,7 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
 
   $node = $form['#node'];
   $text = $form_state['values']['korpus-text-value'];
+  $text = preg_replace('/\r/', '', $text);
 
   if (str_get_html($text)->plaintext != str_get_html($node->body)->plaintext) {
     drupal_set_message(t('Annotator modified the content of the text'), 'error');
@@ -209,7 +214,13 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
   }
 
   $node->body = $text;
+  if ($form_state['clicked_button']['#value'] == t('Auto Annotate')) {
+    drupal_set_message(t('Automatic annotator complete.'));
+    $text = _lingwo_korpus_autolookup_node($node);
+  }
+
   $node->teaser = node_teaser($node->body, $node->format);
+  $node->_lingwo_korpus_no_segment = TRUE;
   node_save($node);
 
   drupal_set_message(t('Annotation saved.'));
@@ -278,6 +289,12 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
   if ($node->type != lingwo_korpus_text_content_type())
     return;
 
+  if ($op == 'presave' && !$node->_lingwo_korpus_no_segment) {
+    // segment the text on save
+    _lingwo_korpus_autolookup_node($node, 'body',   FALSE);
+    _lingwo_korpus_autolookup_node($node, 'teaser', FALSE);
+  }
+
   if ($op == 'update' || $op == 'delete') {
     // clear all cached texts for this node
     cache_clear_all($node->nid, 'cache_lingwo_korpus', TRUE);
@@ -293,6 +310,7 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
       lingwo_korpus_generate_hash($entry);
       drupal_write_record('lingwo_korpus_entry', $entry);
     }
+
   }
 
   if ($op == 'view') {
@@ -499,14 +517,76 @@ function lingwo_korpus_block($op = 'list', $delta = 0, $edit = array()) {
 function theme_lingwo_korpus_annotation_reader_block($footer_id, $footer_margin) {
   return '<div id="lingwo-korpus-dock" data-footer-id="'.$footer_id.'" data-footer-margin="'.$footer_margin.'"></div>';
 }
+
+/*
+ * Dealing with the automatic annotator.
+ */
+
+function _lingwo_korpus_autolookup_node(&$node, $which='body', $full_lookup=TRUE) {
+  $cmd = $full_lookup ? '-' : '-s -';
+  if ($result = _lingwo_korpus_exec_autolookup_py($cmd, $node->$which)) {
+    $node->$which = $result;
+    return TRUE;
+  }
+  return FALSE;
+}
+
+function _lingwo_korpus_exec_autolookup_py($cmd, $data) {
+  $cmd = implode(' ', array(
+    lingwo_korpus_python_exec(),
+    drupal_get_path('module', 'lingwo_dictionary') .'/nlp/autolookup.py',
+    $cmd,
+  ));
+
+  $descspec = array(
+    0 => array('pipe', 'r'),
+    1 => array('pipe', 'w'),
+    2 => array('pipe', 'w'),
+  );
+
+  $process = proc_open($cmd, $descspec, $pipes, NULL, NULL);
+  if (is_resource($process)) {
+    // write the node body to the child's stdin
+    fwrite($pipes[0], $data);
+    fclose($pipes[0]);
+
+    // read the result from the child's stdout
+    $result = stream_get_contents($pipes[1]);
+    fclose($pipes[1]);
+
+    // read the error stream
+    $error = stream_get_contents($pipes[2]);
+    fclose($pipes[2]);
+
+    // if the program was successful, update the node
+    $return_value = proc_close($process);
+    if ($return_value == 0) {
+      return $result;
+    }
+    else {
+      drupal_set_message(t('Error running automatic annotator.'), 'error');
+      watchdog('lingwo_korpus', "Error running autolookup.py: ". $error, NULL, WATCHDOG_ERROR);
+    }
+  }
+}
+
 /*
  * Settings
  */
+
 function lingwo_korpus_text_content_type($value=NULL) {
   if (is_null($value)) {
     return variable_get('lingwo_korpus_text_content_type', '');
   }
 
   variable_set('lingwo_korpus_text_content_type', $value);
+}
+
+function lingwo_korpus_python_exec($value=NULL) {
+  if (is_null($value)) {
+    return variable_get('lingwo_korpus_python_exec', '/usr/bin/python');
+  }
+
+  variable_set('lingwo_korpus_python_exec', $value);
 }
 
