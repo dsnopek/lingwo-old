@@ -6,6 +6,8 @@
  * Implements a CCK field for dictionary entries, which will be different for each language and part of speech
  */
 
+require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/lingwo-fields.inc');
+
 /**
  * Implementation of hook_menu().
  */
@@ -25,6 +27,13 @@ function lingwo_fields_menu() {
   */
 
   return $items;
+}
+
+/**
+ * Implementation of hook_lingwo_entry_interface().
+ */
+function lingwo_fields_lingwo_entry_interface($entry) {
+  return new LingwoFields($entry);
 }
 
 // API function to find all the entries which match this form.  This is a pair to

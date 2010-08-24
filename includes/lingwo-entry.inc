@@ -59,7 +59,7 @@ class LingwoEntry {
     return $nid;
   }
 
-  public function getNode() {
+  public function &getNode() {
     return $this->node;
   }
 
