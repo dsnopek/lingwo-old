@@ -460,11 +460,10 @@ function theme_lingwo_fields_widget_form($element) {
 }
 
 function theme_lingwo_fields_formatter_default($node) {
-  lingwo_dictionary_entry_load_translation_source($node);
-  if ($node->translation_source) {
+  if ($source_node = lingwo_dictionary_entry_load_translation_source($node)) {
     // display the fields as if this were the source node (with the source nodes
     // language) and not a member of this language
-    $node = $node->translation_source;
+    $node = $source_node;
   }
   $items = empty($node->lingwo_fields) ? array() : $node->lingwo_fields;
 

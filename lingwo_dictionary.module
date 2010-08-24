@@ -316,13 +316,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       if (isset($node->delete))
         return NULL;
 
-      $pos = lingwo_dictionary_entry_get_pos($node);
-      if (empty($pos)) {
-        form_set_error('pos', t("Couldn't derive Part of Speech from node!"));
-        return;
-      }
-
-      $existing = lingwo_dictionary_entry_lookup($node->language, $pos, $node->title);
+      $existing = lingwo_dictionary_entry_lookup($node->language, $node->pos, $node->title);
 
       if ($existing && $existing != $node->nid) {
         form_set_error('title', 
@@ -333,7 +327,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
     case 'insert':
       $object = (object)array(
         'language' => $node->language,
-        'pos' => lingwo_dictionary_entry_get_pos($node),
+        'pos' => $node->pos,
         'headword' => $node->title,
         'nid' => $node->nid,
       );

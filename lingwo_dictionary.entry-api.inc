@@ -9,84 +9,46 @@
 // TODO: it would be pretty sweet to turn this into a class, rather these functions
 // with such HUGE names.  Yeah, work on that.
 
+require_once('includes/lingwo-entry.inc');
+
 // Let's us know if a node is a translation
 function lingwo_dictionary_entry_is_translation($node) {
-  return isset($node->translation_source) ||
-    ($node->nid && $node->tnid != 0 && $node->nid != $node->tnid);
+  return LingwoEntry::fromNode($node)->isTranslation();
 }
 
 // Loads and returns a node's translation source
 function lingwo_dictionary_entry_load_translation_source(&$node) {
-  if (lingwo_dictionary_entry_is_translation($node) && !isset($node->translation_source)) {
-    // TODO: we shouldn't modify the node!  At least not using this name, since 'translation'
-    // owns it..
-    $node->translation_source = node_load($node->tnid);
-  }
-  
+  $entry = LingwoEntry::fromNode($node);
+  $node->translation_source = $entry->getTranslationSource();
   return $node->translation_source;
 }
 
 // Returns an array of languages where the first is always the source language
 function lingwo_dictionary_entry_get_languages($node, $for_humans=FALSE) {
-  if ($source_node = lingwo_dictionary_entry_load_translation_source($node)) {
-    $res = array($source_node->language, $node->language);
-  }
-  else {
-    $res = array($node->language);
-  }
-
-  if ($for_humans) {
-    $languages = language_list();
-    for ($i = 0; $i < count($res); $i++) {
-      // TODO: we need to translate the names to the current interface!
-      $res[$i] = $languages[$res[$i]]->name;
-    }
-  }
-
-  return $res;
+  return LingwoEntry::fromNode($node)->getLanguages($for_humans);
 }
 
 // Gets the Part of Speech from a node
-function lingwo_dictionary_entry_get_pos($node, $human_readable=FALSE) {
-  if ($human_readable) {
-  	return lingwo_dictionary_pos_options(TRUE, $node->pos);
-  }
-
-  return $node->pos;
+function lingwo_dictionary_entry_get_pos($node, $for_humans=FALSE) {
+  return LingwoEntry::fromNode($node)->getPos($for_humans);
 }
 
 // Makes a "Lingwo ID" for the entry
 // TODO: we need a paired parse_id function!
 function lingwo_dictionary_entry_get_id($node) {
-  return implode('/', array(
-    implode('-', lingwo_dictionary_entry_get_languages($node)),
-    $node->title)) .'('. lingwo_dictionary_entry_get_pos($node) .')';
+  return LingwoEntry::fromNode($node)->getLingwoId();
 }
 
 // Gets an nid from the "Lingwo ID"
 function lingwo_dictionary_entry_from_id($id) {
-  list($source_lang, $headword) = explode('/', $id);
-  list($source_lang, $target_lang) = explode('-', $source_lang);
-  if (preg_match('/([^\(]+)\(([^\)]+)\)/', $headword, $matches)) {
-    $headword = trim($matches[1]);
-    $pos  = $matches[2];
-  }
-
-  $nid = lingwo_dictionary_entry_lookup($source_lang, $pos, $headword);
-
-  if ($target_lang) {
-    $trans = translation_node_get_translations($nid);
-    if ($trans[$target_lang]) {
-      $nid = $trans[$target_lang]->nid;
-    }
-    else {
-      $nid = NULL;
-    }
-  }
-
-  return $nid;
+  return LingwoEntry::lingwo2nid($id);
 }
 
+function lingwo_dictionary_entry_path($node) {
+  return LingwoEntry::fromNode($node)->getPath();
+}
+
+// TODO: This isn't really an entry function!!  This is is the wrong 'namespace'
 function lingwo_dictionary_entry_generate_hash(&$entry) {
   $entry->entry_hash =
     sha1(join(':', array($entry->language, $entry->pos, $entry->headword)));
@@ -138,23 +100,5 @@ function lingwo_dictionary_search_entries($text, $options=array()) {
   }
 
   return $results;
-}
-
-function lingwo_dictionary_entry_path($node) {
-  if (lingwo_dictionary_settings('lookup_path')) {
-    $lang = $node->language;
-    if ($source_node = lingwo_dictionary_entry_load_translation_source($node)) {
-      $lang = $source_node->language .'-'. $lang;
-    }
-    $pos = lingwo_dictionary_entry_get_pos($node);
-
-    return implode('/', array(
-      lingwo_dictionary_settings('lookup_path'),
-      $lang,
-      $node->title .'('. $pos .')'
-    ));
-  }
-
-  return isset($node->alias) ? $node->alias : ('node/'. $node->nid);
 }
 
