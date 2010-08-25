@@ -221,6 +221,7 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
   $node = $entry->getNode();
   $pos = $entry->getPos();
   $items = $node->lingwo_fields;
+  $extra_forms = intval($form_state['extra_forms']);
 
   $default_values = array();
   if (!empty($items)) {
@@ -236,23 +237,24 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
     '#tree'  => TRUE,
   );
 
+  $ahah = array(
+    //'event' => 'change',
+    'path' => ahah_helper_path(array('lingwo_fields', 'wrapper')),
+    //'path' => 'lingwo_fields/ahah/'. $field_name,
+    'wrapper' => 'lingwo_fields-wrapper',
+    'effect' => 'fade',
+  );
+
   // If this node is new, then add the AHAH and 'Refresh' button that allows
   // changing which fields are available.
   if (!$node->nid) {
-    $ahah = array(
-      //'event' => 'change',
-      'path' => ahah_helper_path(array('lingwo_fields', 'wrapper')),
-      //'path' => 'lingwo_fields/ahah/'. $field_name,
-      'wrapper' => 'lingwo_fields-wrapper',
-      'effect' => 'fade',
-    );
     $form['language']['#ahah'] = $ahah; // + array('event' => 'change');
     $form['pos']['#ahah'] = $ahah;
 
     $element['refresh'] = array(
       '#type' => 'submit',
       '#value' => t('Refresh'),
-      '#submit' => array('lingwo_fields_change_pos_submit'),
+      '#submit' => array('lingwo_fields_submit_change_pos_submit'),
       '#ahah' => $ahah + array('event' => 'click')
     );
   }
@@ -277,6 +279,8 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
   );
 
   $index = 0;
+  # TODO: this really won't work, we need to combine the lingwo_language_fields and 
+  # the extra fields that are being passed in.
   foreach (lingwo_language_fields($node->language, $pos) as $name => $field) {
     // TODO: use $form_state['storage'] to get the interim default values!
     $default = $default_values[$name];
@@ -285,6 +289,7 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
         'type' => $field['type'],
         'name' => $name,
         'value' => NULL,
+        # TODO: why does this say 'automatic' => TRUE?  Why not take the actual value?
         'automatic' => TRUE,
       );
     }
@@ -349,12 +354,49 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
     $element['wrapper']['fields'][$index++] = $field_form;
   }
 
+  for($i = 0; $i < $extra_forms; $i++) {
+    $field_form = array(
+      '#type' => 'fieldset',
+      '#title' => t('Extra Form').':',
+      '#attributes' => array(
+        'class' => "lingwo-fields-extra-form",
+      ),
+      #'#prefix' => '<div class="lingwo-fields-extra-form">',
+      #'#suffix' => '</div>',
+    );
+    $field_form['name'] = array(
+      //'#title' => t('Name'),
+      '#type' => 'textfield',
+      '#default_value' => '',
+      '#attributes' => array(
+        'class' => "lingwo-fields-name",
+      ),
+    );
+    $field_form['type'] = array(
+      '#type' => 'hidden',
+      '#value' => 'form',
+    );
+    $field_form['value'] = array(
+      //'#title' => t('Value'),
+      '#type' => 'textfield',
+      '#default_value' => '',
+    );
+    $element['wrapper']['fields'][$index++] = $field_form;
+  }
+
   if ($index == 0) {
     $element['wrapper']['placeholder'] = array(
       '#type' => 'markup',
       '#value' => '<p>'. t('No fields for this Language and Part of Speech') .'</p>'
     );
   }
+
+  $element['add_more_forms'] = array(
+    '#type' => 'button',
+    '#value' => t('Add More Forms'),
+    '#ahah' => $ahah + array('event' => 'click'),
+    '#submit' => array('lingwo_fields_submit_add_more_forms'),
+  );
 
   // for the theme function
   $element['#node'] = $node;
@@ -376,6 +418,7 @@ function theme_lingwo_fields_widget_form_wrapper($element) {
     'pos' => $element['#pos'],
   )), 'setting');
   drupal_add_js(drupal_get_path('module', 'lingwo_fields') .'/lingwo_fields.js');
+  drupal_add_css(drupal_get_path('module', 'lingwo_fields') .'/lingwo_fields.css');
 
   return drupal_render($element); 
 }
@@ -413,9 +456,15 @@ function lingwo_fields_ahah($field_name) {
 }
 */
 
-function lingwo_fields_change_pos_submit($form, &$form_state) {
+function lingwo_fields_submit_change_pos_submit($form, &$form_state) {
   // TODO: should we really do this?
   $node = _ld_form_to_node($form, $form_state);
+}
+
+function lingwo_fields_submit_add_more_forms($form, &$form_state) {
+  // TODO: should we really do this?
+  $node = _ld_form_to_node($form, $form_state);
+  $form_state['extra_forms'] = 3;
 }
 
 /*

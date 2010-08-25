@@ -5,6 +5,7 @@
     var entry = null;
 
     var field_map = {};
+    var extra_forms = [];
     var timer = null;
 
     // updates the on screen form with values from the entry
@@ -146,6 +147,37 @@
         };
     };
 
+    function ExtraForm (node) {
+        this.wrapperNode = node;
+
+        var self = this;
+
+        this.nameNode = $('.lingwo-fields-name', this.wrapperNode);
+        this.nonameNode = $('<a class="lingwo-fields-noname" href="#">'+Drupal.t('Set name')+'</a>');
+        this.nonameNode.click(function (evt) {
+            self.nameNode.parent().show();
+            self.nameNode
+                .val('name')
+                .focus();
+            self.nameNode.get(0).select();
+            self.nonameNode.hide();
+            return false;
+        });
+        this.nameNode.blur(function (evt) {
+            if (self.nameNode.val() == '') {
+                self.nameNode.parent().hide();
+                self.nonameNode.show();
+            }
+        });
+
+        // put the noname node after the legend
+        var legend = $('legend', this.wrapperNode);
+        legend.append(' ');
+        legend.append(this.nonameNode);
+
+        this.nameNode.parent().hide();
+    }
+
 
     Drupal.behaviors.lingwo_fields = function (context) {
         // load the settings
@@ -183,9 +215,15 @@
                 });
 
                 field_map = {};
+                extra_forms = [];
                 $('.lingwo-fields-control', context).each(function (i) {
                     var control = new Control(this);
                     field_map[control.name] = control;
+                });
+                $('.lingwo-fields-extra-form', context).each(function (i) {
+                    //console.debug(this);
+                    var extraForm = new ExtraForm(this);
+                    extra_forms.push(extraForm);
                 });
 
                 // updated the form!!

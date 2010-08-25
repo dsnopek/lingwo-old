@@ -1,0 +1,15 @@
+
+fieldset.lingwo-fields-extra-form {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+fieldset legend {
+    font-weight: bold;
+}
+
+.lingwo-fields-noname {
+    font-weight: normal;
+}
+
