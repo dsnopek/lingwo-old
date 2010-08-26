@@ -221,7 +221,14 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
   // do it in the submit handler.
   // TODO: here is where we should start using some sweet API functions
   if ($value = $form_state['values']['_lingwo_fields']['add_new_form']) {
-    $fields->add($value['name'], $value['type'], $value['value']);
+    if (!empty($value['value'])) {
+      $fields->add($value['name'], $value['type'], $value['value']);
+    }
+  }
+  
+  // record if we are supposed to add an extra value to a field
+  if ($extra_value = $form_state['values']['_lingwo_fields']['extra_value']) {
+    $fields->add($extra_value, $fields->getType('type'), '');
   }
 
   $element = array(
@@ -239,19 +246,11 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
     'effect' => 'fade',
   );
 
-  // If this node is new, then add the AHAH and 'Refresh' button that allows
-  // changing which fields are available.
+  // If this node is new, then add the AHAH which will activate when language
+  // or pos are changed.
   if (!$node->nid) {
     $form['language']['#ahah'] = $ahah; // + array('event' => 'change');
     $form['pos']['#ahah'] = $ahah;
-
-    $element['refresh'] = array(
-      '#type' => 'submit',
-      '#value' => t('Refresh'),
-      '#submit' => array('lingwo_fields_submit_change_pos_submit'),
-      '#ahah' => $ahah + array('event' => 'click'),
-      '#parents' => array('_lingwo_fields','refresh'),
-    );
   }
 
   $element['wrapper'] = array(
@@ -352,34 +351,57 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
     );
   }
 
+  // TODO: maybe move all the '_lingwo_fields' stuff down here and do it with a 
+  // single parent and #TREE?
+  $_lingwo_fields = array(
+    '#parents' => array('_lingwo_fields'),
+    '#tree' => TRUE,
+  );
+
+  // for adding multiple forms
+  $_lingwo_fields['extra_value'] = array(
+    '#type' => 'hidden',
+    '#value' => '',
+  );
+
   // for adding non-standard forms
-  $element['wrapper']['add_new_form'] = array(
+  $_lingwo_fields['add_new_form'] = array(
     '#type' => 'fieldset',
     '#title' => t('Extra Form').':',
     '#attributes' => array(
       'class' => "lingwo-fields-extra-form",
     ),
-    '#parents' => array('_lingwo_fields','add_new_form'),
   );
-  $element['wrapper']['add_new_form']['name'] = array(
+  $_lingwo_fields['add_new_form']['name'] = array(
     '#type' => 'textfield',
     '#attributes' => array(
       'class' => "lingwo-fields-name",
     ),
   );
-  $element['wrapper']['add_new_form']['type'] = array(
+  $_lingwo_fields['add_new_form']['type'] = array(
     '#type'  => 'hidden',
     '#value' => 'form',
   );
-  $element['wrapper']['add_new_form']['value'] = array(
+  $_lingwo_fields['add_new_form']['value'] = array(
     '#type' => 'textfield',
   );
-  $element['wrapper']['add_new_form']['add_new_form'] = array(
+  $_lingwo_fields['add_new_form']['add_new_form'] = array(
     '#type' => 'submit',
     '#value' => t('Add new form'),
     '#submit' => array('lingwo_fields_submit_add_new_form'),
     '#ahah' => $ahah + array('event' => 'click')
   );
+
+  // for reloading the current values
+  $_lingwo_fields['refresh'] = array(
+    '#type' => 'submit',
+    '#value' => t('Refresh'),
+    '#submit' => array('lingwo_fields_submit_change_pos_submit'),
+    '#ahah' => $ahah + array('event' => 'click'),
+    '#parents' => array('_lingwo_fields','refresh'),
+  );
+
+  $element['wrapper']['_lingwo_fields'] = $_lingwo_fields;
 
   // for the theme function
   $element['#node'] = $node;

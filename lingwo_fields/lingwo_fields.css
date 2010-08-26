@@ -9,7 +9,9 @@ fieldset legend {
     font-weight: bold;
 }
 
-.lingwo-fields-noname {
+.lingwo-fields-noname,
+.lingwo-fields-addvalue {
     font-weight: normal;
+    color: blue;
 }
 

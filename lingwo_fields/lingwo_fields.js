@@ -27,10 +27,27 @@
         this.type = $(node).attr('data-type'),
         this.name = $(node).attr('data-name');
 
+        var self = this;
+
         this.inputNode = node;
         this.wrapperNode = $(this.inputNode).parent().parent().get(0);
         this.valueNode = $('<a class="lingwo-fields-value" href="#"></a>');
         this.autoNode = document.getElementById((''+node.id).replace(/-value$/, '-automatic'));
+
+        if (this.type == 'form') {
+          this.addValueNode = $('<a class="lingwo-fields-addvalue" href="#">'+Drupal.t('Add value')+'</a>');
+          this.addValueNode.click(function (evt) {
+            $('#edit--lingwo-fields-extra-value').val(self.name);
+            $('#edit--lingwo-fields-refresh').click();
+            return false;
+          });
+
+          // put the addValueNode after the label
+          var label = $('label', this.wrapperNode);
+          console.debug(label);
+          label.append(' ');
+          label.append(this.addValueNode);
+        }
 
         $(this.inputNode).after(this.valueNode);
 
@@ -200,8 +217,8 @@
                     pos: pos
                 });
 
-                // remove the Refresh button, AHAH will handle the reloading
-                $('#edit-lingwo-fields-refresh', context).remove();
+                // hide the Refresh button, AHAH will handle the reloading
+                $('#edit--lingwo-fields-refresh', context).hide();
 
                 $('#edit-title', context).bind('keyup', function (evt) {
                     entry.headword = evt.target.value;
