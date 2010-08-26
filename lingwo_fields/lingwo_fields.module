@@ -215,41 +215,14 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
 
   $node = $entry->getNode();
   $pos = $entry->getPos();
-  $items = $node->lingwo_fields;
-  $extra_forms = intval($form_state['extra_forms']);
+  $fields = $entry->getInterface('lingwo_fields');
 
   // add the from to our form list (we have to do this here because in AHAH we can't
   // do it in the submit handler.
   // TODO: here is where we should start using some sweet API functions
   if ($value = $form_state['values']['_lingwo_fields']['add_new_form']) {
-    unset($value['add_new_form']);
-    $items[$value['name']] = $value;
-    _lingwo_fields_clean($items);
+    $fields->add($value['name'], $value['type'], $value['value']);
   }
-
-  // TODO: combining the lingwo_language_fields() and the actual values should be an
-  // API function somehow
-  $fields = array();
-  foreach (lingwo_language_fields($node->language, $pos) as $name => $field) {
-    if (isset($items[$name])) {
-      $item = $items[$name];
-      unset($items[$name]);
-    }
-    else {
-      // setup some defaults from the definition
-      $item = array(
-        'type'      => $field['type'],
-        'name'      => $name,
-        'value'     => NULL,
-        'automatic' => TRUE
-      );
-    }
-
-    $item['definition'] = $field;
-
-    $fields[$name] = $item;
-  }
-  $fields += $items;
 
   $element = array(
     '#type'  => 'fieldset',
@@ -489,7 +462,8 @@ function lingwo_fields_submit_add_new_form($form, &$form_state) {
 /*
  * Our "API" functions
  */
-function lingwo_fields_map_items(&$items, $fapi = FALSE) {
+// creates a special map of FAPI items for use by the themes
+function lingwo_fields_map_items(&$items) {
   $map = array(
     ':classes' => array(),
     ':options' => array(),
@@ -499,17 +473,6 @@ function lingwo_fields_map_items(&$items, $fapi = FALSE) {
   foreach (element_children($items) as $index) {
     // From the formatter them function we get $items[$index]['#item'] but if we just toss
     // $node->lingwo_fields in here, we get $items[$index] -- both modes are supported.
-    $item_info = $items[$index];
-    /*
-    if ($fapi) {
-      if (empty($item_info['#item'])) {
-        // This isn't an item, so skip it
-        continue;
-      }
-      $item_info = $item_info['#item'];
-    }
-    */
-
     $item_info = $items[$index]['#item'] ? $items[$index]['#item'] : $items[$index];
     $type = $item_info['type'];
     $name = $item_info['name'];
@@ -529,7 +492,7 @@ function lingwo_fields_map_items(&$items, $fapi = FALSE) {
  */
 
 function template_preprocess_lingwo_fields_widget_form(&$vars) {
-  $vars['fields'] = lingwo_fields_map_items($vars['element'], TRUE);
+  $vars['fields'] = lingwo_fields_map_items($vars['element']);
 }
 
 function theme_lingwo_fields_widget_form($element) {
@@ -537,42 +500,38 @@ function theme_lingwo_fields_widget_form($element) {
 }
 
 function theme_lingwo_fields_formatter_default($node) {
-  if ($source_node = lingwo_dictionary_entry_load_translation_source($node)) {
+  $entry = LingwoEntry::fromNode($node);
+
+  if ($source_node = $entry->getTranslationSource()) {
     // display the fields as if this were the source node (with the source nodes
     // language) and not a member of this language
+    $entry = LingwoEntry::fromNode($source_node);
     $node = $source_node;
   }
-  $items = empty($node->lingwo_fields) ? array() : $node->lingwo_fields;
-
-  $fdef = lingwo_language_fields($node->language, lingwo_dictionary_entry_get_pos($node));
 
   // fill element with real FAPI elements that simple display the item
   $element = array();
-  foreach ($items as $item) {
-    $name = $item['name'];
-    $label = isset($fdef[$name]['label']) ? $fdef[$name]['label'] : $name;
+  foreach ($entry->getInterface('lingwo_fields') as $name => $field) {
+    $def = $fields['definition'];
+    $label = isset($def[$name]['label']) ? $def[$name]['label'] : $name;
 
     $element[] = array(
       '#type' => 'item',
       '#title' => $label,
-      '#value' => $item['value'],
-      '#item'  => $item,
+      '#value' => $field['value'],
+      '#item'  => $field,
     );
   }
 
-  // Since CCK forces our theme name, we send to another theme to do the real
-  // theming, with possible specific themes.
-  $pos = lingwo_dictionary_entry_get_pos($node);
-
   return theme(array(
-      'lingwo_fields_view_'. $node->language .'_'. $pos,
+      'lingwo_fields_view_'. $node->language .'_'. $node->pos,
       'lingwo_fields_view_'. $node->language, 
       'lingwo_fields_view'
   ), $element);
 }
 
 function template_preprocess_lingwo_fields_view(&$vars) {
-  $vars['fields'] = lingwo_fields_map_items($vars['element'], TRUE);
+  $vars['fields'] = lingwo_fields_map_items($vars['element']);
 }
 
 function theme_lingwo_fields_view($element) {

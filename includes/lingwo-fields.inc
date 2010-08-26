@@ -1,21 +1,52 @@
 <?php
 
-class LingwoFields {
+class LingwoFields implements IteratorAggregate {
   private $entry;
-  private $map;
   private $node;
 
   function __construct($entry) {
     $this->entry = $entry;
     $this->node =& $entry->getNode();
 
-    if (empty($node->lingwo_fields)) {
-      $node->lingwo_fields = array();
+    if (!isset($this->node->lingwo_fields)) {
+      $this->node->lingwo_fields = array();
     }
-    $this->map = array();
-    foreach ($node->lingwo_fields as &$field) {
-      $this->map[$field['name']] =& $field;
+  }
+
+  public function getFields() {
+    $this->clean();
+    $items = $this->node->lingwo_fields;
+    $fields = array();
+    foreach (lingwo_language_fields($this->node->language, $pos) as $name => $field) {
+      if (isset($items[$name])) {
+        $item = $items[$name];
+        unset($items[$name]);
+      }
+      else {
+        // setup some defaults from the definition
+        $item = array(
+          'type'      => $field['type'],
+          'name'      => $name,
+          'value'     => NULL,
+          'automatic' => TRUE
+        );
+      }
+
+      $item['definition'] = $field;
+
+      $fields[$name] = $item;
     }
+    $fields += $items;
+
+    return $fields;
+  }
+
+  public function clean() {
+    _lingwo_fields_clean($this->node->lingwo_fields);
+  }
+
+  public function getIterator() {
+    return new ArrayIterator($this->getFields());
   }
 
   public function getEntry() {
@@ -23,18 +54,18 @@ class LingwoFields {
   }
 
   public function exists($name) {
-    return isset($this->map[$name]);
+    return isset($this->node->lingwo_fields[$name]);
   }
 
   public function getType($name) {
-    if (isset($this->map[$name])) {
-      return $this->map[$name]['type'];
+    if (isset($this->node->lingwo_fields[$name])) {
+      return $this->node->lingwo_fields[$name]['type'];
     }
   }
 
   public function getOne($name) {
-    if (isset($this->map[$name])) {
-      $value = $this->map[$name]['value'];
+    if (isset($this->node->lingwo_fields[$name])) {
+      $value = $this->node->lingwo_fields[$name]['value'];
       if (is_array($value)) {
         $value = $value[0];
       }
@@ -43,8 +74,8 @@ class LingwoFields {
   }
 
   public function getMany($name) {
-    if (isset($this->map[$name])) {
-      $value = $this->map[$name]['value'];
+    if (isset($this->node->lingwo_fields[$name])) {
+      $value = $this->node->lingwo_fields[$name]['value'];
       if (!is_array($value)) {
         $value = array($value);
       }
@@ -53,32 +84,23 @@ class LingwoFields {
   }
 
   public function set($name, $type, $value, $automatic=FALSE) {
-    if (isset($this->map[$name])) {
-      $field =& $this->map[$name];
-      $field['type'] = $type;
-      $field['value'] = $value;
-      $field['automatic'] = $automatic;
-    }
-    else {
+    if (!isset($this->node->lingwo_fields[$name])) {
       $field = array(
-        'name'      => $name,
-        'type'      => $type,
-        'value'     => $value,
-        'automatic' => $automatic,
+        'name' => $name,
       );
-
-      $this->node->lingwo_senses[] =& $field;
-      $this->map[$name] =& $field;
+      $this->node->lingwo_senses[$name] = $field;
     }
+
+    $field =& $this->node->lingwo_fields[$name];
+    $field['type']      = $type;
+    $field['value']     = $value;
+    $field['automatic'] = $automatic;
   }
 
   public function add($name, $type, $value, $automatic=FALSE) {
     if ($orig = $this->getMany($name)) {
       $orig[] = $value;
       $value = $orig;
-    }
-    else {
-      $value = array($value);
     }
     $this->set($name, $type, $value, $automatic);
   }
