@@ -30,7 +30,7 @@
         this.inputNode = node;
         this.wrapperNode = $(this.inputNode).parent().parent().get(0);
         this.valueNode = $('<a class="lingwo-fields-value" href="#"></a>');
-        this.autoNode = $('#'+(''+node.id).replace(/-value$/, '-automatic')).get();
+        this.autoNode = document.getElementById((''+node.id).replace(/-value$/, '-automatic'));
 
         $(this.inputNode).after(this.valueNode);
 

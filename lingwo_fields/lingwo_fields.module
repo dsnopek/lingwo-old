@@ -90,12 +90,9 @@ function lingwo_fields_theme() {
 /*
  * Implementation of hook_form_alter().
  */
-function lingwo_fields_form_alter(&$form, $form_state, $form_id) {
+function lingwo_fields_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == (lingwo_dictionary_settings('entry_content_type') .'_node_form')) {
     $node = $form['#node'];
-    if (!isset($node)) {
-      $node = (object)$form_state['node'];
-    }
     $entry = LingwoEntry::fromNode($node);
     if (!$entry->isTranslation()) {
       // only applies to entries that are not translations
@@ -122,8 +119,6 @@ function lingwo_fields_content_extra_fields($type_name) {
 }
 
 function _lingwo_fields_clean(&$items) {
-  unset($items['refresh']);
-
   foreach ($items as &$item) {
     if ($item['type'] == 'class') {
       $item['value'] = intval($item['value']);
@@ -223,12 +218,38 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
   $items = $node->lingwo_fields;
   $extra_forms = intval($form_state['extra_forms']);
 
-  $default_values = array();
-  if (!empty($items)) {
-    foreach ($items as $item) {
-      $default_values[$item['name']] = $item;
-    }
+  // add the from to our form list (we have to do this here because in AHAH we can't
+  // do it in the submit handler.
+  // TODO: here is where we should start using some sweet API functions
+  if ($value = $form_state['values']['_lingwo_fields']['add_new_form']) {
+    unset($value['add_new_form']);
+    $items[$value['name']] = $value;
+    _lingwo_fields_clean($items);
   }
+
+  // TODO: combining the lingwo_language_fields() and the actual values should be an
+  // API function somehow
+  $fields = array();
+  foreach (lingwo_language_fields($node->language, $pos) as $name => $field) {
+    if (isset($items[$name])) {
+      $item = $items[$name];
+      unset($items[$name]);
+    }
+    else {
+      // setup some defaults from the definition
+      $item = array(
+        'type'      => $field['type'],
+        'name'      => $name,
+        'value'     => NULL,
+        'automatic' => TRUE
+      );
+    }
+
+    $item['definition'] = $field;
+
+    $fields[$name] = $item;
+  }
+  $fields += $items;
 
   $element = array(
     '#type'  => 'fieldset',
@@ -255,7 +276,8 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
       '#type' => 'submit',
       '#value' => t('Refresh'),
       '#submit' => array('lingwo_fields_submit_change_pos_submit'),
-      '#ahah' => $ahah + array('event' => 'click')
+      '#ahah' => $ahah + array('event' => 'click'),
+      '#parents' => array('_lingwo_fields','refresh'),
     );
   }
 
@@ -278,25 +300,15 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
     'forms' => array()
   );
 
-  $index = 0;
-  # TODO: this really won't work, we need to combine the lingwo_language_fields and 
-  # the extra fields that are being passed in.
-  foreach (lingwo_language_fields($node->language, $pos) as $name => $field) {
+  foreach ($fields as $name => $field) {
+    $def = $field['definition'];
+    unset($field['definition']);
+
     // TODO: use $form_state['storage'] to get the interim default values!
-    $default = $default_values[$name];
-    if (empty($default)) {
-      $default = array(
-        'type' => $field['type'],
-        'name' => $name,
-        'value' => NULL,
-        # TODO: why does this say 'automatic' => TRUE?  Why not take the actual value?
-        'automatic' => TRUE,
-      );
-    }
     $field_form = array(
       '#prefix' => '<div>',
       '#suffix' => '</div>',
-      '#item'   => $default,
+      '#item'   => $field,
     );
     $field_form['name'] = array(
       '#type' => 'hidden',
@@ -307,17 +319,21 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
       '#value' => $field['type'],
     );
     $field_form['value'] = array(
-      '#title' => isset($field['label']) ? $field['label'] : $name,
-      '#default_value' => $default['value'],
+      '#title' => isset($def['label']) ? $def['label'] : $name,
+      '#default_value' => $field['value'],
       // TODO: we need to enforce required with select boxes
-      '#required' => $field['required'] ? TRUE : FALSE,
+      '#required' => $def['required'] ? TRUE : FALSE,
       '#attributes' => array(
         'class' => 'lingwo-fields-control',
         'data-type' => $field['type'],
         'data-name' => $name,
       ),
-      '#description' => $field['description'],
+      '#description' => $def['description'],
     );
+    if (!empty($def)) {
+      // we mark this control having a definition 
+      $field_form['value']['#attributes']['data-has-definition'] = 'true';
+    }
 
     switch ($field['type']) {
       case 'class':
@@ -330,7 +346,7 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
         );
         break;;
       case 'option':
-        $options = $field['options'];
+        $options = $def['options'];
         $options = array('' => '-none-') + $options;
 
         $field_form['value'] += array(
@@ -345,57 +361,51 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
         break;;
     };
 
-    $field_form['automatic'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Automatic'),
-      '#default_value' => $default['automatic'],
-    );
+    //if (!empty($def)) {
+      $field_form['automatic'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Automatic'),
+        '#default_value' => $field['automatic'],
+      );
+    //}
 
-    $element['wrapper']['fields'][$index++] = $field_form;
+    $element['wrapper']['fields'][$name] = $field_form;
   }
 
-  for($i = 0; $i < $extra_forms; $i++) {
-    $field_form = array(
-      '#type' => 'fieldset',
-      '#title' => t('Extra Form').':',
-      '#attributes' => array(
-        'class' => "lingwo-fields-extra-form",
-      ),
-      #'#prefix' => '<div class="lingwo-fields-extra-form">',
-      #'#suffix' => '</div>',
-    );
-    $field_form['name'] = array(
-      //'#title' => t('Name'),
-      '#type' => 'textfield',
-      '#default_value' => '',
-      '#attributes' => array(
-        'class' => "lingwo-fields-name",
-      ),
-    );
-    $field_form['type'] = array(
-      '#type' => 'hidden',
-      '#value' => 'form',
-    );
-    $field_form['value'] = array(
-      //'#title' => t('Value'),
-      '#type' => 'textfield',
-      '#default_value' => '',
-    );
-    $element['wrapper']['fields'][$index++] = $field_form;
-  }
-
-  if ($index == 0) {
+  if (count($element['wrapper']['fields']) == 0) {
     $element['wrapper']['placeholder'] = array(
       '#type' => 'markup',
       '#value' => '<p>'. t('No fields for this Language and Part of Speech') .'</p>'
     );
   }
 
-  $element['add_more_forms'] = array(
-    '#type' => 'button',
-    '#value' => t('Add More Forms'),
-    '#ahah' => $ahah + array('event' => 'click'),
-    '#submit' => array('lingwo_fields_submit_add_more_forms'),
+  // for adding non-standard forms
+  $element['wrapper']['add_new_form'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Extra Form').':',
+    '#attributes' => array(
+      'class' => "lingwo-fields-extra-form",
+    ),
+    '#parents' => array('_lingwo_fields','add_new_form'),
+  );
+  $element['wrapper']['add_new_form']['name'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+      'class' => "lingwo-fields-name",
+    ),
+  );
+  $element['wrapper']['add_new_form']['type'] = array(
+    '#type'  => 'hidden',
+    '#value' => 'form',
+  );
+  $element['wrapper']['add_new_form']['value'] = array(
+    '#type' => 'textfield',
+  );
+  $element['wrapper']['add_new_form']['add_new_form'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add new form'),
+    '#submit' => array('lingwo_fields_submit_add_new_form'),
+    '#ahah' => $ahah + array('event' => 'click')
   );
 
   // for the theme function
@@ -461,10 +471,19 @@ function lingwo_fields_submit_change_pos_submit($form, &$form_state) {
   $node = _ld_form_to_node($form, $form_state);
 }
 
-function lingwo_fields_submit_add_more_forms($form, &$form_state) {
+function lingwo_fields_submit_add_new_form($form, &$form_state) {
   // TODO: should we really do this?
-  $node = _ld_form_to_node($form, $form_state);
-  $form_state['extra_forms'] = 3;
+  $node =& _ld_form_to_node($form, $form_state);
+
+  // Unfortunately, with AHAH this doesn't work...
+  /*
+  $value = $form_state['values']['_lingwo_fields']['add_new_form'];
+  unset($value['add_new_form']);
+  $node['lingwo_fields'][$value['name']] = $value;
+
+  // we need to clean the input
+  _lingwo_fields_clean($node['lingwo_fields']);
+  */
 }
 
 /*

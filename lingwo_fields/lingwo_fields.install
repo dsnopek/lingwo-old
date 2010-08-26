@@ -87,12 +87,12 @@ function _lingwo_fields_insert_new_fields($items) {
 
   foreach ($items as $item) {
     if (!is_null($item->value)) {
-      array_push($new->data, array(
+      $new->data[$item->name] = array(
         'type'      => $item->type,
         'name'      => $item->name,
         'value'     => $item->value,
         'automatic' => $item->automatic,
-      ));
+      );
     }
   }
 

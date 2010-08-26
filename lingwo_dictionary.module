@@ -23,6 +23,8 @@ function _ld_make_uuid() {
 
 // Helper for implementing AHAH
 // TODO: now that we are using ahah_helper, this should be removed
+// TODO: actually, AHAH helper appears to not be doing this for us atleast on lingwo_fields
+// when trying to "Add More Forms" and there is no headword
 function _ld_disable_validation(&$form) {
   foreach (element_children($form) as $child) {
     $form[$child]['#validated'] = TRUE;
