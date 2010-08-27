@@ -99,6 +99,10 @@ class LingwoFields implements IteratorAggregate {
   }
 
   public function addForm($name, $value, $automatic=FALSE) {
+    if (is_null($name)) {
+      $name = '_noname_';
+      $automatic = FALSE;
+    }
     if (isset($this->node->lingwo_fields[$name])) {
       $this->node->lingwo_fields[$name]['alt'][] = $value;
     }
@@ -108,7 +112,7 @@ class LingwoFields implements IteratorAggregate {
         'type' => 'form',
         'automatic' => $automatic
       );
-      if ($name == '') {
+      if ($name == '_noname_') {
         $this->node->lingwo_fields[$name]['alt'][] = $value;
       }
       else {

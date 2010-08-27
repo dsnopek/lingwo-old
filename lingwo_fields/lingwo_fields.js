@@ -26,15 +26,21 @@
     function Control (node) {
         this.type = $(node).attr('data-type'),
         this.name = $(node).attr('data-name');
+        this.hasDefinition = $(node).attr('data-has-definition') == 'true';
 
         var self = this;
 
         this.inputNode = $('.lingwo-fields-value', node).get(0);
         this.wrapperNode = $(node).get(0);
-        this.valueNode = $('<a href="#"></a>');
+        this.valueNode = $('<a href="#" class="lingwo-fields-value"></a>');
         this.autoNode = document.getElementById((''+this.inputNode.id).replace(/-value$/, '-automatic'));
+        this.removeNode = document.getElementById((''+this.inputNode.id).replace(/-value$/, '-remove'));
+        if (this.removeNode) {
+          $(this.removeNode).addClass('lingwo-fields-remove-button');
+        }
 
-        if (this.type == 'form') {
+        // TODO: this should be clean-up and moved into another function (ie. _attachEvents)
+        if (this.type == 'form' && this.name != '_noname_') {
           this.addValueNode = $('<a class="lingwo-fields-addvalue" href="#">'+Drupal.t('Add value')+'</a>');
           this.addValueNode.click(function (evt) {
             $('#edit--lingwo-fields-extra-value').val(self.name);
@@ -47,8 +53,16 @@
           label.append(' ');
           label.append(this.addValueNode);
         }
+        /*
+        if (this.name == '_noname_') {
+          // move the input node to the end
+          $(this.inputNode).appendTo(this.inputNode.parentNode);
+        }
+        */
 
-        $(this.inputNode).after(this.valueNode);
+        if (this.hasDefinition) {
+          $(this.inputNode).after(this.valueNode);
+        }
 
         this._reattachCheckbox();
         this._attachEvents();
@@ -56,15 +70,34 @@
     };
     // does some swanky magic to re-arrange the checkbox for a tighter UI
     Control.prototype._reattachCheckbox = function () {
+        var checkboxNode = this.hasDefinition ? this.autoNode : this.removeNode;
+
         // first we want to seperate the label from the check box and hide the label
-        $(this.autoNode).insertBefore($(this.autoNode).parent());
-        $('label', $(this.autoNode).parent()).hide().attr('for', this.autoNode.id);
+        $(checkboxNode).insertBefore($(checkboxNode).parent());
+        $('label', $(checkboxNode).parent()).hide().attr('for', checkboxNode.id);
 
         // then we want to move the check box to be before the input
-        $(this.autoNode).parent().insertBefore($(this.inputNode).parent()).css({
-            //display: 'inline',
-            'float': 'left',
-            'margin': '0'
+        $(checkboxNode).parent().insertBefore($(this.inputNode).parent());
+
+        if (!this.hasDefinition) {
+            // that the checkbox is in place, we want to replace it with a link
+            var self = this;
+            var removeButton = $('<a href="#" class="lingwo-fields-remove-button"></a>');
+            removeButton.click(function (evt) {
+                $(self.removeNode).attr('checked', 'checked').click();
+                return false;
+            });
+            removeButton.insertAfter(checkboxNode);
+            $(checkboxNode).hide();
+            checkboxNode = removeButton.get(0);
+        }
+        
+        $(checkboxNode).css({
+            'display': 'block',
+            'float':   'left',
+            'width':   '15px',
+            'margin':  '0',
+            'margin-right': '5px',
         });
     };
     // sets up all the proper event handlers to make this control work
@@ -107,6 +140,8 @@
     };
     // takes the value from the autoNode and toggles the controls
     Control.prototype.updateAutomatic = function () {
+        if (!this.hasDefinition) return;
+
         this.automatic = $(this.autoNode).attr('checked') ? true : false;
         if (this.automatic) {
             $(this.inputNode).hide();
@@ -124,6 +159,8 @@
     };
     // pulls the values for this control from an entry
     Control.prototype.fromEntry = function () {
+        if (!this.hasDefinition) return;
+
         var value      = '<i>(empty)</i>',
             inputValue = '',
             showFunc;
@@ -150,6 +187,8 @@
     };
     // pulls values from the form and pushs them to the entry
     Control.prototype.toEntry = function () {
+        if (!this.hasDefinition) return;
+
         switch(this.type) {
             case 'class':
                 entry.fields[this.name] = $(':selected', this.inputNode).val() == '1';
@@ -173,7 +212,6 @@
         this.nonameNode.click(function (evt) {
             self.nameNode.parent().show();
             self.nameNode
-                .val('name')
                 .focus();
             self.nameNode.get(0).select();
             self.nonameNode.hide();
@@ -181,7 +219,7 @@
         });
         this.nameNode.blur(function (evt) {
             if (self.nameNode.val() == '') {
-                self.nameNode.parent().hide();
+                self.nameNode.val('_noname_').parent().hide();
                 self.nonameNode.show();
             }
         });

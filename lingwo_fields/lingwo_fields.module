@@ -120,10 +120,19 @@ function lingwo_fields_content_extra_fields($type_name) {
 
 function _lingwo_fields_clean(&$items) {
   foreach ($items as &$item) {
+    unset($item['remove']);
+
     if ($item['type'] == 'class') {
       $item['value'] = intval($item['value']);
     }
     $item['automatic'] = (bool)$item['automatic'];
+
+    if (isset($item['alt'])) {
+      $item['alt'] = array_filter($item['alt']);
+      if (count($item['alt']) == 0) {
+        unset($item['alt']);
+      }
+    }
   }
 }
 
@@ -247,7 +256,8 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
     'path' => ahah_helper_path(array('lingwo_fields', 'wrapper')),
     //'path' => 'lingwo_fields/ahah/'. $field_name,
     'wrapper' => 'lingwo_fields-wrapper',
-    'effect' => 'fade',
+    //'effect' => 'fade',
+    'effect' => 'none',
   );
 
   // If this node is new, then add the AHAH which will activate when language
@@ -277,6 +287,8 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
   );
 
   foreach ($fields as $name => $field) {
+    if ($form_state['values']['lingwo_fields'][$name]['remove']) continue;
+
     $def = $field['definition'];
     unset($field['definition']);
 
@@ -302,6 +314,7 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
       '#type' => 'hidden',
       '#value' => $field['type'],
     );
+
     $field_form['value'] = array(
       '#title' => isset($def['label']) ? $def['label'] : $name,
       '#default_value' => $field['value'],
@@ -351,19 +364,31 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
           '#type' => 'textfield',
           '#default_value' => $value,
           '#attributes' => array(
-            'class' => 'lingwo-fields-alt',
+            'class' => 'lingwo-fields-value',
           ),
         );
       }
     }
 
-    //if (!empty($def)) {
+    if ($name == '_noname_') {
+      $field_form['value']['#type'] = 'hidden';
+      $field_form['alt'][0]['#title'] = t('Un-named forms');
+    }
+
+    if (empty($def)) {
+      $field_form['remove'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Remove'),
+        '#ahah' => $ahah + array('event' => 'click'),
+      );
+    }
+    else {
       $field_form['automatic'] = array(
         '#type' => 'checkbox',
         '#title' => t('Automatic'),
         '#default_value' => $field['automatic'],
       );
-    //}
+    }
 
     $element['wrapper']['fields'][$name] = $field_form;
   }
@@ -397,6 +422,7 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
   );
   $_lingwo_fields['add_new_form']['name'] = array(
     '#type' => 'textfield',
+    '#default_value' => '_noname_',
     '#attributes' => array(
       'class' => "lingwo-fields-name",
     ),
@@ -554,11 +580,22 @@ function theme_lingwo_fields_formatter_default($node) {
   $element = array();
   foreach ($entry->getInterface('lingwo_fields') as $name => $field) {
     $def = $field['definition'];
-    $label = isset($def['label']) ? $def['label'] : $name;
+    if ($name == '_noname_') {
+      $label = t('Un-named forms');
+    }
+    else {
+      $label = isset($def['label']) ? $def['label'] : $name;
+    }
 
     $value = $field['value'];
     if (isset($field['alt'])) {
-      $value = implode(', ', array_merge(array($value), $field['alt']));
+      if ($value != '') {
+        $value = array($value);
+      }
+      else {
+        $value = array();
+      }
+      $value = implode(', ', array_merge($value, $field['alt']));
     }
 
     $element[] = array(
