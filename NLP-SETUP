@@ -1,0 +1,39 @@
+
+How to setup a python virtualenv for the NLP code?
+==================================================
+
+ * Create the virtualenv:
+
+   cd $HOME/prj/lingwo
+   virtualenv python-nlp-env
+ 
+ * Install PyYAML 3.09
+
+   $HOME/prj/lingwo/python-nlp-env/bin/easy_install PyYAML==3.09
+ 
+ * Install NLTK version 2.0b9:
+
+   wget http://nltk.googlecode.com/files/nltk-2.0b9.zip
+   unzip -a nltk-2.0b9.zip
+   cd nltk-2.0b9
+   $HOME/prj/lingwo/python-nlp-env/bin/python setup.py install
+ 
+ * Install the required NLTK data packages:
+
+   $HOME/prj/lingwo/python-nlp-env/bin/python
+   import nltk
+   nltk.download()
+ 
+ * Install html5lib version 0.90:
+
+   wget http://html5lib.googlecode.com/files/html5lib-0.90.zip
+   unzip -a html5lib-0.90.zip
+   cd html5lib-0.90
+   $HOME/prj/lingwo/python-nlp-env/bin/python setup.py install
+
+ * Create a config file
+
+   cd $HOME/prj/lingwo/lingwo_dictionary/nlp/LingwoNLP
+   cp config-example.py config.py
+   vim config.py
+
