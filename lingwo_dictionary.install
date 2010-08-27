@@ -78,7 +78,7 @@ function lingwo_dictionary_update_6002() {
 
   $res = db_query('SELECT language, pos, headword, nid FROM {lingwo_dictionary_entry}');
   while ($entry = db_fetch_object($res)) {
-    lingwo_dictionary_entry_generate_hash($entry);
+    lingwo_dictionary_generate_hash($entry);
     drupal_write_record('lingwo_dictionary_entry', $entry,
       array('language', 'pos', 'headword'));
   }

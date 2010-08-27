@@ -286,6 +286,11 @@ function lingwo_dictionary_content_extra_fields($type_name) {
   return $extra;
 }
 
+function lingwo_dictionary_generate_hash(&$object) {
+  $object->entry_hash =
+    sha1(join(':', array($object->language, $object->pos, $object->headword)));
+}
+
 /**
  * Implementation of hook_nodeapi().
  */
@@ -338,6 +343,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
         'headword' => $node->title,
         'nid' => $node->nid,
       );
+      lingwo_dictionary_generate_hash($object);
       drupal_write_record('lingwo_dictionary_entry', $object);
       break;
     case 'delete':

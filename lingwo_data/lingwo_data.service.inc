@@ -128,20 +128,9 @@ function _lingwo_data_import_process_original($entry) {
 
   // process fields
   if (!empty($entry['fields']) && module_exists('lingwo_fields')) {
-    // we have to add the fields in the same order as the form
-    foreach (lingwo_language_fields($entry['language'], $entry['pos']) as $field_name => $field) {
-      $auto = $entry['fields'][$field_name]['automatic'];
-      if (!isset($auto)) {
-        $auto = TRUE;
-      }
-
-      $res['fields'][] = array(
-        'name'      => $field_name,
-        'type'      => $field['type'],
-        'value'     => $entry['fields'][$field_name]['value'],
-        'automatic' => $auto,
-      );
-    }
+    // we don't need to do any processing here, because it will happen
+    // at _lingwo_data_import_set_field_value
+    $res['fields'] = $entry['fields'];
   }
 
   return $res;
@@ -196,7 +185,11 @@ function _lingwo_data_entry_has_changed($node, $entry_data) {
   return $entry_data != $old_entry_data;
 }
 
-function _lingwo_data_import_set_field_value(&$field, $value, $type) {
+function _lingwo_data_import_set_field_value($field, $value, $type) {
+  if (is_null($field)) {
+    $field = array();
+  }
+
   switch ($type) {
     case 'lingwo_fields':
       $field['type'] = $value['type'];
@@ -217,6 +210,8 @@ function _lingwo_data_import_set_field_value(&$field, $value, $type) {
       $field['value'] = $value;
       break;
   }
+
+  return $field;
 }
 
 function _lingwo_data_import_process_field_values($node, &$items, $type, $values) {
@@ -275,8 +270,8 @@ function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
   }
   // TODO: we really should merge these, not just overwrite them!
   $field = &$node->$field_name;
-  for($i = 0; $i < count($values); $i++) {
-    _lingwo_data_import_set_field_value($field[$i], $values[$i], $field_type);
+  foreach($values as $i => $value) {
+    $field[$i] = _lingwo_data_import_set_field_value($field[$i], $value, $field_type);
   }
 
   _lingwo_data_import_process_field_values($node, $field, $field_type, $values);

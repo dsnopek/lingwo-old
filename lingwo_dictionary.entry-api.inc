@@ -56,12 +56,6 @@ function lingwo_dictionary_entry_path($node) {
   }
 }
 
-// TODO: This isn't really an entry function!!  This is is the wrong 'namespace'
-function lingwo_dictionary_entry_generate_hash(&$entry) {
-  $entry->entry_hash =
-    sha1(join(':', array($entry->language, $entry->pos, $entry->headword)));
-}
-
 // Lookup an entry based on its headword, language and pos
 function lingwo_dictionary_entry_lookup($language, $pos, $headword) {
   $res = db_query("SELECT nid FROM {lingwo_dictionary_entry} ".

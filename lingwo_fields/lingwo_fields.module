@@ -238,7 +238,9 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
 
   // add the from to our form list (we have to do this here because in AHAH we can't
   // do it in the submit handler)
-  if ($value = $form_state['values']['_lingwo_fields']['add_new_form']) {
+  
+  if ($form_state['clicked_button']['#value'] == t('Add new form')) {
+    $value = $form_state['values']['_lingwo_fields']['add_new_form'];
     if (!empty($value['value'])) {
       $fields->addForm($value['name'], $value['value']);
     }
