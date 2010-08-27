@@ -205,10 +205,13 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
   require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
 
   $node = $form['#node'];
+  $node_body = $node->body;
+  $node_body = preg_replace('/\r/', '', $node_body);
+
   $text = $form_state['values']['korpus-text-value'];
   $text = preg_replace('/\r/', '', $text);
 
-  if (str_get_html($text)->plaintext != str_get_html($node->body)->plaintext) {
+  if (str_get_html($text)->plaintext != str_get_html($node_body)->plaintext) {
     drupal_set_message(t('Annotator modified the content of the text'), 'error');
     return;
   }
