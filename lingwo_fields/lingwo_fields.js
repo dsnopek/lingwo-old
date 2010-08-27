@@ -5,7 +5,6 @@
     var entry = null;
 
     var field_map = {};
-    var extra_forms = [];
     var timer = null;
 
     // updates the on screen form with values from the entry
@@ -23,46 +22,34 @@
         }
     };
 
+    function setupAddValueLink(name, wrapperNode) {
+        addValueNode = $('<a class="lingwo-fields-addvalue" href="#">'+Drupal.t('Add value')+'</a>');
+        addValueNode.click(function (evt) {
+            $('#edit--lingwo-fields-extra-value').val(name);
+            $('#edit--lingwo-fields-refresh').click();
+            return false;
+        });
+
+        // put the addValueNode after the label
+        label = $('label[for=edit-lingwo-fields-'+name+'-value]', wrapperNode);
+        label.append(' ');
+        label.append(addValueNode);
+    }
+
     function Control (node) {
         this.type = $(node).attr('data-type'),
         this.name = $(node).attr('data-name');
-        this.hasDefinition = $(node).attr('data-has-definition') == 'true';
-
-        var self = this;
 
         this.inputNode = $('.lingwo-fields-value', node).get(0);
         this.wrapperNode = $(node).get(0);
         this.valueNode = $('<a href="#" class="lingwo-fields-value"></a>');
         this.autoNode = document.getElementById((''+this.inputNode.id).replace(/-value$/, '-automatic'));
-        this.removeNode = document.getElementById((''+this.inputNode.id).replace(/-value$/, '-remove'));
-        if (this.removeNode) {
-          $(this.removeNode).addClass('lingwo-fields-remove-button');
+
+        if (this.type == 'form') {
+            setupAddValueLink(this.name, this.wrapperNode);
         }
 
-        // TODO: this should be clean-up and moved into another function (ie. _attachEvents)
-        if (this.type == 'form' && this.name != '_noname_') {
-          this.addValueNode = $('<a class="lingwo-fields-addvalue" href="#">'+Drupal.t('Add value')+'</a>');
-          this.addValueNode.click(function (evt) {
-            $('#edit--lingwo-fields-extra-value').val(self.name);
-            $('#edit--lingwo-fields-refresh').click();
-            return false;
-          });
-
-          // put the addValueNode after the label
-          var label = $('label[for='+this.inputNode.id+']', this.wrapperNode);
-          label.append(' ');
-          label.append(this.addValueNode);
-        }
-        /*
-        if (this.name == '_noname_') {
-          // move the input node to the end
-          $(this.inputNode).appendTo(this.inputNode.parentNode);
-        }
-        */
-
-        if (this.hasDefinition) {
-          $(this.inputNode).after(this.valueNode);
-        }
+        $(this.inputNode).after(this.valueNode);
 
         this._reattachCheckbox();
         this._attachEvents();
@@ -70,35 +57,13 @@
     };
     // does some swanky magic to re-arrange the checkbox for a tighter UI
     Control.prototype._reattachCheckbox = function () {
-        var checkboxNode = this.hasDefinition ? this.autoNode : this.removeNode;
-
         // first we want to seperate the label from the check box and hide the label
-        $(checkboxNode).insertBefore($(checkboxNode).parent());
-        $('label', $(checkboxNode).parent()).hide().attr('for', checkboxNode.id);
+        $(this.autoNode).insertBefore($(this.autoNode).parent());
+        $('label', $(this.autoNode).parent()).hide().attr('for', this.autoNode.id);
 
         // then we want to move the check box to be before the input
-        $(checkboxNode).parent().insertBefore($(this.inputNode).parent());
-
-        if (!this.hasDefinition) {
-            // that the checkbox is in place, we want to replace it with a link
-            var self = this;
-            var removeButton = $('<a href="#" class="lingwo-fields-remove-button"></a>');
-            removeButton.click(function (evt) {
-                $(self.removeNode).attr('checked', 'checked').click();
-                return false;
-            });
-            removeButton.insertAfter(checkboxNode);
-            $(checkboxNode).hide();
-            checkboxNode = removeButton.get(0);
-        }
-        
-        $(checkboxNode).css({
-            'display': 'block',
-            'float':   'left',
-            'width':   '15px',
-            'margin':  '0',
-            'margin-right': '5px',
-        });
+        $(this.autoNode).parent() .insertBefore($(this.inputNode).parent());
+        $(this.autoNode).addClass('lingwo-fields-control-prefix-item');
     };
     // sets up all the proper event handlers to make this control work
     Control.prototype._attachEvents = function () {
@@ -140,8 +105,6 @@
     };
     // takes the value from the autoNode and toggles the controls
     Control.prototype.updateAutomatic = function () {
-        if (!this.hasDefinition) return;
-
         this.automatic = $(this.autoNode).attr('checked') ? true : false;
         if (this.automatic) {
             $(this.inputNode).hide();
@@ -159,8 +122,6 @@
     };
     // pulls the values for this control from an entry
     Control.prototype.fromEntry = function () {
-        if (!this.hasDefinition) return;
-
         var value      = '<i>(empty)</i>',
             inputValue = '',
             showFunc;
@@ -202,7 +163,29 @@
         };
     };
 
-    function ExtraForm (node) {
+    function setupExtraField (node) {
+        var name = $(node).attr('data-name'),
+            type = $(node).attr('data-type'),
+            inputNode = $('.lingwo-fields-value', node).get(0),
+            removeNode = document.getElementById((''+inputNode.id).replace(/-value$/, '-remove')),
+            addValueNode, label, removeButton;
+
+        if (type == 'form' && name != '_noname_') {
+            setupAddValueLink(name, node);
+        }
+
+        // add the remove button
+        removeButton = $('<a href="#" class="lingwo-fields-remove-button"></a>');
+        removeButton.click(function (evt) {
+            $(removeNode).attr('checked', 'checked').click();
+            return false;
+        });
+        removeButton.addClass('lingwo-fields-control-prefix-item');
+        removeButton.insertBefore(inputNode.parentNode);
+        $(removeNode).parent().hide();
+    }
+
+    function setupAddNewForm (node) {
         this.wrapperNode = node;
 
         var self = this;
@@ -269,15 +252,20 @@
                 });
 
                 field_map = {};
-                extra_forms = [];
                 $('.lingwo-fields-control', context).each(function (i) {
-                    var control = new Control(this);
-                    field_map[control.name] = control;
+                    var hasDefinition = $(this).attr('data-has-definition') == 'true',
+                        control;
+
+                    if (hasDefinition) {
+                        control = new Control(this);
+                        field_map[control.name] = control;
+                    }
+                    else {
+                        setupExtraField(this);
+                    }
                 });
                 $('#edit--lingwo-fields-add-new-form', context).each(function (i) {
-                    //console.debug(this);
-                    var extraForm = new ExtraForm(this);
-                    extra_forms.push(extraForm);
+                    setupAddNewForm(this);
                 });
 
                 // updated the form!!
