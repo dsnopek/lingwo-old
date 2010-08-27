@@ -32,13 +32,12 @@
         this.inputNode = $('.lingwo-fields-value', node).get(0);
         this.wrapperNode = $(node).get(0);
         this.valueNode = $('<a href="#"></a>');
-        this.autoNode = document.getElementById((''+this.inputNode.id).replace(/-value-0$/, '-automatic'));
+        this.autoNode = document.getElementById((''+this.inputNode.id).replace(/-value$/, '-automatic'));
 
         if (this.type == 'form') {
           this.addValueNode = $('<a class="lingwo-fields-addvalue" href="#">'+Drupal.t('Add value')+'</a>');
           this.addValueNode.click(function (evt) {
             $('#edit--lingwo-fields-extra-value').val(self.name);
-            console.debug($('#edit--lingwo-fields-extra-value'));
             $('#edit--lingwo-fields-refresh').click();
             return false;
           });
@@ -62,7 +61,7 @@
         $('label', $(this.autoNode).parent()).hide().attr('for', this.autoNode.id);
 
         // then we want to move the check box to be before the input
-        $(this.autoNode).parent().insertBefore($(this.inputNode).parent().parent()).css({
+        $(this.autoNode).parent().insertBefore($(this.inputNode).parent()).css({
             //display: 'inline',
             'float': 'left',
             'margin': '0'

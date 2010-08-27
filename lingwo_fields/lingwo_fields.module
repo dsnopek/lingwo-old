@@ -120,15 +120,6 @@ function lingwo_fields_content_extra_fields($type_name) {
 
 function _lingwo_fields_clean(&$items) {
   foreach ($items as &$item) {
-    // unravel multiple values
-    if (is_array($item['value'])) {
-      if (count($item['value']) == 1) {
-        $item['value'] = $item['value'][0];
-      }
-      elseif (count($item['value']) == 0) {
-        $item['value'] = NULL;
-      }
-    }
     if ($item['type'] == 'class') {
       $item['value'] = intval($item['value']);
     }
@@ -150,9 +141,9 @@ function _lingwo_fields_write_record($fields, $is_update) {
   db_query('DELETE FROM {lingwo_fields_forms} WHERE nid = %d', $fields->nid);
   foreach ($fields->data as $field) {
     if ($field['type'] == 'form') {
-      $values = $field['value'];
-      if (!is_array($values)) {
-        $values = array($values);
+      $values = array($field['value']);
+      if (isset($field['alt'])) {
+        $values = array_merge($values, $field['alt']);
       }
       foreach ($values as $value) {
         $form = (object)array(
@@ -237,13 +228,12 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
   // TODO: here is where we should start using some sweet API functions
   if ($value = $form_state['values']['_lingwo_fields']['add_new_form']) {
     if (!empty($value['value'])) {
-      $fields->add($value['name'], $value['type'], $value['value']);
+      $fields->addForm($value['name'], $value['value']);
     }
   }
   
   // record if we are supposed to add an extra value to a field
   $extra_value = $form_state['values']['_lingwo_fields']['extra_value'];
-  watchdog('debug', 'extra_value: '. print_r($extra_value, TRUE));
 
   $element = array(
     '#type'  => 'fieldset',
@@ -312,24 +302,9 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
       '#type' => 'hidden',
       '#value' => $field['type'],
     );
-
-    $values = $field['value'];
-    if (!is_array($values)) {
-      $values = array($values);
-    }
-    if ($extra_value == $name) {
-      $values[] = '';
-    }
-    $value = array_shift($values);
-
     $field_form['value'] = array(
-      '#prefix' => '<div>',
-      '#suffix' => '</div>',
-    );
-
-    $field_form['value'][0] = array(
       '#title' => isset($def['label']) ? $def['label'] : $name,
-      '#default_value' => $value,
+      '#default_value' => $field['value'],
       // TODO: we need to enforce required with select boxes
       '#required' => $def['required'] ? TRUE : FALSE,
       '#attributes' => array(
@@ -340,7 +315,7 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
 
     switch ($field['type']) {
       case 'class':
-        $field_form['value'][0] += array(
+        $field_form['value'] += array(
           '#type' => 'select',
           '#options' => array(
             0 => t('False'),
@@ -352,28 +327,34 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
         $options = $def['options'];
         $options = array('' => '-none-') + $options;
 
-        $field_form['value'][0] += array(
+        $field_form['value'] += array(
           '#type' => 'select',
           '#options' => $options,
         );
         break;;
       case 'form':
-        $field_form['value'][0] += array(
+        $field_form['value'] += array(
           '#type' => 'textfield',
         );
         break;;
     };
 
+    $alt = $field['alt'];
+    if ($extra_value == $name) {
+      $alt[] = '';
+    }
     # since only forms can have multiple values, these are always
     # textfields.
-    foreach ($values as $value) {
-      $field_form['value'][] = array(
-        '#type' => 'textfield',
-        '#default_value' => $value,
-        '#attributes' => array(
-          'class' => 'lingwo-fields-extra-value',
-        ),
-      );
+    if (!empty($alt)) {
+      foreach ($alt as $value) {
+        $field_form['alt'][] = array(
+          '#type' => 'textfield',
+          '#default_value' => $value,
+          '#attributes' => array(
+            'class' => 'lingwo-fields-alt',
+          ),
+        );
+      }
     }
 
     //if (!empty($def)) {
@@ -419,10 +400,6 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
     '#attributes' => array(
       'class' => "lingwo-fields-name",
     ),
-  );
-  $_lingwo_fields['add_new_form']['type'] = array(
-    '#type'  => 'hidden',
-    '#value' => 'form',
   );
   $_lingwo_fields['add_new_form']['value'] = array(
     '#type' => 'textfield',
@@ -580,8 +557,8 @@ function theme_lingwo_fields_formatter_default($node) {
     $label = isset($def['label']) ? $def['label'] : $name;
 
     $value = $field['value'];
-    if (is_array($value)) {
-      $value = implode(', ', $value);
+    if (isset($field['alt'])) {
+      $value = implode(', ', array_merge(array($value), $field['alt']));
     }
 
     $element[] = array(

@@ -65,21 +65,22 @@ class LingwoFields implements IteratorAggregate {
 
   public function getOne($name) {
     if (isset($this->node->lingwo_fields[$name])) {
-      $value = $this->node->lingwo_fields[$name]['value'];
-      if (is_array($value)) {
-        $value = $value[0];
-      }
-      return $value;
+      return $this->node->lingwo_fields[$name]['value'];
     }
   }
 
   public function getMany($name) {
     if (isset($this->node->lingwo_fields[$name])) {
-      $value = $this->node->lingwo_fields[$name]['value'];
-      if (!is_array($value)) {
-        $value = array($value);
+      if (isset($this->node->lingwo_fields[$name]['value'])) {
+        $values = array($this->node->lingwo_fields[$name]['value']);
       }
-      return $value;
+      else {
+        $values = array();
+      }
+      if (isset($this->node->lingwo_fields[$name]['alt'])) {
+        $values = array_merge($values, $this->node->lingwo_fields[$name]['alt']);
+      }
+      return $values;
     }
   }
 
@@ -97,12 +98,23 @@ class LingwoFields implements IteratorAggregate {
     $field['automatic'] = $automatic;
   }
 
-  public function add($name, $type, $value, $automatic=FALSE) {
-    if ($orig = $this->getMany($name)) {
-      $orig[] = $value;
-      $value = $orig;
+  public function addForm($name, $value, $automatic=FALSE) {
+    if (isset($this->node->lingwo_fields[$name])) {
+      $this->node->lingwo_fields[$name]['alt'][] = $value;
     }
-    $this->set($name, $type, $value, $automatic);
+    else {
+      $this->node->lingwo_fields[$name] = array(
+        'name' => $name,
+        'type' => 'form',
+        'automatic' => $automatic
+      );
+      if ($name == '') {
+        $this->node->lingwo_fields[$name]['alt'][] = $value;
+      }
+      else {
+        $this->node->lingwo_fields[$name]['value'] = $value;
+      }
+    }
   }
 }
 
