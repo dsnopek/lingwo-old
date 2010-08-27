@@ -154,7 +154,11 @@ function _lingwo_fields_write_record($fields, $is_update) {
       if (isset($field['alt'])) {
         $values = array_merge($values, $field['alt']);
       }
+
       foreach ($values as $value) {
+        // don't add an empty value!
+        if (is_null($value) || $value == '') continue;
+
         $form = (object)array(
           'nid'       => $fields->nid,
           'form'      => $value,
