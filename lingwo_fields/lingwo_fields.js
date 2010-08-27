@@ -219,7 +219,7 @@
 
         // get the language/pos from settings or the form
         var lang = settings.lang || $('#edit-language :selected').val();
-        var pos  = settings.pos || $('#'+settings.pos_field+' :selected').val();
+        var pos  = settings.pos  || $('#edit-pos :selected').val();
 
         require(
             ['lingwo_dictionary/languages/'+lang,

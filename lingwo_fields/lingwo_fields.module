@@ -237,8 +237,7 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
   $fields = $entry->getInterface('lingwo_fields');
 
   // add the from to our form list (we have to do this here because in AHAH we can't
-  // do it in the submit handler.
-  // TODO: here is where we should start using some sweet API functions
+  // do it in the submit handler)
   if ($value = $form_state['values']['_lingwo_fields']['add_new_form']) {
     if (!empty($value['value'])) {
       $fields->addForm($value['name'], $value['value']);
@@ -291,6 +290,7 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
   );
 
   foreach ($fields as $name => $field) {
+    // skip it was marked for removal
     if ($form_state['values']['lingwo_fields'][$name]['remove']) continue;
 
     $def = $field['definition'];
@@ -404,8 +404,6 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
     );
   }
 
-  // TODO: maybe move all the '_lingwo_fields' stuff down here and do it with a 
-  // single parent and #TREE?
   $_lingwo_fields = array(
     '#parents' => array('_lingwo_fields'),
     '#tree' => TRUE,
@@ -466,8 +464,6 @@ function theme_lingwo_fields_widget_form_wrapper($element) {
 
   drupal_add_js(array('lingwo_fields' => array(
     'is_new' => $node->nid == 0,
-    // TODO: do we really need this now that it is static?
-    'pos_field' => 'edit-pos',
     'lang' => $node->language,
     'pos' => $element['#pos'],
   )), 'setting');
