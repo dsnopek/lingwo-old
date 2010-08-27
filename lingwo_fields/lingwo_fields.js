@@ -186,33 +186,30 @@
     }
 
     function setupAddNewForm (node) {
-        this.wrapperNode = node;
+        var nameNode = $('.lingwo-fields-name', this.wrapperNode),
+            nonameNode = $('<a class="lingwo-fields-noname" href="#">'+Drupal.t('Set name')+'</a>'),
+            legend;
 
-        var self = this;
-
-        this.nameNode = $('.lingwo-fields-name', this.wrapperNode);
-        this.nonameNode = $('<a class="lingwo-fields-noname" href="#">'+Drupal.t('Set name')+'</a>');
-        this.nonameNode.click(function (evt) {
-            self.nameNode.parent().show();
-            self.nameNode
-                .focus();
-            self.nameNode.get(0).select();
-            self.nonameNode.hide();
+        nonameNode.click(function (evt) {
+            nameNode.parent().show();
+            nameNode.focus();
+            nameNode.get(0).select();
+            nonameNode.hide();
             return false;
         });
-        this.nameNode.blur(function (evt) {
-            if (self.nameNode.val() == '') {
-                self.nameNode.val('_noname_').parent().hide();
-                self.nonameNode.show();
+        nameNode.blur(function (evt) {
+            if (nameNode.val() == '') {
+                nameNode.val('_noname_').parent().hide();
+                nonameNode.show();
             }
         });
 
         // put the noname node after the legend
-        var legend = $('legend', this.wrapperNode);
+        legend = $('legend', node);
         legend.append(' ');
-        legend.append(this.nonameNode);
+        legend.append(nonameNode);
 
-        this.nameNode.parent().hide();
+        nameNode.parent().hide();
     }
 
 
