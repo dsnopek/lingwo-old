@@ -9,7 +9,7 @@
 /*
 function lingwo_data_service_update_entry_access($data) {
   $data = json_decode($data);
-  $nid = lingwo_dictionary_entry_lookup($data->headword, $data->language, $data->pos);
+  $nid = lingwo_dictionary_entry_lookup($data->pos, $data->language, $data->headword);
 
   if (is_null($nid)) {
     $entry_type = lingwo_dictionary_settings('entry_content_type');
@@ -122,30 +122,15 @@ function _lingwo_data_import_process_original($entry) {
   }
 
   // process senses
-  if (!empty($entry['senses']) && lingwo_data_settings('field_senses') &&
-      module_exists('lingwo_senses')) {
-
+  if (!empty($entry['senses']) && module_exists('lingwo_senses')) {
     $res['senses'] = _lingwo_data_import_process_simple_field($entry, 'senses');
   }
 
   // process fields
-  if (!empty($entry['fields']) && lingwo_data_settings('field_fields') &&
-      module_exists('lingwo_fields')) {
-
-    // we have to add the fields in the same order as the form
-    foreach (lingwo_language_fields($entry['language'], $entry['pos']) as $field_name => $field) {
-      $auto = $entry['fields'][$field_name]['automatic'];
-      if (!isset($auto)) {
-        $auto = TRUE;
-      }
-
-      $res['fields'][] = array(
-        'name'      => $field_name,
-        'type'      => $field['type'],
-        'value'     => $entry['fields'][$field_name]['value'],
-        'automatic' => $auto,
-      );
-    }
+  if (!empty($entry['fields']) && module_exists('lingwo_fields')) {
+    // we don't need to do any processing here, because it will happen
+    // at _lingwo_data_import_set_field_value
+    $res['fields'] = $entry['fields'];
   }
 
   return $res;
@@ -155,9 +140,7 @@ function _lingwo_data_import_process_translation($entry) {
   $res = array();
 
   // process senses
-  if (!empty($entry['senses']) && lingwo_data_settings('field_senses') &&
-      module_exists('lingwo_senses')) {
-
+  if (!empty($entry['senses']) && module_exists('lingwo_senses')) {
     $res['senses'] = _lingwo_data_import_process_simple_field($entry, 'senses');
   }
 
@@ -202,7 +185,11 @@ function _lingwo_data_entry_has_changed($node, $entry_data) {
   return $entry_data != $old_entry_data;
 }
 
-function _lingwo_data_import_set_field_value(&$field, $value, $type) {
+function _lingwo_data_import_set_field_value($field, $value, $type) {
+  if (is_null($field)) {
+    $field = array();
+  }
+
   switch ($type) {
     case 'lingwo_fields':
       $field['type'] = $value['type'];
@@ -223,6 +210,8 @@ function _lingwo_data_import_set_field_value(&$field, $value, $type) {
       $field['value'] = $value;
       break;
   }
+
+  return $field;
 }
 
 function _lingwo_data_import_process_field_values($node, &$items, $type, $values) {
@@ -237,9 +226,8 @@ function _lingwo_data_import_process_field_values($node, &$items, $type, $values
 
       # Find the number of values we were given.
       if (lingwo_dictionary_entry_is_translation($node)) {
-        $field_senses = lingwo_data_settings('field_senses');
         $translation_source = lingwo_dictionary_entry_load_translation_source($node);
-        $max = count($translation_source->$field_senses);
+        $max = count($translation_source->lingwo_senses);
       }
       else {
         $max = count($values);
@@ -262,24 +250,31 @@ function _lingwo_data_import_process_field_values($node, &$items, $type, $values
 }
 
 function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
-  $field_name = lingwo_data_settings('field_'. $field_alias);
-  if (empty($field_name)) {
-    return;
+  if ($field_alias == 'senses' || $field_alias == 'fields') {
+    // Not CCK, these are special.
+    $field_name = $field_type = ('lingwo_'.$field_alias);
   }
+  else {
+    $field_name = lingwo_data_settings('field_'. $field_alias);
+    if (empty($field_name)) {
+      return;
+    }
 
-  // TODO: get CCK infos about this field
-  $field_type = content_fields($field_name, lingwo_dictionary_settings('entry_content_type'));
+    // get the CCK type name
+    $field_type = content_fields($field_name, lingwo_dictionary_settings('entry_content_type'));
+    $field_type = $field_type['type'];
+  }
 
   if (!isset($node->$field_name)) {
     $node->$field_name = array();
   }
   // TODO: we really should merge these, not just overwrite them!
   $field = &$node->$field_name;
-  for($i = 0; $i < count($values); $i++) {
-    _lingwo_data_import_set_field_value($field[$i], $values[$i], $field_type['type']);
+  foreach($values as $i => $value) {
+    $field[$i] = _lingwo_data_import_set_field_value($field[$i], $value, $field_type);
   }
 
-  _lingwo_data_import_process_field_values($node, $field, $field_type['type'], $values);
+  _lingwo_data_import_process_field_values($node, $field, $field_type, $values);
 }
 
 function _lingwo_data_import_set_fields(&$node, $fields) {
@@ -314,7 +309,7 @@ function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
     $languages = _lingwo_data_import_process_language($entry);
 
     // Try to find if the already entry exists.
-    $nid = lingwo_dictionary_entry_lookup($entry['headword'], $entry['language'], $entry['pos']);
+    $nid = lingwo_dictionary_entry_lookup($entry['language'], $entry['pos'], $entry['headword']);
     $is_new = $nid ? FALSE : TRUE;
 
     // Process the list of sources given by the $entry.
@@ -365,10 +360,9 @@ function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
 
         # we need to put the original sense ids on the translation, otherwise
         # the importer will make up new IDs!!
-        $field_senses = lingwo_data_settings('field_senses');
-        $tnode->$field_senses = array();
-        foreach ($tnode->translation_source->$field_senses as $sense) {
-          array_push($tnode->$field_senses, array('id' => $sense['id']));
+        $tnode->lingwo_senses = array();
+        foreach ($tnode->translation_source->lingwo_senses as $sense) {
+          array_push($tnode->lingwo_senses, array('id' => $sense['id']));
         }
       }
 

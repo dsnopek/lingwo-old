@@ -23,6 +23,8 @@ function _ld_make_uuid() {
 
 // Helper for implementing AHAH
 // TODO: now that we are using ahah_helper, this should be removed
+// TODO: actually, AHAH helper appears to not be doing this for us atleast on lingwo_fields
+// when trying to "Add More Forms" and there is no headword
 function _ld_disable_validation(&$form) {
   foreach (element_children($form) as $child) {
     $form[$child]['#validated'] = TRUE;
@@ -37,14 +39,20 @@ function _ld_element_process(&$element, $process_func) {
 
 // Helper for implementing AHAH
 // TODO: now that we are using ahah_helper, this should be removed
-function _ld_form_to_node(&$form, &$form_state) {
+function &_ld_form_to_node(&$form, &$form_state) {
   $form['#submit'] = array('');
   $node = node_form_submit_build_node($form, $form_state);
 
   // hack to stop taxonomy from resetting when the form is rebuilt
   //$form_state['node']['taxonomy'] = taxonomy_preview_terms($node);
 
-  return $node;
+  return $form_state['node'];
+}
+
+// Helper: returns TRUE if the given node is a translation
+function _ld_is_translation($node) {
+  return isset($node->translation_source) ||
+    ($node->nid && $node->tnid != 0 && $node->nid != $node->tnid);
 }
 
 function lingwo_dictionary_add_require_js() {
@@ -65,9 +73,8 @@ function lingwo_dictionary_add_require_js() {
 function lingwo_dictionary_init() {
   if (lingwo_dictionary_settings('redirect_node') && lingwo_dictionary_settings('lookup_path')) {
     if (preg_match('/^node\/(\d+)$/', $_GET['q'], $matches)) {
-      $node = node_load($matches[1]);
-      if ($node->type == lingwo_dictionary_settings('entry_content_type')) {
-        $redirect = lingwo_dictionary_entry_path($node);
+      if ($entry = LingwoEntry::fromNid($matches[1])) {
+        $redirect = $entry->getPath();
       }
     }
 
@@ -112,6 +119,34 @@ function lingwo_dictionary_menu() {
   }
 
   return $items;
+}
+
+/*
+ * Implementation of hook_services()
+ */
+function lingwo_dictionary_service() {
+  return array(
+    array(
+      '#method' => 'lingwo_dictionary.search_entries',
+      '#callback' => 'lingwo_dictionary_search_entries',
+      '#access arguments' => array('access content'),
+      '#args' => array(
+        array(
+          '#name' => 'text',
+          '#type' => 'string',
+          '#description' => t('Text to lookup'),
+        ),
+        array(
+          '#name' => 'options',
+          '#type' => 'struct',
+          '#description' => t('A struct representing search options.'),
+          '#optional' => TRUE,
+        ),
+      ),
+      '#return' => 'array',
+      '#help' => t('An array of structs containing the "nid" of the entries and maybe some other things.'),
+    ),
+  );
 }
 
 /**
@@ -196,7 +231,7 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
         $form['language']['#default_value'] = $_GET['language'];
         $node->language = $_GET['language'];
       }
-      if (isset($_GET['pos']) && !lingwo_dictionary_entry_is_translation($node)) {
+      if (isset($_GET['pos']) && !_ld_is_translation($node)) {
         $node->pos = $_GET['pos'];
       }
     }
@@ -215,7 +250,7 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
     );
 
     // when editting a translation or existing node...
-    if (isset($node->nid) || lingwo_dictionary_entry_is_translation($node)) {
+    if (isset($node->nid) || _ld_is_translation($node)) {
       // make title uneditable
       $form['title']['#name'] = 'title-disabled';
       $form['title']['#disabled'] = TRUE;
@@ -251,6 +286,11 @@ function lingwo_dictionary_content_extra_fields($type_name) {
   return $extra;
 }
 
+function lingwo_dictionary_generate_hash(&$object) {
+  $object->entry_hash =
+    sha1(join(':', array($object->language, $object->pos, $object->headword)));
+}
+
 /**
  * Implementation of hook_nodeapi().
  */
@@ -264,7 +304,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       return array('pos' => $node->translation_source->pos);
     }
 
-    $nid = lingwo_dictionary_entry_is_translation($node) ? $node->tnid : $node->nid;
+    $nid = _ld_is_translation($node) ? $node->tnid : $node->nid;
     $row = db_fetch_object(db_query("SELECT pos FROM {lingwo_dictionary_entry} WHERE nid = %d", $nid));
     if (!$row) {
       // TODO: this should really be a watchdog message because it appears to happen normally when
@@ -280,7 +320,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
   }
 
   // The rest are only on sources
-  if (lingwo_dictionary_entry_is_translation($node))
+  if (_ld_is_translation($node))
     return NULL;
 
   switch ($op) {
@@ -288,13 +328,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       if (isset($node->delete))
         return NULL;
 
-      $pos = lingwo_dictionary_entry_get_pos($node);
-      if (empty($pos)) {
-        form_set_error('pos', t("Couldn't derive Part of Speech from node!"));
-        return;
-      }
-
-      $existing = lingwo_dictionary_entry_lookup($node->title, $node->language, $pos);
+      $existing = lingwo_dictionary_entry_lookup($node->language, $node->pos, $node->title);
 
       if ($existing && $existing != $node->nid) {
         form_set_error('title', 
@@ -305,10 +339,11 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
     case 'insert':
       $object = (object)array(
         'language' => $node->language,
-        'pos' => lingwo_dictionary_entry_get_pos($node),
+        'pos' => $node->pos,
         'headword' => $node->title,
         'nid' => $node->nid,
       );
+      lingwo_dictionary_generate_hash($object);
       drupal_write_record('lingwo_dictionary_entry', $object);
       break;
     case 'delete':

@@ -26,7 +26,7 @@ How to update your test server with data from the live server?
 
  4. Enable the development module:
     
-    drush en devel
+    drush en devel --yes
  
  5. Configure the devel module to eat e-mail messages:
 

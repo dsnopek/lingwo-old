@@ -69,20 +69,16 @@ function lingwo_korpus_lookup_entry() {
   $url = urldecode($_GET['url']);
   $url = preg_replace(':.*?'.lingwo_dictionary_settings('lookup_path').'/(.*):', '$1', $url);
   
-  // load the node with this ID
-  $nid = lingwo_dictionary_entry_from_id($url);
-  if (is_null($nid)) {
-    // This should be slicker!  Probably themed, provide a link for creating the entry.
-    $content = t('Entry not found.');
-  }
-  else {
-    $node = node_load($nid);
-
+  if ($entry = LingwoEntry::fromLingwoId($url)) {
     if (module_exists('rules')) {
-      rules_invoke_event('lingwo_korpus_lookup', $user, $node);
+      rules_invoke_event('lingwo_korpus_lookup', $user, $entry->getNode());
     }
 
-    $content = node_view($node, TRUE);
+    $content = node_view($entry->getNode(), TRUE);
+  }
+  else {
+    // This should be slicker!  Probably themed, provide a link for creating the entry.
+    $content = t('Entry not found.');
   }
 
   // return the HTML to the Ajax caller
@@ -97,14 +93,11 @@ function lingwo_korpus_lookup_senses() {
   $pos = urldecode($_GET['pos']);
   $headword = urldecode($_GET['headword']);
 
-  $nid = lingwo_dictionary_entry_lookup($headword, $language, $pos);
+  $nid = lingwo_dictionary_entry_lookup($language, $pos, $headword);
   if (!empty($nid)) {
     $node = node_load($nid);
-    # HACK: This has no way of knowing this is the field!  We really need to
-    # change the storage mechanizm of lingwo_senses away from CCK.
-    $field_senses = 'field_senses';
     $senses = array();
-    foreach ($node->$field_senses as $sense) {
+    foreach ($node->lingwo_senses as $sense) {
       $senses[$sense['id']] = array(
         'example'    => $sense['data']['example'],
         'difference' => $sense['data']['difference'],
@@ -183,8 +176,12 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
   );
 
   $form['save'] = array(
-    '#type' => 'submit',
+    '#type'  => 'submit',
     '#value' => t('Save'),
+  );
+  $form['auto'] = array(
+    '#type'  => 'submit',
+    '#value' => t('Auto Annotate'),
   );
 
   drupal_add_js(array(
@@ -208,15 +205,25 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
   require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
 
   $node = $form['#node'];
-  $text = $form_state['values']['korpus-text-value'];
+  $node_body = $node->body;
+  $node_body = preg_replace('/\r/', '', $node_body);
 
-  if (str_get_html($text)->plaintext != str_get_html($node->body)->plaintext) {
+  $text = $form_state['values']['korpus-text-value'];
+  $text = preg_replace('/\r/', '', $text);
+
+  if (str_get_html($text)->plaintext != str_get_html($node_body)->plaintext) {
     drupal_set_message(t('Annotator modified the content of the text'), 'error');
     return;
   }
 
   $node->body = $text;
+  if ($form_state['clicked_button']['#value'] == t('Auto Annotate')) {
+    drupal_set_message(t('Automatic annotator complete.'));
+    $text = _lingwo_korpus_autolookup_node($node);
+  }
+
   $node->teaser = node_teaser($node->body, $node->format);
+  $node->_lingwo_korpus_no_segment = TRUE;
   node_save($node);
 
   drupal_set_message(t('Annotation saved.'));
@@ -285,6 +292,12 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
   if ($node->type != lingwo_korpus_text_content_type())
     return;
 
+  if ($op == 'presave' && !$node->_lingwo_korpus_no_segment) {
+    // segment the text on save
+    _lingwo_korpus_autolookup_node($node, 'body',   FALSE);
+    _lingwo_korpus_autolookup_node($node, 'teaser', FALSE);
+  }
+
   if ($op == 'update' || $op == 'delete') {
     // clear all cached texts for this node
     cache_clear_all($node->nid, 'cache_lingwo_korpus', TRUE);
@@ -300,6 +313,7 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
       lingwo_korpus_generate_hash($entry);
       drupal_write_record('lingwo_korpus_entry', $entry);
     }
+
   }
 
   if ($op == 'view') {
@@ -421,7 +435,7 @@ function lingwo_korpus_admin_list_entries(&$form_state) {
   if ($form_state['values']['input']) {
     $links = array();
     foreach (lingwo_korpus_text_entry_list($form_state['values']['input'], $form_state['values']['from_lang']) as $entry) {
-      $nid = lingwo_dictionary_entry_lookup($entry->headword, $entry->language, $entry->pos);
+      $nid = lingwo_dictionary_entry_lookup($entry->language, $entry->pos, $entry->headword);
 
       if (!empty($form_state['values']['to_lang'])) {
         $trans = translation_node_get_translations($nid);
@@ -506,14 +520,76 @@ function lingwo_korpus_block($op = 'list', $delta = 0, $edit = array()) {
 function theme_lingwo_korpus_annotation_reader_block($footer_id, $footer_margin) {
   return '<div id="lingwo-korpus-dock" data-footer-id="'.$footer_id.'" data-footer-margin="'.$footer_margin.'"></div>';
 }
+
+/*
+ * Dealing with the automatic annotator.
+ */
+
+function _lingwo_korpus_autolookup_node(&$node, $which='body', $full_lookup=TRUE) {
+  $cmd = $full_lookup ? '-' : '-s -';
+  if ($result = _lingwo_korpus_exec_autolookup_py($cmd, $node->$which)) {
+    $node->$which = $result;
+    return TRUE;
+  }
+  return FALSE;
+}
+
+function _lingwo_korpus_exec_autolookup_py($cmd, $data) {
+  $cmd = implode(' ', array(
+    lingwo_korpus_python_exec(),
+    drupal_get_path('module', 'lingwo_dictionary') .'/nlp/autolookup.py',
+    $cmd,
+  ));
+
+  $descspec = array(
+    0 => array('pipe', 'r'),
+    1 => array('pipe', 'w'),
+    2 => array('pipe', 'w'),
+  );
+
+  $process = proc_open($cmd, $descspec, $pipes, NULL, NULL);
+  if (is_resource($process)) {
+    // write the node body to the child's stdin
+    fwrite($pipes[0], $data);
+    fclose($pipes[0]);
+
+    // read the result from the child's stdout
+    $result = stream_get_contents($pipes[1]);
+    fclose($pipes[1]);
+
+    // read the error stream
+    $error = stream_get_contents($pipes[2]);
+    fclose($pipes[2]);
+
+    // if the program was successful, update the node
+    $return_value = proc_close($process);
+    if ($return_value == 0) {
+      return $result;
+    }
+    else {
+      drupal_set_message(t('Error running automatic annotator.'), 'error');
+      watchdog('lingwo_korpus', "Error running autolookup.py: ". $error, NULL, WATCHDOG_ERROR);
+    }
+  }
+}
+
 /*
  * Settings
  */
+
 function lingwo_korpus_text_content_type($value=NULL) {
   if (is_null($value)) {
     return variable_get('lingwo_korpus_text_content_type', '');
   }
 
   variable_set('lingwo_korpus_text_content_type', $value);
+}
+
+function lingwo_korpus_python_exec($value=NULL) {
+  if (is_null($value)) {
+    return variable_get('lingwo_korpus_python_exec', '/usr/bin/python');
+  }
+
+  variable_set('lingwo_korpus_python_exec', $value);
 }
 

@@ -7,36 +7,160 @@
  */
 
 /**
+ * Implementation of hook_schema().
+ */
+function lingwo_senses_schema() {
+  $schema['lingwo_senses_revisions'] = array(
+    'description' => 'Stores the sense data for a revision of a given entry',
+    'fields' => array(
+      'vid' => array(
+        'description' => 'The primary identifier for this version.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'nid' => array(
+        'description' => 'The {node} this version belongs to.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'data' => array(
+        'description' => 'Serialized data representing the senses.',
+        'type' => 'text',
+        'size' => 'normal',
+        'serialize' => TRUE,
+        'not null' => TRUE,
+      ),
+    ),
+    'indexes' => array(
+      'nid' => array('nid'),
+    ),
+    'primary key' => array('vid'),
+  );
+
+  return $schema;
+}
+
+function _lingwo_senses_insert_new_sense($senses) {
+  $new = (object)array(
+    'vid'  => $senses[0]->vid,
+    'nid'  => $senses[0]->nid,
+    'data' => array(),
+  );
+
+  foreach ($senses as $sense) {
+    array_push($new->data, array(
+      'id' => $sense->id,
+      'data' => is_null($sense->data) ? NULL : unserialize($sense->data),
+    ));
+  }
+
+  # clean up the data
+  _lingwo_senses_clean($new->data);
+
+  drupal_write_record('lingwo_senses_revisions', $new);
+}
+
+/*
+ * In this version is where we move from CCK to a raw database table.
+ */
+function lingwo_senses_update_6001() {
+  module_load_include('inc', 'content', 'includes/content.crud');
+
+  $schema['lingwo_senses_revisions'] = array(
+    'description' => 'Stores the sense data for a revision of a given entry',
+    'fields' => array(
+      'vid' => array(
+        'description' => 'The primary identifier for this version.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'nid' => array(
+        'description' => 'The {node} this version belongs to.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'data' => array(
+        'description' => 'Serialized data representing the senses.',
+        'type' => 'text',
+        'size' => 'normal',
+        'serialize' => TRUE,
+        'not null' => TRUE,
+      ),
+    ),
+    'indexes' => array(
+      'nid' => array('nid'),
+    ),
+    'primary key' => array('vid'),
+  );
+
+  $ret = array();
+  db_create_table($ret, 'lingwo_senses_revisions', $schema['lingwo_senses_revisions']);
+
+  # rebuild the schema cache so that drupal_write_record() will work.
+  drupal_get_schema(NULL, TRUE);
+
+  # copy all the data from the CCK table to this table..
+  $entry_content_type = lingwo_dictionary_settings('entry_content_type');
+  if (!empty($entry_content_type)) {
+    foreach (content_fields(NULL, $entry_content_type) as $field_name => $field) {
+      // dsm()
+      if ($field['module'] == 'lingwo_senses') {
+        $senses = array();
+        $last = NULL;
+        $res = db_query('SELECT nid, vid, delta, '. $field_name .'_id as id, '. $field_name .'_data as data FROM {content_'. $field_name .'} ORDER BY nid, vid, delta');
+        while ($row = db_fetch_object($res)) {
+          $cur = implode(':', array($row->nid, $row->vid));
+          if ($last != $cur) {
+            if (!is_null($last)) {
+              _lingwo_senses_insert_new_sense($senses);
+              $senses = array();
+            }
+            $last = $cur;
+          }
+          $senses[] = $row;
+        }
+        _lingwo_senses_insert_new_sense($senses);
+
+        // remove the CCK field
+        content_field_instance_delete($field_name, $entry_content_type);
+      }
+    }
+  }
+
+  return $ret;
+}
+
+/**
  * Implementation of hook_install().
  */
 function lingwo_senses_install() {
-  variable_set('lingwo_senses_schema_version', 6000);
-  drupal_load('module', 'content');
-  content_notify('install', 'lingwo_senses');
+  drupal_install_schema('lingwo_senses');
 }
 
 /**
  * Implementation of hook_uninstall().
  */
 function lingwo_senses_uninstall() {
-  drupal_load('module', 'content');
-  content_notify('uninstall', 'lingwo_senses');
-  variable_del('lingwo_senses_schema_version');
+  drupal_uninstall_schema('lingwo_senses');
 }
 
 /**
  * Implementation of hook_enable().
  */
 function lingwo_senses_enable() {
-  drupal_load('module', 'content');
-  content_notify('enable', 'lingwo_senses');
 }
 
 /**
  * Implementation of hook_disable().
  */
 function lingwo_senses_disable() {
-  drupal_load('module', 'content');
-  content_notify('disable', 'lingwo_senses');
 }
 

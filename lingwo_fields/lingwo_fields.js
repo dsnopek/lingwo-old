@@ -22,14 +22,32 @@
         }
     };
 
+    function setupAddValueLink(name, wrapperNode) {
+        addValueNode = $('<a class="lingwo-fields-addvalue" href="#">'+Drupal.t('Add value')+'</a>');
+        addValueNode.click(function (evt) {
+            $('#edit--lingwo-fields-extra-value').val(name);
+            $('#edit--lingwo-fields-refresh').click();
+            return false;
+        });
+
+        // put the addValueNode after the label
+        label = $('label[for=edit-lingwo-fields-'+name+'-value]', wrapperNode);
+        label.append(' ');
+        label.append(addValueNode);
+    }
+
     function Control (node) {
         this.type = $(node).attr('data-type'),
         this.name = $(node).attr('data-name');
 
-        this.inputNode = node;
-        this.wrapperNode = $(this.inputNode).parent().parent().get(0);
-        this.valueNode = $('<a class="lingwo-fields-value" href="#"></a>');
-        this.autoNode = $('#'+(''+node.id).replace(/-value$/, '-automatic')).get();
+        this.inputNode = $('.lingwo-fields-value', node).get(0);
+        this.wrapperNode = $(node).get(0);
+        this.valueNode = $('<a href="#" class="lingwo-fields-value"></a>');
+        this.autoNode = document.getElementById((''+this.inputNode.id).replace(/-value$/, '-automatic'));
+
+        if (this.type == 'form') {
+            setupAddValueLink(this.name, this.wrapperNode);
+        }
 
         $(this.inputNode).after(this.valueNode);
 
@@ -44,11 +62,8 @@
         $('label', $(this.autoNode).parent()).hide().attr('for', this.autoNode.id);
 
         // then we want to move the check box to be before the input
-        $(this.autoNode).parent().insertBefore($(this.inputNode).parent()).css({
-            display: 'inline',
-            'float': 'left',
-            'margin': '0'
-        });
+        $(this.autoNode).parent() .insertBefore($(this.inputNode).parent());
+        $(this.autoNode).addClass('lingwo-fields-control-prefix-item');
     };
     // sets up all the proper event handlers to make this control work
     Control.prototype._attachEvents = function () {
@@ -133,6 +148,8 @@
     };
     // pulls values from the form and pushs them to the entry
     Control.prototype.toEntry = function () {
+        if (!this.hasDefinition) return;
+
         switch(this.type) {
             case 'class':
                 entry.fields[this.name] = $(':selected', this.inputNode).val() == '1';
@@ -146,6 +163,55 @@
         };
     };
 
+    function setupExtraField (node) {
+        var name = $(node).attr('data-name'),
+            type = $(node).attr('data-type'),
+            inputNode = $('.lingwo-fields-value', node).get(0),
+            removeNode = document.getElementById((''+inputNode.id).replace(/-value$/, '-remove')),
+            addValueNode, label, removeButton;
+
+        if (type == 'form' && name != '_noname_') {
+            setupAddValueLink(name, node);
+        }
+
+        // add the remove button
+        removeButton = $('<a href="#" class="lingwo-fields-remove-button"></a>');
+        removeButton.click(function (evt) {
+            $(removeNode).attr('checked', 'checked').click();
+            return false;
+        });
+        removeButton.addClass('lingwo-fields-control-prefix-item');
+        removeButton.insertBefore(inputNode.parentNode);
+        $(removeNode).parent().hide();
+    }
+
+    function setupAddNewForm (node) {
+        var nameNode = $('.lingwo-fields-name', this.wrapperNode),
+            nonameNode = $('<a class="lingwo-fields-noname" href="#">'+Drupal.t('Set name')+'</a>'),
+            legend;
+
+        nonameNode.click(function (evt) {
+            nameNode.parent().show();
+            nameNode.focus();
+            nameNode.get(0).select();
+            nonameNode.hide();
+            return false;
+        });
+        nameNode.blur(function (evt) {
+            if (nameNode.val() == '') {
+                nameNode.val('_noname_').parent().hide();
+                nonameNode.show();
+            }
+        });
+
+        // put the noname node after the legend
+        legend = $('legend', node);
+        legend.append(' ');
+        legend.append(nonameNode);
+
+        nameNode.parent().hide();
+    }
+
 
     Drupal.behaviors.lingwo_fields = function (context) {
         // load the settings
@@ -153,7 +219,7 @@
 
         // get the language/pos from settings or the form
         var lang = settings.lang || $('#edit-language :selected').val();
-        var pos  = settings.pos || $('#'+settings.pos_field+' :selected').val();
+        var pos  = settings.pos  || $('#edit-pos :selected').val();
 
         require(
             ['lingwo_dictionary/languages/'+lang,
@@ -168,8 +234,8 @@
                     pos: pos
                 });
 
-                // remove the Refresh button, AHAH will handle the reloading
-                $('#edit-'+settings.field_name+'-refresh', context).remove();
+                // hide the Refresh button, AHAH will handle the reloading
+                $('#edit--lingwo-fields-refresh', context).hide();
 
                 $('#edit-title', context).bind('keyup', function (evt) {
                     entry.headword = evt.target.value;
@@ -183,9 +249,20 @@
                 });
 
                 field_map = {};
-                $('.'+settings.field_name+'-control', context).each(function (i) {
-                    var control = new Control(this);
-                    field_map[control.name] = control;
+                $('.lingwo-fields-control', context).each(function (i) {
+                    var hasDefinition = $(this).attr('data-has-definition') == 'true',
+                        control;
+
+                    if (hasDefinition) {
+                        control = new Control(this);
+                        field_map[control.name] = control;
+                    }
+                    else {
+                        setupExtraField(this);
+                    }
+                });
+                $('#edit--lingwo-fields-add-new-form', context).each(function (i) {
+                    setupAddNewForm(this);
                 });
 
                 // updated the form!!

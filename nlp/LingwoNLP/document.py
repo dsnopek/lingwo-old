@@ -1,6 +1,11 @@
 
 from xml.dom import Node as XmlNode
-import html5lib
+import html5lib, codecs
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 # A generally useful DOM extension
 def Node_insertAfter(parent, newElem, refElem):
@@ -39,6 +44,17 @@ class _DomWrapper(object):
 class DocumentError(Exception):
     pass
 
+def writeHtml(writer, nodeList):
+    from html5lib.treewalkers import getTreeWalker
+    #from html5lib.serializer.htmlserializer import HTMLSerializer
+    from html5lib.serializer.xhtmlserializer import XHTMLSerializer
+
+    walker = getTreeWalker('dom')
+    serializer = XHTMLSerializer()
+    for node in nodeList:
+        for item in serializer.serialize(walker(node)):
+            writer.write(item)
+
 class Document(_DomWrapper):
     def __init__(self, dom):
         if dom.nodeType != XmlNode.DOCUMENT_NODE:
@@ -49,9 +65,16 @@ class Document(_DomWrapper):
         from LingwoNLP.segment import segmentDocument
         segmentDocument(self._dom)
 
+    def __str__(self):
+        buffer = StringIO()
+        writer = codecs.getwriter('utf-8')(buffer)
+        body = self._dom.getElementsByTagName('body')[0]
+        writeHtml(writer, body.childNodes)
+        return buffer.getvalue()
+
     @property
     def sents(self):
-        for elem in self._dom.getElementsByTagName('s'):
+        for elem in self._dom.getElementsByTagName('sent'):
             yield TokenStream(elem)
 
     @property
@@ -69,8 +92,8 @@ class Token(_DomWrapper):
 
 class TokenStream(_DomWrapper):
     def __init__(self, dom):
-        if dom.nodeType != XmlNode.ELEMENT_NODE or dom.tagName != 's':
-            raise DocumentError('TokenStream must wrap around a <s> sentence element')
+        if dom.nodeType != XmlNode.ELEMENT_NODE or dom.tagName != 'sent':
+            raise DocumentError('TokenStream must wrap around a <sent> sentence element')
         _DomWrapper.__init__(self, dom)
 
         self.tokens = []
@@ -82,7 +105,6 @@ def parse(fd):
     return Document(html5lib.parse(fd, treebuilder='dom'))
 
 def parseString(s):
-    from StringIO import StringIO
     return parse(StringIO(s))
 
 

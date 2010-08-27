@@ -247,7 +247,7 @@ def _sent_tokenize(text):
 
 class SentenceSegmenter(Segmenter):
     def __init__(self, tokenize=_sent_tokenize):
-        Segmenter.__init__(self, 's', tokenize)
+        Segmenter.__init__(self, 'sent', tokenize)
 
 # A replacement for nltk.word_tokenize() that uses our modified MyTreebankWordTokenizer()
 def _word_tokenize(text):
@@ -267,7 +267,7 @@ def segmentDocument(doc, sent_segmenter=None, word_segmenter=None):
     # segment the words
     if word_segmenter is None:
         word_segmenter = WordSegmenter()
-    for sent in doc.getElementsByTagName('s'):
+    for sent in doc.getElementsByTagName('sent'):
         word_segmenter.run(sent)
 
 def main():
