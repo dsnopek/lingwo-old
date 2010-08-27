@@ -11,6 +11,10 @@ How to setup a python virtualenv for the NLP code?
 
    $HOME/prj/lingwo/python-nlp-env/bin/easy_install PyYAML==3.09
  
+ * Install simplejson 2.1.1
+ 
+   $HOME/prj/lingwo/python-nlp-env/bin/easy_install simplejson==2.1.1
+
  * Install NLTK version 2.0b9:
 
    wget http://nltk.googlecode.com/files/nltk-2.0b9.zip
@@ -22,7 +26,7 @@ How to setup a python virtualenv for the NLP code?
 
    $HOME/prj/lingwo/python-nlp-env/bin/python
    import nltk
-   nltk.download()
+   nltk.download('punkt')
  
  * Install html5lib version 0.90:
 
