@@ -17,7 +17,7 @@ class LingwoFields implements IteratorAggregate {
     $this->clean();
     $items = $this->node->lingwo_fields;
     $fields = array();
-    foreach (lingwo_language_fields($this->node->language, $pos) as $name => $field) {
+    foreach (lingwo_language_fields($this->node->language, $this->node->pos) as $name => $field) {
       if (isset($items[$name])) {
         $item = $items[$name];
         unset($items[$name]);

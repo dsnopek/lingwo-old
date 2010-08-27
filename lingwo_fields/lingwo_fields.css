@@ -1,11 +1,11 @@
 
-fieldset.lingwo-fields-extra-form {
+#edit--lingwo-fields-add-new-form {
     border: 0;
     margin: 0;
     padding: 0;
 }
 
-fieldset legend {
+#edit--lingwo-fields-add-new-form legend {
     font-weight: bold;
 }
 
@@ -13,5 +13,9 @@ fieldset legend {
 .lingwo-fields-addvalue {
     font-weight: normal;
     color: blue;
+}
+
+.lingwo-fields-extra-value {
+    margin-left: 20px;
 }
 

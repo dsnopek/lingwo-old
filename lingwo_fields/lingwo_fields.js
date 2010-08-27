@@ -29,22 +29,22 @@
 
         var self = this;
 
-        this.inputNode = node;
-        this.wrapperNode = $(this.inputNode).parent().parent().get(0);
-        this.valueNode = $('<a class="lingwo-fields-value" href="#"></a>');
-        this.autoNode = document.getElementById((''+node.id).replace(/-value$/, '-automatic'));
+        this.inputNode = $('.lingwo-fields-value', node).get(0);
+        this.wrapperNode = $(node).get(0);
+        this.valueNode = $('<a href="#"></a>');
+        this.autoNode = document.getElementById((''+this.inputNode.id).replace(/-value-0$/, '-automatic'));
 
         if (this.type == 'form') {
           this.addValueNode = $('<a class="lingwo-fields-addvalue" href="#">'+Drupal.t('Add value')+'</a>');
           this.addValueNode.click(function (evt) {
             $('#edit--lingwo-fields-extra-value').val(self.name);
+            console.debug($('#edit--lingwo-fields-extra-value'));
             $('#edit--lingwo-fields-refresh').click();
             return false;
           });
 
           // put the addValueNode after the label
-          var label = $('label', this.wrapperNode);
-          console.debug(label);
+          var label = $('label[for='+this.inputNode.id+']', this.wrapperNode);
           label.append(' ');
           label.append(this.addValueNode);
         }
@@ -62,8 +62,8 @@
         $('label', $(this.autoNode).parent()).hide().attr('for', this.autoNode.id);
 
         // then we want to move the check box to be before the input
-        $(this.autoNode).parent().insertBefore($(this.inputNode).parent()).css({
-            display: 'inline',
+        $(this.autoNode).parent().insertBefore($(this.inputNode).parent().parent()).css({
+            //display: 'inline',
             'float': 'left',
             'margin': '0'
         });
@@ -237,7 +237,7 @@
                     var control = new Control(this);
                     field_map[control.name] = control;
                 });
-                $('.lingwo-fields-extra-form', context).each(function (i) {
+                $('#edit--lingwo-fields-add-new-form', context).each(function (i) {
                     //console.debug(this);
                     var extraForm = new ExtraForm(this);
                     extra_forms.push(extraForm);

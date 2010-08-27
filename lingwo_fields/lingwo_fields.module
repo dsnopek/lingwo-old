@@ -120,6 +120,15 @@ function lingwo_fields_content_extra_fields($type_name) {
 
 function _lingwo_fields_clean(&$items) {
   foreach ($items as &$item) {
+    // unravel multiple values
+    if (is_array($item['value'])) {
+      if (count($item['value']) == 1) {
+        $item['value'] = $item['value'][0];
+      }
+      elseif (count($item['value']) == 0) {
+        $item['value'] = NULL;
+      }
+    }
     if ($item['type'] == 'class') {
       $item['value'] = intval($item['value']);
     }
@@ -141,12 +150,18 @@ function _lingwo_fields_write_record($fields, $is_update) {
   db_query('DELETE FROM {lingwo_fields_forms} WHERE nid = %d', $fields->nid);
   foreach ($fields->data as $field) {
     if ($field['type'] == 'form') {
-      $form = (object)array(
-        'nid'       => $fields->nid,
-        'form'      => $field['value'],
-        'form_name' => $field['name'],
-      );
-      drupal_write_record('lingwo_fields_forms', $form);
+      $values = $field['value'];
+      if (!is_array($values)) {
+        $values = array($values);
+      }
+      foreach ($values as $value) {
+        $form = (object)array(
+          'nid'       => $fields->nid,
+          'form'      => $value,
+          'form_name' => $field['name'],
+        );
+        drupal_write_record('lingwo_fields_forms', $form);
+      }
     }
   }
 }
@@ -227,9 +242,8 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
   }
   
   // record if we are supposed to add an extra value to a field
-  if ($extra_value = $form_state['values']['_lingwo_fields']['extra_value']) {
-    $fields->add($extra_value, $fields->getType('type'), '');
-  }
+  $extra_value = $form_state['values']['_lingwo_fields']['extra_value'];
+  watchdog('debug', 'extra_value: '. print_r($extra_value, TRUE));
 
   $element = array(
     '#type'  => 'fieldset',
@@ -276,9 +290,17 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
     $def = $field['definition'];
     unset($field['definition']);
 
-    // TODO: use $form_state['storage'] to get the interim default values!
+    $control_tag  = '<div ';
+    $control_tag .= 'class="lingwo-fields-control" ';
+    $control_tag .= 'data-type="'. $field['type'] .'" ';
+    $control_tag .= 'data-name="'. $name .'" ';
+    if (!empty($def)) {
+      $control_tag .= 'data-has-definition="true" ';
+    }
+    $control_tag .= '>';
+
     $field_form = array(
-      '#prefix' => '<div>',
+      '#prefix' => $control_tag,
       '#suffix' => '</div>',
       '#item'   => $field,
     );
@@ -290,26 +312,35 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
       '#type' => 'hidden',
       '#value' => $field['type'],
     );
+
+    $values = $field['value'];
+    if (!is_array($values)) {
+      $values = array($values);
+    }
+    if ($extra_value == $name) {
+      $values[] = '';
+    }
+    $value = array_shift($values);
+
     $field_form['value'] = array(
+      '#prefix' => '<div>',
+      '#suffix' => '</div>',
+    );
+
+    $field_form['value'][0] = array(
       '#title' => isset($def['label']) ? $def['label'] : $name,
-      '#default_value' => $field['value'],
+      '#default_value' => $value,
       // TODO: we need to enforce required with select boxes
       '#required' => $def['required'] ? TRUE : FALSE,
       '#attributes' => array(
-        'class' => 'lingwo-fields-control',
-        'data-type' => $field['type'],
-        'data-name' => $name,
+        'class' => 'lingwo-fields-value',
       ),
       '#description' => $def['description'],
     );
-    if (!empty($def)) {
-      // we mark this control having a definition 
-      $field_form['value']['#attributes']['data-has-definition'] = 'true';
-    }
 
     switch ($field['type']) {
       case 'class':
-        $field_form['value'] += array(
+        $field_form['value'][0] += array(
           '#type' => 'select',
           '#options' => array(
             0 => t('False'),
@@ -321,17 +352,29 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
         $options = $def['options'];
         $options = array('' => '-none-') + $options;
 
-        $field_form['value'] += array(
+        $field_form['value'][0] += array(
           '#type' => 'select',
           '#options' => $options,
         );
         break;;
       case 'form':
-        $field_form['value'] += array(
+        $field_form['value'][0] += array(
           '#type' => 'textfield',
         );
         break;;
     };
+
+    # since only forms can have multiple values, these are always
+    # textfields.
+    foreach ($values as $value) {
+      $field_form['value'][] = array(
+        '#type' => 'textfield',
+        '#default_value' => $value,
+        '#attributes' => array(
+          'class' => 'lingwo-fields-extra-value',
+        ),
+      );
+    }
 
     //if (!empty($def)) {
       $field_form['automatic'] = array(
@@ -361,7 +404,6 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
   // for adding multiple forms
   $_lingwo_fields['extra_value'] = array(
     '#type' => 'hidden',
-    '#value' => '',
   );
 
   // for adding non-standard forms
@@ -369,7 +411,7 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
     '#type' => 'fieldset',
     '#title' => t('Extra Form').':',
     '#attributes' => array(
-      'class' => "lingwo-fields-extra-form",
+      'id' => 'edit--lingwo-fields-add-new-form',
     ),
   );
   $_lingwo_fields['add_new_form']['name'] = array(
@@ -534,13 +576,18 @@ function theme_lingwo_fields_formatter_default($node) {
   // fill element with real FAPI elements that simple display the item
   $element = array();
   foreach ($entry->getInterface('lingwo_fields') as $name => $field) {
-    $def = $fields['definition'];
-    $label = isset($def[$name]['label']) ? $def[$name]['label'] : $name;
+    $def = $field['definition'];
+    $label = isset($def['label']) ? $def['label'] : $name;
+
+    $value = $field['value'];
+    if (is_array($value)) {
+      $value = implode(', ', $value);
+    }
 
     $element[] = array(
       '#type' => 'item',
       '#title' => $label,
-      '#value' => $field['value'],
+      '#value' => $value,
       '#item'  => $field,
     );
   }
