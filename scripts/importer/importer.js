@@ -129,6 +129,25 @@ require([
             //print (JSON.stringify(entry.senses));
             //print (JSON.stringify(entry.translations.pl));
 
+            // find the trans with the bad characters
+            /*
+            var old_trans = entry.translations;
+            for( var xxx in old_trans) {
+                entry.translations = {xxx: old_trans[xxx]};
+                try {
+                    service.update_entry(entry, false);
+                    print ('Success: '+xxx);
+                }
+                catch (e) {
+                    print ('Failed: '+xxx);
+                    print (JSON.stringify(entry.translations));
+                }
+            }
+            */
+
+            // reduce to just the Polish & English translations (there appears to be a maximum on argument size)
+            entry.translations = { 'pl': entry.translations.pl, 'en': entry.translations.en };
+
             try {
                 print(service.update_entry(entry, OPTS['force-changed'] == 'true'));
             }
