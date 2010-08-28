@@ -309,9 +309,11 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
   if ($op == 'insert' || $op == 'update') {
     // record all the entries used in this corpus text
     foreach (lingwo_korpus_text_entry_list($node->body, $node->language) as $entry) {
-      $entry->nid = $node->nid;
-      lingwo_korpus_generate_hash($entry);
-      drupal_write_record('lingwo_korpus_entry', $entry);
+      if (!empty($entry->pos)) {
+        $entry->nid = $node->nid;
+        lingwo_korpus_generate_hash($entry);
+        drupal_write_record('lingwo_korpus_entry', $entry);
+      }
     }
 
   }
