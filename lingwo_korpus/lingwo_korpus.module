@@ -293,12 +293,13 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
     return;
 
   if ($op == 'presave' && !$node->_lingwo_korpus_no_segment) {
+    $orig_body = $node->body;
     if (!_lingwo_korpus_autolookup_node($node, 'body', FALSE)) {
       // if there are any errors, we don't need to continue
       return;
     }
 
-    if ($node->teaser_include && $node->teaser == substr($node->body, 0, strlen($node->teaser))) {
+    if ($node->teaser_include && $node->teaser == substr($orig_body, 0, strlen($node->teaser))) {
       // The teaser is just a section of the body, they are a connected whole.
       // So, we need to regenerate the teaser bit since we've altered the body
       // (lifted from node/node.module's node_submit() function)
