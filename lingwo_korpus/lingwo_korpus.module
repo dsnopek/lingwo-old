@@ -219,7 +219,7 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
   $node->body = $text;
   if ($form_state['clicked_button']['#value'] == t('Auto Annotate')) {
     drupal_set_message(t('Automatic annotator complete.'));
-    $text = _lingwo_korpus_autolookup_node($node);
+    _lingwo_korpus_autolookup_node($node);
   }
 
   $node->teaser = node_teaser($node->body, $node->format);
@@ -293,9 +293,25 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
     return;
 
   if ($op == 'presave' && !$node->_lingwo_korpus_no_segment) {
-    // segment the text on save
-    _lingwo_korpus_autolookup_node($node, 'body',   FALSE);
-    _lingwo_korpus_autolookup_node($node, 'teaser', FALSE);
+    if (!_lingwo_korpus_autolookup_node($node, 'body', FALSE)) {
+      // if there are any errors, we don't need to continue
+      return;
+    }
+
+    if ($node->teaser_include && $node->teaser == substr($node->body, 0, strlen($node->teaser))) {
+      // The teaser is just a section of the body, they are a connected whole.
+      // So, we need to regenerate the teaser bit since we've altered the body
+      // (lifted from node/node.module's node_submit() function)
+      $node->teaser = node_teaser($node->body, isset($node->format) ? $node->format : NULL);
+    }
+    else {
+      // The teaser and body are two distinct parts, the teaser isn't shown when
+      // on the node display page (atleast I think this is what teaser_include is about)
+      // I know that we don't show the annotation reader for just the teaser, but 
+      // I think segmenting the teaser is the right thing to do...  If one day we want
+      // to have the annotation reader in the text browser, it will help.
+      _lingwo_korpus_autolookup_node($node, 'teaser', FALSE);
+    }
   }
 
   if ($op == 'update' || $op == 'delete') {
@@ -530,7 +546,7 @@ function theme_lingwo_korpus_annotation_reader_block($footer_id, $footer_margin)
 function _lingwo_korpus_autolookup_node(&$node, $which='body', $full_lookup=TRUE) {
   $cmd = $full_lookup ? '-' : '-s -';
   if ($result = _lingwo_korpus_exec_autolookup_py($cmd, $node->$which)) {
-    $node->$which = $result;
+    $node->$which = rtrim($result);
     return TRUE;
   }
   return FALSE;
