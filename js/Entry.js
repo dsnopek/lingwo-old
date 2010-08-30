@@ -121,6 +121,12 @@ require.def('lingwo_dictionary/Entry',
                 
                 return value;
             },
+            
+            setField: function (name, value) {
+                this.fields[name] = value;
+                // now that a field has been manually updated, it could change everything
+                this.clearCache();
+            },
 
             // TODO: this should be flexible enough to handle situations where we
             //       don't want the first word to be THE word.

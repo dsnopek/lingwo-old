@@ -258,9 +258,158 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             });
         }
 
-        function parseSensesAndTranslations(entry, text) {
+        function getFormsInfo(text) {
+            var input = new LineReader(text), line, match;
+
+            // attempt to find the line defining the forms
+            while (!input.eof()) {
+                line = input.readline();
+                if (match = /^\{\{en-[^|}]+([^}]*)\}\}/.exec(line)) {
+                    if (match.length == 2) {
+                        return match[1].substr(1).split('|');
+                    }
+                    return;
+                }
+                else if(!/^==/.test(line)) {
+                    // if we encouter a line which isn't part of the
+                    // lead in (ie. ==English== ===Verb===) then we know
+                    // that we have gone too far and haven't located the
+                    // appropriate line
+                    return;
+                }
+            }
+        }
+
+        var formParsers = {
+            // this is basically a literal port of the code in the Wiktionary's template:en-verb
+            'verb': function (entry, formInfo) {
+                var headword = entry.headword,
+                    infinitive = 'to '+headword,
+                    getPres3rdSg = function () {
+                        if (formInfo[1] == 'es' || formInfo[2] == 'es') {
+                            if (formInfo.length == 2) {
+                                return formInfo[0] + 'es';
+                            }
+                            return formInfo[0] + formInfo[1] + 'es';
+                        }
+                        else if (formInfo[1] + formInfo[2] == 'ied') {
+                            return formInfo[0] + formInfo[1] + 'es';
+                        }
+                        else if (/^(d|ed|ing)$/.test(formInfo[1]) || /^(d|ed|ing)$/.test(formInfo[2])) {
+                            return headword + 's';
+                        }
+                        else if (formInfo.length >= 3) {
+                            return formInfo[0];
+                        }
+
+                        return headword + 's';
+                    },
+                    getPresP = function () {
+                        if (formInfo[1] == 'es' || formInfo[2] == 'es') {
+                            if (formInfo.length == 2) {
+                                return formInfo[0] + 'ing';
+                            }
+                            return formInfo[0] + formInfo[1] + 'ing';
+                        }
+                        else if (formInfo[1] + formInfo[2] == 'ied') {
+                            return headword + 'ing';
+                        }
+                        else if (/^(d|ed|ing)$/.test(formInfo[1]) || /^(d|ed|ing)$/.test(formInfo[2])) {
+                            if (formInfo.length == 2) {
+                                return formInfo[0] + 'ing';
+                            }
+                            return formInfo[0] + formInfo[1] + 'ing';
+                        }
+                        else if (formInfo.length >= 3) {
+                            return formInfo[1];
+                        }
+
+                        return headword + 'ing';
+                        
+                    },
+                    getPast = function () {
+                        if (formInfo[1] == 'd' || formInfo[1] == 'ed') {
+                            return formInfo[0] + formInfo[1];
+                        }
+                        else if (formInfo[2] == 'd' || formInfo[2] == 'ed') {
+                            return formInfo[0] + formInfo[1] + formInfo[2];
+                        }
+                        else if (formInfo[1] == 'es' || formInfo[2] == 'es') {
+                            if (formInfo.length == 2) {
+                                return formInfo[0] + 'ed';
+                            }
+                            return formInfo[0] + formInfo[1] + 'ed';
+                        }
+                        else if (formInfo[1] + formInfo[2] == 'ying') {
+                            return headword + 'd';
+                        }
+                        else if (formInfo[1] == 'ing' || formInfo[2] == 'ing') {
+                            if (formInfo.length == 2) {
+                                return formInfo[0] + 'ed';
+                            }
+                            return formInfo[0] + formInfo[1] + 'ed';
+                        }
+                        else if (formInfo.length >= 3) {
+                            return formInfo[2];
+                        }
+
+                        return headword + 'ed';
+                    },
+                    getPastP = function () {
+                        if (formInfo.length >= 4) {
+                            return formInfo[formInfo.length-1];
+                        }
+                        return getPast();
+                    },
+                    postProcess = function (forms) {
+                        var formName;
+                        for(formName in forms) {
+                            if (forms[formName] == '-') {
+                                forms[formName] = '';
+                            }
+                        }
+                        return forms;
+                    },
+                    match;
+
+                if (match = /^inf=(.*)$/.exec(formInfo[0])) {
+                    infinitive = match[1];
+                    formInfo = formInfo.slice(1);
+                }
+
+                return postProcess({
+                    'infinitive': infinitive,
+                    '-s': getPres3rdSg(),
+                    '-ing': getPresP(),
+                    '2nd': getPast(),
+                    '3rd': getPastP(),
+                });
+            },
+        };
+
+        function parseForms(entry, text) {
+            var formInfo = getFormsInfo(text), forms, formName;
+            if (typeof formInfo === 'undefined') {
+                print ('** '+entry.headword +' ** Has no forms data!  Needs to be checked by a human!');
+                return;
+            }
+            print (entry.headword);
+            print ('formInfo: '+formInfo);
+            if (typeof formParsers[entry.pos] !== 'undefined') {
+                forms = formParsers[entry.pos](entry, formInfo);
+                for (formName in forms) {
+                    if (entry.getField(formName) != forms[formName]) {
+                        print ('form: '+formName+' = '+forms[formName]);
+                        entry.setField(formName, forms[formName]);
+                    }
+                }
+            }
+        }
+
+        function parse(entry, text) {
             parseTranslations(entry, text);
             parseSenses(entry, text);
+            parseForms(entry, text);
         }
 
         function getData(text, pos, type) {
@@ -348,7 +497,11 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
 
             parser: function (entry) {
                 var raw = entry.getSource('en.wiktionary.org').raw;
-                parseSensesAndTranslations(entry, raw);
+                parse(entry, raw);
+            },
+
+            _internal: {
+                formParsers: formParsers
             }
         };
     }
