@@ -40,6 +40,20 @@ require.def('lingwo_dictionary/languages/en.test-data',
             {   headword: 'lady',
                 pos: 'noun'
             },
+            {
+                headword: 'water',
+                pos: 'noun',
+                fields: {
+                    plural_type: 'singular'
+                }
+            },
+            {
+                headword: 'pants',
+                pos: 'noun',
+                fields: {
+                    plural_type: 'plural'
+                }
+            },
 
             // verbs
             {   headword: 'read',

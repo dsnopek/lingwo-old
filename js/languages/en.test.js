@@ -28,7 +28,9 @@ require(
                     'watch': 'watches',
                     'boy': 'boys',
                     'hero': 'heroes',
-                    'lady': 'ladies'
+                    'lady': 'ladies',
+                    'water': '',
+                    'pants': 'pants'
                 });
             },
 

@@ -156,6 +156,9 @@ require.def('lingwo_dictionary/Entry',
             _handleFormValue: function (value) {
                 var tmp;
 
+                if (value === null) {
+                    value = new this.language.Word();
+                }
                 if (!(value instanceof Array)) {
                     // If the value returned isn't an array, first, make it an array.
                     value = [value];

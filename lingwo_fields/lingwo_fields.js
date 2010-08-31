@@ -148,8 +148,6 @@
     };
     // pulls values from the form and pushs them to the entry
     Control.prototype.toEntry = function () {
-        if (!this.hasDefinition) return;
-
         switch(this.type) {
             case 'class':
                 entry.fields[this.name] = $(':selected', this.inputNode).val() == '1';

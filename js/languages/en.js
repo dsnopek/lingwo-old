@@ -42,11 +42,31 @@ require.def('lingwo_dictionary/languages/en',
         }
 
         lang.fields.noun = {
+            'plural_type': {
+                type: 'option',
+                label: 'Plural Type',
+                options: {
+                    'both': 'Has singular and plural',
+                    'singular': 'Singular only',
+                    'plural': 'Plural only'
+                },
+                automatic: function (entry) {
+                    return 'both';
+                }
+            },
             'plural': {
                 type: 'form',
                 label: 'Plural',
                 automatic: function (entry) {
-                    return append_s(entry.getWord());
+                    var type = entry.getField('plural_type');
+                    switch (type) {
+                        case 'both':
+                            return append_s(entry.getWord());
+                        case 'singular':
+                            return null;
+                        case 'plural':
+                            return entry.getWord();
+                    }
                 }
             }
         };
