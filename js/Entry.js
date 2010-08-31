@@ -20,6 +20,7 @@ require.def('lingwo_dictionary/Entry',
                 this.like = args.like || null;
 
                 this.fields = args.fields || {};
+                this.field_alternatives = args.field_alternatives || {};
                 this.sources = args.sources || null;
 
                 this.clearCache();
@@ -31,6 +32,7 @@ require.def('lingwo_dictionary/Entry',
                 this.pron = entry.pron;
                 this.like = entry.like;
                 this.fields = entry.fields;
+                this.field_alternatives = entry.field_alternatives;
                 this.clearCache();
             },
 
@@ -55,6 +57,10 @@ require.def('lingwo_dictionary/Entry',
                             value: this.getField(name),
                             automatic: this.isAutomatic(name)
                         };
+
+                        if (typeof this.field_alternatives[name] != 'undefined') {
+                            fields[name]['alt'] = this.field_alternatives[name];
+                        }
                     }
                 }
 
@@ -126,6 +132,23 @@ require.def('lingwo_dictionary/Entry',
                 this.fields[name] = value;
                 // now that a field has been manually updated, it could change everything
                 this.clearCache();
+            },
+
+            getFieldAlternatives: function (name) {
+                if (typeof this.field_alternatives[name] === 'undefined') {
+                    return [];
+                }
+                return this.field_alternatives[name];
+            },
+
+            setFieldAlternatives: function (name, value) {
+                this.field_alternatives[name] = value;
+            },
+
+            addFieldAlternative: function (name, value) {
+                var alt = this.getFieldAlternatives(name);
+                alt.push(value);
+                this.setFieldAlternatives(name, alt);
             },
 
             // TODO: this should be flexible enough to handle situations where we

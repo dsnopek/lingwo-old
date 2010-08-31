@@ -264,7 +264,7 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             // attempt to find the line defining the forms
             while (!input.eof()) {
                 line = input.readline();
-                if (match = /^\{\{en-[^|}]+([^}]*)\}\}/.exec(line)) {
+                if (match = /^\{\{en-[^|}]+(.*)\}\}$/.exec(line)) {
                     if (match.length == 2) {
                         return match[1].substr(1).split('|');
                     }
@@ -356,18 +356,64 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                         return headword + 'ed';
                     },
                     getPastP = function () {
-                        if (formInfo.length >= 4) {
+                        if (formInfo[1] == 'd' || formInfo[1] == 'ed') {
+                            return formInfo[0] + formInfo[1];
+                        }
+                        else if (formInfo[2] == 'd' || formInfo[2] == 'ed') {
+                            return formInfo[0] + formInfo[1] + formInfo[2];
+                        }
+                        else if (formInfo[1] == 'es' || formInfo[2] == 'es') {
+                            if (formInfo.length == 2) {
+                                return formInfo[0] + 'ed';
+                            }
+                            return formInfo[0] + formInfo[1] + 'ed';
+                        }
+                        else if (formInfo[1] + formInfo[2] == 'ying') {
+                            return headword + 'd';
+                        }
+                        else if (formInfo[1] == 'ing' || formInfo[2] == 'ing') {
+                            if (formInfo.length == 2) {
+                                return formInfo[0] + 'ed';
+                            }
+                            return formInfo[0] + formInfo[1] + 'ed';
+                        }
+                        else if (formInfo.length >= 3) {
                             return formInfo[formInfo.length-1];
                         }
-                        return getPast();
+
+                        return headword + 'ed';
                     },
                     postProcess = function (forms) {
-                        var formName;
+                        var formName, val;
                         for(formName in forms) {
-                            if (forms[formName] == '-') {
-                                forms[formName] = '';
+                            val = forms[formName];
+
+                            // process the value (mainly, we want to clean it up and see
+                            // if there are any alternatives)
+                            val = WikiText.clean(val);
+                            // some qualifier words
+                            val = val.replace(/obsolete|dialect|archaic|poetic|rarely|US|UK|chiefly|North American|British/g, ' ');
+                            // if there is no 'or' but there is a comma, then we convert the comma
+                            // to an 'or'.
+                            if (val.indexOf(' or ') == -1 && val.indexOf(',')) {
+                                val = val.replace(',', ' or ');
                             }
+                            // remove random symbols and punctuation
+                            val = val.replace(/[\{\}(),]/g, ' ');
+                            // split on 'or'
+                            val = val.split(' or ');
+                            // clean up the result
+                            val = val.map(trim);
+                            val = val.map(function (v) { return v == '-' ? '' : v; });
+
+                            forms[formName] = val;
                         }
+
+                        // sometimes when specifying non-standard infinitives, the editors forget to put the 'to' in
+                        if (forms['infinitive'][0].length > 0 && forms['infinitive'][0].slice(0, 3) != 'to ') {
+                            forms['infinitive'][0] = 'to ' + forms['infinitive'][0];
+                        }
+
                         return forms;
                     },
                     match;
@@ -388,20 +434,35 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
         };
 
         function parseForms(entry, text) {
-            var formInfo = getFormsInfo(text), forms, formName;
+            // don't even mess with it, if we have no parser for it...
+            if (typeof formParsers[entry.pos] === 'undefined') {
+                return;
+            }
+
+            var formInfo = getFormsInfo(text), forms, formName, val, origLength;
             if (typeof formInfo === 'undefined') {
                 print ('** '+entry.headword +' ** Has no forms data!  Needs to be checked by a human!');
                 return;
             }
-            print (entry.headword);
+
             print ('formInfo: '+formInfo);
-            if (typeof formParsers[entry.pos] !== 'undefined') {
-                forms = formParsers[entry.pos](entry, formInfo);
-                for (formName in forms) {
-                    if (entry.getField(formName) != forms[formName]) {
-                        print ('form: '+formName+' = '+forms[formName]);
-                        entry.setField(formName, forms[formName]);
-                    }
+
+            forms = formParsers[entry.pos](entry, formInfo);
+            for (formName in forms) {
+                val = forms[formName];
+
+                // put the first value as the main form (we trust the Wiktionary's order)
+                if (entry.getField(formName) != val[0]) {
+                    print ('form: '+formName+' = '+val[0]);
+                    entry.setField(formName, val[0]);
+                }
+
+                // put the rest as alternatives
+                val = val.slice(1);
+                val = val.filter(function (v) { return v != ''; });
+                if (val.length > 0) {
+                    print ('alternatives for '+formName+' = '+val);
+                    entry.setFieldAlternatives(formName, val);
                 }
             }
         }

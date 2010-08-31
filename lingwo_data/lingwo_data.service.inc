@@ -196,6 +196,9 @@ function _lingwo_data_import_set_field_value($field, $value, $type) {
       $field['name'] = $value['name'];
       $field['value'] = $value['value'];
       $field['automatic'] = $value['automatic'];
+      if (!empty($value['alt'])) {
+        $field['alt'] = $value['alt'];
+      }
       break;
 
     case 'lingwo_senses':

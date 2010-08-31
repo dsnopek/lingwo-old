@@ -148,6 +148,9 @@ require([
             // reduce to just the Polish & English translations (there appears to be a maximum on argument size)
             entry.translations = { 'pl': entry.translations.pl, 'en': entry.translations.en };
 
+            // DEBUG:
+            //print (JSON.stringify(entry.getFields()));
+
             try {
                 print(service.update_entry(entry, OPTS['force-changed'] == 'true'));
             }
