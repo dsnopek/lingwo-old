@@ -41,6 +41,43 @@ require.def('lingwo_dictionary/languages/en',
                    word.append('s');
         }
 
+        function double_last_cvc (word) {
+            if (word.letters.length == 3 && word.hasEnding([Language.cls('consonant'), Language.cls('vowel'), Language.cls('consonant')])) {
+                return word.append(word.letters[word.letters.length-1][0]);
+            }
+            return word;
+        }
+
+        // TODO: in the future base this off the IPA!!
+        function syllable_count (word) {
+            var scount = 0, vlast = 0, i;
+            for(i = 0; i < word.letters.length; i++) {
+                if (lang.letterHasClass(word.letters[i][0], 'vowel')) {
+                    // count this as a syllable, if the last letter was a consonant,
+                    // or we have already encountered two vowels in a row, and this
+                    // is the third...
+                    if (vlast == 0 || vlast == 2) {
+                        // a special exception, we don't count a lone 'e' on the 
+                        // end of a word.
+                        if (word.letters[i][0] == 'e' && vlast == 0 && i == word.letters.length-1) {
+                            break;
+                        }
+
+                        // otherwise, it was a syllable!
+                        scount++;
+                    }
+                    // mark that we encountered a vowel
+                    vlast++;
+                }
+                else {
+                    // mark that we encountered a consonant
+                    vlast = 0;
+                }
+            }
+
+            return scount;
+        }
+
         lang.fields.noun = {
             'plural_type': {
                 type: 'option',
@@ -70,6 +107,55 @@ require.def('lingwo_dictionary/languages/en',
                 }
             }
         };
+
+        lang.fields.adjective = {
+            'more': {
+                type: 'form',
+                label: 'more Form',
+                automatic: function (entry) {
+                    var word = entry.getWord();
+                    if (syllable_count(word) >= 3) {
+                        return [lang.parseWord('more'), word];
+                    }
+                    word = double_last_cvc(word);
+                    return word.ending('e').append('r') ||
+                           word.ending('y').replace('ier') ||
+                           word.append('er');
+                }
+            },
+            'most': {
+                type: 'form',
+                label: 'most Form',
+                automatic: function (entry) {
+                    var word = entry.getWord();
+                    if (syllable_count(word) >= 3) {
+                        return [lang.parseWord('most'), word];
+                    }
+                    word = double_last_cvc(word);
+                    return word.ending('e').append('st') ||
+                           word.ending('y').replace('iest') ||
+                           word.append('est');
+                },
+            }
+        };
+
+        lang.fields.adverb = {
+            'more': {
+                type: 'form',
+                label: 'more Form',
+                automatic: function (entry) {
+                    return [lang.parseWord('more'), entry.getWord()];
+                }
+            },
+            'most': {
+                type: 'form',
+                label: 'most Form',
+                automatic: function (entry) {
+                    return [lang.parseWord('most'), entry.getWord()];
+                },
+            }
+        };
+
 
         lang.fields.verb = {
             // TODO: do we want to do other persons just to accomidate the verb "to be"?  Its

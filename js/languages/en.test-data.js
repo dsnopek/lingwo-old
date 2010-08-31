@@ -40,15 +40,13 @@ require.def('lingwo_dictionary/languages/en.test-data',
             {   headword: 'lady',
                 pos: 'noun'
             },
-            {
-                headword: 'water',
+            {   headword: 'water',
                 pos: 'noun',
                 fields: {
                     plural_type: 'singular'
                 }
             },
-            {
-                headword: 'pants',
+            {   headword: 'pants',
                 pos: 'noun',
                 fields: {
                     plural_type: 'plural'
@@ -80,6 +78,28 @@ require.def('lingwo_dictionary/languages/en.test-data',
             {   headword: 'work out',
                 pos: 'verb'
             },
+
+            // adjectives
+            {   headword: 'old',
+                pos: 'adjective'
+            },
+            {   headword: 'late',
+                pos: 'adjective'
+            },
+            {   headword: 'easy',
+                pos: 'adjective'
+            },
+            {   headword: 'fat',
+                pos: 'adjective',
+            },
+            {   headword: 'intelligent',
+                pos: 'adjective'
+            },
+
+            // adverbs
+            {   headword: 'quietly',
+                pos: 'adverb'
+            }
     ]);
     }
 );

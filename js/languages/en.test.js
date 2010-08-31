@@ -75,6 +75,38 @@ require(
                     'infinitive': 'to work out',
                 });
             },
+
+            testAdjectiveComparativeForm: function () {
+                this.checkFieldMulti('more', {
+                    'old': 'older',
+                    'late': 'later',
+                    'easy': 'easier',
+                    'fat': 'fatter',
+                    'intelligent': 'more intelligent'
+                });
+            },
+
+            testAdjectiveSuperlativeForm: function () {
+                this.checkFieldMulti('most', {
+                    'old': 'oldest',
+                    'late': 'latest',
+                    'easy': 'easiest',
+                    'fat': 'fattest',
+                    'intelligent': 'most intelligent'
+                });
+            },
+
+            testAdverbComparativeForm: function () {
+                this.checkFieldMulti('more', {
+                    'quietly': 'more quietly'
+                });
+            },
+
+            testAdverbSuperlativeForm: function () {
+                this.checkFieldMulti('most', {
+                    'quietly': 'most quietly'
+                });
+            }
         }).run();
     }
 );

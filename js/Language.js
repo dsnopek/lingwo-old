@@ -133,7 +133,7 @@ require.def('lingwo_dictionary/Language',
                 },
 
                 'valueOf': function () { return this.toString(); },
-
+                
                 '_parseSpec': function (spec) {
                     if (typeof spec == 'string') {
                         return this.lang.parseWord(spec).letters;
@@ -154,13 +154,7 @@ require.def('lingwo_dictionary/Language',
                 '_compLetter': function (letter, letter_spec) {
                     switch (letter_spec.spec) {
                         case 'cls':
-                            var letterDef = this.lang.alphabet[letter[0]];
-                            for (var i = 0; i < letterDef.classes.length; i++) {
-                                if (letterDef.classes[i] == letter_spec.value) {
-                                    return true;
-                                }
-                            }
-                            return false;
+                            return this.lang.letterHasClass(letter[0], letter_spec.value);
                         default:
                             // it is a letter!
                             return letter[0] == letter_spec[0];
@@ -218,6 +212,18 @@ require.def('lingwo_dictionary/Language',
         };
         extendPrototype(Language, {
             alphabet: null,
+
+            // Returns true if a letter in the alphabet has a specific class
+            letterHasClass: function (name, cls) {
+                var letterDef = this.alphabet[name];
+                for (var i = 0; i < letterDef.classes.length; i++) {
+                    if (letterDef.classes[i] == cls) {
+                        return true;
+                    }
+                }
+                return false;
+            },
+
 
             // creates a Word's "letter" from a string.
             //
