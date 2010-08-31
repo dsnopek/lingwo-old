@@ -1,7 +1,6 @@
 
 (function () {
     // This module will control the lingwo_fields form.
-    var settings;
     var entry = null;
 
     var field_map = {};
@@ -212,12 +211,9 @@
 
 
     Drupal.behaviors.lingwo_fields = function (context) {
-        // load the settings
-        settings = Drupal.settings.lingwo_fields;
-
-        // get the language/pos from settings or the form
-        var lang = settings.lang || $('#edit-language :selected').val();
-        var pos  = settings.pos  || $('#edit-pos :selected').val();
+        // get the language/pos from the form
+        var lang = $('#edit-language :selected').val();
+        var pos  = $('#edit-pos :selected').val();
 
         require(
             ['lingwo_dictionary/languages/'+lang,

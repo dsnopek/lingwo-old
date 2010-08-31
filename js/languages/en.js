@@ -121,6 +121,9 @@ require.def('lingwo_dictionary/languages/en',
                 }
             }
         }
+        
+        // auxilary verb has all the same fields as a normal verb
+        lang.fields['auxilary verb'] = lang.fields.verb;
 
         return lang;
     }

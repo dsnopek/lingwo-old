@@ -239,8 +239,25 @@ function lingwo_fields_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
 function lingwo_fields_widget(&$form, &$form_state, $entry) {
   ahah_helper_register($form, $form_state);
 
-  $node = $entry->getNode();
-  $pos = $entry->getPos();
+  $node =& $entry->getNode();
+  $pos = $node->pos;
+  if (empty($pos)) {
+    $pos = array_keys($form['pos']['#options']);
+    $pos = $pos[0];
+    $node->pos = $pos;
+  }
+  $language = $node->language;
+  if (empty($language)) {
+    $language = array_keys($form['language']['#options']);
+    $language = $language[0];
+    $node->language = $language;
+  }
+  if ($old_pair = $form_state['values']['_lingwo_fields']['old_pair']) {
+    if ($old_pair != implode(':', array($language, $pos))) {
+      // clear the fields, because we just changed the language or pos!
+      $node->lingwo_fields = array();
+    }
+  }
   $fields = $entry->getInterface('lingwo_fields');
 
   // add the from to our form list (we have to do this here because in AHAH we can't
@@ -418,6 +435,12 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
     '#tree' => TRUE,
   );
 
+  // for detecting a language/pos change
+  $_lingwo_fields['old_pair'] = array(
+    '#type' => 'hidden',
+    '#value' => implode(':', array($language, $pos)),
+  );
+
   // for adding multiple forms
   $_lingwo_fields['extra_value'] = array(
     '#type' => 'hidden',
@@ -471,11 +494,6 @@ function theme_lingwo_fields_widget_form_wrapper($element) {
 
   lingwo_dictionary_add_require_js();
 
-  drupal_add_js(array('lingwo_fields' => array(
-    'is_new' => $node->nid == 0,
-    'lang' => $node->language,
-    'pos' => $element['#pos'],
-  )), 'setting');
   drupal_add_js(drupal_get_path('module', 'lingwo_fields') .'/lingwo_fields.js');
   drupal_add_css(drupal_get_path('module', 'lingwo_fields') .'/lingwo_fields.css');
 
