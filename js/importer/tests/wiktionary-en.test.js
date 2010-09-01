@@ -7,49 +7,84 @@ require(
      'lingwo_dictionary/util/json2',
     ],
     function (TestCase, Entry, en, wiktionary_en, JSON) {
+        function doitFactory(pos, compose) {
+            return function (name, headword, parts) {
+                var forms = wiktionary_en._internal.formParsers[pos](
+                    name, new Entry({ headword: headword }), parts);
+                for(var name in forms) {
+                    if (forms[name] instanceof Array) {
+                        forms[name] = forms[name].join(',');
+                    }
+                }
+                return compose(forms).join(':');
+            };
+        }
+
         TestCase.subclass({
             testParseFormsVerb: function () {
-                var doit = function (headword, parts) {
-                    var forms = wiktionary_en._internal.formParsers.verb(
-                        new Entry({ headword: headword }), parts);
-                    return [forms['infinitive'], forms['-s'], forms['-ing'], forms['2nd'], forms['3rd']].join(':');
-                };
+                var doit = doitFactory('verb', function (forms) {
+                    return [forms['infinitive'], forms['-s'], forms['-ing'], forms['2nd'], forms['3rd']];
+                });
 
-                this.assertEquals(doit('buzz',   ['buzz',  'es']), 'to buzz:buzzes:buzzing:buzzed:buzzed');
-                this.assertEquals(doit('dye',    ['dye',   'd' ]), 'to dye:dyes:dyeing:dyed:dyed');
-                this.assertEquals(doit('admire', ['admir', 'es']), 'to admire:admires:admiring:admired:admired');
+                this.assertEquals(doit('en-verb', 'buzz',   ['buzz',  'es']), 'to buzz:buzzes:buzzing:buzzed:buzzed');
+                this.assertEquals(doit('en-verb', 'dye',    ['dye',   'd' ]), 'to dye:dyes:dyeing:dyed:dyed');
+                this.assertEquals(doit('en-verb', 'admire', ['admir', 'es']), 'to admire:admires:admiring:admired:admired');
 
-                this.assertEquals(doit('bus',    ['bus', 's', 'es' ]), 'to bus:busses:bussing:bussed:bussed');
-                this.assertEquals(doit('cry',    ['cr',  'i', 'ed' ]), 'to cry:cries:crying:cried:cried');
-                this.assertEquals(doit('tie',    ['t',   'y', 'ing']), 'to tie:ties:tying:tied:tied');
-                this.assertEquals(doit('trek',   ['trek','k', 'ed' ]), 'to trek:treks:trekking:trekked:trekked');
+                this.assertEquals(doit('en-verb', 'bus',    ['bus', 's', 'es' ]), 'to bus:busses:bussing:bussed:bussed');
+                this.assertEquals(doit('en-verb', 'cry',    ['cr',  'i', 'ed' ]), 'to cry:cries:crying:cried:cried');
+                this.assertEquals(doit('en-verb', 'tie',    ['t',   'y', 'ing']), 'to tie:ties:tying:tied:tied');
+                this.assertEquals(doit('en-verb', 'trek',   ['trek','k', 'ed' ]), 'to trek:treks:trekking:trekked:trekked');
 
-                this.assertEquals(doit('set', ['sets','setting','set']), 'to set:sets:setting:set:set');
-                this.assertEquals(doit('do',  ['does','doing','did','done']), 'to do:does:doing:did:done');
+                this.assertEquals(doit('en-verb', 'set', ['sets','setting','set']), 'to set:sets:setting:set:set');
+                this.assertEquals(doit('en-verb', 'do',  ['does','doing','did','done']), 'to do:does:doing:did:done');
 
-                this.assertEquals(doit('can',  ['inf=-','can','-','could','-']), ':can::could:');
+                this.assertEquals(doit('en-verb', 'can',  ['inf=-','can','-','could','-']), ':can::could:');
 
             },
 
             testParseFormsAdj: function () {
-                var doit = function (headword, parts) {
-                    var forms = wiktionary_en._internal.formParsers.adjective(
-                        new Entry({ headword: headword }), parts);
-                    for(var name in forms) {
-                        if (forms[name] instanceof Array) {
-                            forms[name] = forms[name].join(',');
-                        }
-                    }
-                    return [forms['more'], forms['most']].join(':');
-                };
+                var doit = doitFactory('adjective', function (forms) {
+                    return [forms['more'], forms['most']];
+                });
 
-                this.assertEquals(doit('beautiful', []),                'more beautiful:most beautiful');
-                this.assertEquals(doit('tall',      ['er']),            'taller:tallest');
-                this.assertEquals(doit('pretty',    ['pretti','er']),   'prettier:prettiest');
-                this.assertEquals(doit('good',      ['better','best']), 'better:best');
-                this.assertEquals(doit('annual',    ['-']),             ':');
-                this.assertEquals(doit('abject',    ['er','more']),     'abjecter,more abject:abjectest,most abject');
-                this.assertEquals(doit('funky',     ['funkier']),       'funkier:most funky');
+                this.assertEquals(doit('en-adj', 'beautiful', []),                'more beautiful:most beautiful');
+                this.assertEquals(doit('en-adj', 'tall',      ['er']),            'taller:tallest');
+                this.assertEquals(doit('en-adj', 'pretty',    ['pretti','er']),   'prettier:prettiest');
+                this.assertEquals(doit('en-adj', 'good',      ['better','best']), 'better:best');
+                this.assertEquals(doit('en-adj', 'annual',    ['-']),             ':');
+                this.assertEquals(doit('en-adj', 'abject',    ['er','more']),     'abjecter,more abject:abjectest,most abject');
+                this.assertEquals(doit('en-adj', 'funky',     ['funkier']),       'funkier:most funky');
+            },
+
+            testParseFormsNoun: function () {
+                var doit = doitFactory('noun', function (forms) {
+                    return [forms['plural_type'],forms['plural']];
+                });
+
+                this.assertEquals(doit('en-noun', 'noun',         []),                 ':nouns');
+                this.assertEquals(doit('en-noun', 'noun',         ['s']),              ':nouns');
+                this.assertEquals(doit('en-noun', 'noun',         ['s','?']),          ':nouns');
+                this.assertEquals(doit('en-noun', 'church',       ['es']),             ':churches');
+                this.assertEquals(doit('en-noun', 'belfry',       ['belfr','ies']),    ':belfries');
+                this.assertEquals(doit('en-noun', 'genus',        ['gen','era']),      ':genera');
+                this.assertEquals(doit('en-noun', 'awe',          ['-']),              'singular:');
+                this.assertEquals(doit('en-noun', 'beer',         ['s','-']),          ':beers');
+                this.assertEquals(doit('en-noun', 'rain',         ['-','s']),          ':rains');
+                this.assertEquals(doit('en-noun', 'greenery',     ['-','greeneries']), ':greeneries');
+                this.assertEquals(doit('en-noun', 'abliguration', ['!']),              'singular:');
+                this.assertEquals(doit('en-noun', 'abliguration', ['!','s']),          'singular:');
+                this.assertEquals(doit('en-noun', 'tuchus',       ['?']),              'singular:');
+                this.assertEquals(doit('en-noun', 'tuchus',       ['?','s']),          'singular:');
+                this.assertEquals(doit('en-noun', 'Abkhaz',       ['Abkhaz']),         ':Abkhaz');
+                this.assertEquals(doit('en-noun', 'octopus',      ['es','pl2=octopi','pl3=octopodes']),
+                    ':octopuses,octopi,octopodes');
+                this.assertEquals(doit('en-noun', 'fuzzy die',
+                    ['sg=[[fuzzy]] [[die]]',"pl=''Depending on meaning, either'' '''fuzzy die''' or '''[[fuzzy dice]]'''"]),
+                    ':fuzzy die,fuzzy dice');
+                this.assertEquals(doit('en-noun', 'minimum', ['pl2=minima','pl=minimums']), ':minimums,minima');
+
+                this.assertEquals(doit('en-plural-noun', 'underpants', []), 'plural:');
+                this.assertEquals(doit('en-plural noun', 'underpants', []), 'plural:');
             },
         }).run();
     }

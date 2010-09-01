@@ -264,11 +264,12 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             // attempt to find the line defining the forms
             while (!input.eof()) {
                 line = input.readline();
-                if (match = /^\{\{en-[^|}]+(.*)\}\}$/.exec(line)) {
-                    if (match.length == 2) {
-                        return match[1].substr(1).split('|');
-                    }
-                    return;
+                if (match = /^\{\{(en-[^|}]+)(.*)\}\}$/.exec(line)) {
+                    // to correct for a very specific data irregularity, where a {{i|...}} template
+                    // is put on the same line as the form information.
+                    match[2] = match[2].replace(/\}\}\s*\{\{i\|.*$/, '');
+
+                    return [match[1], match[2].substr(1).split('|')];
                 }
                 else if(!/^==/.test(line)) {
                     // if we encouter a line which isn't part of the
@@ -290,8 +291,8 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                 // if there are any alternatives)
                 val = WikiText.clean(val);
                 // some qualifier words (unless they *are* the headword!)
-                val = val.replace(/obsolete|dialect|archaic|poetic|rarely|US|UK|chiefly|North American|British/g, function ($0) {
-                    return $0 == headword ? $0 : ' ';
+                val = val.replace(/obsolete|collectively|dialect|archaic|poetic|rarely|US|UK|chiefly|North American|British|plural|common noun|collective noun|and|Depending on meaning, either/g, function ($0) {
+                    return headword.indexOf($0) != -1 ? $0 : ' ';
                 });
                 // remove comments
                 val = val.replace(/<!--.*?-->/g, ' ');
@@ -323,7 +324,9 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
 
         var formParsers = {
             // this is basically a literal port of the code in the Wiktionary's template:en-verb
-            'verb': function (entry, formInfo) {
+            'verb': function (formInfoName, entry, formInfo) {
+                if (formInfoName != 'en-verb') return;
+
                 var headword = entry.headword,
                     infinitive = 'to '+headword,
                     getPres3rdSg = function () {
@@ -447,7 +450,9 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                 return forms
             },
 
-            'adjective': function (entry, formInfo) {
+            'adjective': function (formInfoName, entry, formInfo) {
+                if (formInfoName != 'en-adj') return;
+
                 var headword = entry.headword, most = '', more = '', forms;
 
                 if (/^pos=/.test(formInfo[0])) {
@@ -496,6 +501,62 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                 return forms;
             },
 
+            'noun': function (formInfoName, entry, formInfo) {
+                if (formInfoName == 'en-plural-noun' || formInfoName == 'en-plural noun') return {plural_type: ['plural']};
+                else if (formInfoName != 'en-noun') return;
+
+                var headword = entry.headword, plural = '', forms, extras;
+
+                if (/^sg=|head=/.test(formInfo[0])) {
+                    formInfo.shift();
+                }
+                extras   = formInfo.filter(function (v) { return  /^pl[23]=/.test(v); });
+                formInfo = formInfo.filter(function (v) { return !/^pl[23]=/.test(v); });
+                if (/^pl=/.test(formInfo[0])) {
+                    formInfo[0] = formInfo[0].replace(/^pl=/, '');
+                }
+
+                if (formInfo[0] == '!' || formInfo[0] == '?' || (formInfo.length == 1 && formInfo[0] == '-')) {
+                    return {plural_type: ['singular']};
+                }
+                else if (formInfo[0] == 's' || formInfo[0] == 'es') {
+                    plural = headword + formInfo[0];
+                }
+                else if (formInfo[1] == 's' || formInfo[1] == 'es' || formInfo[1] == 'ies') {
+                    if (!/^[-!?]$/.test(formInfo[0])) {
+                        plural = formInfo[0] + formInfo[1];
+                    }
+                    else {
+                        plural = headword + formInfo[1];
+                    }
+                }
+                else if (formInfo.length >= 2 && formInfo[1] && formInfo[1] != '-') {
+                    if (formInfo[0] != '-') {
+                        plural = formInfo[0] + formInfo[1];
+                    }
+                    else {
+                        plural = formInfo[1];
+                    }
+                }
+                else if (formInfo.length >= 1 && formInfo[0]) {
+                    plural = formInfo[0];
+                }
+                else {
+                    plural = headword + 's';
+                }
+
+                forms = postProcessForms({ plural: plural }, headword);
+
+                // assign the multiples
+                extras.forEach(function (v) {
+                    var match;
+                    if (match = /^pl([23])=(.*)$/.exec(v)) {
+                        forms['plural'][parseInt(match[1])-1] = match[2];
+                    }
+                });
+
+                return forms;
+            },
         };
 
         function parseForms(entry, text) {
@@ -504,15 +565,19 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                 return;
             }
 
-            var formInfo = getFormsInfo(text), forms, formName, val, origLength;
+            var formInfo = getFormsInfo(text), formInfoName, forms, formName, val, origLength;
             if (typeof formInfo === 'undefined') {
                 print ('** '+entry.headword +' ** Has no forms data!  Needs to be checked by a human!');
                 return;
             }
+            formInfoName = formInfo[0];
+            formInfo     = formInfo[1];
 
             print ('formInfo: '+formInfo);
 
-            forms = formParsers[entry.pos](entry, formInfo);
+            forms = formParsers[entry.pos](formInfoName, entry, formInfo);
+            if (typeof forms != 'object') return;
+
             for (formName in forms) {
                 val = forms[formName];
 
