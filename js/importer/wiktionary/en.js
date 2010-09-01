@@ -501,6 +501,13 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                 return forms;
             },
 
+            'adverb': function (formInfoName, entry, formInfo) {
+                if (formInfoName != 'en-adv') return;
+
+                // re-use the adjective parser
+                return formParsers['adjective']('en-adj', entry, formInfo);
+            },
+
             'noun': function (formInfoName, entry, formInfo) {
                 if (formInfoName == 'en-plural-noun' || formInfoName == 'en-plural noun') return {plural_type: ['plural']};
                 else if (formInfoName != 'en-noun') return;

@@ -56,6 +56,20 @@ require(
                 this.assertEquals(doit('en-adj', 'funky',     ['funkier']),       'funkier:most funky');
             },
 
+            testParseFormsAdv: function () {
+                var doit = doitFactory('adverb', function (forms) {
+                    return [forms['more'], forms['most']];
+                });
+
+                this.assertEquals(doit('en-adv', 'beautifully', []),                'more beautifully:most beautifully');
+                this.assertEquals(doit('en-adv', 'beautifully', ['']),              'more beautifully:most beautifully');
+                this.assertEquals(doit('en-adv', 'fast',        ['er']),            'faster:fastest');
+                this.assertEquals(doit('en-adv', 'last',        ['lat','er']),      'later:latest');
+                this.assertEquals(doit('en-adv', 'well',        ['better','best']), 'better:best');
+                this.assertEquals(doit('en-adv', 'uniquely',    ['-']),             ':');
+                this.assertEquals(doit('en-adv', 'test',        ['er','more']),     'tester,more test:testest,most test');
+            },
+
             testParseFormsNoun: function () {
                 var doit = doitFactory('noun', function (forms) {
                     return [forms['plural_type'],forms['plural']];
@@ -85,7 +99,7 @@ require(
 
                 this.assertEquals(doit('en-plural-noun', 'underpants', []), 'plural:');
                 this.assertEquals(doit('en-plural noun', 'underpants', []), 'plural:');
-            },
+            }
         }).run();
     }
 );
