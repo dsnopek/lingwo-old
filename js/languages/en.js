@@ -109,10 +109,15 @@ require.def('lingwo_dictionary/languages/en',
         };
 
         lang.fields.adjective = {
+            'not_comparable': {
+                type: 'class',
+                label: 'Not comparable'
+            },
             'more': {
                 type: 'form',
                 label: 'more Form',
                 automatic: function (entry) {
+                    if (entry.getField('not_comparable')) return null;
                     var word = entry.getWord();
                     if (syllable_count(word) >= 3) {
                         return [lang.parseWord('more'), word];
@@ -127,6 +132,7 @@ require.def('lingwo_dictionary/languages/en',
                 type: 'form',
                 label: 'most Form',
                 automatic: function (entry) {
+                    if (entry.getField('not_comparable')) return null;
                     var word = entry.getWord();
                     if (syllable_count(word) >= 3) {
                         return [lang.parseWord('most'), word];
@@ -135,15 +141,20 @@ require.def('lingwo_dictionary/languages/en',
                     return word.ending('e').append('st') ||
                            word.ending('y').replace('iest') ||
                            word.append('est');
-                },
+                }
             }
         };
 
         lang.fields.adverb = {
+            'not_comparable': {
+                type: 'class',
+                label: 'Not comparable'
+            },
             'more': {
                 type: 'form',
                 label: 'more Form',
                 automatic: function (entry) {
+                    if (entry.getField('not_comparable')) return null;
                     return [lang.parseWord('more'), entry.getWord()];
                 }
             },
@@ -151,8 +162,9 @@ require.def('lingwo_dictionary/languages/en',
                 type: 'form',
                 label: 'most Form',
                 automatic: function (entry) {
+                    if (entry.getField('not_comparable')) return null;
                     return [lang.parseWord('most'), entry.getWord()];
-                },
+                }
             }
         };
 

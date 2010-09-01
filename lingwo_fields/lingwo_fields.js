@@ -121,7 +121,7 @@
     };
     // pulls the values for this control from an entry
     Control.prototype.fromEntry = function () {
-        var value      = '<i>(empty)</i>',
+        var value      = '',
             inputValue = '',
             showFunc;
 
@@ -130,6 +130,10 @@
             if (this.type == 'class') {
                 inputValue = (value == 'true') ? '1' : '0';
             }
+        }
+
+        if (value == '') {
+            value = '<i>(empty)</i>';
         }
 
         $(this.inputNode).val(inputValue);

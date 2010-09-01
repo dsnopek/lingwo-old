@@ -2,12 +2,14 @@ en:abbreviation:Mr.
 en:abbreviation:Mrs
 en:adjective:American
 en:adjective:Catholic
+en:adjective:Indian
 en:adjective:Japanese
 en:adjective:abstract
 en:adjective:adequate
 en:adjective:adoptive
 en:adjective:afraid
 en:adjective:after
+en:adjective:alone
 en:adjective:animal
 en:adjective:apparent
 en:adjective:around
@@ -16,46 +18,63 @@ en:adjective:average
 en:adjective:away
 en:adjective:back
 en:adjective:bad
+en:adjective:beautiful
+en:adjective:beginning
 en:adjective:best
 en:adjective:better
 en:adjective:biological
 en:adjective:black
+en:adjective:blue
 en:adjective:born
+en:adjective:bottom
 en:adjective:central
 en:adjective:certain
 en:adjective:city
 en:adjective:classic
 en:adjective:close
 en:adjective:cold
+en:adjective:coming
+en:adjective:common
 en:adjective:competent
+en:adjective:complete
 en:adjective:concrete
 en:adjective:confident
 en:adjective:controlling
 en:adjective:country
 en:adjective:cultural
+en:adjective:dark
+en:adjective:deep
 en:adjective:different
 en:adjective:difficult
 en:adjective:direct
 en:adjective:divine
 en:adjective:done
 en:adjective:down
+en:adjective:dry
 en:adjective:early
+en:adjective:easy
 en:adjective:educated
 en:adjective:elderly
 en:adjective:elegant
+en:adjective:else
 en:adjective:equal
 en:adjective:even
 en:adjective:extra
 en:adjective:family
 en:adjective:far
+en:adjective:fast
 en:adjective:federal
 en:adjective:fine
 en:adjective:first
 en:adjective:following
 en:adjective:foreign
 en:adjective:front
+en:adjective:full
 en:adjective:future
+en:adjective:game
 en:adjective:given
+en:adjective:gold
+en:adjective:gone
 en:adjective:good
 en:adjective:grammatical
 en:adjective:great
@@ -65,10 +84,11 @@ en:adjective:grownup
 en:adjective:half
 en:adjective:hard
 en:adjective:healthy
+en:adjective:heavy
 en:adjective:high
-en:adjective:historical
 en:adjective:holy
 en:adjective:home
+en:adjective:hot
 en:adjective:how
 en:adjective:human
 en:adjective:illegal
@@ -82,6 +102,7 @@ en:adjective:known
 en:adjective:large
 en:adjective:last
 en:adjective:later
+en:adjective:lay
 en:adjective:left
 en:adjective:light
 en:adjective:lightning fast
@@ -93,7 +114,9 @@ en:adjective:live
 en:adjective:living
 en:adjective:loath
 en:adjective:long
+en:adjective:low
 en:adjective:low-stress
+en:adjective:main
 en:adjective:major
 en:adjective:mandated
 en:adjective:materialistic
@@ -101,6 +124,7 @@ en:adjective:mean
 en:adjective:mnemonic
 en:adjective:monetary
 en:adjective:moral
+en:adjective:moving
 en:adjective:natural
 en:adjective:near
 en:adjective:new
@@ -113,6 +137,7 @@ en:adjective:on
 en:adjective:one
 en:adjective:only
 en:adjective:open
+en:adjective:outside
 en:adjective:over
 en:adjective:own
 en:adjective:paper
@@ -121,16 +146,20 @@ en:adjective:part
 en:adjective:particular
 en:adjective:past
 en:adjective:political
+en:adjective:poor
 en:adjective:popular
+en:adjective:possible
 en:adjective:private
 en:adjective:prominent
 en:adjective:public
 en:adjective:puritan
 en:adjective:ready
+en:adjective:real
 en:adjective:red
 en:adjective:religious
 en:adjective:remaining
 en:adjective:right
+en:adjective:round
 en:adjective:runaway
 en:adjective:same
 en:adjective:scientific
@@ -143,14 +172,19 @@ en:adjective:simple
 en:adjective:small
 en:adjective:sometime
 en:adjective:sound
+en:adjective:special
 en:adjective:spiritual
-en:adjective:standard
 en:adjective:still
 en:adjective:strange
+en:adjective:strong
 en:adjective:such
 en:adjective:superb
 en:adjective:sure
+en:adjective:taken
+en:adjective:tall
+en:adjective:third
 en:adjective:through
+en:adjective:tiny
 en:adjective:together
 en:adjective:top
 en:adjective:total
@@ -161,7 +195,7 @@ en:adjective:unseen
 en:adjective:untaxed
 en:adjective:up
 en:adjective:up in arms
-en:adjective:used to
+en:adjective:warm
 en:adjective:warring
 en:adjective:wasting
 en:adjective:well
@@ -169,6 +203,7 @@ en:adjective:western
 en:adjective:white
 en:adjective:whole
 en:adjective:wide
+en:adjective:wild
 en:adjective:world
 en:adjective:worldly
 en:adjective:young
@@ -183,9 +218,12 @@ en:adverb:ago
 en:adverb:all
 en:adverb:all the way
 en:adverb:almost
+en:adverb:alone
 en:adverb:along
+en:adverb:already
 en:adverb:also
 en:adverb:any
+en:adverb:anything
 en:adverb:around
 en:adverb:as
 en:adverb:at least
@@ -200,25 +238,32 @@ en:adverb:better
 en:adverb:between
 en:adverb:but
 en:adverb:by
-en:adverb:by heart
 en:adverb:by the time
 en:adverb:carefully
 en:adverb:clearly
 en:adverb:close
 en:adverb:cold
 en:adverb:completely
+en:adverb:deep
 en:adverb:deeply
 en:adverb:doggedly
 en:adverb:down
 en:adverb:early
 en:adverb:early on
+en:adverb:easy
+en:adverb:either
+en:adverb:else
 en:adverb:enough
 en:adverb:equally
 en:adverb:even
 en:adverb:ever
 en:adverb:far
+en:adverb:fast
+en:adverb:finally
+en:adverb:fine
 en:adverb:first
 en:adverb:for example
+en:adverb:full
 en:adverb:globally
 en:adverb:half
 en:adverb:hard
@@ -232,6 +277,7 @@ en:adverb:in expectation
 en:adverb:in fact
 en:adverb:increasingly
 en:adverb:inside
+en:adverb:instead
 en:adverb:just
 en:adverb:just about
 en:adverb:just as
@@ -251,12 +297,10 @@ en:adverb:naturally
 en:adverb:near
 en:adverb:never
 en:adverb:next
-en:adverb:no longer
 en:adverb:normally
 en:adverb:not
 en:adverb:now
 en:adverb:off
-en:adverb:off the top of one's head
 en:adverb:often
 en:adverb:on
 en:adverb:once
@@ -264,16 +308,22 @@ en:adverb:only
 en:adverb:other
 en:adverb:out
 en:adverb:out of thin air
+en:adverb:outside
 en:adverb:over
+en:adverb:past
 en:adverb:perhaps
 en:adverb:pretty much
+en:adverb:probably
 en:adverb:quickly
+en:adverb:quite
+en:adverb:real
 en:adverb:really
 en:adverb:right
 en:adverb:seemingly
 en:adverb:short
 en:adverb:similarly
 en:adverb:since
+en:adverb:slowly
 en:adverb:so
 en:adverb:some
 en:adverb:something
@@ -282,6 +332,7 @@ en:adverb:sometimes
 en:adverb:soon
 en:adverb:specially
 en:adverb:still
+en:adverb:suddenly
 en:adverb:that
 en:adverb:then
 en:adverb:there
@@ -305,6 +356,8 @@ en:adverb:when
 en:adverb:where
 en:adverb:whole
 en:adverb:why
+en:adverb:wide
+en:adverb:within
 en:adverb:without
 en:adverb:yes
 en:adverb:yet
@@ -319,6 +372,7 @@ en:auxilary verb:let's
 en:auxilary verb:may
 en:auxilary verb:might
 en:auxilary verb:must
+en:auxilary verb:shall
 en:auxilary verb:should
 en:auxilary verb:will
 en:auxilary verb:would
@@ -330,6 +384,7 @@ en:conjunction:because
 en:conjunction:before
 en:conjunction:both
 en:conjunction:but
+en:conjunction:either
 en:conjunction:even though
 en:conjunction:how
 en:conjunction:however
@@ -350,6 +405,7 @@ en:conjunction:what
 en:conjunction:when
 en:conjunction:where
 en:conjunction:whereas
+en:conjunction:whether
 en:conjunction:while
 en:conjunction:why
 en:conjunction:yet
@@ -359,6 +415,7 @@ en:determiner:any
 en:determiner:both
 en:determiner:certain
 en:determiner:each
+en:determiner:either
 en:determiner:enough
 en:determiner:every
 en:determiner:few
@@ -390,13 +447,16 @@ en:exclamation:well
 en:exclamation:what
 en:exclamation:why
 en:exclamation:yes
+en:noun:America
 en:noun:American
 en:noun:China
 en:noun:Christian
 en:noun:France
 en:noun:God
+en:noun:Indian
 en:noun:Internet
 en:noun:Japan
+en:noun:Miss
 en:noun:Protestant
 en:noun:United States
 en:noun:abbreviation
@@ -414,7 +474,9 @@ en:noun:anablephobia
 en:noun:angel
 en:noun:animal
 en:noun:answer
+en:noun:anything
 en:noun:approach
+en:noun:area
 en:noun:article
 en:noun:aspect
 en:noun:at
@@ -423,18 +485,26 @@ en:noun:auxilary verb
 en:noun:award
 en:noun:awards ceremony
 en:noun:back
+en:noun:ball
 en:noun:balloon
+en:noun:beginning
 en:noun:behind
 en:noun:being
 en:noun:belief
 en:noun:best
 en:noun:better
 en:noun:biologist
+en:noun:bird
 en:noun:black
+en:noun:blue
 en:noun:board
+en:noun:boat
 en:noun:body
 en:noun:book
+en:noun:bottom
+en:noun:box
 en:noun:boy
+en:noun:building
 en:noun:bump
 en:noun:but
 en:noun:call
@@ -442,6 +512,7 @@ en:noun:camp
 en:noun:candidate
 en:noun:capitalism
 en:noun:car
+en:noun:care
 en:noun:career
 en:noun:case
 en:noun:cash
@@ -450,6 +521,7 @@ en:noun:century
 en:noun:chance
 en:noun:change
 en:noun:charity
+en:noun:check
 en:noun:cheese
 en:noun:childhood
 en:noun:children
@@ -461,6 +533,7 @@ en:noun:close
 en:noun:clown
 en:noun:cold
 en:noun:college
+en:noun:coming
 en:noun:communication
 en:noun:community
 en:noun:company
@@ -479,6 +552,7 @@ en:noun:coworker
 en:noun:cubicle
 en:noun:curriculum
 en:noun:cut
+en:noun:dark
 en:noun:day
 en:noun:detail
 en:noun:determiner
@@ -486,6 +560,7 @@ en:noun:development
 en:noun:device
 en:noun:devil
 en:noun:dispute
+en:noun:distance
 en:noun:door
 en:noun:double-edged sword
 en:noun:down
@@ -514,17 +589,21 @@ en:noun:fact
 en:noun:faith
 en:noun:fall
 en:noun:family
+en:noun:fast
 en:noun:father
 en:noun:fear
 en:noun:feel
 en:noun:feeling
 en:noun:feet
+en:noun:field
 en:noun:fifth
 en:noun:find
+en:noun:fine
 en:noun:fire
 en:noun:first
 en:noun:fish
 en:noun:five
+en:noun:floor
 en:noun:fodder
 en:noun:food
 en:noun:foot
@@ -536,15 +615,18 @@ en:noun:frailty
 en:noun:friend
 en:noun:front
 en:noun:fundamentalist
+en:noun:game
 en:noun:gene
 en:noun:genus
 en:noun:germ
+en:noun:girl
 en:noun:given
+en:noun:glass
 en:noun:globophobia
 en:noun:go
+en:noun:gold
 en:noun:good
 en:noun:grammar
-en:noun:grandparent
 en:noun:great
 en:noun:green
 en:noun:ground
@@ -552,16 +634,21 @@ en:noun:group
 en:noun:half
 en:noun:hand
 en:noun:hearing
+en:noun:heart
 en:noun:heaven
 en:noun:hell
 en:noun:high school
 en:noun:hippopotomonstrosesquipedaliophobia
 en:noun:historian
+en:noun:hold
 en:noun:home
+en:noun:horse
+en:noun:hour
 en:noun:house
 en:noun:how
 en:noun:hundred
 en:noun:hypothesis
+en:noun:ice
 en:noun:idea
 en:noun:ideal
 en:noun:if
@@ -586,7 +673,9 @@ en:noun:known
 en:noun:land
 en:noun:language
 en:noun:law
+en:noun:lay
 en:noun:learner
+en:noun:leave
 en:noun:left
 en:noun:lesson
 en:noun:letter
@@ -600,16 +689,17 @@ en:noun:list
 en:noun:living
 en:noun:look
 en:noun:looks
+en:noun:low
 en:noun:making
 en:noun:man
+en:noun:map
 en:noun:math
+en:noun:matter
 en:noun:matter of course
 en:noun:meal
 en:noun:mean
 en:noun:meaning
 en:noun:means
-en:noun:memorization
-en:noun:memory
 en:noun:men
 en:noun:menu
 en:noun:method
@@ -620,15 +710,19 @@ en:noun:mnemonic
 en:noun:mobility
 en:noun:modem
 en:noun:money
+en:noun:moon
 en:noun:more
 en:noun:morning
 en:noun:mother
+en:noun:mountain
 en:noun:move
 en:noun:much
+en:noun:music
 en:noun:name
 en:noun:nation
 en:noun:night
 en:noun:nothing
+en:noun:notice
 en:noun:notion
 en:noun:noun
 en:noun:number
@@ -643,6 +737,7 @@ en:noun:option
 en:noun:order
 en:noun:other
 en:noun:out
+en:noun:outside
 en:noun:owner
 en:noun:pace
 en:noun:page
@@ -652,27 +747,32 @@ en:noun:parent
 en:noun:parenting
 en:noun:part
 en:noun:particle
+en:noun:past
 en:noun:pattern
 en:noun:people
+en:noun:person
 en:noun:phobia
 en:noun:phrase
 en:noun:phylum
 en:noun:picture
+en:noun:piece
 en:noun:place
 en:noun:planet
+en:noun:plant
 en:noun:play
-en:noun:poem
 en:noun:point
 en:noun:poll
 en:noun:pop
 en:noun:population
 en:noun:portion
+en:noun:power
 en:noun:practice
 en:noun:prefix
 en:noun:preposition
 en:noun:president
 en:noun:print
 en:noun:prisoner
+en:noun:problem
 en:noun:proclamation
 en:noun:profession
 en:noun:progress
@@ -684,6 +784,8 @@ en:noun:public
 en:noun:pupaphobe
 en:noun:puppet
 en:noun:quarter
+en:noun:question
+en:noun:rain
 en:noun:reading
 en:noun:recipient
 en:noun:red
@@ -692,8 +794,12 @@ en:noun:rest
 en:noun:restaurant
 en:noun:rhyme
 en:noun:right
+en:noun:river
+en:noun:road
+en:noun:rock
 en:noun:role
 en:noun:room
+en:noun:round
 en:noun:rule
 en:noun:run
 en:noun:sadist
@@ -710,23 +816,33 @@ en:noun:second
 en:noun:sentence
 en:noun:sequence
 en:noun:service
+en:noun:ship
 en:noun:short
 en:noun:show
 en:noun:six
+en:noun:size
 en:noun:skill
+en:noun:sky
 en:noun:slice
 en:noun:slide
+en:noun:snow
 en:noun:society
+en:noun:someone
 en:noun:song
 en:noun:sound
 en:noun:space
+en:noun:special
 en:noun:species
 en:noun:spinach
 en:noun:spine
 en:noun:stage
+en:noun:stand
 en:noun:standard
+en:noun:start
 en:noun:state
+en:noun:stay
 en:noun:still
+en:noun:stop
 en:noun:story
 en:noun:stranger
 en:noun:structure
@@ -735,11 +851,15 @@ en:noun:study
 en:noun:substance
 en:noun:success
 en:noun:suffix
+en:noun:summer
 en:noun:sun
 en:noun:superiority
+en:noun:surface
 en:noun:survey
 en:noun:symbol
+en:noun:system
 en:noun:table
+en:noun:talk
 en:noun:target language
 en:noun:tax
 en:noun:taxonomy
@@ -747,11 +867,13 @@ en:noun:teacher
 en:noun:technology
 en:noun:teens
 en:noun:television
+en:noun:ten
 en:noun:tendency
 en:noun:test
 en:noun:theory
 en:noun:there
 en:noun:thing
+en:noun:third
 en:noun:threat
 en:noun:three
 en:noun:time
@@ -762,6 +884,7 @@ en:noun:today
 en:noun:toddler
 en:noun:top
 en:noun:topic
+en:noun:town
 en:noun:track
 en:noun:train
 en:noun:tree
@@ -772,7 +895,6 @@ en:noun:two
 en:noun:underpinning
 en:noun:university
 en:noun:up
-en:noun:upbringing
 en:noun:use
 en:noun:user
 en:noun:value
@@ -783,9 +905,12 @@ en:noun:vision
 en:noun:voice
 en:noun:wage
 en:noun:waiter
+en:noun:walk
 en:noun:want
+en:noun:watch
 en:noun:water
 en:noun:way
+en:noun:weather
 en:noun:well
 en:noun:west
 en:noun:westerner
@@ -794,16 +919,20 @@ en:noun:while
 en:noun:white
 en:noun:whole
 en:noun:why
+en:noun:wild
 en:noun:will
 en:noun:wind
+en:noun:winter
 en:noun:word
 en:noun:work
 en:noun:worker
 en:noun:workplace
 en:noun:world
+en:noun:writing
 en:noun:year
 en:noun:young
 en:phrase:in order to
+en:phrase:or else
 en:phrase:such as
 en:prefix:pseudo-
 en:prefix:re-
@@ -841,7 +970,9 @@ en:preposition:on
 en:preposition:onto
 en:preposition:out
 en:preposition:out of
+en:preposition:outside
 en:preposition:over
+en:preposition:past
 en:preposition:since
 en:preposition:through
 en:preposition:to
@@ -852,10 +983,15 @@ en:preposition:up
 en:preposition:upon
 en:preposition:via
 en:preposition:with
+en:preposition:within
 en:preposition:without
 en:pronoun:I
 en:pronoun:any
+en:pronoun:anything
+en:pronoun:either
 en:pronoun:enough
+en:pronoun:everyone
+en:pronoun:everything
 en:pronoun:few
 en:pronoun:he
 en:pronoun:her
@@ -863,6 +999,7 @@ en:pronoun:himself
 en:pronoun:his
 en:pronoun:it
 en:pronoun:its
+en:pronoun:itself
 en:pronoun:many
 en:pronoun:my
 en:pronoun:no one
@@ -913,20 +1050,26 @@ en:verb:better
 en:verb:bless
 en:verb:blur
 en:verb:book
+en:verb:bottom
+en:verb:box
 en:verb:bring
 en:verb:build
 en:verb:call
 en:verb:capture
+en:verb:care
+en:verb:carry
+en:verb:center
 en:verb:change
 en:verb:chase
+en:verb:check
 en:verb:choose
 en:verb:close
 en:verb:coin
 en:verb:come
 en:verb:come up with
 en:verb:comes to
-en:verb:commit
 en:verb:communicate
+en:verb:complete
 en:verb:connect
 en:verb:continue
 en:verb:cost
@@ -938,9 +1081,11 @@ en:verb:define
 en:verb:die
 en:verb:dim
 en:verb:discover
+en:verb:distance
 en:verb:do
 en:verb:draw
 en:verb:drill
+en:verb:dry
 en:verb:eat
 en:verb:educate
 en:verb:end
@@ -951,22 +1096,29 @@ en:verb:eye
 en:verb:face
 en:verb:fade
 en:verb:fail
+en:verb:fall
+en:verb:fast
 en:verb:father
 en:verb:fear
 en:verb:feel
+en:verb:field
 en:verb:figure
 en:verb:file
 en:verb:find
+en:verb:fine
 en:verb:fire
 en:verb:fish
 en:verb:fix
+en:verb:floor
 en:verb:focus
+en:verb:follow
 en:verb:follow suit
 en:verb:forget
 en:verb:form
 en:verb:free up
 en:verb:front
 en:verb:fry
+en:verb:game
 en:verb:garner
 en:verb:gear
 en:verb:get
@@ -978,10 +1130,12 @@ en:verb:group
 en:verb:grow
 en:verb:grow up
 en:verb:hand
+en:verb:happen
 en:verb:have
 en:verb:hear
 en:verb:help
 en:verb:hobble
+en:verb:hold
 en:verb:identify
 en:verb:imagine
 en:verb:imply
@@ -998,6 +1152,7 @@ en:verb:keep up
 en:verb:know
 en:verb:land
 en:verb:last
+en:verb:lay
 en:verb:learn
 en:verb:leave
 en:verb:leave behind
@@ -1005,18 +1160,23 @@ en:verb:let
 en:verb:letter
 en:verb:light
 en:verb:like
+en:verb:list
 en:verb:live
 en:verb:long
 en:verb:look
-en:verb:made
+en:verb:main
 en:verb:make
 en:verb:manipulate
+en:verb:map
 en:verb:market
+en:verb:matter
 en:verb:mean
 en:verb:memorize
+en:verb:mind
 en:verb:mother
 en:verb:move
 en:verb:name
+en:verb:need
 en:verb:notice
 en:verb:number
 en:verb:occur
@@ -1029,20 +1189,24 @@ en:verb:own
 en:verb:page
 en:verb:paper
 en:verb:part
+en:verb:pattern
 en:verb:pay
 en:verb:perceive
 en:verb:picture
 en:verb:place
+en:verb:plant
 en:verb:play
 en:verb:point
 en:verb:pop
+en:verb:power
 en:verb:prefer
 en:verb:profess
 en:verb:put
+en:verb:question
+en:verb:rain
 en:verb:read
 en:verb:ready
 en:verb:receive
-en:verb:recite
 en:verb:red
 en:verb:remain
 en:verb:remember
@@ -1052,7 +1216,9 @@ en:verb:rest
 en:verb:restore
 en:verb:return
 en:verb:right
+en:verb:rock
 en:verb:room
+en:verb:round
 en:verb:rout
 en:verb:run
 en:verb:say
@@ -1064,25 +1230,33 @@ en:verb:seem
 en:verb:sentence
 en:verb:serve
 en:verb:service
+en:verb:ship
 en:verb:short
 en:verb:show
 en:verb:siphon
 en:verb:sit
 en:verb:slide
 en:verb:smear
+en:verb:snow
 en:verb:sound
 en:verb:space
 en:verb:speak
+en:verb:stand
+en:verb:start
 en:verb:state
+en:verb:stay
 en:verb:stem
 en:verb:still
+en:verb:stop
 en:verb:stretch
 en:verb:suffer
+en:verb:surface
 en:verb:surprise
 en:verb:table
 en:verb:take
 en:verb:take over
 en:verb:take up
+en:verb:talk
 en:verb:teach
 en:verb:tell
 en:verb:term
@@ -1101,13 +1275,16 @@ en:verb:up
 en:verb:update
 en:verb:urge
 en:verb:use
-en:verb:value
 en:verb:view
+en:verb:voice
 en:verb:vow
+en:verb:walk
 en:verb:want
+en:verb:warm
 en:verb:watch
 en:verb:watch over
 en:verb:water
+en:verb:weather
 en:verb:well
 en:verb:while
 en:verb:wind
