@@ -30,6 +30,27 @@ require(
                 this.assertEquals(doit('can',  ['inf=-','can','-','could','-']), ':can::could:');
 
             },
+
+            testParseFormsAdj: function () {
+                var doit = function (headword, parts) {
+                    var forms = wiktionary_en._internal.formParsers.adjective(
+                        new Entry({ headword: headword }), parts);
+                    for(var name in forms) {
+                        if (forms[name] instanceof Array) {
+                            forms[name] = forms[name].join(',');
+                        }
+                    }
+                    return [forms['more'], forms['most']].join(':');
+                };
+
+                this.assertEquals(doit('beautiful', []),                'more beautiful:most beautiful');
+                this.assertEquals(doit('tall',      ['er']),            'taller:tallest');
+                this.assertEquals(doit('pretty',    ['pretti','er']),   'prettier:prettiest');
+                this.assertEquals(doit('good',      ['better','best']), 'better:best');
+                this.assertEquals(doit('annual',    ['-']),             ':');
+                this.assertEquals(doit('abject',    ['er','more']),     'abjecter,more abject:abjectest,most abject');
+                this.assertEquals(doit('funky',     ['funkier']),       'funkier:most funky');
+            },
         }).run();
     }
 );

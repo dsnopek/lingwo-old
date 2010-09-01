@@ -145,6 +145,9 @@ require.def('lingwo_dictionary/languages/en',
             }
         };
 
+        // a 'determiner' gets the same fields as an 'adjective'
+        lang.fields.determiner = lang.fields.adjective;
+
         lang.fields.adverb = {
             'not_comparable': {
                 type: 'class',
@@ -220,7 +223,7 @@ require.def('lingwo_dictionary/languages/en',
             }
         }
         
-        // auxilary verb has all the same fields as a normal verb
+        // an 'auxilary verb' has all the same fields as a normal 'verb'
         lang.fields['auxilary verb'] = lang.fields.verb;
 
         return lang;

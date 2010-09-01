@@ -280,6 +280,47 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             }
         }
 
+        // basically takes care of splitting forms into multiples when they are specified
+        function postProcessForms(forms, headword) {
+            var formName, val;
+            for(formName in forms) {
+                val = forms[formName];
+
+                // process the value (mainly, we want to clean it up and see
+                // if there are any alternatives)
+                val = WikiText.clean(val);
+                // some qualifier words (unless they *are* the headword!)
+                val = val.replace(/obsolete|dialect|archaic|poetic|rarely|US|UK|chiefly|North American|British/g, function ($0) {
+                    return $0 == headword ? $0 : ' ';
+                });
+                // remove comments
+                val = val.replace(/<!--.*?-->/g, ' ');
+                // if there is no 'or' but there is a comma, slash or semi-colon, then we
+                // convert those to an 'or'.
+                /*
+                ',/;'.split('').forEach(function (c) {
+                    if (val.indexOf(' or ') == -1 && val.indexOf(c)) {
+                        val = val.replace(c, ' or ');
+                    }
+                });
+                */
+                // TODO: I don't know if this is safe to do if there is already a 'or' in it!
+                val = val.replace(/[,\/;]/g, ' or ');
+                // remove random symbols and punctuation
+                val = val.replace(/[\{\}(),]/g, ' ');
+                // split on 'or'
+                val = val.split(' or ');
+                // clean up the result
+                val = val.map(trim);
+                val = val.map(function (v) { return v == '-' ? '' : v; });
+
+                forms[formName] = val;
+            }
+
+
+            return forms;
+         }
+
         var formParsers = {
             // this is basically a literal port of the code in the Wiktionary's template:en-verb
             'verb': function (entry, formInfo) {
@@ -383,54 +424,78 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
 
                         return headword + 'ed';
                     },
-                    postProcess = function (forms) {
-                        var formName, val;
-                        for(formName in forms) {
-                            val = forms[formName];
-
-                            // process the value (mainly, we want to clean it up and see
-                            // if there are any alternatives)
-                            val = WikiText.clean(val);
-                            // some qualifier words
-                            val = val.replace(/obsolete|dialect|archaic|poetic|rarely|US|UK|chiefly|North American|British/g, ' ');
-                            // if there is no 'or' but there is a comma, then we convert the comma
-                            // to an 'or'.
-                            if (val.indexOf(' or ') == -1 && val.indexOf(',')) {
-                                val = val.replace(',', ' or ');
-                            }
-                            // remove random symbols and punctuation
-                            val = val.replace(/[\{\}(),]/g, ' ');
-                            // split on 'or'
-                            val = val.split(' or ');
-                            // clean up the result
-                            val = val.map(trim);
-                            val = val.map(function (v) { return v == '-' ? '' : v; });
-
-                            forms[formName] = val;
-                        }
-
-                        // sometimes when specifying non-standard infinitives, the editors forget to put the 'to' in
-                        if (forms['infinitive'][0].length > 0 && forms['infinitive'][0].slice(0, 3) != 'to ') {
-                            forms['infinitive'][0] = 'to ' + forms['infinitive'][0];
-                        }
-
-                        return forms;
-                    },
-                    match;
+                    match, forms;
 
                 if (match = /^inf=(.*)$/.exec(formInfo[0])) {
                     infinitive = match[1];
                     formInfo = formInfo.slice(1);
                 }
 
-                return postProcess({
+                forms = postProcessForms({
                     'infinitive': infinitive,
                     '-s': getPres3rdSg(),
                     '-ing': getPresP(),
                     '2nd': getPast(),
                     '3rd': getPastP(),
-                });
+                }, headword);
+
+                // sometimes when specifying non-standard infinitives, the editors forget to put the 'to' in
+                if (forms['infinitive'][0].length > 0 && forms['infinitive'][0].slice(0, 3) != 'to ') {
+                    forms['infinitive'][0] = 'to ' + forms['infinitive'][0];
+                }
+
+                return forms
             },
+
+            'adjective': function (entry, formInfo) {
+                var headword = entry.headword, most = '', more = '', forms;
+
+                if (/^pos=/.test(formInfo[0])) {
+                    formInfo.shift();
+                }
+                if (formInfo.length == 1 && formInfo[0] == 'more') {
+                    formInfo = [];
+                }
+
+                if (formInfo[0] == '-' || formInfo[0] == '?') {
+                    // simple!
+                    return {'not_comparable': [true]};
+                }
+                else if (formInfo[1] == 'er') {
+                    more = formInfo[0]+'er';
+                    most = formInfo[0]+'est';
+                }
+                else if (formInfo[1] == 'ier') {
+                    more = formInfo[0]+'ier';
+                    most = formInfo[0]+'iest';
+                }
+                else if (formInfo[0] == 'er') {
+                    more = headword+'er';
+                    most = headword+'est';
+                }
+                else if (formInfo.length == 2 && formInfo[1] != 'more') {
+                    more = formInfo[0];
+                    most = formInfo[1];
+                }
+                else if (formInfo.length == 1 && formInfo[0] != '') {
+                    more = formInfo[0];
+                    most = 'most '+headword;
+                }
+                else {
+                    more = 'more '+headword;
+                    most = 'most '+headword;
+                }
+
+                forms = postProcessForms({ more: more, most: most }, headword);
+
+                if (formInfo[1] == 'more' || formInfo[2] == 'more') {
+                    forms['more'].push('more '+headword);
+                    forms['most'].push('most '+headword);
+                }
+
+                return forms;
+            },
+
         };
 
         function parseForms(entry, text) {
