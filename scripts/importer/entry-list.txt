@@ -690,6 +690,7 @@ en:noun:living
 en:noun:look
 en:noun:looks
 en:noun:low
+en:noun:main
 en:noun:making
 en:noun:man
 en:noun:map
@@ -1164,7 +1165,6 @@ en:verb:list
 en:verb:live
 en:verb:long
 en:verb:look
-en:verb:main
 en:verb:make
 en:verb:manipulate
 en:verb:map
