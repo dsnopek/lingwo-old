@@ -268,6 +268,8 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                     // to correct for a very specific data irregularity, where a {{i|...}} template
                     // is put on the same line as the form information.
                     match[2] = match[2].replace(/\}\}\s*\{\{i\|.*$/, '');
+                    // also, happens with {{US}}, {{transitive}} and {{intransitive}}
+                    match[2] = match[2].replace(/\}\}\s*\{\{(?:US|transitive|intransitive).*$/, '');
 
                     return [match[1], match[2].substr(1).split('|')];
                 }
@@ -291,11 +293,13 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                 // if there are any alternatives)
                 val = WikiText.clean(val);
                 // some qualifier words (unless they *are* the headword!)
-                val = val.replace(/obsolete|collectively|dialect|archaic|poetic|rarely|US|UK|chiefly|North American|British|plural|common noun|collective noun|and|Depending on meaning, either/g, function ($0) {
+                val = val.replace(/obsolete|collectively|dialect|in (\S+) sense only|archaic|less commonly|dated|poetic|rarely|transitive|intransitive|US|mostly UK|UK|chiefly|North American|British|Commonwealth|plural|common noun|collective noun|and|Depending on meaning, either/g, function ($0) {
                     return headword.indexOf($0) != -1 ? $0 : ' ';
                 });
                 // remove comments
                 val = val.replace(/<!--.*?-->/g, ' ');
+                // sometimes people write "or," which needs to become a normal " or "
+                val = val.replace(/or,/g, ' or ');
                 // if there is no 'or' but there is a comma, slash or semi-colon, then we
                 // convert those to an 'or'.
                 /*
@@ -421,8 +425,11 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                             }
                             return formInfo[0] + formInfo[1] + 'ed';
                         }
-                        else if (formInfo.length >= 3) {
-                            return formInfo[formInfo.length-1];
+                        else if (formInfo.length == 3) {
+                            return formInfo[2];
+                        }
+                        else if (formInfo.length > 3) {
+                            return formInfo[3];
                         }
 
                         return headword + 'ed';
