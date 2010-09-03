@@ -40,7 +40,7 @@ def lookup(remote, doc):
                 if word != res['headword']:
                     token.dom.setAttribute('headword', res['headword'])
                 token.dom.setAttribute('pos', res['pos'])
-                if res.has_key('form_name'):
+                if res.has_key('form_name') and res['form_name'] != '_noname_':
                     token.dom.setAttribute('form', res['form_name'])
 
 def main():
