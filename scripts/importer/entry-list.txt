@@ -67,7 +67,7 @@ en:adjective:direct
 en:adjective:divine
 en:adjective:done
 en:adjective:down
-en:adjective:drive
+en:verb:drive
 en:adjective:dry
 en:adjective:early
 en:adjective:easy

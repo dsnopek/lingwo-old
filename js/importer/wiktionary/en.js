@@ -236,7 +236,7 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                     
                     // If its followed by an example, read that too.
                     if (/^#:/.exec(input.peekline())) {
-                        sense.example = clean(input.readline());
+                        sense.example = clean(input.readline(), 255);
                     }
 
                     sensesMap[normalize(sense.difference)] = sense;
@@ -265,6 +265,11 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             while (!input.eof()) {
                 line = input.readline();
                 if (match = /^\{\{(en-[^|}]+)(.*)\}\}$/.exec(line)) {
+                    // there are some errors where someone wrote {{en-verb}} or {{en-verb|...}}.  Since
+                    // we can't correctly process this, we should just return the no arguments version.
+                    if (/\{\{en-verb\}\}/.test(line)) {
+                        return ['en-verb', []];
+                    }
                     // to correct for a very specific data irregularity, where a {{i|...}} template
                     // is put on the same line as the form information.
                     match[2] = match[2].replace(/\}\}\s*\{\{i\|.*$/, '');
