@@ -6,7 +6,32 @@ require.def('lingwo_dictionary/annotation/Embed',
         var bibliobird_url = 'http://localhost:35637';
 
         function loadEntry(target, contentArea, setContentFunc) {
-            alert('loadEntry');
+            var sense_id = target.attr('data-sense');
+
+            setContentFunc('Loading ...');
+
+            // lookup the entry on the server
+            $.ajax({
+                url: bibliobird_url+'/lingwo_korpus/lookup_entry',
+                dataType: 'jsonp',
+                data: { url: target.attr('href') },
+                success: function (res) {
+                    setContentFunc(res.content);
+                    $('.node', contentArea).removeClass('clear-block');
+
+                    if (sense_id) {
+                        $('.lingwo-sense-id-'+sense_id, contentArea).addClass('selected');
+                    }
+
+                    // TODO: how to handle this?
+                    // hack to integrate the flag module
+                    /*
+                    if (Drupal.flagLink) {
+                        Drupal.flagLink(contentArea);
+                    }
+                    */
+                }
+            });
         }
 
         $('.bibliobird-content').each(function (i, x) {
@@ -25,7 +50,7 @@ require.def('lingwo_dictionary/annotation/Embed',
                     x.innerHTML = res.content;
                     
                     Reader.setup(x, loadEntry, true);
-                    $('body', x).click(function (evt) {
+                    $('body').click(function (evt) {
                         return Reader.onClick(evt);
                     });
                 }

@@ -443,7 +443,7 @@ function lingwo_korpus_filter_text($text, $lang_pair) {
     $el->tag = 'a';
     $el->class = 'anno';
     # TODO: this should be a library function somewhere
-    $el->href = url(lingwo_dictionary_settings('lookup_path').'/'.$lang_pair.'/'.$headword.'('.$attrs['pos'].')');
+    $el->href = url(lingwo_dictionary_settings('lookup_path').'/'.$lang_pair.'/'.$headword.'('.$attrs['pos'].')', array('absolute' => TRUE));
     $el->setAttribute('data-form', $attrs['form']);
     $el->setAttribute('data-sense', $attrs['sense']);
   }
