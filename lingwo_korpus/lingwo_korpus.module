@@ -106,7 +106,7 @@ function lingwo_korpus_lookup_entry() {
   }
 
   // return the HTML to the Ajax caller
-  drupal_json(array('content' => $content));
+  drupal_jsonp(array('content' => $content));
 }
 
 /*
@@ -114,9 +114,35 @@ function lingwo_korpus_lookup_entry() {
  */
 function lingwo_korpus_lookup_content() {
   $url = urldecode($_GET['url']);
-  
-  // return the HTML to the Ajax caller
-  drupal_jsonp(array('content' => '<p><b>Test</b>ing</p>'));
+  $to_lang = urldecode($_GET['to_lang']);
+
+  // TODO: we shouldn't hard-code the 'field_remote_url' field
+  $field = content_fields('field_remote_url', 'content');
+  $db_info = content_database_info($field);
+  $res = db_query("SELECT nid FROM ".$db_info['table']." WHERE ".$db_info['columns']['value']['column']." = '%s' LIMIT 1", $url);
+
+  if ($obj = db_fetch_object($res)) {
+    $node = node_load($obj->nid);
+
+    // TODO: merge this code with the same code in hook_nodeapi() below, we 
+    // copy-pasted this from there.
+    $lang_pair = $node->language .'-'. $to_lang;
+    $cid = $node->nid .'-'. $lang_pair;
+    $data = cache_get($cid, 'cache_lingwo_korpus');
+    if ($data) {
+      $data = $data->data;
+    }
+    else {
+      $data = lingwo_korpus_filter_text($node->body, $lang_pair);
+      cache_set($cid, $data, 'cache_lingwo_korpus');
+    }
+
+    // return the HTML to the Ajax caller
+    drupal_jsonp(array('content' => $data, 'nid' => $node->nid));
+  }
+  else {
+    drupal_not_found();
+  }
 }
 
 /*
