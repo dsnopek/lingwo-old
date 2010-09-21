@@ -34,6 +34,13 @@ function lingwo_korpus_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  $items['lingwo_korpus/lookup_content'] = array(
+    'title' => 'Lookup Content',
+    'page arguments' => array(2),
+    'page callback' => 'lingwo_korpus_lookup_content',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
   $items['lingwo_korpus/lookup_senses'] = array(
     'title' => 'Lookup Senses',
     'page callback' => 'lingwo_korpus_lookup_senses',
@@ -59,6 +66,23 @@ function lingwo_korpus_menu() {
   return $items;
 }
 
+// Copied and modified version of drupal_json()
+function drupal_jsonp($var = NULL) {
+  // We are returning JavaScript, so tell the browser.
+  drupal_set_header('Content-Type: text/javascript; charset=utf-8');
+
+  $callback = urldecode($_GET['callback']);
+  if (isset($var)) {
+    if (!empty($callback)) {
+      echo $callback .'('. drupal_to_js($var) .')';
+    }
+    else {
+      echo drupal_to_js($var);
+    }
+  }
+}
+
+
 /*
  * Our entry lookup AJAX callback.
  */
@@ -83,6 +107,16 @@ function lingwo_korpus_lookup_entry() {
 
   // return the HTML to the Ajax caller
   drupal_json(array('content' => $content));
+}
+
+/*
+ * Our content lookup AJAX callback.
+ */
+function lingwo_korpus_lookup_content() {
+  $url = urldecode($_GET['url']);
+  
+  // return the HTML to the Ajax caller
+  drupal_jsonp(array('content' => '<p><b>Test</b>ing</p>'));
 }
 
 /*
