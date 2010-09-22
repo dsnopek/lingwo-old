@@ -1,6 +1,7 @@
 
-require.def('lingwo_dictionary/annotation/Reader', [],
-    function () {
+require.def('lingwo_dictionary/annotation/Reader',
+    ['jquery'],
+    function ($) {
         var bubble, contentArea, dock, footer, setGlobalEvents = false,
             footerId, footerMargin, selected;
 
@@ -82,7 +83,7 @@ require.def('lingwo_dictionary/annotation/Reader', [],
                     $(window).scroll(positionBubble);
                     $(window).resize(positionBubble);
                     // Special support for the 'admin' module.
-                    if (Drupal.adminToolbar) {
+                    if (typeof window.Drupal !== 'undefined' && Drupal.adminToolbar) {
                         clobber(Drupal.adminToolbar, 'setState', function () {
                             if (!popup) {
                                 bubble.hide();
