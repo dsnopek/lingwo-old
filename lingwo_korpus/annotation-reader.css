@@ -36,4 +36,27 @@ a.anno.selected {
 	background-color: yellow;
 }
 
+/*
+** For the embed window.
+*/
+.bibliobird-embed-titlebar {
+    background-color: blue;
+    color: white;
+    border-bottom: 1px solid white;
+    padding: 2px 10px;
+}
+
+.bibliobird-embed-title {
+    display: block;
+    float: left;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.bibliobird-embed-close,
+.bibliobird-embed-close:visited {
+    display: block;
+    color: white;
+    text-align: right;
+}
 

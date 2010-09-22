@@ -4,24 +4,25 @@ require.def('lingwo_dictionary/annotation/Embed',
     function ($, Reader) {
         //var bibliobird_url = 'http://www.bibliobird.com';
         var bibliobird_url = 'http://localhost:35637',
-            embedWindow = $('<div></div>'),
-            embedIframe = $('<iframe></iframe>');
+            embedWindow = $('<div class="clear-block"><div class="bibliobird-embed-titlebar"><span class="bibliobird-embed-title">BiblioBird</span> <a href="#" class="bibliobird-embed-close">close</a></div></div>'),
+            embedIframe = $('<iframe height="100%" width="100%" border="0" id="bibliobirdEmbedIframe" name="bibliobirdEmbedIframe"></iframe>').appendTo(embedWindow),
+            BiblioBird = {};
 
         // make the embedWindow / embedIframe
-        embedIframe
-            .css({
-                width: 600,
-                height: 400
-            })
-            .appendTo(embedWindow);
         embedWindow
             .css({
                 width: 600,
                 height: 400,
                 position: 'fixed',
+                border: '1px solid black',
+                background: 'white'
             })
             .hide()
             .appendTo($('body'));
+        $('.bibliobird-embed-close', embedWindow).click(function () {
+            embedWindow.hide();
+            return false;
+        });
         function positionEmbedWindow() {
             var left = ($(window).width() - 600) / 2,
                 top  = ($(window).height() - 400) / 2;
@@ -29,6 +30,10 @@ require.def('lingwo_dictionary/annotation/Embed',
         }
         $(window).resize(positionEmbedWindow);
         setTimeout(positionEmbedWindow, 0);
+
+        BiblioBird.login_successful = function () {
+            embedWindow.hide();
+        }
 
         // Debuging!  Cache busting!
         /*
@@ -76,7 +81,8 @@ require.def('lingwo_dictionary/annotation/Embed',
         }
 
         function open_embedded(url) {
-            embedIframe.attr('src', url+'?embed=1');
+            //embedIframe.attr('src', url+'?embed=1');
+            embedIframe.attr('src', url);
             embedWindow.show();
         }
 
@@ -106,7 +112,9 @@ require.def('lingwo_dictionary/annotation/Embed',
                     links.append('Not logged into BiblioBird ');
                     links.append($('<a></a>')
                         .html('Login')
-                        .attr('href', bibliobird_url+'/user/login')
+                        //.attr('href', bibliobird_url+'/user/login')
+                        .attr('href', bibliobird_url+'/lingwo_korpus/rlogin'
+                            +'?redirect=http://localhost:8081/bibliobird-login-successful.html')
                         .click(function (evt) { open_embedded(evt.target.href); return false; })
                     );
                     links.append(' ');
@@ -151,6 +159,9 @@ require.def('lingwo_dictionary/annotation/Embed',
                 }
             });
         });
+
+        // leave for other scripts
+        window.BiblioBird = BiblioBird;
     }
 );
 

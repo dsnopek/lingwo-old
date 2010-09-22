@@ -47,6 +47,24 @@ function lingwo_korpus_menu() {
     'access arguments' => array('annotate lingwo_korpus texts'),
     'type' => MENU_CALLBACK,
   );
+  $items['lingwo_korpus/rlogin'] = array(
+    'title' => 'Remote Login',
+    'page callback' => 'lingwo_korpus_remote_login_page',
+    'access callback' => 'user_is_anonymous',
+    'type' => MENU_CALLBACK,
+  );
+  $items['lingwo_korpus/rlogout'] = array(
+    'title' => 'Remote Logout',
+    'page callback' => 'lingwo_korpus_remote_logout_page',
+    'access callback' => 'user_is_logged_in',
+    'type' => MENU_CALLBACK,
+  );
+  $items['lingwo_korpus/rloggedin'] = array(
+    'title' => 'Login Successful',
+    'page callback' => 'lingwo_korpus_remote_loggedin_page',
+    'access callback' => 'user_is_logged_in',
+    'type' => MENU_CALLBACK,
+  );
   $items['lingwo_korpus/admin/list_entries'] = array(
     'title' => 'List Entries',
     'page arguments' => array('lingwo_korpus_admin_list_entries'),
@@ -180,6 +198,31 @@ function lingwo_korpus_lookup_senses() {
   }
 
   drupal_json(array('senses' => $senses));
+}
+
+/*
+ * Builds the rlogin page.
+ */
+function lingwo_korpus_remote_login_page() {
+  $login_form = drupal_get_form('user_login_block');
+  drupal_set_header('Content-Type: text/html; charset=utf-8');
+  echo theme('lingwo_korpus_remote_login_page', $login_form);
+}
+
+function lingwo_korpus_remote_login_submit($form, &$form_state) {
+  global $user;
+  if ($user->uid) {
+    $redirect = 'lingwo_korpus/rloggedin';
+    if (!empty($_GET['redirect'])) {
+      $redirect = $_GET['redirect'];
+    }
+    $form_state['redirect'] = $redirect;
+  }
+}
+
+function lingwo_korpus_remote_loggedin_page() {
+  drupal_set_header('Content-Type: text/html; charset=utf-8');
+  echo theme('lingwo_korpus_remote_loggedin_page');
 }
 
 /* 
@@ -323,7 +366,17 @@ function lingwo_korpus_theme() {
         'footer_id' => NULL,
         'footer_margin' => NULL,
       )
-    )
+    ),
+    'lingwo_korpus_remote_login_page' => array(
+      'arguments' => array(
+        'login_form' => NULL,
+      ),
+      'template' => 'lingwo-korpus-remote-login-page',
+    ),
+    'lingwo_korpus_remote_loggedin_page' => array(
+      'arguments' => array(),
+      'template' => 'lingwo-korpus-remote-loggedin-page',
+    ),
   );
 }
 
@@ -583,6 +636,10 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
       $form['body_field']['body']['#default_value'] = $content;
       $form['title']['#default_value'] = $html->find('title', 0)->plaintext;
     }
+  }
+  elseif ($form_id == 'user_login_block' && $_GET['q'] == 'lingwo_korpus/rlogin') {
+    unset($form['#action']);
+    $form['#submit'] = array('lingwo_korpus_remote_login_submit');
   }
 }
 
