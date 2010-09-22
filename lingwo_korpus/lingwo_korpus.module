@@ -87,7 +87,7 @@ function drupal_jsonp($var = NULL) {
  * Our entry lookup AJAX callback.
  */
 function lingwo_korpus_lookup_entry() {
-  global $user;
+  global $user, $language;
 
   // get the "Lingwo ID" out of the 'url' GET argument
   $url = urldecode($_GET['url']);
@@ -97,6 +97,11 @@ function lingwo_korpus_lookup_entry() {
     if (module_exists('rules')) {
       rules_invoke_event('lingwo_korpus_lookup', $user, $entry->getNode());
     }
+
+    // HACK: force the language to be set to whatever the $node->language is!  This is 
+    // necessary for when we are using embed.js and always load from http://www.bibliobird.com
+    $languages = language_list();
+    $language = $languages[$entry->getNode()->language];
 
     $content = node_view($entry->getNode(), TRUE);
   }
