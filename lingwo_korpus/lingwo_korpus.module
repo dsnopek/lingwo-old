@@ -118,8 +118,15 @@ function lingwo_korpus_lookup_entry() {
  * Our content lookup AJAX callback.
  */
 function lingwo_korpus_lookup_content() {
+  global $user;
+
   $url = urldecode($_GET['url']);
   $to_lang = urldecode($_GET['to_lang']);
+
+  $json = array();
+  if ($user->uid != 0) {
+    $json['username'] = $user->name;
+  }
 
   // TODO: we shouldn't hard-code the 'field_remote_url' field
   $field = content_fields('field_remote_url', 'content');
@@ -142,18 +149,14 @@ function lingwo_korpus_lookup_content() {
       cache_set($cid, $data, 'cache_lingwo_korpus');
     }
 
-    // return the HTML to the Ajax caller
-    drupal_jsonp(array('content' => $data, 'nid' => $node->nid));
+    $json['content'] = $date;
+    $json['nid'] = $node->nid;
   }
   else {
-    if (!empty($_GET['callback'])) {
-      // JSONP cannot get errors normally!
-      drupal_jsonp(array('error' => TRUE));
-    }
-    else {
-      drupal_not_found();
-    }
+    $json['not_found'] = TRUE;
   }
+
+  return drupal_jsonp($json);
 }
 
 /*
