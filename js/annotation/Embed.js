@@ -17,7 +17,12 @@ require.def('lingwo_dictionary/annotation/Embed',
                 data: { url: target.attr('href') },
                 success: function (res) {
                     setContentFunc(res.content);
-                    $('.node', contentArea).removeClass('clear-block');
+                    $('.node', contentArea)
+                        .removeClass('clear-block')
+                        .removeAttr('id');
+
+                    // TODO: for now, we want to drop the node links
+                    $('ul.links.inline', contentArea).remove();
 
                     if (sense_id) {
                         $('.lingwo-sense-id-'+sense_id, contentArea).addClass('selected');
