@@ -212,17 +212,44 @@ function lingwo_korpus_remote_login_page() {
 function lingwo_korpus_remote_login_submit($form, &$form_state) {
   global $user;
   if ($user->uid) {
-    $redirect = 'lingwo_korpus/rloggedin';
-    if (!empty($_GET['redirect'])) {
-      $redirect = $_GET['redirect'];
+    if (empty($_GET['relay'])) {
+      $form_state['redirect'] = 'lingwo_korpus/rloggedin';
     }
-    $form_state['redirect'] = $redirect;
+    else {
+      $form_state['redirect'] = array('lingwo_korpus/rloggedin', 'relay='.$_GET['relay']);;
+    }
   }
 }
 
 function lingwo_korpus_remote_loggedin_page() {
   drupal_set_header('Content-Type: text/html; charset=utf-8');
-  echo theme('lingwo_korpus_remote_loggedin_page');
+  echo theme('lingwo_korpus_remote_loggedin_page', $_GET['relay']);
+}
+
+function lingwo_korpus_remote_logout_page() {
+  global $user;
+
+  if (!$user->uid) {
+    // User is not logged in
+    return services_error(t('User is not logged in.'), 406);
+  }
+
+  watchdog('user', 'Session closed for %name.', array('%name' => theme('placeholder', $user->name)));
+
+  // Destroy the current session:
+  session_destroy();
+  module_invoke_all('user', 'logout', NULL, $user);
+
+  // Load the anonymous user
+  $user = drupal_anonymous_user();
+
+  if (!empty($_GET['relay'])) {
+    drupal_set_header('Content-Type: text/html; charset=utf-8');
+    echo theme('lingwo_korpus_remote_logout_page', $_GET['relay']);
+  }
+  else {
+    drupal_jsonp(array('success' => TRUE));
+  }
 }
 
 /* 
@@ -374,8 +401,16 @@ function lingwo_korpus_theme() {
       'template' => 'lingwo-korpus-remote-login-page',
     ),
     'lingwo_korpus_remote_loggedin_page' => array(
-      'arguments' => array(),
+      'arguments' => array(
+        'relay_url' => NULL,
+      ),
       'template' => 'lingwo-korpus-remote-loggedin-page',
+    ),
+    'lingwo_korpus_remote_logout_page' => array(
+      'arguments' => array(
+        'relay_url' => NULL,
+      ),
+      'template' => 'lingwo-korpus-remote-logout-page',
     ),
   );
 }

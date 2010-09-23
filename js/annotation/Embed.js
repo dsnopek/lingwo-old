@@ -8,11 +8,16 @@ require.def('lingwo_dictionary/annotation/Embed',
             embedIframe = $('<iframe height="100%" width="100%" border="0" id="bibliobirdEmbedIframe" name="bibliobirdEmbedIframe"></iframe>').appendTo(embedWindow),
             BiblioBird = {};
 
+        // copy config if it is set!
+        if (typeof window.BiblioBird != 'undefined') {
+            BiblioBird = window.BiblioBird;
+        }
+
         // make the embedWindow / embedIframe
         embedWindow
             .css({
-                width: 600,
-                height: 400,
+                width: 400,
+                height: 200,
                 position: 'fixed',
                 border: '1px solid black',
                 background: 'white'
@@ -24,15 +29,17 @@ require.def('lingwo_dictionary/annotation/Embed',
             return false;
         });
         function positionEmbedWindow() {
-            var left = ($(window).width() - 600) / 2,
-                top  = ($(window).height() - 400) / 2;
+            var left = ($(window).width() - 400) / 2,
+                top  = ($(window).height() - 200) / 2;
             embedWindow.css({ top: top, left: left });
         }
         $(window).resize(positionEmbedWindow);
         setTimeout(positionEmbedWindow, 0);
 
-        BiblioBird.login_successful = function () {
-            embedWindow.hide();
+        BiblioBird.receiveMessage = function (msg) {
+            if (msg == '#login-successful') {
+                embedWindow.hide();
+            }
         }
 
         // Debuging!  Cache busting!
@@ -113,8 +120,8 @@ require.def('lingwo_dictionary/annotation/Embed',
                     links.append($('<a></a>')
                         .html('Login')
                         //.attr('href', bibliobird_url+'/user/login')
-                        .attr('href', bibliobird_url+'/lingwo_korpus/rlogin'
-                            +'?redirect=http://localhost:8081/bibliobird-login-successful.html')
+                        .attr('href', bibliobird_url+'/lingwo_korpus/rlogin' +
+                            (BiblioBird.localRelayUrl ? '?relay='+BiblioBird.localRelayUrl : ''))
                         .click(function (evt) { open_embedded(evt.target.href); return false; })
                     );
                     links.append(' ');
