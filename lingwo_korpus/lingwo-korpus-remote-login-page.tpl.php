@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Remote Login</title>
+  <title><?php print $title; ?></title>
+  <?php print $styles; ?>
 </head>
 <body>
-  <?php print $login_form ?>
+  <h1><?php print $title; ?></h1>
+  <?php print $content; ?>
 </body>
 </html>
 

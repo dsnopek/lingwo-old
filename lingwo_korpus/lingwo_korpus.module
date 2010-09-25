@@ -48,7 +48,7 @@ function lingwo_korpus_menu() {
     'type' => MENU_CALLBACK,
   );
   $items['lingwo_korpus/rlogin'] = array(
-    'title' => 'Remote Login',
+    'title' => 'Login to BiblioBird',
     'page callback' => 'lingwo_korpus_remote_login_page',
     'access callback' => 'user_is_anonymous',
     'type' => MENU_CALLBACK,
@@ -101,9 +101,9 @@ function _lingwo_korpus_jsonp($var = NULL) {
   exit();
 }
 
-function _lingwo_korpus_pageless($data) {
+function _lingwo_korpus_remote_login_page($content) {
   drupal_set_header('Content-Type: text/html; charset=utf-8');
-  echo $data;
+  echo theme('lingwo_korpus_remote_login_page', $content);
   exit();
 }
 
@@ -209,10 +209,17 @@ function lingwo_korpus_lookup_senses() {
 /*
  * Builds the rlogin page.
  */
+
+function template_preprocess_lingwo_korpus_remote_login_page(&$vars) {
+  $vars['title'] = drupal_get_title();
+  // If a theme wants to override this using a CSS file, they can create a theme function
+  // which returns a <link .../> which points to it.
+  $vars['styles'] = theme('lingwo_korpus_remote_login_styles');
+}
+
 function lingwo_korpus_remote_login_page() {
-  $login_form = drupal_get_form('user_login_block');
-  drupal_set_header('Content-Type: text/html; charset=utf-8');
-  echo theme('lingwo_korpus_remote_login_page', $login_form);
+  $content = drupal_get_form('user_login_block');
+  _lingwo_korpus_remote_login_page($content);
 }
 
 function lingwo_korpus_remote_login_submit($form, &$form_state) {
@@ -237,8 +244,11 @@ function lingwo_korpus_remote_loggedin_page() {
     _lingwo_korpus_jsonp($json);
   }
   else {
-    drupal_set_header('Content-Type: text/html; charset=utf-8');
-    echo theme('lingwo_korpus_remote_loggedin_page', $_GET['relay']);
+    if ($_GET['relay']) {
+      $content = theme('lingwo_korpus_remote_login_relay_iframe',
+        $_GET['relay'], 'login-successful');
+    }
+    _lingwo_korpus_remote_login_page($content);
   }
 }
 
@@ -260,8 +270,11 @@ function lingwo_korpus_remote_logout_page() {
   $user = drupal_anonymous_user();
 
   if (!empty($_GET['relay'])) {
-    drupal_set_header('Content-Type: text/html; charset=utf-8');
-    echo theme('lingwo_korpus_remote_logout_page', $_GET['relay']);
+    if ($_GET['relay']) {
+      $content = theme('lingwo_korpus_remote_login_relay_iframe',
+        $_GET['relay'], 'logout-successful');
+    }
+    _lingwo_korpus_remote_login_page($content);
   }
   else {
     _lingwo_korpus_jsonp(array('success' => TRUE));
@@ -412,21 +425,20 @@ function lingwo_korpus_theme() {
     ),
     'lingwo_korpus_remote_login_page' => array(
       'arguments' => array(
-        'login_form' => NULL,
+        'content' => NULL,
       ),
       'template' => 'lingwo-korpus-remote-login-page',
     ),
-    'lingwo_korpus_remote_loggedin_page' => array(
+    'lingwo_korpus_remote_login_relay_iframe' => array(
       'arguments' => array(
         'relay_url' => NULL,
+        'message'   => NULL,
       ),
-      'template' => 'lingwo-korpus-remote-loggedin-page',
+      'template' => 'lingwo-korpus-remote-login-relay-iframe',
     ),
-    'lingwo_korpus_remote_logout_page' => array(
-      'arguments' => array(
-        'relay_url' => NULL,
-      ),
-      'template' => 'lingwo-korpus-remote-logout-page',
+    'lingwo_korpus_remote_login_styles' => array(
+      'arguments' => array(),
+      'template' => 'lingwo-korpus-remote-login-styles',
     ),
   );
 }
