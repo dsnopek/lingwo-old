@@ -732,6 +732,10 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
     }
     $items[] = l(t('Request new password'), 'user/password', array('attributes' => array('title' => t('Request new password via e-mail.'), 'target' => '_blank')));
     $form['links'] = array('#value' => theme('item_list', $items));
+
+    // a tiny bit of javascript to focus the username field (tabindex doesn't seem to do the
+    // job in an iframe).
+    $form['js']['#value'] = "<script>document.getElementById('edit-name').focus();</script>";
   }
 }
 
