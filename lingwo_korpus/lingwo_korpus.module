@@ -253,7 +253,7 @@ function lingwo_korpus_remote_loggedin_page() {
   else {
     if ($_GET['relay']) {
       $content = theme('lingwo_korpus_remote_login_relay_iframe',
-        $_GET['relay'], 'login-successful');
+        $_GET['relay'], 'login-successful:'. $user->name);
     }
     _lingwo_korpus_remote_login_page($content, 'rloggedin');
   }

@@ -41,7 +41,7 @@ require.def('lingwo_dictionary/annotation/Embed',
                 });
             },
 
-            initialize: function () {
+            initialize: function (username) {
                 if (this.initialized) return;
 
                 var embedWindow = $('<div class="clear-block"><div class="bibliobird-embed-titlebar"><span class="bibliobird-embed-title">BiblioBird</span> <a href="#" class="bibliobird-embed-close">close</a></div></div>'),
@@ -60,6 +60,7 @@ require.def('lingwo_dictionary/annotation/Embed',
                     .appendTo($('body'));
                 $('.bibliobird-embed-close', embedWindow).click(function () {
                     embedWindow.hide();
+                    BiblioBird.refreshAll();
                     return false;
                 });
                 function positionEmbedWindow() {
@@ -81,13 +82,21 @@ require.def('lingwo_dictionary/annotation/Embed',
                 extend(this, {
                     embedWindow: embedWindow,
                     embedIframe: embedIframe,
+                    username:    username,
                     initialized: true
                 });
             },
 
             receiveMessage: function (msg) {
-                if (msg == '#login-successful') {
+                var parts;
+                if (msg.indexOf('#login-successful') == 0) {
                     this.embedWindow.hide();
+
+                    parts = msg.split(':');
+                    if (parts[1]) {
+                        this.username = parts[1];
+                    }
+
                     this.refreshAll();
                 }
             },
@@ -144,6 +153,7 @@ require.def('lingwo_dictionary/annotation/Embed',
                 url: BiblioBird.url+'/lingwo_korpus/rlogout',
                 dataType: 'jsonp',
                 success: function (res) {
+                    BiblioBird.username = null;
                     BiblioBird.refreshAll();
                 }
             });
@@ -158,8 +168,6 @@ require.def('lingwo_dictionary/annotation/Embed',
             this.links     = $('<div class="bibliobird-links"></div>').insertBefore(x),
             this.data      = {};
 
-            BiblioBird.initialize();
-
             this.lookupContent();
         }
         ContentArea.prototype.lookupContent = function () {
@@ -170,6 +178,9 @@ require.def('lingwo_dictionary/annotation/Embed',
                 dataType: 'jsonp',
                 data: { url: this.url, to_lang: this.to_lang },
                 success: function (res) {
+                    // we only initialize after we have a username..
+                    BiblioBird.initialize(res.username);
+
                     self.data = res;
                     self.rebuildLinks();
 
@@ -187,8 +198,8 @@ require.def('lingwo_dictionary/annotation/Embed',
 
             links.html('');
 
-            if (data.username) {
-                links.append('Logged into BiblioBird as '+data.username+' ');
+            if (BiblioBird.username) {
+                links.append('Logged into BiblioBird as '+BiblioBird.username+' ');
                 links.append($('<a></a>')
                     .html('Logout')
                     .attr('href', BiblioBird.url+'/logout')
