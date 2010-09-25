@@ -215,6 +215,7 @@ function template_preprocess_lingwo_korpus_remote_login_page(&$vars) {
   // If a theme wants to override this using a CSS file, they can create a theme function
   // which returns a <link .../> which points to it.
   $vars['styles'] = theme('lingwo_korpus_remote_login_styles');
+  $vars['messages'] = theme('status_messages', 'error');
 }
 
 function lingwo_korpus_remote_login_page() {

@@ -51,9 +51,6 @@ h1 {
 }
 .form-item {
   margin-bottom: 1px;
-  /*
-  margin-bottom: 5px;
-  */
 }
 /* Display in a single row */
 .item-list {
@@ -102,6 +99,11 @@ li {
   border: 1px solid black;
   color: white;
   background-color: blue;
+}
+.messages {
+  font-weight: bold;
+  margin: 5px 0;
+  color: red;
 }
 
 </style>
