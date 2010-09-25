@@ -50,19 +50,19 @@ function lingwo_korpus_menu() {
   $items['lingwo_korpus/rlogin'] = array(
     'title' => 'Login to BiblioBird',
     'page callback' => 'lingwo_korpus_remote_login_page',
-    'access callback' => 'user_is_anonymous',
+    'access callback' => '_lingwo_korpus_true',
     'type' => MENU_CALLBACK,
   );
   $items['lingwo_korpus/rlogout'] = array(
     'title' => 'Remote Logout',
     'page callback' => 'lingwo_korpus_remote_logout_page',
-    'access callback' => 'user_is_logged_in',
+    'access callback' => '_lingwo_korpus_true',
     'type' => MENU_CALLBACK,
   );
   $items['lingwo_korpus/rloggedin'] = array(
     'title' => 'Login Successful',
     'page callback' => 'lingwo_korpus_remote_loggedin_page',
-    'access callback' => 'user_is_logged_in',
+    'access callback' => '_lingwo_korpus_true',
     'type' => MENU_CALLBACK,
   );
   $items['lingwo_korpus/admin/list_entries'] = array(
@@ -105,6 +105,10 @@ function _lingwo_korpus_remote_login_page($content, $page_name) {
   drupal_set_header('Content-Type: text/html; charset=utf-8');
   echo theme('lingwo_korpus_remote_login_page', $content, $page_name);
   exit();
+}
+
+function _lingwo_korpus_true() {
+  return TRUE;
 }
 
 /*
@@ -225,8 +229,20 @@ function theme_lingwo_korpus_remote_login_styles() {
 }
 
 function lingwo_korpus_remote_login_page() {
-  $content = drupal_get_form('user_login_block');
-  _lingwo_korpus_remote_login_page($content, 'rlogin');
+  global $user;
+  if ($user->uid) {
+    // if we are already logged in, we send the user to lingwo_korpus/rloggedin
+    if (empty($_GET['relay'])) {
+      drupal_goto('lingwo_korpus/rloggedin');
+    }
+    else {
+      drupal_goto('lingwo_korpus/rloggedin', 'relay='.$_GET['relay']);
+    }
+  }
+  else {
+    $content = drupal_get_form('user_login_block');
+    _lingwo_korpus_remote_login_page($content, 'rlogin');
+  }
 }
 
 function lingwo_korpus_remote_login_submit($form, &$form_state) {
@@ -262,19 +278,16 @@ function lingwo_korpus_remote_loggedin_page() {
 function lingwo_korpus_remote_logout_page() {
   global $user;
 
-  if (!$user->uid) {
-    // User is not logged in
-    return services_error(t('User is not logged in.'), 406);
+  if ($user->uid) {
+    watchdog('user', 'Session closed for %name.', array('%name' => theme('placeholder', $user->name)));
+
+    // Destroy the current session:
+    session_destroy();
+    module_invoke_all('user', 'logout', NULL, $user);
+
+    // Load the anonymous user
+    $user = drupal_anonymous_user();
   }
-
-  watchdog('user', 'Session closed for %name.', array('%name' => theme('placeholder', $user->name)));
-
-  // Destroy the current session:
-  session_destroy();
-  module_invoke_all('user', 'logout', NULL, $user);
-
-  // Load the anonymous user
-  $user = drupal_anonymous_user();
 
   if (!empty($_GET['relay'])) {
     if ($_GET['relay']) {
@@ -711,6 +724,14 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
   elseif ($form_id == 'user_login_block' && $_GET['q'] == 'lingwo_korpus/rlogin') {
     unset($form['#action']);
     $form['#submit'] = array('lingwo_korpus_remote_login_submit');
+
+    # copied/pasted/modified from modules/user.module user_login_block()
+    $items = array();
+    if (variable_get('user_register', 1)) {
+      $items[] = l(t('Create new account'), 'user/register', array('attributes' => array('title' => t('Create a new user account.'), 'target' => '_blank')));
+    }
+    $items[] = l(t('Request new password'), 'user/password', array('attributes' => array('title' => t('Request new password via e-mail.'), 'target' => '_blank')));
+    $form['links'] = array('#value' => theme('item_list', $items));
   }
 }
 
