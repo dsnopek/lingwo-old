@@ -2,56 +2,108 @@
 require.def('lingwo_dictionary/annotation/Embed',
     ['jquery','lingwo_dictionary/annotation/Reader'],
     function ($, Reader) {
-        //var bibliobird_url = 'http://www.bibliobird.com';
-        var bibliobird_url = 'http://localhost:35637',
-            embedWindow = $('<div class="clear-block"><div class="bibliobird-embed-titlebar"><span class="bibliobird-embed-title">BiblioBird</span> <a href="#" class="bibliobird-embed-close">close</a></div></div>'),
-            embedIframe = $('<iframe height="100%" width="100%" border="0" id="bibliobirdEmbedIframe" name="bibliobirdEmbedIframe"></iframe>').appendTo(embedWindow),
+        var configDefaults = {
+                url: 'http://www.bibliobird.com',
+                lang: 'en'
+            },
             BiblioBird = {};
+
+        function extend(obj, vals, preserve) {
+            var name;
+            for(name in vals) {
+                if (!preserve || typeof obj[name] == 'undefined') {
+                    obj[name] = vals[name];
+                }
+            }
+        }
 
         // copy config if it is set!
         if (typeof window.BiblioBird != 'undefined') {
             BiblioBird = window.BiblioBird;
         }
+        // setup config defaults
+        extend(BiblioBird, configDefaults, true);
+        // define the BiblioBird object
+        extend(BiblioBird, {
+            initialized: false,
+            contentAreas: [],
+            embedWindow: null,
+            embedIframe: null,
+            username: null,
 
-        // make the embedWindow / embedIframe
-        embedWindow
-            .css({
-                width: 400,
-                height: 200,
-                position: 'fixed',
-                border: '1px solid black',
-                background: 'white'
-            })
-            .hide()
-            .appendTo($('body'));
-        $('.bibliobird-embed-close', embedWindow).click(function () {
-            embedWindow.hide();
-            return false;
-        });
-        function positionEmbedWindow() {
-            var left = ($(window).width() - 400) / 2,
-                top  = ($(window).height() - 200) / 2;
-            embedWindow.css({ top: top, left: left });
-        }
-        $(window).resize(positionEmbedWindow);
-        setTimeout(positionEmbedWindow, 0);
+            // this is called at the beginning, but doesn't necessarily cause the object
+            // to initialize itself.  That only happens if a .bibliobird-content node is
+            // found on the page.
+            start: function () {
+                var self = this;
+                $('.bibliobird-content').each(function () {
+                    self.contentAreas.push(new ContentArea(this));
+                });
+            },
 
-        BiblioBird.receiveMessage = function (msg) {
-            if (msg == '#login-successful') {
-                embedWindow.hide();
+            initialize: function () {
+                if (this.initialized) return;
+
+                var embedWindow = $('<div class="clear-block"><div class="bibliobird-embed-titlebar"><span class="bibliobird-embed-title">BiblioBird</span> <a href="#" class="bibliobird-embed-close">close</a></div></div>'),
+                    embedIframe = $('<iframe height="100%" width="100%" border="0" id="bibliobirdEmbedIframe" name="bibliobirdEmbedIframe"></iframe>').appendTo(embedWindow);
+
+                // make the embedWindow / embedIframe
+                embedWindow
+                    .css({
+                        width: 400,
+                        height: 200,
+                        position: 'fixed',
+                        border: '1px solid black',
+                        background: 'white'
+                    })
+                    .hide()
+                    .appendTo($('body'));
+                $('.bibliobird-embed-close', embedWindow).click(function () {
+                    embedWindow.hide();
+                    return false;
+                });
+                function positionEmbedWindow() {
+                    var left = ($(window).width() - 400) / 2,
+                        top  = ($(window).height() - 200) / 2;
+                    embedWindow.css({ top: top, left: left });
+                }
+                $(window).resize(positionEmbedWindow);
+                setTimeout(positionEmbedWindow, 0);
+
+                // initialize the Reader object
+                // TODO: can we make the first $('body') into null??
+                Reader.setup($('body'), loadEntry, true);
+                $('body').click(function (evt) {
+                    return Reader.onClick(evt);
+                });
+
+                // copy values onto the object
+                extend(this, {
+                    embedWindow: embedWindow,
+                    embedIframe: embedIframe,
+                    initialized: true
+                });
+            },
+
+            receiveMessage: function (msg) {
+                if (msg == '#login-successful') {
+                    this.embedWindow.hide();
+                    this.refreshAll();
+                }
+            },
+
+            openEmbedded: function (url) {
+                this.embedIframe.attr('src', url);
+                this.embedWindow.show();
+            },
+
+            refreshAll: function () {
+                $.each(this.contentAreas, function () {
+                    this.refresh();
+                });
             }
-        }
+        });
 
-        // Debuging!  Cache busting!
-        /*
-        var oldAttach = require.attach;
-        require.attach = function (url, contextName, moduleName, callback, type) {
-           url += (url.indexOf('?') === -1 ? '?' : '&') + 'bust=' + (new
-        Date()).getTime()
-           return oldAttach.call(require, url, contextName, moduleName,
-        callback, type);
-        }
-        */
 
         function loadEntry(target, contentArea, setContentFunc) {
             var sense_id = target.attr('data-sense');
@@ -60,7 +112,7 @@ require.def('lingwo_dictionary/annotation/Embed',
 
             // lookup the entry on the server
             $.ajax({
-                url: bibliobird_url+'/lingwo_korpus/lookup_entry',
+                url: BiblioBird.url+'/lingwo_korpus/lookup_entry',
                 dataType: 'jsonp',
                 data: { url: target.attr('href') },
                 success: function (res) {
@@ -87,86 +139,103 @@ require.def('lingwo_dictionary/annotation/Embed',
             });
         }
 
-        function open_embedded(url) {
-            //embedIframe.attr('src', url+'?embed=1');
-            embedIframe.attr('src', url);
-            embedWindow.show();
+        function logout() {
+            $.ajax({
+                url: BiblioBird.url+'/lingwo_korpus/rlogout',
+                dataType: 'jsonp',
+                success: function (res) {
+                    BiblioBird.refreshAll();
+                }
+            });
         }
 
-        $('.bibliobird-content').each(function (i, x) {
-            var from_lang = $(x).attr('data-from-lang'),
-                to_lang   = $(x).attr('data-to-lang'),
-                url       = $(x).attr('data-url') || window.location.href,
-                teaser    = $(x).attr('data-teaser') == 'true',
-                links     = $('<div class="bibliobird-links"></div>').insertBefore(x);
+        ContentArea = function (x) {
+            this.node      = x;
+            this.from_lang = $(x).attr('data-from-lang');
+            this.to_lang   = $(x).attr('data-to-lang');
+            this.url       = $(x).attr('data-url') || window.location.href;
+            this.teaser    = $(x).attr('data-teaser') == 'true';
+            this.links     = $('<div class="bibliobird-links"></div>').insertBefore(x),
+            this.data      = {};
 
-            function build_links(res) {
-                links.html('');
+            BiblioBird.initialize();
 
-                if (res.username) {
-                    links.append('Logged into BiblioBird as '+res.username+' ');
-                    /*
-                    links.append($('<a></a>')
-                        .html('Logout')
-                        .attr('href', bibliobird_url+'/logout')
-                        // TODO: I think we need a special JSONP logout function, because we need to know when
-                        // its finished
-                        .click(function () { return false })
-                    );
-                    */
-                }
-                else {
-                    links.append('Not logged into BiblioBird ');
-                    links.append($('<a></a>')
-                        .html('Login')
-                        //.attr('href', bibliobird_url+'/user/login')
-                        .attr('href', bibliobird_url+'/lingwo_korpus/rlogin' +
-                            (BiblioBird.localRelayUrl ? '?relay='+BiblioBird.localRelayUrl : ''))
-                        .click(function (evt) { open_embedded(evt.target.href); return false; })
-                    );
-                    links.append(' ');
-                    links.append($('<a></a>')
-                        .html('Join BiblioBird')
-                        .attr('href', bibliobird_url+'/user/register')
-                        .click(function (evt) { open_embedded(evt.target.href); return false; })
-                    );
-                }
-                links.append(' ');
+            this.lookupContent();
+        }
+        ContentArea.prototype.lookupContent = function () {
+            var self = this;
 
-                if (res.not_found) {
-                    links.append($('<a></a>')
-                        .html('Add to Bibliobird')
-                        // TODO: we need some configuration, so we can point the user to the
-                        // correct language site!
-                        .attr({
-                            href: bibliobird_url+'/node/add/content?remote_url='+escape(url),
-                            target: '_blank'
-                        })
-                    );
-                }
-            }
-
-            // we need to JSONP get the annotated text of the node
             $.ajax({
-                url: bibliobird_url+'/lingwo_korpus/lookup_content',
+                url: BiblioBird.url+'/lingwo_korpus/lookup_content',
                 dataType: 'jsonp',
-                data: { url: url, to_lang: to_lang },
+                data: { url: this.url, to_lang: this.to_lang },
                 success: function (res) {
-                    build_links(res);
+                    self.data = res;
+                    self.rebuildLinks();
 
                     if (res.content) {
                         // assign the content
-                        x.innerHTML = res.content;
-                        
-                        Reader.setup(x, loadEntry, true);
-                        $('body').click(function (evt) {
-                            return Reader.onClick(evt);
-                        });
+                        self.node.innerHTML = res.content;
                     }
                 }
             });
-        });
+        }
+        ContentArea.prototype.rebuildLinks = function () {
+            var links = this.links,
+                data  = this.data,
+                self  = this;
 
+            links.html('');
+
+            if (data.username) {
+                links.append('Logged into BiblioBird as '+data.username+' ');
+                links.append($('<a></a>')
+                    .html('Logout')
+                    .attr('href', BiblioBird.url+'/logout')
+                    // TODO: I think we need a special JSONP logout function, because we need to know when
+                    // its finished
+                    .click(function () { logout(); return false; })
+                );
+            }
+            else {
+                links.append('Not logged into BiblioBird ');
+                links.append($('<a></a>')
+                    .html('Login')
+                    //.attr('href', BiblioBird.url+'/user/login')
+                    .attr('href', BiblioBird.url+'/lingwo_korpus/rlogin' +
+                        (BiblioBird.localRelayUrl ? '?relay='+BiblioBird.localRelayUrl : ''))
+                    .click(function (evt) { BiblioBird.openEmbedded(evt.target.href); return false; })
+                );
+                links.append(' ');
+                links.append($('<a></a>')
+                    .html('Join BiblioBird')
+                    .attr({
+                        href: BiblioBird.url+'/user/register',
+                        target: '_blank'
+                    })
+                );
+            }
+            links.append(' ');
+
+            if (data.not_found) {
+                links.append($('<a></a>')
+                    .html('Add to Bibliobird')
+                    // TODO: we need some configuration, so we can point the user to the
+                    // correct language site!
+                    .attr({
+                        href: BiblioBird.url+'/node/add/content?remote_url='+escape(url),
+                        target: '_blank'
+                    })
+                );
+            }
+        }
+        ContentArea.prototype.refresh = function () {
+            this.rebuildLinks();
+        }
+
+        // start our script
+        BiblioBird.start();
+        // attach a content area to each found on the page
         // leave for other scripts
         window.BiblioBird = BiblioBird;
     }

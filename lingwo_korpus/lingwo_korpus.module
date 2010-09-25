@@ -85,7 +85,7 @@ function lingwo_korpus_menu() {
 }
 
 // Copied and modified version of drupal_json()
-function drupal_jsonp($var = NULL) {
+function _lingwo_korpus_jsonp($var = NULL) {
   // We are returning JavaScript, so tell the browser.
   drupal_set_header('Content-Type: text/javascript; charset=utf-8');
 
@@ -98,8 +98,14 @@ function drupal_jsonp($var = NULL) {
       echo drupal_to_js($var);
     }
   }
+  exit();
 }
 
+function _lingwo_korpus_pageless($data) {
+  drupal_set_header('Content-Type: text/html; charset=utf-8');
+  echo $data;
+  exit();
+}
 
 /*
  * Our entry lookup AJAX callback.
@@ -129,7 +135,7 @@ function lingwo_korpus_lookup_entry() {
   }
 
   // return the HTML to the Ajax caller
-  drupal_jsonp(array('content' => $content));
+  _lingwo_korpus_jsonp(array('content' => $content));
 }
 
 /*
@@ -167,14 +173,14 @@ function lingwo_korpus_lookup_content() {
       cache_set($cid, $data, 'cache_lingwo_korpus');
     }
 
-    $json['content'] = $date;
+    $json['content'] = $data;
     $json['nid'] = $node->nid;
   }
   else {
     $json['not_found'] = TRUE;
   }
 
-  return drupal_jsonp($json);
+  _lingwo_korpus_jsonp($json);
 }
 
 /*
@@ -222,8 +228,18 @@ function lingwo_korpus_remote_login_submit($form, &$form_state) {
 }
 
 function lingwo_korpus_remote_loggedin_page() {
-  drupal_set_header('Content-Type: text/html; charset=utf-8');
-  echo theme('lingwo_korpus_remote_loggedin_page', $_GET['relay']);
+  global $user;
+  if ($_GET['callback']) {
+    $json = array();
+    if ($user->uid != 0) {
+      $json['username'] = $user->name;
+    }
+    _lingwo_korpus_jsonp($json);
+  }
+  else {
+    drupal_set_header('Content-Type: text/html; charset=utf-8');
+    echo theme('lingwo_korpus_remote_loggedin_page', $_GET['relay']);
+  }
 }
 
 function lingwo_korpus_remote_logout_page() {
@@ -248,7 +264,7 @@ function lingwo_korpus_remote_logout_page() {
     echo theme('lingwo_korpus_remote_logout_page', $_GET['relay']);
   }
   else {
-    drupal_jsonp(array('success' => TRUE));
+    _lingwo_korpus_jsonp(array('success' => TRUE));
   }
 }
 
