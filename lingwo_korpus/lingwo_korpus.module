@@ -101,9 +101,9 @@ function _lingwo_korpus_jsonp($var = NULL) {
   exit();
 }
 
-function _lingwo_korpus_remote_login_page($content) {
+function _lingwo_korpus_remote_login_page($content, $page_name) {
   drupal_set_header('Content-Type: text/html; charset=utf-8');
-  echo theme('lingwo_korpus_remote_login_page', $content);
+  echo theme('lingwo_korpus_remote_login_page', $content, $page_name);
   exit();
 }
 
@@ -212,15 +212,21 @@ function lingwo_korpus_lookup_senses() {
 
 function template_preprocess_lingwo_korpus_remote_login_page(&$vars) {
   $vars['title'] = drupal_get_title();
+  $vars['body_classes'] = 'page-'. $vars['page_name'];
   // If a theme wants to override this using a CSS file, they can create a theme function
   // which returns a <link .../> which points to it.
   $vars['styles'] = theme('lingwo_korpus_remote_login_styles');
   $vars['messages'] = theme('status_messages', 'error');
 }
 
+function theme_lingwo_korpus_remote_login_styles() {
+  $css = url(drupal_get_path('module', 'lingwo_korpus') .'/lingwo-korpus-remote-login.css');
+  return '<link type="text/css" rel="stylesheet" media="all" href="'.$css.'" />'."\n";
+}
+
 function lingwo_korpus_remote_login_page() {
   $content = drupal_get_form('user_login_block');
-  _lingwo_korpus_remote_login_page($content);
+  _lingwo_korpus_remote_login_page($content, 'rlogin');
 }
 
 function lingwo_korpus_remote_login_submit($form, &$form_state) {
@@ -249,7 +255,7 @@ function lingwo_korpus_remote_loggedin_page() {
       $content = theme('lingwo_korpus_remote_login_relay_iframe',
         $_GET['relay'], 'login-successful');
     }
-    _lingwo_korpus_remote_login_page($content);
+    _lingwo_korpus_remote_login_page($content, 'rloggedin');
   }
 }
 
@@ -275,7 +281,7 @@ function lingwo_korpus_remote_logout_page() {
       $content = theme('lingwo_korpus_remote_login_relay_iframe',
         $_GET['relay'], 'logout-successful');
     }
-    _lingwo_korpus_remote_login_page($content);
+    _lingwo_korpus_remote_login_page($content, 'rlogout');
   }
   else {
     _lingwo_korpus_jsonp(array('success' => TRUE));
@@ -427,6 +433,7 @@ function lingwo_korpus_theme() {
     'lingwo_korpus_remote_login_page' => array(
       'arguments' => array(
         'content' => NULL,
+        'page_name' => NULL,
       ),
       'template' => 'lingwo-korpus-remote-login-page',
     ),
@@ -439,7 +446,7 @@ function lingwo_korpus_theme() {
     ),
     'lingwo_korpus_remote_login_styles' => array(
       'arguments' => array(),
-      'template' => 'lingwo-korpus-remote-login-styles',
+      //'template' => 'lingwo-korpus-remote-login-styles',
     ),
   );
 }
