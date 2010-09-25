@@ -33,7 +33,7 @@ a.anno.selected {
 }
 
 .lingwo-sense.selected {
-	background-color: yellow;
+    background-color: yellow;
 }
 
 /*
@@ -44,6 +44,7 @@ a.anno.selected {
     color: white;
     border-bottom: 1px solid white;
     padding: 2px 10px;
+    height: 20px;
 }
 
 .bibliobird-embed-title {
@@ -58,5 +59,8 @@ a.anno.selected {
     display: block;
     color: white;
     text-align: right;
+}
+#bibliobirdEmbedIframe {
+    height: 175px;
 }
 

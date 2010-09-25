@@ -90,6 +90,10 @@ li {
   border: 1px solid black;
   width: 200px;
 }
+#edit-name.required.error,
+#edit-pass.required.error {
+  border: 2px solid red;
+}
 #edit-submit {
   /* 350px - 75px */
   margin-left: 275px;
