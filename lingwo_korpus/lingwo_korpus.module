@@ -142,6 +142,21 @@ function lingwo_korpus_lookup_entry() {
   _lingwo_korpus_jsonp(array('content' => $content));
 }
 
+// Helper function to return the NID of a content item for the given remote URL
+function _lingwo_korpus_lookup_remote_url($url) {
+  $field_remote_url = lingwo_korpus_field_remote_url();
+  $text_content_type = lingwo_korpus_text_content_type();
+  if (!empty($field_remote_url) && !empty($text_content_type) && !empty($url)) {
+    $field = content_fields($field_remote_url, $text_content_type);
+    $db_info = content_database_info($field);
+    $res = db_query("SELECT nid FROM ".$db_info['table']." WHERE ".$db_info['columns']['value']['column']." = '%s' LIMIT 1", $url);
+    if ($obj = db_fetch_object($res)) {
+      return $obj->nid;
+    }
+  }
+  return NULL;
+}
+
 /*
  * Our content lookup AJAX callback.
  */
@@ -156,13 +171,8 @@ function lingwo_korpus_lookup_content() {
     $json['username'] = $user->name;
   }
 
-  // TODO: we shouldn't hard-code the 'field_remote_url' field
-  $field = content_fields('field_remote_url', 'content');
-  $db_info = content_database_info($field);
-  $res = db_query("SELECT nid FROM ".$db_info['table']." WHERE ".$db_info['columns']['value']['column']." = '%s' LIMIT 1", $url);
-
-  if ($obj = db_fetch_object($res)) {
-    $node = node_load($obj->nid);
+  if ($nid = _lingwo_korpus_lookup_remote_url($url)) {
+    $node = node_load($nid);
 
     // TODO: merge this code with the same code in hook_nodeapi() below, we 
     // copy-pasted this from there.
@@ -178,7 +188,7 @@ function lingwo_korpus_lookup_content() {
     }
 
     $json['content'] = $data;
-    $json['nid'] = $node->nid;
+    $json['nid'] = $nid;
   }
   else {
     $json['not_found'] = TRUE;
@@ -707,13 +717,13 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
     unset($form['language']['#options']['']);
     $form['language']['#required'] = TRUE;
 
-    if (!empty($_GET['remote_url'])) {
+    $field_remote_url = lingwo_korpus_field_remote_url();
+    if (!empty($field_remote_url) && !empty($_GET['remote_url'])) {
       $remote_url = urldecode($_GET['remote_url']);
 
       require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
 
-      // TODO: don't hardcode 'field_remote_url'!
-      $form['field_remote_url'][0]['#default_value']['value'] = $remote_url;
+      $form[$field_remote_url][0]['#default_value']['value'] = $remote_url;
 
       $html = file_get_html($remote_url);
       $content = trim($html->find('.bibliobird-content', 0)->innertext);
@@ -843,6 +853,14 @@ function lingwo_korpus_text_content_type($value=NULL) {
   }
 
   variable_set('lingwo_korpus_text_content_type', $value);
+}
+
+function lingwo_korpus_field_remote_url($value=NULL) {
+  if (is_null($value)) {
+    return variable_get('lingwo_korpus_field_remote_url', '');
+  }
+
+  variable_set('lingwo_korpus_field_remote_url', $value);
 }
 
 function lingwo_korpus_python_exec($value=NULL) {

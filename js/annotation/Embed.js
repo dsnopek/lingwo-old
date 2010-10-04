@@ -257,11 +257,12 @@ require.def('lingwo_dictionary/annotation/Embed',
             }
         });
 
-        // start our script
-        BiblioBird.start();
         // attach a content area to each found on the page
         // leave for other scripts
         window.BiblioBird = BiblioBird;
+
+        // return so that the loading code can call .start()
+        return BiblioBird;
     }
 );
 

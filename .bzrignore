@@ -1,3 +1,4 @@
 staging.db
 punkt.pickle
 config.py
+*.uncompressed.js

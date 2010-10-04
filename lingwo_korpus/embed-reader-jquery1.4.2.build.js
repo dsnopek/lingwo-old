@@ -3,14 +3,13 @@
     paths: {
         lingwo_dictionary: "..",
     },
-    out: "embed-reader-nojquery.js",
-    optimize: "closure",
-    //optimize: "none",
+    out: "embed-reader-jquery1.4.2.uncompressed.js",
+    optimize: "none",
 
-    include: ["jquery-stubs","lingwo_dictionary/annotation/Embed"],
-    includeRequire: true,
+    include: ["jquery-1.4.2","lingwo_dictionary/annotation/Embed"],
     skipModuleInsertion: true,
     pragmas: {
+        jquery: true,
         requireExcludeModify: true,
         requireExcludePlugin: true,
         requireExcludeContext: true
