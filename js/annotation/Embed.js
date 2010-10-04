@@ -246,7 +246,7 @@ require.def('lingwo_dictionary/annotation/Embed',
                         // TODO: we need some configuration, so we can point the user to the
                         // correct language site!
                         .attr({
-                            href: BiblioBird.url+'/node/add/content?remote_url='+escape(url),
+                            href: BiblioBird.url+'/node/add/content?remote_url='+escape(this.url),
                             target: '_blank'
                         })
                     );
