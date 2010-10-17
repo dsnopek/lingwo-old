@@ -20,6 +20,18 @@ def buildElementString(elem):
     buildInner(elem)
     return s
 
+def doSegment(elem):
+    SentenceSegmenter().run(elem)
+    word_segmenter = WordSegmenter();
+    for sent in elem.getElementsByTagName('sent'):
+        word_segmenter.run(sent)
+
+class ProcessTest(unittest.TestCase):
+    def testEndTagSegment(self):
+        elem = parseString('this is a sentence<br />\n')
+        doSegment(elem)
+        self.assertEqual(elem.toxml(), '<body><sent><word>this</word> <word>is</word> <word>a</word> <word>sentence</word><br/>\n</sent></body>');
+
 class Process2Test(unittest.TestCase):
     def testLookup(self):
         s = buildElementString(parseString('<word name="1">first</word> <word name="2">second</word> <word name="3">third</word>'))
@@ -56,6 +68,17 @@ class Process2Test(unittest.TestCase):
         # check that it went correctly
         self.assertEqual(elem.toxml(),
             '<body><x>first</x> <x>second</x> <x>third</x><z>.</z></body>')
+
+    def testWrap2(self):
+        elem = parseString('this is a sentence<br />\n')
+        s = buildElementString(elem)
+        raw = str(s)
+        self.assertEqual(raw, 'this is a sentence\n');
+
+        self.assertEqual(raw[10:18], 'sentence')
+        s.wrap_in_element('x', 10, 18)
+
+        self.assertEqual(elem.toxml(), '<body>this is a <x>sentence</x><br/>\n</body>')
 
 if __name__ == '__main__': unittest.main()
 

@@ -57,6 +57,7 @@ class ElementString(object):
         if which == ElementString._SPLIT_END and localIndex == 0:
             # we really want the previous element because we are past the edge
             lookupIndex, (pos, elem), localIndex = self._find(index-1)
+            localIndex = len(elem.nodeValue)
 #        elif which == ElementString._SPLIT_START and localIndex == len(elem.nodeValue)-1:
 #            # we really want the next element because we are before the edge
 #            lookupIndex, (pos, elem), localIndex = self._find(index+1)
@@ -72,6 +73,7 @@ class ElementString(object):
                     break
             return elem
 
+        #print localIndex, len(elem.nodeValue)
         if which == ElementString._SPLIT_START:
             if localIndex == 0:
                 return walkUpParent(elem)
@@ -159,7 +161,7 @@ class Segmenter(object):
         if not self._elemStr.is_empty():
             raw_text = str(self._elemStr)
             segments = self._tokenize(raw_text)
-            #print raw_text, segments
+            #print repr(raw_text), segments
             endIndex = 0
             for seg in segments:
                 if not re.search(r'\w', seg):
@@ -170,7 +172,7 @@ class Segmenter(object):
                 #print seg
                 startIndex = raw_text.find(seg, endIndex)
                 endIndex = startIndex + len(seg)
-                #print startIndex, endIndex
+                #print startIndex, endIndex, seg
 
                 #print startIndex, endIndex, sent
                 self._elemStr.wrap_in_element(self._elemName, startIndex, endIndex)
