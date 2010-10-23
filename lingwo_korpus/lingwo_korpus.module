@@ -327,15 +327,11 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
   $text = $node->body;
 
   $form['#node'] = $node;
-  $form['edit-mode'] = array(
-    '#type' => 'radios',
-    '#title' => t('Edit Mode'),
-    '#default_value' => 'edit',
-    '#options' => array(
-        'edit' => t('Edit existing'),
-        'add'  => t('Add new')
-    ),
+
+  $form['lingwo-annotator-toolbar'] = array(
+    '#value' => '<div id="lingwo-korpus-annotator-toolbar" class="clear-block"></div>',
   );
+
   $form['korpus-text'] = array(
     '#value' => '<div id="edit-korpus-text">'. $text .'</div>',
   );
@@ -362,7 +358,6 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
     '#type' => 'checkbox',
     '#title' => t('Attributive'),
   );
-
   $form['anno-form']['save'] = array(
     '#value' => '<a href="#" class="anno-form-button" id="edit-anno-form-save">'. t('Save') .'</a>',
   );
@@ -372,7 +367,6 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
   $form['anno-form']['cancel'] = array(
     '#value' => '<a href="#" class="anno-form-button" id="edit-anno-form-cancel">'. t('Cancel') .'</a>',
   );
-
   $form['anno-form']['select-senses'] = array(
     '#value' => '<a href="#" class="anno-form-button" id="edit-anno-form-select-senses">'.
       t('Select Senses...') .'</a>',
@@ -396,13 +390,14 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
     ),
   ), 'setting');
 
-  lingwo_dictionary_add_require_js();
+  lingwo_dictionary_add_require_js(array('text'));
   drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotator.js');
   drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.css');
-  drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotator.css');
+  drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotator.less');
 
   return $form;
 }
+
 
 function lingwo_korpus_annotator_form_submit($form, &$form_state) {
   require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');

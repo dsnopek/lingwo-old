@@ -1,6 +1,6 @@
 /**
  * @license RequireJS rhino Copyright (c) 2010, The Dojo Foundation All Rights Reserved.
- * Available via the MIT, GPL or new BSD license.
+ * Available via the MIT or new BSD license.
  * see: http://github.com/jrburke/requirejs for details
  */
 /*global require: false, readFile: false */
@@ -11,10 +11,7 @@ CommonJS modules, by overriding require.get().
 */
 
 /*globals load: false */
-
-//>>includeStart("useStrict", pragmas.useStrict);
 "use strict";
-//>>includeEnd("useStrict");
 
 require.load = function (moduleName, contextName) {
     var url = require.nameToUrl(moduleName, null, contextName),
@@ -28,6 +25,6 @@ require.load = function (moduleName, contextName) {
 
     load(url);
 
-    //Mark the module loaded.
-    context.loaded[moduleName] = true;
+    //Support anonymous modules.
+    require.completeLoad(moduleName, context);
 };

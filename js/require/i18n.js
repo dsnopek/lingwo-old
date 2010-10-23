@@ -1,14 +1,11 @@
 /**
- * @license RequireJS i18n Copyright (c) 2004-2010, The Dojo Foundation All Rights Reserved.
- * Available via the MIT, GPL or new BSD license.
+ * @license RequireJS i18n Copyright (c) 2010, The Dojo Foundation All Rights Reserved.
+ * Available via the MIT or new BSD license.
  * see: http://github.com/jrburke/requirejs for details
  */
 /*jslint regexp: false, nomen: false, plusplus: false */
 /*global require: false, navigator: false */
-
-//>>includeStart("useStrict", pragmas.useStrict);
 "use strict";
-//>>includeEnd("useStrict");
 
 /**
  * This plugin handles i18n! prefixed modules. It does the following:
@@ -104,6 +101,7 @@
                     val = val.join("/");
 
                     if (!context.specified[val] && !(val in context.loaded) && !context.defined[val]) {
+                        context.defPlugin[val] = 'i18n';
                         toLoad.push(val);
                     }
                 }
@@ -123,7 +121,7 @@
 
         //Load any bundles that are still needed.
         if (toLoad.length) {
-            context.defined.require(toLoad);
+            require(toLoad, context.contextName);
         }
     }
 
@@ -151,7 +149,8 @@
                 bundle = context.nls[master];
                 if (!bundle) {
                     //No master bundle yet, ask for it.
-                    context.defined.require([master]);
+                    context.defPlugin[master] = 'i18n';
+                    require([master], context.contextName);
                     bundle = context.nls[master] = {};
                 }
                 //For nls modules, the callback is just a regular object,
@@ -222,11 +221,13 @@
                 } else {
                     //Store this locale to figure out after masterName is loaded and load masterName.
                     (context.nlsToLoad[masterName] || (context.nlsToLoad[masterName] = [])).push(locale);
-                    context.defined.require([masterName]);
+                    context.defPlugin[masterName] = 'i18n';
+                    require([masterName], contextName);
                 }
             } else {
                 //Top-level bundle. Just call regular load, if not already loaded
                 if (!context.nlsRootLoaded[name]) {
+                    context.defPlugin[name] = 'i18n';
                     require.load(name, contextName);
                 }
             }

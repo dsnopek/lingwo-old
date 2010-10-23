@@ -1,14 +1,11 @@
 /**
- * @license RequireJS text Copyright (c) 2004-2010, The Dojo Foundation All Rights Reserved.
- * Available via the MIT, GPL or new BSD license.
+ * @license RequireJS text Copyright (c) 2010, The Dojo Foundation All Rights Reserved.
+ * Available via the MIT or new BSD license.
  * see: http://github.com/jrburke/requirejs for details
  */
 /*jslint regexp: false, nomen: false, plusplus: false */
 /*global require: false, XMLHttpRequest: false, ActiveXObject: false */
-
-//>>includeStart("useStrict", pragmas.useStrict);
 "use strict";
-//>>includeEnd("useStrict");
 
 (function () {
     var progIds = ['Msxml2.XMLHTTP', 'Microsoft.XMLHTTP', 'Msxml2.XMLHTTP.4.0'],
@@ -162,7 +159,6 @@
                 require.fetchText(url, function (text) {
                     context.text[key] = text;
                     context.loaded[name] = true;
-                    require.checkLoaded(contextName);                    
                 });
             }
         },
