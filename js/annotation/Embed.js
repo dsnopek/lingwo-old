@@ -1,6 +1,6 @@
 
 require.def('lingwo_dictionary/annotation/Embed',
-    ['jquery','lingwo_dictionary/annotation/Reader'],
+    ['jquery','lingwo_dictionary/annotation/Reader2'],
     function ($, Reader) {
         var configDefaults = {
                 url: 'http://www.bibliobird.com',
@@ -72,11 +72,10 @@ require.def('lingwo_dictionary/annotation/Embed',
                 setTimeout(positionEmbedWindow, 0);
 
                 // initialize the Reader object
-                // TODO: can we make the first $('body') into null??
-                Reader.setup($('body'), loadEntry, true);
+                Reader.setup({ layout: 'popup' });
                 $('body').click(function (evt) {
                     BiblioBird.hideEmbedWindow();
-                    return Reader.onClick(evt);
+                    return Reader.handleClick(evt.target);
                 });
 
                 // copy values onto the object
@@ -135,11 +134,10 @@ require.def('lingwo_dictionary/annotation/Embed',
             }
         });
 
-
-        function loadEntry(target, contentArea, setContentFunc) {
+        Reader.onLoad = function (target) {
             var sense_id = target.attr('data-sense');
 
-            setContentFunc('Loading ...');
+            Reader.setBubbleLoading();
 
             // lookup the entry on the server
             $.ajax({
@@ -147,25 +145,35 @@ require.def('lingwo_dictionary/annotation/Embed',
                 dataType: 'jsonp',
                 data: { url: target.attr('href') },
                 success: function (res) {
-                    setContentFunc(res.content);
-                    $('.node', contentArea)
+                    Reader.setBubbleContent(res.content);
+                    $('.node', Reader.contentNode)
                         .removeClass('clear-block')
                         .removeAttr('id');
 
                     // TODO: for now, we want to drop the node links
-                    $('ul.links.inline', contentArea).remove();
+                    $('ul.links.inline', Reader.contentNode).remove();
 
                     if (sense_id) {
-                        $('.lingwo-sense-id-'+sense_id, contentArea).addClass('selected');
+                        $('.lingwo-sense-id-'+sense_id, Reader.contentNode).addClass('selected');
                     }
 
                     // TODO: how to handle this?
                     // hack to integrate the flag module
                     /*
                     if (Drupal.flagLink) {
-                        Drupal.flagLink(contentArea);
+                        Drupal.flagLink(Reader.contentNode);
                     }
                     */
+
+                    // make links relative to bibliobird
+                    $('a', Reader.contentNode).each(function (i, node) {
+                        var href = node.href, localHost;
+                        if (href) {
+                            localHost = window.location.protocol + '//' + window.location.host;
+                            node.href = href.replace(localHost, BiblioBird.url);
+                            node.target = '_blank';
+                        }
+                    });
                 }
             });
         }
