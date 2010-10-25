@@ -28,16 +28,24 @@ word {
         cursor: pointer;
     }
 
-    word.selected {
-        background-color: red;
-    }
-
     word.changed,
     word.added {
         color: white;
         background-color: green;
     }
 
+    word.selected {
+        background-color: red;
+    }
+}
+
+// mark missing words specially
+word.missing {
+	color: black !important;
+	background-color: yellow !important;
+}
+word.missing.selected {
+	border: 1px dashed red !important;
 }
 
 .mode-add {

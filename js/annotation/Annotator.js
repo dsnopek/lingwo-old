@@ -150,6 +150,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
 
                 $('#button-delete').click(function (evt) {
                     Annotator.deleteAnnotation();
+                    return false;
                 }).addClass('disabled');
 
                 $('#button-next').click(function (evt) {
@@ -296,6 +297,45 @@ require.def('lingwo_dictionary/annotation/Annotator',
                     $('#button-missing').removeClass('pressed');
                 }
                 this.onlyMissing = value;
+                if (this.onlyMissing) {
+                    this._startMissingSearch();
+                }
+            },
+
+            _startMissingSearch: function () {
+                var list = $('word', this.textNode).get();
+                var first = list.shift();
+                    lookup = function () {
+                        var node = list.shift(), pos;
+                        if (!Annotator.onlyMissing || !node) {
+                            Annotator._missingSearch = false;
+                            return;
+                        }
+
+                        node = $(node);
+                        pos = node.attr('pos');
+                        if (!pos) {
+                            node.addClass('missing');
+                            setTimeout(lookup, 100);
+                            return;
+                        }
+
+                        $.getJSON('/lingwo_korpus/lookup_senses', {
+                            'language': Drupal.settings.lingwo_korpus.text.language,
+                            'headword': node.attr('headword') || node.text(),
+                            'pos': pos
+                        }, function (res) {
+                            if (res.senses) {
+                                node.removeClass('missing');
+                            }
+                            else {
+                                node.addClass('missing');
+                            }
+                            setTimeout(lookup, 100);
+                        });
+                    };
+                this._missingSearch = true;
+                lookup();
             },
 
             _selectWord: function (target) {
@@ -326,6 +366,29 @@ require.def('lingwo_dictionary/annotation/Annotator',
             },
 
             selectNextWord: function () {
+                if (this.type == 'word') {
+                    var list = $(this.onlyMissing ? 'word.missing' : 'word').get(),
+                        index = -1, i;
+                    if (this.selected !== null) {
+                        for(i = 0; i < list.length; i++) {
+                            if (list[i] == this.selected.get(0)) {
+                                index = i;
+                                break;
+                            }
+                        }
+                    }
+                    index++;
+                    if (index < list.length) {
+                        this.selectWord(list[index]);
+                    }
+                    else {
+                        // don't clear the selection, if we are going through onlyMissing and
+                        // the search hasn't finished yet.
+                        if (!(this.onlyMissing && !this._missingSearch)) {
+                            this.clearSelection();
+                        }
+                    }
+                }
             },
 
             _lookupSelectedEntry: function () {
@@ -342,6 +405,10 @@ require.def('lingwo_dictionary/annotation/Annotator',
                     var sense_id, sense, options = [];
 
                     if (res.senses) {
+                        if (Annotator.selected !== null) {
+                            Annotator.selected.removeClass('missing');
+                        }
+
                         options.push({
                             label: 'None',
                             value: ''
@@ -369,6 +436,9 @@ require.def('lingwo_dictionary/annotation/Annotator',
                     }
                     else {
                         dataNode.html('<i>No entry found.</i>');
+                        if (Annotator.selected !== null) {
+                            Annotator.selected.addClass('missing');
+                        }
                     }
                 });
             },
