@@ -1,0 +1,9 @@
+<div class="form-radios" id="<%= id %>">
+<% for(var i = 0; i < options.length; i++) { %>
+    <%  options[i].type = 'radio';
+        options[i].name = name;
+        options[i].id = id+'-'+options[i].value;
+        options[i].checked = (default_value == options[i].value);
+    %><%= buildForm(options[i]) %>
+<% } %>
+</div>

@@ -22,9 +22,6 @@ require.def('lingwo_dictionary/annotation/Annotator',
          * Setup template functions.
          */
 
-        // add buildForm to the list of arguments always
-        parseTemplate.defaults.buildForm = buildForm;
-
         // make a shorter calling signature for the buttons
         makeBtn = (function (f) {
             return function (label, id) {
@@ -104,20 +101,6 @@ require.def('lingwo_dictionary/annotation/Annotator',
         }
 
         /*
-         * Setup Reader for working with this page.
-         */
-
-        Reader.onLoad = function (target) {
-            Annotator.selectWord(target);
-        };
-        Reader.isWordNode = function (target) {
-            if (target.tagName.toLowerCase() == 'word') {
-                return true;
-            }
-            return false;
-        }
-
-        /*
          * Declare the Annotator.
          */
 
@@ -185,6 +168,16 @@ require.def('lingwo_dictionary/annotation/Annotator',
             },
 
             _setupText: function() {
+                // setup Reader to work for the Annotator
+                Reader.onLoad = function (target) {
+                    Annotator._selectWord(target);
+                };
+                Reader.isWordNode = function (target) {
+                    if (target.tagName.toLowerCase() == 'word') {
+                        return true;
+                    }
+                    return false;
+                }
                 Reader.setup({ layout: 'docked' });
 
                 $(window).click(function (evt) {
@@ -218,53 +211,16 @@ require.def('lingwo_dictionary/annotation/Annotator',
                         .html(makeBubbleForm({ pos_list: res.pos_list, message: msgWordOn }))
                         .appendTo(Reader.contentNode);
 
-                    /*
-                    $('#edit-anno-form-select-senses').click(function (evt) {
-                        $('#sense-selector').show();
-                        $('#edit-anno-form').hide();
-
-                        // load the senses
-                        $('#sense-selector-data').text(Drupal.t('Loading...'));
-
-                        $.getJSON('/lingwo_korpus/lookup_senses', {
-                            'language': Drupal.settings.lingwo_korpus.text.language,
-                            'headword': $('#edit-anno-form-headword').val(),
-                            'pos': $('#edit-anno-form-pos :selected').val()
-                        }, function (res) {
-                            var sense_id, data = $('#sense-selector-data'), sense;
-                            data.html('');
-                            if (res.senses) {
-                                $('<div class="sense-selector-data-item clear-block"></div>')
-                                    .append(
-                                        $('<input type="radio" name="sense-selector-value" value=""></input>')
-                                        .attr('checked', !Annotator.selected.attr('sense') ? 'checked' : null))
-                                    .append('<div class="sense-selector-data-item-label><b>'+Drupal.t('None')+'</b></div>')
-                                    .appendTo(data);
-
-                                for (sense_id in res.senses) {
-                                    sense = res.senses[sense_id];
-                                    $('<div class="sense-selector-data-item clear-block"></div>')
-                                        .append(
-                                            $('<input type="radio" name="sense-selector-value"></input>')
-                                            .attr('checked', Annotator.selected.attr('sense') == sense_id ? 'checked' : null)
-                                            .val(sense_id))
-                                        .append(
-                                            '<div class="sense-selector-data-item-label">' +
-                                            ((!sense.difference && !sense.example) ? sense_id : (
-                                              (sense.difference ? ('<div><b>'+Drupal.t('Difference')+'</b>: '+sense.difference+'</div>') : '') +
-                                              (sense.example    ? ('<div><b>'+Drupal.t('Example')+'</b>: '+sense.example+'</div>') : ''))) +
-                                            '</div>')
-                                        .appendTo(data);
-                                }
-                            }
-                            else {
-                                data.html('<i>'+Drupal.t('No entry found.')+'</i>');
-                            }
-                        });
-
+                    $('#anno-form-lookup-entry').click(function (evt) {
+                        Annotator._lookupSelectedEntry();
                         return false;
                     });
-                    */
+
+                    $('#sense-form-return').click(function (evt) {
+                        Annotator.setBubblePane('anno-form');
+                        return false;
+                    });
+
                 });
             },
 
@@ -342,7 +298,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 this.onlyMissing = value;
             },
 
-            selectWord: function (target) {
+            _selectWord: function (target) {
                 // save the previously selected word
                 if (this.selected !== null) {
                     this.saveAnnotation();
@@ -359,10 +315,62 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 // we can now delete
                 $('#button-delete').removeClass('disabled');
 
+                // clear the old sense form, so that we don't accidently save it to this annotation
+                $('#sense-form-data').html('');
+
                 this.selected = target;
             },
 
+            selectWord: function (target) {
+                Reader.handleClick(target);
+            },
+
             selectNextWord: function () {
+            },
+
+            _lookupSelectedEntry: function () {
+                var dataNode = $('#sense-form-data');
+
+                this.setBubblePane('sense-form');
+                dataNode.text('Loading...');
+
+                $.getJSON('/lingwo_korpus/lookup_senses', {
+                    'language': Drupal.settings.lingwo_korpus.text.language,
+                    'headword': $('#anno-form-headword').val(),
+                    'pos': $('#anno-form-pos :selected').val()
+                }, function (res) {
+                    var sense_id, sense, options = [];
+
+                    if (res.senses) {
+                        options.push({
+                            label: 'None',
+                            value: ''
+                        });
+
+                        for (sense_id in res.senses) {
+                            sense = res.senses[sense_id];
+                            options.push({
+                                label: '<div class="sense-data">'+
+                                       ((!sense.difference && !sense.example) ? sense_id : (
+                                       (sense.difference ? ('<div><b>'+Drupal.t('Difference')+'</b>: '+sense.difference+'</div>') : '') +
+                                       (sense.example    ? ('<div><b>'+Drupal.t('Example')+'</b>: '+sense.example+'</div>') : ''))) +
+                                       '</div>',
+                                value: sense_id
+                            });
+                        }
+
+                        dataNode.html(buildForm({
+                            type: 'radios',
+                            name: 'sense-form-selector',
+                            options: options,
+                            default_value: Annotator.selected.attr('sense')
+                        }));
+                        $('.form-item', dataNode).addClass('clear-block');
+                    }
+                    else {
+                        dataNode.html('<i>No entry found.</i>');
+                    }
+                });
             },
 
             _onSelectionStart: function (selStart) {
@@ -455,15 +463,13 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 }
 
                 // sense
-                /*
-                sense = $("input[@name='sense-selector-value']:checked").val();
+                sense = $("input[@name='sense-form-selector']:checked").val();
                 if (sense) {
                     this.selected.attr('sense', sense);
                 }
                 else {
                     this.selected.removeAttr('sense');
                 }
-                */
 
                 // show that it is changed to the user
                 this.selected.addClass(this.mode == 'edit' ? 'changed' : 'added');

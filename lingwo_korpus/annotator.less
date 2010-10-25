@@ -21,65 +21,48 @@ word {
     padding: 0 1px;
 }
 
-.mode-edit word {
-    background-color: blue;
-    color: white;
-    cursor: pointer;
+.mode-edit {
+    word {
+        background-color: blue;
+        color: white;
+        cursor: pointer;
+    }
+
+    word.selected {
+        background-color: red;
+    }
+
+    word.changed,
+    word.added {
+        color: white;
+        background-color: green;
+    }
+
 }
 
-.mode-edit word.selected {
-    background-color: red;
+.mode-add {
+    word.added {
+        color: white;
+        background-color: green;
+    }
+
+    word {
+        background-color: LightGrey;
+    }
 }
 
-.mode-edit word.changed,
-.mode-edit word.added,
-.mode-add  word.added {
-    color: white;
-    background-color: green;
-}
+#sense-form-selector {
+    .form-radio {
+        display: block;
+        float: left;
+        width: 20px;
+        margin-right: 10px;
+    }
 
-.mode-add word {
-    background-color: LightGrey;
-}
-
-#lingwo-korpus-annotator-dialog {
-    position: fixed;
-    background-color: white;
-    border: 1px solid black;
-    top: 100px;
-    padding: 20px;
-}
-
-.anno-form-button {
-    margin-right: 10px;
-    text-decoration: none;
-    font-weight: bold;
-    color: blue;
-}
-
-#edit-anno-form-select-senses {
-  position: absolute;
-  right: 0;
-}
-
-#sense-selector-return {
-  display: block;
-  text-align: right;
-}
-
-.sense-selector-data-item {
-}
-
-.sense-selector-data-item input {
-  display: block;
-  float: left;
-  width: 20px;
-  margin-right: 10px;
-}
-
-.sense-selector-data-item-label {
-  float: left;
-  width: 200px;
+    .sense-data {
+        float: left;
+        width: 200px;
+    }
 }
 
 /*
