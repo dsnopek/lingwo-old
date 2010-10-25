@@ -1,0 +1,8 @@
+<% if (label) { %>
+<label for="<%= id %>"><%= label %></label>
+<% } %>
+<select class="form-select" name="<%= name %>" id="<%= id %>">
+    <% for (var i = 0; i < options.length; i++) { %>
+    <option value="<%= options[i].value %>"><%= options[i].label %></option>
+    <% } %>
+</select>

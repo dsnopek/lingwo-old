@@ -3,9 +3,13 @@ require.def('lingwo_dictionary/annotation/Annotator',
     ['jquery',
      'lingwo_dictionary/annotation/Reader2',
      'lingwo_dictionary/annotation/TextSelector',
-     'text!lingwo_dictionary/annotation/Annotator/menu.html!strip'
+     'lingwo_dictionary/buildForm',
+     'lingwo_dictionary/parseTemplate',
+     'text!lingwo_dictionary/annotation/Annotator/button.html',
+     'text!lingwo_dictionary/annotation/Annotator/button-group.html',
+     'text!lingwo_dictionary/annotation/Annotator/bubble-form.html'
     ],
-    function ($, Reader, TextSelector, menu_html) {
+    function ($, Reader, TextSelector, buildForm, parseTemplate, makeBtn, makeBtnGrp, makeBubbleForm) {
         var Annotator,
             msgWordOn = '<i>Click a word on the left to edit the annotation</i>',
             msgWordOff = '<i>Panel disabled</i>';
@@ -13,6 +17,28 @@ require.def('lingwo_dictionary/annotation/Annotator',
         // IE hack for un-recognized elements
         document.createElement('word');
         document.createElement('grammar');
+
+        /*
+         * Setup template functions.
+         */
+
+        // add buildForm to the list of arguments always
+        parseTemplate.defaults.buildForm = buildForm;
+
+        // make a shorter calling signature for the buttons
+        makeBtn = (function (f) {
+            return function (label, id) {
+                return f({label:label, id:id});
+            };
+        })(parseTemplate(makeBtn));
+        makeBtnGrp = (function (f) {
+            return function (title, buttons) {
+                return f({title:title, buttons:buttons});
+            };
+        })(parseTemplate(makeBtnGrp));
+        
+        // simple parse
+        makeBubbleForm = parseTemplate(makeBubbleForm);
 
         /*
          * Utility functions.
@@ -33,7 +59,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
             return null;
         }
 
-        function isInsideViewer(node) {
+        function isInsideBubble(node) {
             while (node = node.parentNode) {
                 if (node.id == 'lingwo-korpus-entry-view') {
                     return true;
@@ -99,9 +125,11 @@ require.def('lingwo_dictionary/annotation/Annotator',
             toolbarNode: null,
             textNode: null,
             textValueNode: null,
+            bubbleFormNode: null,
 
             type: null,
             mode: null,
+            bubblePane: 'message',
             onlyMissing: false,
             selected: null,
 
@@ -109,7 +137,19 @@ require.def('lingwo_dictionary/annotation/Annotator',
             _setupDone: false,
 
             _setupToolbar: function () {
-                this.toolbarNode.html(menu_html);
+                this.toolbarNode.html(
+                    makeBtnGrp('Type', [
+                        makeBtn('Sentence', 'button-type-sent'),
+                        makeBtn('Word',     'button-type-word')
+                    ]) +
+                    makeBtnGrp('Mode', [
+                        makeBtn('Add',  'button-mode-add'),
+                        makeBtn('Edit', 'button-mode-edit')
+                    ]) +
+                    makeBtn('Delete',  'button-delete') +
+                    makeBtn('Next',    'button-next') +
+                    makeBtn('Missing', 'button-missing')
+                );
 
                 $.each(['word','sent'], function (i,x) {
                     $('#button-type-'+x).click(function () {
@@ -124,6 +164,10 @@ require.def('lingwo_dictionary/annotation/Annotator',
                         return false;
                     });
                 });
+
+                $('#button-delete').click(function (evt) {
+                    Annotator.deleteAnnotation();
+                }).addClass('disabled');
 
                 $('#button-next').click(function (evt) {
                     if (Annotator.type == 'word') {
@@ -141,24 +185,20 @@ require.def('lingwo_dictionary/annotation/Annotator',
             },
 
             _setupText: function() {
-                Reader.setup({ layout: 'popup' });
-                //Reader.setBubbleContent(msgWordOn);
+                Reader.setup({ layout: 'docked' });
 
                 $(window).click(function (evt) {
                     var wordParent;
                     if (Annotator.type == 'word' && Annotator.mode == 'edit') {
                         if (wordParent = findParentWord(evt.target)) {
+                            // TODO: shouldn't this be handled in .selectWord()?
                             if (Annotator.selected !== null) {
                                 Annotator.saveAnnotation();
                             }
                             return Reader.handleClick(wordParent);
                         }
-                        if (!isInsideViewer(evt.target)) {
-                            if (Annotator.selected !== null) {
-                                Annotator.saveAnnotation();
-                                Annotator.selected = null;
-                            }
-                            Reader.hideBubble();
+                        if (!isInsideBubble(evt.target)) {
+                            Annotator.clearSelection();
                         }
                     }
                 });
@@ -171,86 +211,60 @@ require.def('lingwo_dictionary/annotation/Annotator',
             _setupForm: function () {
                 Reader.setBubbleContent('');
 
-                $('#edit-anno-form')
-                    .css('display', null)
-                    .appendTo(Reader.contentNode);
+                // first, we need to get the list of posItems
+                $.getJSON('/lingwo_korpus/pos_list', function (res) {
+                    Annotator.bubbleFormNode = $('<div id="bubble-form"></div>');
+                    Annotator.bubbleFormNode
+                        .html(makeBubbleForm({ pos_list: res.pos_list, message: msgWordOn }))
+                        .appendTo(Reader.contentNode);
 
-                $('#edit-anno-form-save').click(function (evt) {
-                    Annotator.saveAnnotation();
-                    Reader.hideBubble();
-                    Annotator.selected = null;
-                    return false;
-                });
-                $('#edit-anno-form-delete').click(function (evt) {
-                    Annotator.deleteAnnotation();
-                    Reader.hideBubble();
-                    Annotator.selected = null;
-                    return false;
-                });
-                $('#edit-anno-form-cancel').click(function (evt) {
-                    if (Annotator.mode == 'add') {
-                        Annotator.deleteAnnotation();
-                    }
-                    Reader.hideBubble();
-                    Annotator.selected = null;
-                    return false;
-                });
+                    /*
+                    $('#edit-anno-form-select-senses').click(function (evt) {
+                        $('#sense-selector').show();
+                        $('#edit-anno-form').hide();
 
-                // setup a seperate section for holding the senses
-                $('<div id="sense-selector"><div id="sense-selector-data"></div><a href="#" id="sense-selector-return" class="anno-form-button"></a></div>')
-                    .css('display', 'none')
-                    .appendTo(Reader.contentNode);
-                $('#sense-selector-return')
-                    .text(Drupal.t('Return to annotation...'))
-                    .click(function (evt) {
-                        $('#sense-selector').hide();
-                        $('#edit-anno-form').show();
-                        return false;
-                    });
-                $('#edit-anno-form-select-senses').click(function (evt) {
-                    $('#sense-selector').show();
-                    $('#edit-anno-form').hide();
+                        // load the senses
+                        $('#sense-selector-data').text(Drupal.t('Loading...'));
 
-                    // load the senses
-                    $('#sense-selector-data').text(Drupal.t('Loading...'));
-
-                    $.getJSON('/lingwo_korpus/lookup_senses', {
-                        'language': Drupal.settings.lingwo_korpus.text.language,
-                        'headword': $('#edit-anno-form-headword').val(),
-                        'pos': $('#edit-anno-form-pos :selected').val()
-                    }, function (res) {
-                        var sense_id, data = $('#sense-selector-data'), sense;
-                        data.html('');
-                        if (res.senses) {
-                            $('<div class="sense-selector-data-item clear-block"></div>')
-                                .append(
-                                    $('<input type="radio" name="sense-selector-value" value=""></input>')
-                                    .attr('checked', !Annotator.selected.attr('sense') ? 'checked' : null))
-                                .append('<div class="sense-selector-data-item-label><b>'+Drupal.t('None')+'</b></div>')
-                                .appendTo(data);
-
-                            for (sense_id in res.senses) {
-                                sense = res.senses[sense_id];
+                        $.getJSON('/lingwo_korpus/lookup_senses', {
+                            'language': Drupal.settings.lingwo_korpus.text.language,
+                            'headword': $('#edit-anno-form-headword').val(),
+                            'pos': $('#edit-anno-form-pos :selected').val()
+                        }, function (res) {
+                            var sense_id, data = $('#sense-selector-data'), sense;
+                            data.html('');
+                            if (res.senses) {
                                 $('<div class="sense-selector-data-item clear-block"></div>')
                                     .append(
-                                        $('<input type="radio" name="sense-selector-value"></input>')
-                                        .attr('checked', Annotator.selected.attr('sense') == sense_id ? 'checked' : null)
-                                        .val(sense_id))
-                                    .append(
-                                        '<div class="sense-selector-data-item-label">' +
-                                        ((!sense.difference && !sense.example) ? sense_id : (
-                                          (sense.difference ? ('<div><b>'+Drupal.t('Difference')+'</b>: '+sense.difference+'</div>') : '') +
-                                          (sense.example    ? ('<div><b>'+Drupal.t('Example')+'</b>: '+sense.example+'</div>') : ''))) +
-                                        '</div>')
+                                        $('<input type="radio" name="sense-selector-value" value=""></input>')
+                                        .attr('checked', !Annotator.selected.attr('sense') ? 'checked' : null))
+                                    .append('<div class="sense-selector-data-item-label><b>'+Drupal.t('None')+'</b></div>')
                                     .appendTo(data);
-                            }
-                        }
-                        else {
-                            data.html('<i>'+Drupal.t('No entry found.')+'</i>');
-                        }
-                    });
 
-                    return false;
+                                for (sense_id in res.senses) {
+                                    sense = res.senses[sense_id];
+                                    $('<div class="sense-selector-data-item clear-block"></div>')
+                                        .append(
+                                            $('<input type="radio" name="sense-selector-value"></input>')
+                                            .attr('checked', Annotator.selected.attr('sense') == sense_id ? 'checked' : null)
+                                            .val(sense_id))
+                                        .append(
+                                            '<div class="sense-selector-data-item-label">' +
+                                            ((!sense.difference && !sense.example) ? sense_id : (
+                                              (sense.difference ? ('<div><b>'+Drupal.t('Difference')+'</b>: '+sense.difference+'</div>') : '') +
+                                              (sense.example    ? ('<div><b>'+Drupal.t('Example')+'</b>: '+sense.example+'</div>') : ''))) +
+                                            '</div>')
+                                        .appendTo(data);
+                                }
+                            }
+                            else {
+                                data.html('<i>'+Drupal.t('No entry found.')+'</i>');
+                            }
+                        });
+
+                        return false;
+                    });
+                    */
                 });
             },
 
@@ -287,13 +301,13 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 if (this.type == 'word') {
                     $('#button-next').removeClass('disabled');
                     $('#button-missing').removeClass('disabled');
-                    //Reader.setBubbleContent(msgWordOn);
+                    this.showBubbleMessage(msgWordOn);
                 }
                 else if (this.type == 'sent') {
                     $('#button-next').addClass('disabled');
                     $('#button-missing').addClass('disabled');
                     this.setOnlyMissing(false);
-                    //Reader.setBubbleContent(msgWordOff);
+                    this.showBubbleMessage(msgWordOff);
                 }
             },
 
@@ -301,6 +315,20 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 if (this.mode == mode) return;
                 this._toggleButton('mode', mode);
                 this._selector.activate(this.mode == 'add');
+            },
+
+            setBubblePane: function (bubblePane) {
+                if (this.bubbleFormNode === null) return;
+                if (this.bubblePane == bubblePane) return;
+                $('#bubble-form-pane-'+this.bubblePane).hide();
+                $('#bubble-form-pane-'+bubblePane).show();
+                this.bubblePane = bubblePane;
+            },
+
+            showBubbleMessage: function (message) {
+                if (this.bubbleFormNode === null) return;
+                this.setBubblePane('message');
+                $('#bubble-form-pane-message').html(message);
             },
 
             setOnlyMissing: function (value) {
@@ -315,15 +343,21 @@ require.def('lingwo_dictionary/annotation/Annotator',
             },
 
             selectWord: function (target) {
+                // save the previously selected word
+                if (this.selected !== null) {
+                    this.saveAnnotation();
+                }
+
                 target = $(target);
 
-                $('#edit-anno-form').show();
-                $('#sense-selector').hide();
-
-                $('#edit-anno-form-headword').val(target.attr('headword') || target.text());
-                $('#edit-anno-form-pos').val(target.attr('pos'));
-                $('#edit-anno-form-attributive').attr('checked',
+                this.setBubblePane('anno-form');
+                $('#anno-form-headword').val(target.attr('headword') || target.text());
+                $('#anno-form-pos').val(target.attr('pos'));
+                $('#anno-form-attributive').attr('checked',
                     target.attr('attributive') == 'true' ? 'checked' : '');
+
+                // we can now delete
+                $('#button-delete').removeClass('disabled');
 
                 this.selected = target;
             },
@@ -337,8 +371,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
 
             _onSelectionStop: function (selStart, selEnd) {
                 if (selStart === null || selEnd === null) {
-                    Reader.hideBubble();
-                    this.selected = null;
+                    this.clearSelection();
                     return;
                 }
 
@@ -402,7 +435,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 }
 
                 // headword
-                headword = $('#edit-anno-form-headword').val();
+                headword = $('#anno-form-headword').val();
                 if (headword == this.selected.text()) {
                     this.selected.removeAttr('headword');
                 }
@@ -411,10 +444,10 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 }
 
                 // pos
-                this.selected.attr('pos', $('#edit-anno-form-pos :selected').val());
+                this.selected.attr('pos', $('#anno-form-pos :selected').val());
 
                 // attributive
-                if ($('#edit-anno-form-attributive').attr('checked')) {
+                if ($('#anno-form-attributive').attr('checked')) {
                     this.selected.attr('attributive', 'true');
                 }
                 else {
@@ -422,6 +455,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 }
 
                 // sense
+                /*
                 sense = $("input[@name='sense-selector-value']:checked").val();
                 if (sense) {
                     this.selected.attr('sense', sense);
@@ -429,13 +463,14 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 else {
                     this.selected.removeAttr('sense');
                 }
+                */
 
                 // show that it is changed to the user
                 this.selected.addClass(this.mode == 'edit' ? 'changed' : 'added');
             },
 
             deleteAnnotation: function () {
-                if (!this.selected) return;
+                if (this.selected === null) return;
 
                 var curAnnoNode = this.selected.get(0),
                     parentNode = curAnnoNode.parentNode,
@@ -451,10 +486,19 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 }
 
                 parentNode.removeChild(curAnnoNode);
+                this.clearSelection();
+            },
+
+            clearSelection: function () {
+                this.saveAnnotation();
                 this.selected = null;
+                this.showBubbleMessage(msgWordOn);
+                Reader.clearSelection();
+                $('#button-delete').addClass('disabled');
             },
 
             updateValueNode: function () {
+                this.saveAnnotation();
                 this.textValueNode.val(this._selector.getText());
             }
         };

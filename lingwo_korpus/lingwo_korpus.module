@@ -47,6 +47,12 @@ function lingwo_korpus_menu() {
     'access arguments' => array('annotate lingwo_korpus texts'),
     'type' => MENU_CALLBACK,
   );
+  $items['lingwo_korpus/pos_list'] = array(
+    'title' => 'Part of Speech list',
+    'page callback' => 'lingwo_korpus_pos_list',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
   $items['lingwo_korpus/rlogin'] = array(
     'title' => 'Login to BiblioBird',
     'page callback' => 'lingwo_korpus_remote_login_page',
@@ -218,6 +224,22 @@ function lingwo_korpus_lookup_senses() {
   }
 
   drupal_json(array('senses' => $senses));
+}
+
+/*
+ * Returns a list of the POS
+ */
+function lingwo_korpus_pos_list() {
+  // Because JSON can't hold the order in an Object we need to return an Array
+  $map = lingwo_dictionary_pos_options(TRUE);
+  $list = array();
+  foreach ($map as $value => $label) {
+    $list[] = array('label' => $label, 'value' => $value);
+  }
+  _lingwo_korpus_jsonp(array(
+    'pos_map' => $map,
+    'pos_list' => $list
+  ));
 }
 
 /*

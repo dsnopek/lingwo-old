@@ -1,0 +1,25 @@
+<div id="bubble-form-pane-message"><%= message %></div>
+<div id="bubble-form-pane-anno-form" style="display: none">
+    <%= buildForm([
+        {   type: 'text',
+            id: 'anno-form-headword',
+            label: 'Headword'
+        },
+        {   type: 'select',
+            id: 'anno-form-pos',
+            options: pos_list,
+            label: 'Part of Speech'
+        },
+        {   type: 'checkbox',
+            id: 'anno-form-attributive',
+            label: 'Attributive'
+        }
+    ]) %>
+    
+    <div><a href="javascript:void(0)" id="anno-form-lookup-entry">Lookup Entry</a></div>
+</div>
+<div id="bubble-form-pane-sense-form" style="display: none">
+    <div id="sense-form-sense-data"></div>
+    <div><a href="javascript:void(0)" id="sense-form-return">Return</a></div>
+</div>
+
