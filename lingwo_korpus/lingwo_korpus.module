@@ -443,7 +443,6 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
   }
 
   $node->teaser = node_teaser($node->body, $node->format);
-  $node->_lingwo_korpus_no_segment = TRUE;
   node_save($node);
 
   drupal_set_message(t('Annotation saved.'));
@@ -530,9 +529,9 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
   if ($node->type != lingwo_korpus_text_content_type())
     return;
 
-  if ($op == 'presave' && !$node->_lingwo_korpus_no_segment) {
+  if ($op == 'presave' && $node->lingwo_korpus_auto_annotate) {
     $orig_body = $node->body;
-    if (!_lingwo_korpus_autolookup_node($node, 'body', FALSE)) {
+    if (!_lingwo_korpus_autolookup_node($node, 'body', $node->lingwo_korpus_auto_annotate == 'full')) {
       // if there are any errors, we don't need to continue
       return;
     }
@@ -549,7 +548,7 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
       // I know that we don't show the annotation reader for just the teaser, but 
       // I think segmenting the teaser is the right thing to do...  If one day we want
       // to have the annotation reader in the text browser, it will help.
-      _lingwo_korpus_autolookup_node($node, 'teaser', FALSE);
+      _lingwo_korpus_autolookup_node($node, 'teaser', $node->lingwo_korpus_auto_annotate == 'full');
     }
   }
 
@@ -602,6 +601,23 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
       drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.css');
     }
   }
+}
+
+/**
+ * Implementation of hook_content_extra_fields().
+ */
+function lingwo_korpus_content_extra_fields($type_name) {
+  $extra = array();
+
+  if (lingwo_korpus_text_content_type() == $type_name) {
+    $extra['lingwo_korpus_settings'] = array(
+      'label' => t('Auto Annotate'),
+      'description' => t('Lingwo Korpus "Auto Annotate" field.'),
+      'weight' => 0,
+    );
+  }
+
+  return $extra;
 }
 
 function lingwo_korpus_filter_text($text, $lang_pair) {
@@ -747,6 +763,28 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
       $form['body_field']['body']['#default_value'] = $content;
       $form['title']['#default_value'] = $html->find('title', 0)->plaintext;
     }
+
+    $form['lingwo_korpus_settings'] = array(
+      '#type' => 'fieldset',
+      // TODO: this will take more thought.  If the item isn't there, then we'll have to
+      // copy the defaults in at some point.
+      //'#access' => user_access('administer lingwo_korpus'),
+      '#title' => t('Auto annotate'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#tree' => FALSE,
+    );
+    $form['lingwo_korpus_settings']['lingwo_korpus_auto_annotate'] = array(
+      '#type'  => 'radios',
+      //'#title' => t('Auto Annotate'),
+      '#options' => array(
+        ''        => t("Don't auto annotate"),
+        'segment' => t("Segment only"),
+        'full'    => t("Full automatic annotation"),
+      ),
+      // TODO: the default value should be configurable on the admin page
+      '#default_value' => empty($form['#node']->nid) ? 'segment' : '',
+    );
   }
   elseif ($form_id == 'user_login_block' && $_GET['q'] == 'lingwo_korpus/rlogin') {
     unset($form['#action']);
