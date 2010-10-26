@@ -129,8 +129,11 @@ require.def('lingwo_dictionary/annotation/Annotator',
                         makeBtn('Add',  'button-mode-add'),
                         makeBtn('Edit', 'button-mode-edit')
                     ]) +
-                    makeBtn('Delete',  'button-delete') +
-                    makeBtn('Next',    'button-next') +
+                    makeBtn('Delete', 'button-delete') +
+                    makeBtnGrp('Step', [
+                        makeBtn('Previous', 'button-prev'),
+                        makeBtn('Next',     'button-next')
+                    ]) +
                     makeBtn('Missing', 'button-missing')
                 );
 
@@ -153,10 +156,13 @@ require.def('lingwo_dictionary/annotation/Annotator',
                     return false;
                 }).addClass('disabled');
 
+                $('#button-prev').click(function (evt) {
+                    Annotator.selectPreviousWord();
+                    return false;
+                });
+
                 $('#button-next').click(function (evt) {
-                    if (Annotator.type == 'word') {
-                      Annotator.selectNextWord();
-                    }
+                    Annotator.selectNextWord();
                     return false;
                 });
 
@@ -228,6 +234,75 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 });
             },
 
+            _setupKeyboardEvents: function () {
+                $(document).keyup(function (evt) {
+                    var tagName = evt.target.tagName.toLowerCase();
+                    if (tagName != 'textarea' && tagName != 'select' && !(tagName == 'input' && evt.target.type == 'text')) {
+                        if (evt.which == 46) { // delete
+                            Annotator.deleteAnnotation();
+                            return false;
+                        }
+                        if (evt.which == 78) { // n
+                            if (evt.shiftKey) {
+                                Annotator.selectPreviousWord();
+                            }
+                            else {
+                                Annotator.selectNextWord();
+                            }
+                            return false;
+                        }
+                        if (evt.which == 65 && Annotator.mode == 'edit') {
+                            Annotator.setMode('add');
+                            return false;
+                        }
+                        if (evt.which == 69 && Annotator.mode == 'add') {
+                            Annotator.setMode('edit');
+                            return false;
+                        }
+                        if (Annotator.bubblePane == 'anno-form') {
+                            if (evt.which == 72) { // h
+                                $('#anno-form-headword').focus().select();
+                                return false;
+                            } else if (evt.which == 80) { // p
+                                $('#anno-form-pos').focus();
+                                // NOTE: this only happens when using keydown() and not keyup()!
+                                // for some reason, the select also seems to take the keydown
+                                // event and this will change its value.  So, we re-instate the
+                                // original value. (Originally observed on Firefox 3.0.6)
+                                /*
+                                setTimeout(function () {
+                                    $('#anno-form-pos').val(Annotator.selected.attr('pos')||'');
+                                }, 0);
+                                */
+                                return false;
+                            } else if (evt.which == 84) { // t
+                                $('#anno-form-attributive').attr('checked', 
+                                    !$('#anno-form-attributive').attr('checked'));
+                                return false;
+                            } else if (evt.which == 76) { // l
+                                Annotator._lookupSelectedEntry();
+                                return false;
+                            } else if (evt.which == 27) { // escape
+                                Annotator.clearSelection();
+                                return false;
+                            }
+                        }
+                        else if (Annotator.bubblePane == 'sense-form') {
+                            if (evt.which == 76 || evt.which == 27 || evt.which == 13) { // l, escape, enter
+                                Annotator.setBubblePane('anno-form');
+                                return false;
+                            }
+                        }
+                    } else {
+                        // a quick escape from a text area
+                        if (evt.which == 27 || (evt.which == 13 && tagName != 'textarea')) { // escape, enter
+                            $(evt.target).blur();
+                            return false;
+                        }
+                    }
+                });
+            },
+
             setup: function (config) {
                 if (this._setupDone) return;
                 this._setupDone = true;
@@ -239,6 +314,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 this._setupToolbar();
                 this._setupText();
                 this._setupForm();
+                this._setupKeyboardEvents();
 
                 this.setType('word');
                 this.setMode('edit');
@@ -282,6 +358,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 if (this.bubblePane == bubblePane) return;
                 $('#bubble-form-pane-'+this.bubblePane).hide();
                 $('#bubble-form-pane-'+bubblePane).show();
+                $('body').focus();
                 this.bubblePane = bubblePane;
             },
 
@@ -368,7 +445,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 Reader.handleClick(target);
             },
 
-            selectNextWord: function () {
+            _selectRelativeWord: function (inc) {
                 if (this.type == 'word') {
                     var list = $(this.onlyMissing ? 'word.missing' : 'word').get(),
                         index = -1, i;
@@ -380,8 +457,13 @@ require.def('lingwo_dictionary/annotation/Annotator',
                             }
                         }
                     }
-                    index++;
-                    if (index < list.length) {
+                    if (index == -1) {
+                        index = (inc > 0 ? 0 : list.length-1);
+                    }
+                    else {
+                        index += inc;
+                    }
+                    if (index >= 0 && index < list.length) {
                         this.selectWord(list[index]);
                     }
                     else {
@@ -392,6 +474,14 @@ require.def('lingwo_dictionary/annotation/Annotator',
                         }
                     }
                 }
+            },
+
+            selectNextWord: function () {
+                this._selectRelativeWord(1);
+            },
+
+            selectPreviousWord: function () {
+                this._selectRelativeWord(-1);
             },
 
             _lookupSelectedEntry: function () {
@@ -436,6 +526,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
                             default_value: Annotator.selected.attr('sense')
                         }));
                         $('.form-item', dataNode).addClass('clear-block');
+                        $('#sense-form-selector .form-radio:checked').focus();
                     }
                     else {
                         dataNode.html('<i>No entry found.</i>');
@@ -561,6 +652,17 @@ require.def('lingwo_dictionary/annotation/Annotator',
                     parentNode = curAnnoNode.parentNode,
                     node = curAnnoNode.firstChild, next;
 
+                // this is OK to do here, because we already have the selected
+                // node saved in curAnnoNode.
+                // TODO: if (and when) we rework how selectNextWord is done, this
+                // should be done after the annotation is deleted..
+                if (this.type == 'word') {
+                    this.selectNextWord();
+                }
+                else {
+                    this.clearSelection();
+                }
+
                 while(node) {
                     next = node.nextSibling;
 
@@ -571,7 +673,6 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 }
 
                 parentNode.removeChild(curAnnoNode);
-                this.clearSelection();
             },
 
             clearSelection: function () {

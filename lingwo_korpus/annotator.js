@@ -15,6 +15,7 @@
                     Annotator.updateValueNode();
                     return true;
                 });
+
             }
         );
     };
