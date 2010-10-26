@@ -207,9 +207,12 @@ require.def('lingwo_dictionary/annotation/Annotator',
 
                 // first, we need to get the list of posItems
                 $.getJSON('/lingwo_korpus/pos_list', function (res) {
+                    var pos_list = res.pos_list;
+                    pos_list.unshift({ label: '-none-', value: '' });
+
                     Annotator.bubbleFormNode = $('<div id="bubble-form"></div>');
                     Annotator.bubbleFormNode
-                        .html(makeBubbleForm({ pos_list: res.pos_list, message: msgWordOn }))
+                        .html(makeBubbleForm({ pos_list: pos_list, message: msgWordOn }))
                         .appendTo(Reader.contentNode);
 
                     $('#anno-form-lookup-entry').click(function (evt) {
@@ -348,7 +351,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
 
                 this.setBubblePane('anno-form');
                 $('#anno-form-headword').val(target.attr('headword') || target.text());
-                $('#anno-form-pos').val(target.attr('pos'));
+                $('#anno-form-pos').val(target.attr('pos') || '');
                 $('#anno-form-attributive').attr('checked',
                     target.attr('attributive') == 'true' ? 'checked' : '');
 
@@ -506,7 +509,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
             },
 
             saveAnnotation: function () {
-                var headword, changed = false, sense;
+                var headword, pos, changed = false, sense;
 
                 if (this.selected === null) {
                     return;
@@ -522,7 +525,13 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 }
 
                 // pos
-                this.selected.attr('pos', $('#anno-form-pos :selected').val());
+                pos = $('#anno-form-pos :selected').val();
+                if (pos) {
+                    this.selected.attr('pos', pos);
+                }
+                else {
+                    this.selected.removeAttr('pos');
+                }
 
                 // attributive
                 if ($('#anno-form-attributive').attr('checked')) {
