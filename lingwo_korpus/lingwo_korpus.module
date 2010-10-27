@@ -361,39 +361,6 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
     '#type' => 'hidden',
   );
 
-  // the annotation form that pops up
-  $form['anno-form'] = array(
-    '#prefix' => '<div id="edit-anno-form" style="display: none;">',
-    '#suffix' => '</div>',
-    '#tree' => TRUE,
-  );
-  $form['anno-form']['headword'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Headword'),
-  );
-  $form['anno-form']['pos'] = array(
-    '#type' => 'select',
-    '#title' => t('Part of Speech'),
-    '#options' => lingwo_dictionary_pos_options(TRUE),
-  );
-  $form['anno-form']['attributive'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Attributive'),
-  );
-  $form['anno-form']['save'] = array(
-    '#value' => '<a href="#" class="anno-form-button" id="edit-anno-form-save">'. t('Save') .'</a>',
-  );
-  $form['anno-form']['delete'] = array(
-    '#value' => '<a href="#" class="anno-form-button" id="edit-anno-form-delete">'. t('Delete') .'</a>',
-  );
-  $form['anno-form']['cancel'] = array(
-    '#value' => '<a href="#" class="anno-form-button" id="edit-anno-form-cancel">'. t('Cancel') .'</a>',
-  );
-  $form['anno-form']['select-senses'] = array(
-    '#value' => '<a href="#" class="anno-form-button" id="edit-anno-form-select-senses">'.
-      t('Select Senses...') .'</a>',
-  );
-
   $form['save'] = array(
     '#type'  => 'submit',
     '#value' => t('Save'),
@@ -620,26 +587,57 @@ function lingwo_korpus_content_extra_fields($type_name) {
   return $extra;
 }
 
+function _lingwo_korpus_contains_links($el) {
+  $words = $el->find('word');
+  if (!empty($words)) return TRUE;
+  $as = $el->find('a');
+  if (!empty($as)) return TRUE;
+  return FALSE;
+}
+
 function lingwo_korpus_filter_text($text, $lang_pair) {
   require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
 
   $html = str_get_html($text); 
-  foreach($html->find('word') as $el) {
+  $refid = 0;
+  /*
+  $words = $html->find('word');
+  for ($i = count($words)-1; $i >= 0; $i--) {
+    $el = $words[$i];
+  */
+  foreach (array_reverse($html->find('word')) as $el) {
     // get all the attributes and clear them
     $attrs = $el->attr;
     $el->attr = array();
 
     // get the headword
     $headword = isset($attrs['headword']) ? $attrs['headword'] : $el->plaintext;
+    $href = url(lingwo_dictionary_settings('lookup_path').'/'.$lang_pair.'/'.$headword.'('.$attrs['pos'].')', array('absolute' => TRUE));
 
     // TODO: nested <a> tags is no good, so we need some solution here.
-    // convert to a link
-    $el->tag = 'a';
-    $el->class = 'anno';
-    # TODO: this should be a library function somewhere
-    $el->href = url(lingwo_dictionary_settings('lookup_path').'/'.$lang_pair.'/'.$headword.'('.$attrs['pos'].')', array('absolute' => TRUE));
-    $el->setAttribute('data-form', $attrs['form']);
-    $el->setAttribute('data-sense', $attrs['sense']);
+    if (!_lingwo_korpus_contains_links($el)) {
+      // convert to a link
+      $el->tag = 'a';
+      $el->class = 'anno';
+      # TODO: this should be a library function somewhere
+      $el->href = $href;
+      $el->setAttribute('data-form', $attrs['form']);
+      $el->setAttribute('data-sense', $attrs['sense']);
+    }
+    else {
+      $el->tag = 'span';
+      $el->class = 'anno-span';
+      // TODO: is this necessary?
+      $el->setAttribute('id', 'anno-span-'. $refid);
+
+      // DRS: Big fat hack!!  This is super sketchy stuff!  We need a real DOM.
+      if (!isset($el->_[HDOM_INFO_OUTER])) {
+        $el->_[HDOM_INFO_OUTER] = $el->outertext();
+      }
+      $el->_[HDOM_INFO_OUTER] = '<a class="anno-anchor" href="'.$href.'">&gt;&gt;</a>'.$el->_[HDOM_INFO_OUTER];
+
+      $refid++;
+    }
   }
 
   return $html->outertext;

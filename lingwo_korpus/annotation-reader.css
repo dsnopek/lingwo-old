@@ -4,6 +4,14 @@ a.anno {
     text-decoration: none;
 }
 
+.anno-span {
+  border-bottom: 1px dashed blue;
+  display: inline-block;
+}
+.anno-anchor {
+  text-decoration: none;
+}
+
 a.anno:hover {
     background-color: #0066FF;
     cursor: pointer;
