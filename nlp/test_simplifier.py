@@ -27,9 +27,9 @@ class SimplifierTest(unittest.TestCase):
         self.assertEqual(simplify('<a href="http://www.example.com"><word pos="adjective">sliding</word> <word headword="door" pos="noun">doors</word></a>', 'en'),
             '<a href="http://www.example.com"><span class="anno-text" data-entry="6a2cd28ee7c6f3b987deb8976b2ab8e9db8470af" id="anno-text-1">sliding</span><span class="anno-anchor" data-anno="anno-text-1">1</span> <span class="anno-text" data-entry="79d1123800393ead56c1dd81c5adba658cae5a5a" id="anno-text-0">doors</span></a><span class="anno-anchor" data-anno="anno-text-0">1</span>')
         self.assertEqual(simplify('<word pos="noun"><word pos="adjective">sliding</word> <word headword="door" pos="noun">doors</word></word>', 'en'),
-            '<span class="anno-text" data-entry="05d0ad50636aa708f22c7d9932adcb55fb3d4880" id="anno-text-2"><span class="anno-text" data-entry="6a2cd28ee7c6f3b987deb8976b2ab8e9db8470af" id="anno-text-1">sliding</span><span class="anno-anchor" data-anno="anno-text-1">1</span> <span class="anno-text" data-entry="79d1123800393ead56c1dd81c5adba658cae5a5a" id="anno-text-0">doors</span></span><span class="anno-anchor" data-anno="anno-text-0">1</span><span class="anno-anchor" data-anno="anno-text-2">2</span>')
-
-
+            '<span class="anno-text" data-entry="05d0ad50636aa708f22c7d9932adcb55fb3d4880" id="anno-text-0"><span class="anno" data-entry="6a2cd28ee7c6f3b987deb8976b2ab8e9db8470af">sliding</span> <span class="anno" data-entry="79d1123800393ead56c1dd81c5adba658cae5a5a">doors</span></span><span class="anno-anchor" data-anno="anno-text-0">1</span>')
+        self.assertEqual(simplify('<a href="http://www.example.com"><word pos="noun"><word pos="adjective">sliding</word> <word headword="door" pos="noun">doors</word></word></a>', 'en'),
+            '<a href="http://www.example.com"><span class="anno-text" data-entry="05d0ad50636aa708f22c7d9932adcb55fb3d4880" id="anno-text-2"><span class="anno-text" data-entry="6a2cd28ee7c6f3b987deb8976b2ab8e9db8470af" id="anno-text-1">sliding</span><span class="anno-anchor" data-anno="anno-text-1">1</span> <span class="anno-text" data-entry="79d1123800393ead56c1dd81c5adba658cae5a5a" id="anno-text-0">doors</span></span></a><span class="anno-anchor" data-anno="anno-text-0">1</span><span class="anno-anchor" data-anno="anno-text-2">2</span>')
 
 if __name__ == '__main__': unittest.main()
 

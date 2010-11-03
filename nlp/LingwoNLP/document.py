@@ -124,7 +124,7 @@ class Simplifier(object):
         # first, we search upward
         node = elem
         while node.parentNode is not None and node.parentNode.nodeType == XmlNode.ELEMENT_NODE:
-            if node.parentNode.tagName.lower() in ('word', 'a'):
+            if node.parentNode.tagName == 'a':
                 return True
             node = node.parentNode
 
@@ -165,9 +165,9 @@ class Simplifier(object):
                 # place the anchor and set its content
                 placeAfter = newElem
                 anchorContent = 1
-                while placeAfter.nextSibling is None and placeAfter.parentNode is not None and placeAfter.nodeType == XmlNode.ELEMENT_NODE and placeAfter.parentNode.tagName.lower() in ('word', 'a'):
+                while placeAfter.nextSibling is None and placeAfter.parentNode is not None and placeAfter.nodeType == XmlNode.ELEMENT_NODE and placeAfter.parentNode.tagName in ('word', 'a'):
                     placeAfter = placeAfter.parentNode
-                while placeAfter.nextSibling is not None and placeAfter.nextSibling.nodeType == XmlNode.ELEMENT_NODE and placeAfter.nextSibling.tagName.lower() == 'span' and placeAfter.nextSibling.getAttribute('class') == 'anno-anchor':
+                while placeAfter.nextSibling is not None and placeAfter.nextSibling.nodeType == XmlNode.ELEMENT_NODE and placeAfter.nextSibling.tagName == 'span' and placeAfter.nextSibling.getAttribute('class') == 'anno-anchor':
                     placeAfter = placeAfter.nextSibling
                     anchorContent += 1
                 anchorElem.appendChild(self.doc.createTextNode(str(anchorContent)))
