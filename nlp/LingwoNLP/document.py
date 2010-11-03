@@ -29,9 +29,28 @@ def Element_text(node):
     for child in node.childNodes:
         if child.nodeType in (XmlNode.TEXT_NODE, XmlNode.CDATA_SECTION_NODE):
             s += child.nodeValue
-        elif child.nodeType == XmlNode.ELEMENT_NODE:
+        #elif child.nodeType == XmlNode.ELEMENT_NODE:
+        # TODO: this is a HACK!  We shouldn't have something this specific in here.
+        elif child.nodeType == XmlNode.ELEMENT_NODE and not child.getAttribute('class') == 'anno-anchor':
             s += Element_text(child)
     return s
+
+# replaces an Element with its children
+def Element_replaceWithChildren(node):
+    for child in node.childNodes:
+        node.removeChild(child)
+        node.parentNode.insertBefore(child, node)
+    node.parentNode.removeChild(node)
+
+def Element_replaceWithTagName(node, tagName):
+    newNode = node.ownerDocument.createElement(tagName)
+    node.parentNode.insertBefore(newNode, node)
+    childNodes = node.childNodes[:]
+    for child in childNodes:
+        node.removeChild(child)
+        newNode.appendChild(child)
+    node.parentNode.removeChild(node)
+    return newNode
 
 class _DomWrapper(object):
     def __init__(self, dom):
@@ -55,6 +74,120 @@ def writeHtml(writer, nodeList):
         for item in serializer.serialize(walker(node)):
             writer.write(item)
 
+# makes the 'body' of the document into XHTML
+def _serializeBody(doc):
+    buffer = StringIO()
+    writer = codecs.getwriter('utf-8')(buffer)
+    body = doc.getElementsByTagName('body')[0]
+    writeHtml(writer, body.childNodes)
+    return buffer.getvalue()
+
+class Simplifier(object):
+    """ Makes cleaned up HTML from the document.
+    
+    It does the following:
+
+      * <word> becomes a special <span> with a data-entry attribute containing
+        a hash of "language:pos:headword#sense_id" and a class of "anno"
+
+      * If any <word>'s are nested inside other <word>'s or <a>'s, they get a
+        class of "anno-text" and an incremental id like "anno-text-#".  Another
+        <span> with a class of "anno-anchor" and an attribute data-anno listing
+        the id will be placed after the first <span>.  If this is the last child
+        then the second <span> will instead be placed after the parent element,
+        or if the parent is also nested, the first parent which isn't.
+
+      * <sent> tags are simply removed.
+    """
+
+    def __init__(self, doc, lang):
+        self.doc = doc
+        self.lang = lang
+
+    @classmethod
+    def hash(cls, language, pos, headword):
+        import hashlib
+        return hashlib.sha1(':'.join([language, pos, headword])).hexdigest()
+
+    def hashNode(self, node):
+        if not node.hasAttribute('pos'):
+            return None
+
+        if node.hasAttribute('headword'):
+            headword = node.getAttribute('headword')
+        else:
+            headword = Element_text(node)
+
+        return Simplifier.hash(self.lang, node.getAttribute('pos'), headword)
+
+    def _isNested(self, elem):
+        # first, we search upward
+        node = elem
+        while node.parentNode is not None and node.parentNode.nodeType == XmlNode.ELEMENT_NODE:
+            if node.parentNode.tagName.lower() in ('word', 'a'):
+                return True
+            node = node.parentNode
+
+        # next, we search downward
+        for node in elem.getElementsByTagName('span'):
+            if node.getAttribute('class') in ('anno','anno-text'):
+                return True
+
+        return False
+
+    def simplify(self):
+        words = self.doc.getElementsByTagName('word')
+        words.reverse()
+
+        annoTextId = 0
+
+        for elem in words:
+            # we have to do this before Element_replaceWithTagName() because it will
+            # remove all of elem's children!
+            dataEntry = self.hashNode(elem)
+
+            # TODO: remove!
+            #if not self._isNested(elem):
+            #    return
+
+            newElem = Element_replaceWithTagName(elem, 'span')
+
+            if self._isNested(newElem):
+                # setup as an .anno-text
+                newElem.setAttribute('id', 'anno-text-'+str(annoTextId))
+                newElem.setAttribute('class', 'anno-text')
+
+                # create the anchor
+                anchorElem = self.doc.createElement('span')
+                anchorElem.setAttribute('class', 'anno-anchor')
+                anchorElem.setAttribute('data-anno', 'anno-text-'+str(annoTextId))
+
+                # place the anchor and set its content
+                placeAfter = newElem
+                anchorContent = 1
+                while placeAfter.nextSibling is None and placeAfter.parentNode is not None and placeAfter.nodeType == XmlNode.ELEMENT_NODE and placeAfter.parentNode.tagName.lower() in ('word', 'a'):
+                    placeAfter = placeAfter.parentNode
+                while placeAfter.nextSibling is not None and placeAfter.nextSibling.nodeType == XmlNode.ELEMENT_NODE and placeAfter.nextSibling.tagName.lower() == 'span' and placeAfter.nextSibling.getAttribute('class') == 'anno-anchor':
+                    placeAfter = placeAfter.nextSibling
+                    anchorContent += 1
+                anchorElem.appendChild(self.doc.createTextNode(str(anchorContent)))
+                Node_insertAfter(placeAfter.parentNode, anchorElem, placeAfter)
+
+                annoTextId += 1
+            else:
+                # just a plain .anno
+                newElem.setAttribute('class', 'anno')
+
+            # if we have a valid entry hash, then we should put it on the span
+            if dataEntry is not None:
+                if elem.hasAttribute('sense'):
+                    dataEntry = dataEntry + '#' + elem.getAttribute('sense')
+                newElem.setAttribute('data-entry', dataEntry)
+
+        # remove all the <sent> tags
+        for elem in self.doc.getElementsByTagName('sent'):
+            Element_replaceWithChildren(elem)
+
 class Document(_DomWrapper):
     def __init__(self, dom):
         if dom.nodeType != XmlNode.DOCUMENT_NODE:
@@ -66,11 +199,15 @@ class Document(_DomWrapper):
         segmentDocument(self._dom)
 
     def __str__(self):
-        buffer = StringIO()
-        writer = codecs.getwriter('utf-8')(buffer)
-        body = self._dom.getElementsByTagName('body')[0]
-        writeHtml(writer, body.childNodes)
-        return buffer.getvalue()
+        return self.toHtml()
+
+    def toHtml(self):
+        return _serializeBody(this._dom)
+
+    def toSimplifiedHtml(self, language):
+        doc = self._dom.cloneNode(True)
+        Simplifier(doc, language).simplify()
+        return _serializeBody(doc)
 
     @property
     def sents(self):
