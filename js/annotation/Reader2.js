@@ -263,17 +263,13 @@ require.def('lingwo_dictionary/annotation/Reader2',
             },
 
             showBubble: function () {
-                if (!this.shown) {
-                    this.layout.show();
-                    this.shown = true;
-                }
+                this.layout.show();
+                this.shown = true;
             },
 
             hideBubble: function () {
-                if (this.shown) {
-                    this.layout.hide();
-                    this.shown = false;
-                }
+                this.layout.hide();
+                this.shown = false;
             },
 
             setBubbleContent: function (content) {
