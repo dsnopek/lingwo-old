@@ -3,6 +3,7 @@ require.def('lingwo_dictionary/annotation/Reader2',
     ['jquery'],
     function ($) {
         var Reader, Layouts,
+            isIE6 = /MSIE 6/i.test(navigator.userAgent),
             configDefaults = {
                 layout: 'docked'
             };
@@ -28,6 +29,7 @@ require.def('lingwo_dictionary/annotation/Reader2',
                 return func.apply(obj, arguments);
             }
         }
+
 
         Layouts = {
             popup: {
@@ -62,7 +64,7 @@ require.def('lingwo_dictionary/annotation/Reader2',
 
                     // hack for browsers that don't correctly support max-height
                     //setTimeout(function () {
-                        if (bubble.height() > 200) {
+                        if (isIE6 || bubble.height() > 200) {
                             bubble.css({ height: 200 });
                         }
                     //}, 0);
@@ -171,6 +173,11 @@ require.def('lingwo_dictionary/annotation/Reader2',
                 }
                 this.config = config;
 
+                // IE6 doesn't play well with our docked version..
+                if (this.config.layout == 'docked' && isIE6) {
+                    this.config.layout = 'popup';
+                }
+
                 if (this.isSetup) {
                     this.layout.shutdown();
                     this.layout = null;
@@ -192,19 +199,62 @@ require.def('lingwo_dictionary/annotation/Reader2',
                 layout = (typeof this.config.layout == 'string') ? Layouts[this.config.layout] : this.config.layout;
                 layout.setup();
 
+                if (!this.config.skipHoverEvents) {
+                    this.setupHoverEvents();
+                }
+
                 this.layout = layout;
                 this.isSetup = false;
             },
 
+            setupHoverEvents: function () {
+                var self = this;
+
+                $('.anno, .anno-anchor')
+                    // unbind() makes this re-runnable as many times as necessary
+                    .unbind('mouseenter mouseleave')
+                    .bind('mouseenter', function (evt) {
+                        var target = $(evt.target), annoText;
+                        target.addClass('hover');
+                        if (annoText = self._getAnnoText(target)) {
+                            annoText.addClass('hover');
+                        }
+                    })
+                    .bind('mouseleave', function (evt) {
+                        var target = $(evt.target), annoText;
+                        target.removeClass('hover');
+                        if (annoText = self._getAnnoText(target)) {
+                            annoText.removeClass('hover');
+                        }
+                    });
+            },
+
+            _getAnnoText: function (node) {
+                var annoText;
+                if (node.hasClass('anno-anchor')) {
+                    if (annoText = node.attr('data-anno')) {
+                        return $('#'+annoText);
+                    }
+                }
+                return null;
+            },
+
             setSelection: function (node) {
+                var annoText;
                 if (this.selectedNode) {
                     this.selectedNode.removeClass('selected');
+                    if (annoText = this._getAnnoText(this.selectedNode)) {
+                        annoText.removeClass('selected');
+                    }
                     this.selectedNode = null;
                 }
                 if (node) {
                     node = $(node);
                     node.addClass('selected');
                     this.selectedNode = node;
+                    if (annoText = this._getAnnoText(this.selectedNode)) {
+                        annoText.addClass('selected');
+                    }
                 }
             },
 

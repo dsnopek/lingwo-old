@@ -178,7 +178,6 @@ function lingwo_korpus_lookup_content() {
   global $user;
 
   $url = urldecode($_GET['url']);
-  $to_lang = urldecode($_GET['to_lang']);
 
   $json = array();
   if ($user->uid != 0) {

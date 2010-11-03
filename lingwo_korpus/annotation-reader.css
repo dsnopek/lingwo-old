@@ -1,4 +1,29 @@
 
+/* We should change this to .selected-sense so that IE6 will be able to recognize it! */
+.lingwo-sense.selected {
+    background-color: yellow;
+}
+
+a.external {
+    text-decoration: none;
+    border-bottom: 1px solid blue;
+}
+
+a.external:visited {
+    color: purple;
+    text-decoration: none;
+    border-bottom: 1px solid purple;
+}
+
+.anno-anchor {
+	vertical-align: super;
+	border: 1px solid blue;
+	color: blue;
+	font-size: .6em;
+	margin: 0 1px;
+	padding: 0 3px;
+}
+
 .anno.hover,
 .anno-anchor.hover,
 .anno-text.hover {
@@ -15,17 +40,6 @@
     color: white;
 }
 
-.anno-anchor {
-	display: inline-block;
-	vertical-align: super;
-	text-align: center;
-	border: 1px solid blue;
-	color: blue;
-	font-size: .6em;
-	margin: 0 1px;
-	padding: 0 3px;
-}
-
 #lingwo-korpus-entry-view-wrapper {
     background-color: white;
     position: absolute;
@@ -40,10 +54,6 @@
     position: fixed;
 }
 #lingwo-korpus-entry-view {
-}
-
-.lingwo-sense.selected {
-    background-color: yellow;
 }
 
 /*

@@ -72,7 +72,7 @@ require.def('lingwo_dictionary/annotation/Embed',
                 setTimeout(positionEmbedWindow, 0);
 
                 // initialize the Reader object
-                Reader.setup({ layout: 'popup' });
+                Reader.setup({ layout: 'popup', skipHoverEvents: true });
                 $('body').click(function (evt) {
                     BiblioBird.hideEmbedWindow();
                     return Reader.handleClick(evt.target);
@@ -135,7 +135,9 @@ require.def('lingwo_dictionary/annotation/Embed',
         });
 
         Reader.onLoad = function (target) {
-            var sense_id = target.attr('data-sense');
+            var parts = (target.attr('data-entry') || '').split('#'),
+                hash  = parts[0],
+                sense = parts[1];
 
             Reader.setBubbleLoading();
 
@@ -143,7 +145,7 @@ require.def('lingwo_dictionary/annotation/Embed',
             $.ajax({
                 url: BiblioBird.url+'/lingwo_korpus/lookup_entry',
                 dataType: 'jsonp',
-                data: { url: target.attr('href') },
+                data: { hash: hash, lang: BiblioBird.lang },
                 success: function (res) {
                     Reader.setBubbleContent(res.content);
                     $('.node', Reader.contentNode)
@@ -153,8 +155,8 @@ require.def('lingwo_dictionary/annotation/Embed',
                     // TODO: for now, we want to drop the node links
                     $('ul.links.inline', Reader.contentNode).remove();
 
-                    if (sense_id) {
-                        $('.lingwo-sense-id-'+sense_id, Reader.contentNode).addClass('selected');
+                    if (sense) {
+                        $('.lingwo-sense-id-'+sense, Reader.contentNode).addClass('selected');
                     }
 
                     // TODO: how to handle this?
@@ -180,8 +182,6 @@ require.def('lingwo_dictionary/annotation/Embed',
 
         ContentArea = function (x) {
             this.node      = x;
-            this.from_lang = $(x).attr('data-from-lang');
-            this.to_lang   = $(x).attr('data-to-lang');
             this.url       = $(x).attr('data-url') || window.location.href;
             this.teaser    = $(x).attr('data-teaser') == 'true';
             this.links     = $('<div class="bibliobird-links"></div>').insertBefore(x),
@@ -196,7 +196,7 @@ require.def('lingwo_dictionary/annotation/Embed',
                 $.ajax({
                     url: BiblioBird.url+'/lingwo_korpus/lookup_content',
                     dataType: 'jsonp',
-                    data: { url: this.url, to_lang: this.to_lang },
+                    data: { url: this.url },
                     success: function (res) {
                         // we only initialize after we have a username..
                         BiblioBird.initialize(res.username);
@@ -207,6 +207,7 @@ require.def('lingwo_dictionary/annotation/Embed',
                         if (res.content) {
                             // assign the content
                             self.node.innerHTML = res.content;
+                            Reader.setupHoverEvents();
                         }
                     }
                 });

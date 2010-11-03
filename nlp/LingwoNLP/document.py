@@ -96,6 +96,8 @@ class Simplifier(object):
         or if the parent is also nested, the first parent which isn't.
 
       * <sent> tags are simply removed.
+
+      * <a> get target="_blank" and class="external"
     """
 
     def __init__(self, doc, lang):
@@ -134,6 +136,18 @@ class Simplifier(object):
         return False
 
     def simplify(self):
+        def hasClass(node, clsName):
+            if not node.hasAttribute('class'):
+                return False
+            return clsName in node.getAttribute('class').split(' ')
+
+        def removeClass(node, clsName):
+            if not node.hasAttribute('class'):
+                return
+            l = node.getAttribute('class').split(' ')
+            del l[l.index(clsName)]
+            node.setAttribute('class', ' '.join(l))
+
         # first pass: we simply convert the <word>'s to <span>'s
         for elem in self.doc.getElementsByTagName('word'):
             # we have to do this before Element_replaceWithTagName() because it will
@@ -162,29 +176,46 @@ class Simplifier(object):
 
             # create the anchor
             anchorElem = self.doc.createElement('span')
-            anchorElem.setAttribute('class', 'anno-anchor')
             anchorElem.setAttribute('data-anno', 'anno-text-'+str(annoTextId))
             
             # transfer the data-entry from the elem to anchorElem
-            anchorElem.setAttribute('data-entry', elem.getAttribute('data-entry'))
-            elem.removeAttribute('data-entry')
+            if elem.hasAttribute('data-entry'):
+                anchorElem.setAttribute('data-entry', elem.getAttribute('data-entry'))
+                elem.removeAttribute('data-entry')
 
-            # place the anchor and set its content
-            anchorContent = 1
+            # place the anchor and set its content/class
+            anchorIndex = 1
             placeAfter = elem
+            # count up along the end edge
             while placeAfter.nextSibling is None and placeAfter.parentNode is not None and placeAfter.nodeType == XmlNode.ELEMENT_NODE and (placeAfter.parentNode.tagName == 'a' or (placeAfter.parentNode.tagName == 'span' and placeAfter.parentNode.getAttribute('class') in ('anno','anno-text'))):
                 placeAfter = placeAfter.parentNode
-            while placeAfter.nextSibling is not None and placeAfter.nextSibling.nodeType == XmlNode.ELEMENT_NODE and placeAfter.nextSibling.tagName == 'span' and placeAfter.nextSibling.getAttribute('class') == 'anno-anchor':
+            # count forward over previously placed anchors
+            while placeAfter.nextSibling is not None and placeAfter.nextSibling.nodeType == XmlNode.ELEMENT_NODE and placeAfter.nextSibling.tagName == 'span' and hasClass(placeAfter.nextSibling, 'anno-anchor'):
                 placeAfter = placeAfter.nextSibling
-                anchorContent += 1
+                if anchorIndex == 1:
+                    # it isn't the only anymore!
+                    removeClass(placeAfter, 'anno-anchor-only');
+                anchorIndex += 1
+            # place the anchor
             Node_insertAfter(placeAfter.parentNode, anchorElem, placeAfter)
-            anchorElem.appendChild(self.doc.createTextNode(str(anchorContent)))
+            anchorElem.appendChild(self.doc.createTextNode(str(anchorIndex)))
+            # set the class name
+            anchorClass = 'anno-anchor anno-anchor-'+str(anchorIndex)
+            if anchorIndex == 1:
+                anchorClass += ' anno-anchor-only';
+            anchorElem.setAttribute('class', anchorClass)
 
             annoTextId += 1
 
         # third pass: remove all the <sent> tags
         for elem in self.doc.getElementsByTagName('sent'):
             Element_replaceWithChildren(elem)
+
+        # fourth pass: mark all the anchors as external
+        for elem in self.doc.getElementsByTagName('a'):
+            if elem.hasAttribute('href'):
+                elem.setAttribute('target', '_blank')
+                elem.setAttribute('class', 'external')
 
 class Document(_DomWrapper):
     def __init__(self, dom):
@@ -200,7 +231,7 @@ class Document(_DomWrapper):
         return self.html()
 
     def html(self):
-        return _serializeBody(this._dom)
+        return _serializeBody(self._dom)
 
     def purehtml(self, language):
         doc = self._dom.cloneNode(True)

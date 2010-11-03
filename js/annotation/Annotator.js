@@ -185,7 +185,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
                     }
                     return false;
                 }
-                Reader.setup({ layout: 'docked' });
+                Reader.setup({ layout: 'docked', skipHoverEvents: true });
 
                 $(window).click(function (evt) {
                     var wordParent;
