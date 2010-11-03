@@ -1,27 +1,29 @@
 
-a.anno {
-    color: black;
-    text-decoration: none;
-}
-
-.anno-span {
-  border-bottom: 1px dashed blue;
-  display: inline-block;
-}
-.anno-anchor {
-  text-decoration: none;
-}
-
-a.anno:hover {
+.anno.hover,
+.anno-anchor.hover,
+.anno-text.hover {
     background-color: #0066FF;
     cursor: pointer;
     color: white;
 }
 
-a.anno.selected {
+.anno.selected,
+.anno-anchor.selected,
+.anno-text.selected {
     background-color: #FF0000;
     cursor: pointer;
     color: white;
+}
+
+.anno-anchor {
+	display: inline-block;
+	vertical-align: super;
+	text-align: center;
+	border: 1px solid blue;
+	color: blue;
+	font-size: .6em;
+	margin: 0 1px;
+	padding: 0 3px;
 }
 
 #lingwo-korpus-entry-view-wrapper {

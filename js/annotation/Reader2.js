@@ -239,7 +239,7 @@ require.def('lingwo_dictionary/annotation/Reader2',
             // to decide if it should take action or not.  Override on pages where
             // we aren't using the 'anno' class.
             isWordNode: function (node) {
-                return $(node).hasClass('anno');
+                return $(node).hasClass('anno') || $(node).hasClass('anno-anchor');
             },
 
             handleClick: function (target) {

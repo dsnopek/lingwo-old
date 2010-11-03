@@ -123,11 +123,19 @@ function _lingwo_korpus_true() {
 function lingwo_korpus_lookup_entry() {
   global $user, $language;
 
-  // get the "Lingwo ID" out of the 'url' GET argument
-  $url = urldecode($_GET['url']);
-  $url = preg_replace(':.*?'.lingwo_dictionary_settings('lookup_path').'/(.*):', '$1', $url);
+  // lookup via either the 'url' or 'hash' arguments
+  if ($_GET['url']) {
+    // get the "Lingwo ID" out of the 'url' GET argument
+    $url = urldecode($_GET['url']);
+    $url = preg_replace(':.*?'.lingwo_dictionary_settings('lookup_path').'/(.*):', '$1', $url);
+    $entry = LingwoEntry::fromLingwoId($url);
+  }
+  elseif ($_GET['hash']) {
+    $target_lang = !empty($_GET['lang']) ? $_GET['lang'] : $language->language;
+    $entry = LingwoEntry::fromHash(urldecode($_GET['hash']), $target_lang);
+  }
   
-  if ($entry = LingwoEntry::fromLingwoId($url)) {
+  if ($entry) {
     if (module_exists('rules')) {
       rules_invoke_event('lingwo_korpus_lookup', $user, $entry->getNode());
     }
@@ -180,18 +188,7 @@ function lingwo_korpus_lookup_content() {
   if ($nid = _lingwo_korpus_lookup_remote_url($url)) {
     $node = node_load($nid);
 
-    // TODO: merge this code with the same code in hook_nodeapi() below, we 
-    // copy-pasted this from there.
-    $lang_pair = $node->language .'-'. $to_lang;
-    $cid = $node->nid .'-'. $lang_pair;
-    $data = cache_get($cid, 'cache_lingwo_korpus');
-    if ($data) {
-      $data = $data->data;
-    }
-    else {
-      $data = lingwo_korpus_filter_text($node->body, $lang_pair);
-      cache_set($cid, $data, 'cache_lingwo_korpus');
-    }
+    $data = lingwo_korpus_filter_text($node->body, $node->language, $node->nid);
 
     $json['content'] = $data;
     $json['nid'] = $nid;
@@ -548,19 +545,7 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
         return;
       }
 
-      $lang_pair =  $node_language .'-'. $language->language;
-      $cid = $node->nid .'-'. $lang_pair;
-
-      // get from the cache or process the data
-      $data = cache_get($cid, 'cache_lingwo_korpus');
-      if ($data) {
-        $data = $data->data;
-      }
-      else {
-        $data = lingwo_korpus_filter_text($node->content['body']['#value'], $lang_pair);
-        cache_set($cid, $data, 'cache_lingwo_korpus');
-      }
-      $node->content['body']['#value'] = $data;
+      $node->content['body']['#value'] = lingwo_korpus_filter_text($node->content['body']['#value'], $node_language, $node->nid);
 
       lingwo_dictionary_add_require_js();
       drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.js');
@@ -595,52 +580,23 @@ function _lingwo_korpus_contains_links($el) {
   return FALSE;
 }
 
-function lingwo_korpus_filter_text($text, $lang_pair) {
-  require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
-
-  $html = str_get_html($text); 
-  $refid = 0;
-  /*
-  $words = $html->find('word');
-  for ($i = count($words)-1; $i >= 0; $i--) {
-    $el = $words[$i];
-  */
-  foreach (array_reverse($html->find('word')) as $el) {
-    // get all the attributes and clear them
-    $attrs = $el->attr;
-    $el->attr = array();
-
-    // get the headword
-    $headword = isset($attrs['headword']) ? $attrs['headword'] : $el->plaintext;
-    $href = url(lingwo_dictionary_settings('lookup_path').'/'.$lang_pair.'/'.$headword.'('.$attrs['pos'].')', array('absolute' => TRUE));
-
-    // TODO: nested <a> tags is no good, so we need some solution here.
-    if (!_lingwo_korpus_contains_links($el)) {
-      // convert to a link
-      $el->tag = 'a';
-      $el->class = 'anno';
-      # TODO: this should be a library function somewhere
-      $el->href = $href;
-      $el->setAttribute('data-form', $attrs['form']);
-      $el->setAttribute('data-sense', $attrs['sense']);
-    }
-    else {
-      $el->tag = 'span';
-      $el->class = 'anno-span';
-      // TODO: is this necessary?
-      $el->setAttribute('id', 'anno-span-'. $refid);
-
-      // DRS: Big fat hack!!  This is super sketchy stuff!  We need a real DOM.
-      if (!isset($el->_[HDOM_INFO_OUTER])) {
-        $el->_[HDOM_INFO_OUTER] = $el->outertext();
-      }
-      $el->_[HDOM_INFO_OUTER] = '<a class="anno-anchor" href="'.$href.'">&gt;&gt;</a>'.$el->_[HDOM_INFO_OUTER];
-
-      $refid++;
+function lingwo_korpus_filter_text($text, $language, $cid=NULL) {
+  if (!is_null($cid)) {
+    $data = cache_get($cid, 'cache_lingwo_korpus');
+    if ($data) {
+      return $data->data;
     }
   }
 
-  return $html->outertext;
+  if ($filtered = _lingwo_korpus_exec_korpus2html_py("-l $language -", $text)) {
+    if (!is_null($cid)) {
+      cache_set($cid, $filtered, 'cache_lingwo_korpus');
+    }
+
+    return $filtered;
+  }
+  
+  return $text;
 }
 
 function lingwo_korpus_text_entry_list($text, $lang) {
@@ -857,11 +813,11 @@ function _lingwo_korpus_autolookup_node(&$node, $which='body', $full_lookup=TRUE
   return FALSE;
 }
 
-function _lingwo_korpus_exec_autolookup_py($cmd, $data) {
+function _lingwo_korpus_exec_python($script, $args, $data) {
   $cmd = implode(' ', array(
     lingwo_korpus_python_exec(),
-    drupal_get_path('module', 'lingwo_dictionary') .'/nlp/autolookup.py',
-    $cmd,
+    drupal_get_path('module', 'lingwo_dictionary') .'/'. $script,
+    $args,
   ));
 
   $descspec = array(
@@ -870,6 +826,8 @@ function _lingwo_korpus_exec_autolookup_py($cmd, $data) {
     2 => array('pipe', 'w'),
   );
 
+  $ret = array();
+
   $process = proc_open($cmd, $descspec, $pipes, NULL, NULL);
   if (is_resource($process)) {
     // write the node body to the child's stdin
@@ -877,22 +835,43 @@ function _lingwo_korpus_exec_autolookup_py($cmd, $data) {
     fclose($pipes[0]);
 
     // read the result from the child's stdout
-    $result = stream_get_contents($pipes[1]);
+    $ret['result'] = stream_get_contents($pipes[1]);
     fclose($pipes[1]);
 
     // read the error stream
-    $error = stream_get_contents($pipes[2]);
+    $ret['error'] = stream_get_contents($pipes[2]);
     fclose($pipes[2]);
 
     // if the program was successful, update the node
-    $return_value = proc_close($process);
-    if ($return_value == 0) {
-      return $result;
-    }
-    else {
-      drupal_set_message(t('Error running automatic annotator.'), 'error');
-      watchdog('lingwo_korpus', "Error running autolookup.py: ". $error, NULL, WATCHDOG_ERROR);
-    }
+    $ret['return_value'] = proc_close($process);
+  }
+
+  return $ret;
+}
+
+function _lingwo_korpus_exec_autolookup_py($cmd, $data) {
+  $ret = _lingwo_korpus_exec_python('nlp/autolookup.py', $cmd, $data);
+
+  // if the program was successful, update return the result
+  if ($ret['return_value'] == 0) {
+    return $ret['result'];
+  }
+  else {
+    drupal_set_message(t('Error running automatic annotator.'), 'error');
+    watchdog('lingwo_korpus', "Error running autolookup.py: ". $ret['error'], NULL, WATCHDOG_ERROR);
+  }
+}
+
+function _lingwo_korpus_exec_korpus2html_py($cmd, $data) {
+  $ret = _lingwo_korpus_exec_python('nlp/korpus2html.py', $cmd, $data);
+
+  // if the program was successful, update return the result
+  if ($ret['return_value'] == 0) {
+    return $ret['result'];
+  }
+  else {
+    drupal_set_message(t('Error converting content item to HTML.'), 'error');
+    watchdog('lingwo_korpus', "Error running korpus2html.py: ". $ret['error'], NULL, WATCHDOG_ERROR);
   }
 }
 

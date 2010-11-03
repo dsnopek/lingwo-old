@@ -36,6 +36,17 @@ class LingwoEntry {
     return LingwoEntry::fromNid(lingwo_dictionary_entry_lookup($language, $pos, $headword));
   }
 
+  public static function fromHash($hash, $target_lang=NULL) {
+    return LingwoEntry::fromNid(LingwoEntry::hash2nid($hash, $target_lang));
+  }
+
+  private static function getTranslationForNid($nid, $target_lang) {
+    $trans = translation_node_get_translations($nid);
+    if ($trans[$target_lang]) {
+      return $trans[$target_lang]->nid;
+    }
+  }
+
   public static function lingwo2nid($id) {
     list($source_lang, $headword) = explode('/', $id);
     list($source_lang, $target_lang) = explode('-', $source_lang);
@@ -47,16 +58,21 @@ class LingwoEntry {
     $nid = lingwo_dictionary_entry_lookup($source_lang, $pos, $headword);
 
     if ($target_lang) {
-      $trans = translation_node_get_translations($nid);
-      if ($trans[$target_lang]) {
-        $nid = $trans[$target_lang]->nid;
-      }
-      else {
-        $nid = NULL;
-      }
+      $nid = LingwoEntry::getTranslationForNid($nid, $target_lang);
     }
 
     return $nid;
+  }
+
+  public static function hash2nid($hash, $target_lang=NULL) {
+    $res = db_query("SELECT nid FROM {lingwo_dictionary_entry} WHERE entry_hash = '%s'", $hash);
+    if ($obj = db_fetch_object($res)) {
+      $nid = $obj->nid;
+      if (!is_null($target_lang)) {
+        $nid = LingwoEntry::getTranslationForNid($nid, $target_lang);
+      }
+      return $nid;
+    }
   }
 
   public function &getNode() {

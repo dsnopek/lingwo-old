@@ -55,9 +55,9 @@ require.def('lingwo_dictionary/annotation/Embed',
                         height: 200,
                         position: 'fixed',
                         border: '1px solid black',
-                        background: 'white'
+                        background: 'white',
+                        display: 'none'
                     })
-                    .hide()
                     .appendTo($('body'));
                 $('.bibliobird-embed-close', embedWindow).click(function () {
                     BiblioBird.hideEmbedWindow();

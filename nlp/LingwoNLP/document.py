@@ -164,6 +164,10 @@ class Simplifier(object):
             anchorElem = self.doc.createElement('span')
             anchorElem.setAttribute('class', 'anno-anchor')
             anchorElem.setAttribute('data-anno', 'anno-text-'+str(annoTextId))
+            
+            # transfer the data-entry from the elem to anchorElem
+            anchorElem.setAttribute('data-entry', elem.getAttribute('data-entry'))
+            elem.removeAttribute('data-entry')
 
             # place the anchor and set its content
             anchorContent = 1
