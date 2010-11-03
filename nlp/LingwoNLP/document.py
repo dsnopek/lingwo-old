@@ -29,9 +29,7 @@ def Element_text(node):
     for child in node.childNodes:
         if child.nodeType in (XmlNode.TEXT_NODE, XmlNode.CDATA_SECTION_NODE):
             s += child.nodeValue
-        #elif child.nodeType == XmlNode.ELEMENT_NODE:
-        # TODO: this is a HACK!  We shouldn't have something this specific in here.
-        elif child.nodeType == XmlNode.ELEMENT_NODE and not child.getAttribute('class') == 'anno-anchor':
+        elif child.nodeType == XmlNode.ELEMENT_NODE:
             s += Element_text(child)
     return s
 
@@ -136,55 +134,51 @@ class Simplifier(object):
         return False
 
     def simplify(self):
-        words = self.doc.getElementsByTagName('word')
-        words.reverse()
-
-        annoTextId = 0
-
-        for elem in words:
+        # first pass: we simply convert the <word>'s to <span>'s
+        for elem in self.doc.getElementsByTagName('word'):
             # we have to do this before Element_replaceWithTagName() because it will
             # remove all of elem's children!
             dataEntry = self.hashNode(elem)
 
-            # TODO: remove!
-            #if not self._isNested(elem):
-            #    return
-
             newElem = Element_replaceWithTagName(elem, 'span')
-
-            if self._isNested(newElem):
-                # setup as an .anno-text
-                newElem.setAttribute('id', 'anno-text-'+str(annoTextId))
-                newElem.setAttribute('class', 'anno-text')
-
-                # create the anchor
-                anchorElem = self.doc.createElement('span')
-                anchorElem.setAttribute('class', 'anno-anchor')
-                anchorElem.setAttribute('data-anno', 'anno-text-'+str(annoTextId))
-
-                # place the anchor and set its content
-                placeAfter = newElem
-                anchorContent = 1
-                while placeAfter.nextSibling is None and placeAfter.parentNode is not None and placeAfter.nodeType == XmlNode.ELEMENT_NODE and placeAfter.parentNode.tagName in ('word', 'a'):
-                    placeAfter = placeAfter.parentNode
-                while placeAfter.nextSibling is not None and placeAfter.nextSibling.nodeType == XmlNode.ELEMENT_NODE and placeAfter.nextSibling.tagName == 'span' and placeAfter.nextSibling.getAttribute('class') == 'anno-anchor':
-                    placeAfter = placeAfter.nextSibling
-                    anchorContent += 1
-                anchorElem.appendChild(self.doc.createTextNode(str(anchorContent)))
-                Node_insertAfter(placeAfter.parentNode, anchorElem, placeAfter)
-
-                annoTextId += 1
-            else:
-                # just a plain .anno
-                newElem.setAttribute('class', 'anno')
-
+            newElem.setAttribute('class', 'anno')
             # if we have a valid entry hash, then we should put it on the span
             if dataEntry is not None:
                 if elem.hasAttribute('sense'):
                     dataEntry = dataEntry + '#' + elem.getAttribute('sense')
                 newElem.setAttribute('data-entry', dataEntry)
 
-        # remove all the <sent> tags
+        # second pass: we deal with our word <span>'s nested inside <a> or other word <span>'s
+        spans = self.doc.getElementsByTagName('span')
+        spans.reverse()
+        annoTextId = 0
+        for elem in spans:
+            if elem.getAttribute('class') != 'anno' or not self._isNested(elem):
+                continue
+
+            # setup as an .anno-text
+            elem.setAttribute('id', 'anno-text-'+str(annoTextId))
+            elem.setAttribute('class', 'anno-text')
+
+            # create the anchor
+            anchorElem = self.doc.createElement('span')
+            anchorElem.setAttribute('class', 'anno-anchor')
+            anchorElem.setAttribute('data-anno', 'anno-text-'+str(annoTextId))
+
+            # place the anchor and set its content
+            anchorContent = 1
+            placeAfter = elem
+            while placeAfter.nextSibling is None and placeAfter.parentNode is not None and placeAfter.nodeType == XmlNode.ELEMENT_NODE and (placeAfter.parentNode.tagName == 'a' or (placeAfter.parentNode.tagName == 'span' and placeAfter.parentNode.getAttribute('class') in ('anno','anno-text'))):
+                placeAfter = placeAfter.parentNode
+            while placeAfter.nextSibling is not None and placeAfter.nextSibling.nodeType == XmlNode.ELEMENT_NODE and placeAfter.nextSibling.tagName == 'span' and placeAfter.nextSibling.getAttribute('class') == 'anno-anchor':
+                placeAfter = placeAfter.nextSibling
+                anchorContent += 1
+            Node_insertAfter(placeAfter.parentNode, anchorElem, placeAfter)
+            anchorElem.appendChild(self.doc.createTextNode(str(anchorContent)))
+
+            annoTextId += 1
+
+        # third pass: remove all the <sent> tags
         for elem in self.doc.getElementsByTagName('sent'):
             Element_replaceWithChildren(elem)
 
