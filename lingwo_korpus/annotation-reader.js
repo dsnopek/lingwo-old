@@ -14,7 +14,8 @@
                     Reader.setBubbleLoading();
 
                     // lookup the entry on the server
-                    $.getJSON(Drupal.settings.activePath+'/lingwo_korpus/lookup_entry', {'hash': hash},
+                    $.getJSON(Drupal.settings.basePath+'lingwo_korpus/lookup_entry',
+                        { 'hash': hash, 'lang': Drupal.settings.language},
                         function (res) {
                             Reader.setBubbleContent(res.content);
                             $('.node', Reader.contentNode).removeClass('clear-block');

@@ -4,7 +4,8 @@ require.def('lingwo_dictionary/annotation/Embed',
     function ($, Reader) {
         var configDefaults = {
                 url: 'http://www.bibliobird.com',
-                lang: 'en'
+                lang: 'en',
+                showLinks: true
             },
             BiblioBird = {};
 
@@ -213,6 +214,8 @@ require.def('lingwo_dictionary/annotation/Embed',
                 });
             },
             rebuildLinks: function () {
+                if (!BiblioBird.showLinks) return;
+
                 var links = this.links,
                     data  = this.data,
                     self  = this;
