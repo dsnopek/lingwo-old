@@ -35,7 +35,8 @@ def Element_text(node):
 
 # replaces an Element with its children
 def Element_replaceWithChildren(node):
-    for child in node.childNodes:
+    childNodes = node.childNodes[:]
+    for child in childNodes:
         node.removeChild(child)
         node.parentNode.insertBefore(child, node)
     node.parentNode.removeChild(node)
