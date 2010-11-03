@@ -1,0 +1,87 @@
+
+/* We should change this to .selected-sense so that IE6 will be able to recognize it! */
+.lingwo-sense.selected {
+    background-color: yellow;
+}
+
+a.external {
+    text-decoration: none;
+    border-bottom: 1px solid blue;
+}
+
+a.external:visited {
+    color: purple;
+    text-decoration: none;
+    border-bottom: 1px solid purple;
+}
+
+.anno-anchor {
+	vertical-align: super;
+	border: 1px solid blue;
+	color: blue;
+	font-size: .6em;
+	margin: 0 1px;
+	padding: 0 3px;
+}
+
+.anno.hover,
+.anno-anchor.hover,
+.anno-text.hover {
+    background-color: #0066FF;
+    cursor: pointer;
+    color: white;
+}
+
+.anno.selected,
+.anno-anchor.selected,
+.anno-text.selected {
+    background-color: #FF0000;
+    cursor: pointer;
+    color: white;
+}
+
+#lingwo-korpus-entry-view-wrapper {
+    background-color: white;
+    position: absolute;
+    border: 1px solid black;
+    width: 298px;
+    overflow: auto;
+    z-index: 100;
+}
+#lingwo-korpus-entry-view-wrapper.popup {
+    max-height: 200px;
+}
+#lingwo-korpus-entry-view-wrapper.docked {
+    position: fixed;
+}
+#lingwo-korpus-entry-view {
+}
+
+/*
+** For the embed window.
+*/
+.bibliobird-embed-titlebar {
+    background-color: blue;
+    color: white;
+    border-bottom: 1px solid white;
+    padding: 2px 10px;
+    height: 20px;
+}
+
+.bibliobird-embed-title {
+    display: block;
+    float: left;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.bibliobird-embed-close,
+.bibliobird-embed-close:visited {
+    display: block;
+    color: white;
+    text-align: right;
+}
+#bibliobirdEmbedIframe {
+    height: 175px;
+}
+

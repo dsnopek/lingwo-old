@@ -4,6 +4,7 @@ REQUIRE=/home/dsnopek/prj/requirejs-0.13.0
 BUILDSH=$REQUIRE/build/build.sh
 CLOSURE=$REQUIRE/build/lib/closure/compiler.jar
 STUBS=../js/require/require-stubs.js
+LESSC=/home/dsnopek/prj/lingwo/drupal/sites/all/modules/less/lessphp/lessc.inc.php
 
 for profile in *.build.js; do
 	name=`echo $profile | sed -e s,\.build\.js$,,`
@@ -23,4 +24,12 @@ for profile in *.build.js; do
 	# run the closure compiler
 	java -jar $CLOSURE --js $name.uncompressed.js --js_output_file $name.js
 done
+
+echo "Generating annotation-reader.css..."
+php <<EOF
+<?php
+require_once('$LESSC');
+\$less = new lessc();
+file_put_contents('annotation-reader.css', \$less->parse(file_get_contents('annotation-reader.less')));
+EOF
 
