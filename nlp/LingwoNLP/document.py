@@ -193,12 +193,12 @@ class Document(_DomWrapper):
         segmentDocument(self._dom)
 
     def __str__(self):
-        return self.toHtml()
+        return self.html()
 
-    def toHtml(self):
+    def html(self):
         return _serializeBody(this._dom)
 
-    def toSimplifiedHtml(self, language):
+    def purehtml(self, language):
         doc = self._dom.cloneNode(True)
         Simplifier(doc, language).simplify()
         return _serializeBody(doc)
