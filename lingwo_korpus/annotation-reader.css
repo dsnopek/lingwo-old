@@ -46,6 +46,7 @@ a.external:visited {
     border: 1px solid black;
     width: 298px;
     overflow: auto;
+    z-index: 100;
 }
 #lingwo-korpus-entry-view-wrapper.popup {
     max-height: 200px;
