@@ -395,6 +395,12 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
   $text = $form_state['values']['korpus-text-value'];
   $text = preg_replace('/\r/', '', $text);
 
+  // There is weird tendency for self-closed <embed> and <param> tags to come back
+  // without the self-closing slash, which breaks simplehtmldom -- and makes for 
+  // invalid XHTML!
+  $text = preg_replace('/<embed ([^>]*)(?<!\/)>/i','<embed \1 />', $text);
+  $text = preg_replace('/<param ([^>]*)(?<!\/)>/i','<param \1 />', $text);
+
   if (str_get_html($text)->plaintext != str_get_html($node_body)->plaintext) {
     drupal_set_message(t('Annotator modified the content of the text'), 'error');
     return;
