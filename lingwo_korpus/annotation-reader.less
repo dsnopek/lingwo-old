@@ -1,9 +1,4 @@
 
-/* We should change this to .selected-sense so that IE6 will be able to recognize it! */
-.lingwo-sense.selected {
-    background-color: yellow;
-}
-
 a.external {
     text-decoration: none;
     border-bottom: 1px solid blue;
@@ -133,6 +128,12 @@ a.external:visited {
 	}
 	ul.links li.first {
 	  padding: 0;
+	}
+
+	// show the sense as selected
+	.lingwo-sense-list li.selected,
+	.lingwo-sense-list li.selected blockquote {
+		background-color: yellow;
 	}
 }
 
