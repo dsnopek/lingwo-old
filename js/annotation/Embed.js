@@ -183,7 +183,7 @@ require.def('lingwo_dictionary/annotation/Embed',
 
         ContentArea = function (x) {
             this.node      = x;
-            this.url       = $(x).attr('data-url') || window.location.href;
+            this.url       = $(x).attr('data-url') || (''+window.location.href).split('#')[0];
             this.teaser    = $(x).attr('data-teaser') == 'true';
             this.links     = $('<div class="bibliobird-links"></div>').insertBefore(x),
             this.data      = {};
