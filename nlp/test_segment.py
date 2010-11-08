@@ -81,15 +81,70 @@ class ElementStringTest(unittest.TestCase):
         self.assertEqual(elem.toxml(), '<body>this is a <x>sentence</x><br/>\n</body>')
 
     def testWrap3(self):
+        elem = parseString('<a href="away">link text</a>')
+        s = buildElementString(elem)
+        raw = str(s)
+        self.assertEqual(raw, 'link text')
+
+        self.assertEqual(raw[0:9], 'link text')
+        s.wrap_in_element('x', 0, 9, flags=ElementString.FAVOR_INNER)
+
+        self.assertEqual(elem.toxml(), '<body><a href="away"><x>link text</x></a></body>')
+
+    def testWrap4(self):
+        elem = parseString('<a href="away">link text</a>')
+        s = buildElementString(elem)
+        raw = str(s)
+        self.assertEqual(raw, 'link text')
+
+        self.assertEqual(raw[0:9], 'link text')
+        s.wrap_in_element('x', 0, 9, flags=ElementString.FAVOR_OUTER)
+
+        self.assertEqual(elem.toxml(), '<body><x><a href="away">link text</a></x></body>')
+
+    def testWrap5(self):
+        elem = parseString('<a href="away">link text</a>')
+        s = buildElementString(elem)
+        raw = str(s)
+        self.assertEqual(raw, 'link text')
+
+        self.assertEqual(raw[0:4], 'link')
+        s.wrap_in_element('x', 0, 4, flags=ElementString.FAVOR_OUTER)
+
+        self.assertEqual(elem.toxml(), '<body><a href="away"><x>link</x> text</a></body>')
+
+    def testWrap6(self):
+        elem = parseString('<a href="away">link text</a>')
+        s = buildElementString(elem)
+        raw = str(s)
+        self.assertEqual(raw, 'link text')
+
+        self.assertEqual(raw[5:9], 'text')
+        s.wrap_in_element('x', 5, 9, flags=ElementString.FAVOR_OUTER)
+
+        self.assertEqual(elem.toxml(), '<body><a href="away">link <x>text</x></a></body>')
+
+    def testWrap7(self):
         elem = parseString('<p>First Sentence.  <strong>This is:</strong> the second sentence.</p>')
         s = buildElementString(elem)
         raw = str(s)
         self.assertEqual(raw, 'First Sentence.  This is: the second sentence.')
 
         self.assertEqual(raw[17:46], 'This is: the second sentence.')
-        s.wrap_in_element('x', 17, 46, walkUpInlineElements=True)
+        s.wrap_in_element('x', 17, 46)
 
         self.assertEqual(elem.toxml(), '<body><p>First Sentence.  <x><strong>This is:</strong> the second sentence.</x></p></body>')
+
+    def testWrap8(self):
+        elem = parseString('<p>First Sentence <strong>is Awesome!</strong>  The second sentence.</p>')
+        s = buildElementString(elem)
+        raw = str(s)
+        self.assertEqual(raw, 'First Sentence is Awesome!  The second sentence.')
+
+        self.assertEqual(raw[0:26], 'First Sentence is Awesome!')
+        s.wrap_in_element('x', 0, 26)
+
+        self.assertEqual(elem.toxml(), '<body><p><x>First Sentence <strong>is Awesome!</strong></x>  The second sentence.</p></body>')
 
 
 if __name__ == '__main__': unittest.main()

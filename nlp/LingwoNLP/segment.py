@@ -15,6 +15,9 @@ class MyPunktLanguageVars(PunktLanguageVars):
     """Characters that cannot appear within words"""
 
 class ElementString(object):
+    FAVOR_INNER = 0
+    FAVOR_OUTER = 1 << 0
+
     def __init__(self):
         self.reset()
 
@@ -107,9 +110,12 @@ class ElementString(object):
         parts = [elem, sibling]
         return parts[which]
 
-    def wrap_in_element(self, elemName, startIndex, endIndex, walkUpInlineElements=False):
-        startElem = self._splitEndPoint(startIndex, ElementString._SPLIT_START, walkUpInlineElements)
-        endElem = self._splitEndPoint(endIndex, ElementString._SPLIT_END, walkUpInlineElements)
+    def wrap_in_element(self, elemName, startIndex, endIndex, flags=None):
+        if flags is None:
+            flags = ElementString.FAVOR_INNER
+
+        startElem = self._splitEndPoint(startIndex, ElementString._SPLIT_START, flags==ElementString.FAVOR_OUTER)
+        endElem = self._splitEndPoint(endIndex, ElementString._SPLIT_END, flags==ElementString.FAVOR_OUTER)
         if startElem.parentNode != endElem.parentNode:
             print startElem, endElem
             print self._lookup
