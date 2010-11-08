@@ -9,8 +9,9 @@ from nltk.tokenize.punkt import PunktLanguageVars, PunktWordTokenizer
 class MyPunktLanguageVars(PunktLanguageVars):
     sent_end_chars = ('.', '?', '!', '"', '\'')
 
+    # DRS: we added \. and removed \'
     # TODO: does this break sentences segmentation with English?
-    _re_non_word_chars   = r"(?:[?!)\";}\]\*:@\.\'\({\[])"
+    _re_non_word_chars   = r"(?:[?!)\";}\]\*:@\.\({\[])"
     """Characters that cannot appear within words"""
 
 class ElementString(object):
@@ -59,7 +60,7 @@ class ElementString(object):
     _SPLIT_START = 1
     _SPLIT_END = 0
     
-    def _splitEndPoint(self, index, which):
+    def _splitEndPoint(self, index, which, walkUpInlineElements=False):
         lookupIndex, (pos, elem), localIndex = self._find(index)
         if which == ElementString._SPLIT_END and localIndex == 0:
             # we really want the previous element because we are past the edge
@@ -69,9 +70,15 @@ class ElementString(object):
 #            # we really want the next element because we are before the edge
 #            lookupIndex, (pos, elem), localIndex = self._find(index+1)
 
+        def canWalkUp(elem):
+            if walkUpInlineElements:
+                return elem.parentNode.tagName in Segmenter.INLINE_ELEMENTS
+            else:
+                return elem.parentNode.tagName == 'word'
+
         # we move up the tree if we are on the very edge of a word annotation
         def walkUpParent(elem):
-            while elem.parentNode.tagName == 'word':
+            while canWalkUp(elem):
                 if which == ElementString._SPLIT_START and elem == elem.parentNode.firstChild:
                     elem = elem.parentNode
                 elif which == ElementString._SPLIT_END and elem == elem.parentNode.lastChild:
@@ -100,9 +107,9 @@ class ElementString(object):
         parts = [elem, sibling]
         return parts[which]
 
-    def wrap_in_element(self, elemName, startIndex, endIndex):
-        startElem = self._splitEndPoint(startIndex, ElementString._SPLIT_START)
-        endElem = self._splitEndPoint(endIndex, ElementString._SPLIT_END)
+    def wrap_in_element(self, elemName, startIndex, endIndex, walkUpInlineElements=False):
+        startElem = self._splitEndPoint(startIndex, ElementString._SPLIT_START, walkUpInlineElements)
+        endElem = self._splitEndPoint(endIndex, ElementString._SPLIT_END, walkUpInlineElements)
         if startElem.parentNode != endElem.parentNode:
             print startElem, endElem
             print self._lookup
@@ -132,9 +139,18 @@ class Segmenter(object):
     #
     BLOCK_ELEMENTS = ['div','p','li','td','th','dt','dd','blockquote','center','h1','h2','h3','h4','h5','h6','address','del','ins','pre']
 
+    # This is a list of all elements we recognize as "inline" (it isn't a complete list from
+    # the HTML5 spec, but probably should be).  The main function of this list is that we
+    # walk up span elements and include them inside sentences.
+    INLINE_ELEMENTS = ['a','b','i','u','strong','em','span','word']
+
     # These are elements so problematic, that we simply ignore them if they happen to wander
     # into our innocent HTML document.
     SKIP_ELEMENTS = ['input','button','label','legend','option','textarea','iframe']
+
+    # Child classes (ie. SentenceSegmenter) can set this to True so that we walk up elements
+    # listed in INLINE_ELEMENTS.
+    walkUpInlineElements = False
     
     def __init__(self, elemName, tokenize):
         self._elemName = elemName
@@ -176,13 +192,17 @@ class Segmenter(object):
                     # really want it
                     endIndex += len(seg)
                     continue
+
+                # remove leading/trailing white space from the sentences segment
+                seg = seg.strip()
+
                 #print seg
                 startIndex = raw_text.find(seg, endIndex)
                 endIndex = startIndex + len(seg)
                 #print startIndex, endIndex, seg
 
                 #print startIndex, endIndex, sent
-                self._elemStr.wrap_in_element(self._elemName, startIndex, endIndex)
+                self._elemStr.wrap_in_element(self._elemName, startIndex, endIndex, self.walkUpInlineElements)
 
         self._elemStr.reset()
 
@@ -261,6 +281,8 @@ def _sent_tokenize(text, lang):
     return punkt_tokenizer.tokenize(text, realign_boundaries=True)
 
 class SentenceSegmenter(Segmenter):
+    walkUpInlineElements = True
+
     def __init__(self, tokenize=_sent_tokenize, lang='en'):
         # if the user is passing the default default tokenize, then
         # we make sure it is called with the 'lang' argument
