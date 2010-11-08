@@ -219,14 +219,15 @@ class Simplifier(object):
                 elem.setAttribute('class', 'external')
 
 class Document(_DomWrapper):
-    def __init__(self, dom):
+    def __init__(self, dom, lang):
         if dom.nodeType != XmlNode.DOCUMENT_NODE:
             raise DocumentError('Document must be based around a Document node')
         _DomWrapper.__init__(self, dom)
+        self.lang = lang
 
     def segmentize(self):
         from LingwoNLP.segment import segmentDocument
-        segmentDocument(self._dom)
+        segmentDocument(self._dom, self.lang)
 
     def __str__(self):
         return self.html()
@@ -234,9 +235,9 @@ class Document(_DomWrapper):
     def html(self):
         return _serializeBody(self._dom)
 
-    def purehtml(self, language):
+    def purehtml(self):
         doc = self._dom.cloneNode(True)
-        Simplifier(doc, language).simplify()
+        Simplifier(doc, self.lang).simplify()
         return _serializeBody(doc)
 
     @property
@@ -268,10 +269,14 @@ class TokenStream(_DomWrapper):
             if child.nodeType == XmlNode.ELEMENT_NODE and child.tagName == 'word':
                 self.tokens.append(Token(child))
 
-def parse(fd):
-    return Document(html5lib.parse(fd, treebuilder='dom'))
+def parse(fd, lang):
+    return Document(html5lib.parse(fd, treebuilder='dom', encoding='utf-8'), lang)
 
-def parseString(s):
-    return parse(StringIO(s))
+def parseString(s, lang):
+    # if the string is unicode, then we need to encode it as 'utf-8'
+    # because html5lib chokes on it.
+    if isinstance(s, unicode):
+        s = s.encode('utf-8')
+    return parse(StringIO(s), lang)
 
 

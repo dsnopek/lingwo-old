@@ -2,12 +2,16 @@
 import re
 import cPickle as pickle
 from xml.dom import Node
-import nltk
+import nltk, os.path
 from LingwoNLP.document import parse, parseString, Text_split
 
-from nltk.tokenize.punkt import PunktLanguageVars
+from nltk.tokenize.punkt import PunktLanguageVars, PunktWordTokenizer
 class MyPunktLanguageVars(PunktLanguageVars):
-   sent_end_chars = ('.', '?', '!', '"', '\'')
+    sent_end_chars = ('.', '?', '!', '"', '\'')
+
+    # TODO: does this break sentences segmentation with English?
+    _re_non_word_chars   = r"(?:[?!)\";}\]\*:@\.\'\({\[])"
+    """Characters that cannot appear within words"""
 
 class ElementString(object):
     def __init__(self):
@@ -26,7 +30,10 @@ class ElementString(object):
         self._lookup.append((len(self._string), elem))
 
     def __str__(self):
-        return self._string
+        return str(self._string)
+
+    def __unicode__(self):
+        return unicode(self._string)
 
     def _find(self, index):
         res = None
@@ -159,7 +166,7 @@ class Segmenter(object):
 
     def _doSegment(self):
         if not self._elemStr.is_empty():
-            raw_text = str(self._elemStr)
+            raw_text = unicode(self._elemStr)
             segments = self._tokenize(raw_text)
             #print repr(raw_text), segments
             endIndex = 0
@@ -241,34 +248,57 @@ class MyTreebankWordTokenizer(TokenizerI):
 
         return text.split()
 
+def _load_punkt(lang):
+    if lang == 'en':
+        return nltk.data.load('tokenizers/punkt/english.pickle')
+    else:
+        return pickle.load(open(os.path.join(os.path.dirname(__file__), 'punkt-'+lang+'.pickle'), 'r'))
+
 # A replacement for nltk.sent_tokenize() because we want to pass
 # realign_boundaries=True to .tokenize()
-def _sent_tokenize(text):
-    punkt_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+def _sent_tokenize(text, lang):
+    punkt_tokenizer = _load_punkt(lang)
     return punkt_tokenizer.tokenize(text, realign_boundaries=True)
 
 class SentenceSegmenter(Segmenter):
-    def __init__(self, tokenize=_sent_tokenize):
+    def __init__(self, tokenize=_sent_tokenize, lang='en'):
+        # if the user is passing the default default tokenize, then
+        # we make sure it is called with the 'lang' argument
+        if tokenize is _sent_tokenize:
+            def lang_tokenize(text):
+                return _sent_tokenize(text, lang)
+            tokenize = lang_tokenize
+
         Segmenter.__init__(self, 'sent', tokenize)
 
 # A replacement for nltk.word_tokenize() that uses our modified MyTreebankWordTokenizer()
-def _word_tokenize(text):
-    treebank_tokenizer = MyTreebankWordTokenizer()
-    return treebank_tokenizer.tokenize(text)
+def _word_tokenize(text, lang):
+    if lang == 'en':
+        treebank_tokenizer = MyTreebankWordTokenizer()
+        return treebank_tokenizer.tokenize(text)
+    else:
+        # TODO: does this really make sense?  PunktWordTokenizer really
+        # just calls into MyPunktLanguageVars anyway...
+        punkt_tokenizer = PunktWordTokenizer(MyPunktLanguageVars())
+        return punkt_tokenizer.tokenize(text)
 
 class WordSegmenter(Segmenter):
-    def __init__(self, tokenize=_word_tokenize):
+    def __init__(self, tokenize=_word_tokenize, lang='en'):
+        if tokenize is _word_tokenize:
+            def lang_tokenize(text):
+                return _word_tokenize(text, lang)
+            tokenize = lang_tokenize
         Segmenter.__init__(self, 'word', tokenize)
 
-def segmentDocument(doc, sent_segmenter=None, word_segmenter=None):
+def segmentDocument(doc, lang, sent_segmenter=None, word_segmenter=None):
     # segment the sentences
     if sent_segmenter is None:
-        sent_segmenter = SentenceSegmenter()
+        sent_segmenter = SentenceSegmenter(lang=lang)
     sent_segmenter.run(doc.getElementsByTagName('body')[0])
 
     # segment the words
     if word_segmenter is None:
-        word_segmenter = WordSegmenter()
+        word_segmenter = WordSegmenter(lang=lang)
     for sent in doc.getElementsByTagName('sent'):
         word_segmenter.run(sent)
 

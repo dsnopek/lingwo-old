@@ -812,7 +812,8 @@ function theme_lingwo_korpus_annotation_reader_block($footer_id, $footer_margin)
  */
 
 function _lingwo_korpus_autolookup_node(&$node, $which='body', $full_lookup=TRUE) {
-  $cmd = $full_lookup ? '-' : '-s -';
+  $cmd  = "-l ". $node->language ." ";
+  $cmd .= $full_lookup ? '-' : '-s -';
   if ($result = _lingwo_korpus_exec_autolookup_py($cmd, $node->$which)) {
     $node->$which = rtrim($result);
     return TRUE;

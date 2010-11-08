@@ -32,12 +32,13 @@ def main():
             lang = node['language']
         text = node['body']
 
+
     if lang is None:
         print >> sys.stderr, "Must pass -l language on the command line!"
         sys.exit(1)
 
-    doc = parseString(text)
-    print doc.purehtml(lang)
+    doc = parseString(text, lang)
+    print doc.purehtml()
 
 if __name__ == '__main__': main()
 

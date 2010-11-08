@@ -27,7 +27,7 @@ How to setup a python virtualenv for the NLP code?
    $HOME/prj/lingwo/python-nlp-env/bin/python
    import nltk
    nltk.download('punkt')
- 
+
  * Install html5lib version 0.90:
 
    wget http://html5lib.googlecode.com/files/html5lib-0.90.zip

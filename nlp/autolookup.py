@@ -13,10 +13,10 @@ class Connector(object):
             self.remote.login()
         return self.remote
 
-def lookup(remote, doc):
+def lookup(remote, doc, lang):
     # TODO: this isn't what we want to do in the end, but it will work now for testing
     def qlookup(word):
-        res = remote.call('lingwo_dictionary.search_entries', word, {'language':'en'})
+        res = remote.call('lingwo_dictionary.search_entries', word, {'language':lang})
         if len(res) > 0:
             return res[0]
         return None
@@ -29,7 +29,7 @@ def lookup(remote, doc):
             if token.dom.hasAttribute('pos'):
                 continue
 
-            word = str(token)
+            word = unicode(token)
 
             # try first the word, then a lower case version of the word
             res = qlookup(word)
@@ -46,15 +46,19 @@ def lookup(remote, doc):
 def main():
     import sys, getopt
 
-    opts, args = getopt.getopt(sys.argv[1:], 'sn', [])
+    opts, args = getopt.getopt(sys.argv[1:], 'snl:', [])
 
     do_lookup = True
     do_dryRun = False
+    lang = None
     for o, a in opts:
         if o == '-s':
             do_lookup = False
         elif o == '-n':
             do_dryRun = True
+        elif o == '-l':
+            lang = a
+
 
     if len(args) != 1:
         print >> sys.stderr, "Should take the nid of the text on the command line!"
@@ -70,12 +74,18 @@ def main():
         if content_item['type'] != 'content':
             print >> sys.stderr, "Node must be a content node!"
             sys.exit(1)
+        if lang is None:
+            lang = content_item['language']
 
-    doc = parseString(content_item['body'])
+    if lang is None:
+        print >> sys.stderr, "Must pass -l language on the command line!"
+        sys.exit(1)
+
+    doc = parseString(content_item['body'], lang)
     doc.segmentize()
 
     if do_lookup:
-        lookup(conn.get(), doc)
+        lookup(conn.get(), doc, lang)
 
     content_item['body'] = str(doc)
 
