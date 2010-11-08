@@ -108,7 +108,7 @@ class Simplifier(object):
     @classmethod
     def hash(cls, language, pos, headword):
         import hashlib
-        return hashlib.sha1(':'.join([language, pos, headword])).hexdigest()
+        return hashlib.sha1((unicode(language)+':'+pos+':'+headword).encode('utf-8')).hexdigest()
 
     def hashNode(self, node):
         if not node.hasAttribute('pos'):
