@@ -2,7 +2,7 @@
 import re
 import cPickle as pickle
 from xml.dom import Node
-import nltk, os.path
+import sys, os.path, nltk
 from LingwoNLP.document import parse, parseString, Text_split
 
 from nltk.tokenize.punkt import PunktLanguageVars, PunktWordTokenizer
@@ -13,6 +13,9 @@ class MyPunktLanguageVars(PunktLanguageVars):
     # TODO: does this break sentences segmentation with English?
     _re_non_word_chars   = r"(?:[?!)\";}\]\*:@\.\({\[])"
     """Characters that cannot appear within words"""
+
+class SegmentException(Exception):
+    pass
 
 class ElementString(object):
     FAVOR_INNER = 0
@@ -117,9 +120,9 @@ class ElementString(object):
         startElem = self._splitEndPoint(startIndex, ElementString._SPLIT_START, flags==ElementString.FAVOR_OUTER)
         endElem = self._splitEndPoint(endIndex, ElementString._SPLIT_END, flags==ElementString.FAVOR_OUTER)
         if startElem.parentNode != endElem.parentNode:
-            print startElem, endElem
-            print self._lookup
-            raise "(for now) the sentence can only exist where the start and end point have the same parent"
+            #print startElem, endElem
+            #print self._lookup
+            raise SegmentException("(for now) the sentence can only exist where the start and end point have the same parent")
 
         doc = startElem.ownerDocument
         sentenceElem = doc.createElement(elemName)
@@ -208,7 +211,10 @@ class Segmenter(object):
                 #print startIndex, endIndex, seg
 
                 #print startIndex, endIndex, sent
-                self._elemStr.wrap_in_element(self._elemName, startIndex, endIndex, self.walkUpInlineElements)
+                try:
+                    self._elemStr.wrap_in_element(self._elemName, startIndex, endIndex, self.walkUpInlineElements)
+                except SegmentException, e:
+                    print >> sys.stderr, self.__class__.__name__ + ': Unable to create segment "'+seg+'": '+str(e)
 
         self._elemStr.reset()
 

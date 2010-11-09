@@ -1,7 +1,7 @@
 
 require.def('lingwo_dictionary/annotation/TextSelector',
-    ['lingwo_dictionary/util/declare'],
-    function (declare) {
+    ['lingwo_dictionary/util/declare','jquery'],
+    function (declare, $) {
         function getCharIndex(node) {
             var id, match;
             if (node.id && (match = /c-(\d+)/.exec(node.id))) {
@@ -54,7 +54,7 @@ require.def('lingwo_dictionary/annotation/TextSelector',
                                 charNode = document.createElement('span');
                                 charNode.className = 'c';
                                 charNode.id = 'c-'+charIndex;
-                                charNode.innerHTML = text.substr(i, 1);
+                                $(charNode).text(text.substr(i, 1));
 
                                 charIndex++;
                                 node.insertBefore(charNode, childNode);

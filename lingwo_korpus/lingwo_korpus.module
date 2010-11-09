@@ -403,6 +403,15 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
 
   if (str_get_html($text)->plaintext != str_get_html($node_body)->plaintext) {
     drupal_set_message(t('Annotator modified the content of the text'), 'error');
+    // For debugging this situation!
+    // TODO: When we have normal users using the annotator, we should log this somewhere
+    // we can get to it later to diagnose problems...
+    /*
+    file_put_contents('ttt-node.txt', str_get_html($node_body)->plaintext);
+    file_put_contents('ttt-anno.txt', str_get_html($text)->plaintext);
+    file_put_contents('ttt-node.html', $node_body);
+    file_put_contents('ttt-anno.html', $text);
+    */
     return;
   }
 
@@ -860,13 +869,20 @@ function _lingwo_korpus_exec_python($script, $args, $data) {
 function _lingwo_korpus_exec_autolookup_py($cmd, $data) {
   $ret = _lingwo_korpus_exec_python('nlp/autolookup.py', $cmd, $data);
 
+  if (!empty($ret['error'])) {
+    if ($ret['return_value'] == 0) {
+      drupal_set_message(t('Got warnings when running the automatic annotator.'), 'warning');
+      watchdog('lingwo_korpus', 'Warnings from autolookup.py: '. $ret['error'], NULL, WATCHDOG_WARNING);
+    }
+    else {
+      drupal_set_message(t('Error running automatic annotator.'), 'error');
+      watchdog('lingwo_korpus', "Error running autolookup.py: ". $ret['error'], NULL, WATCHDOG_ERROR);
+    }
+  }
+
   // if the program was successful, update return the result
   if ($ret['return_value'] == 0) {
     return $ret['result'];
-  }
-  else {
-    drupal_set_message(t('Error running automatic annotator.'), 'error');
-    watchdog('lingwo_korpus', "Error running autolookup.py: ". $ret['error'], NULL, WATCHDOG_ERROR);
   }
 }
 
