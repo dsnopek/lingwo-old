@@ -267,10 +267,7 @@ class TokenStream(_DomWrapper):
             raise DocumentError('TokenStream must wrap around a <sent> sentence element')
         _DomWrapper.__init__(self, dom)
 
-        self.tokens = []
-        for child in dom.childNodes:
-            if child.nodeType == XmlNode.ELEMENT_NODE and child.tagName == 'word':
-                self.tokens.append(Token(child))
+        self.tokens = [Token(elem) for elem in dom.getElementsByTagName('word')]
 
 def parse(fd, lang):
     return Document(html5lib.parse(fd, treebuilder='dom', encoding='utf-8'), lang)
