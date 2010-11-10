@@ -234,6 +234,20 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 });
             },
 
+            _setupDefaultEvents: function () {
+                // disable link clicking and dragging
+                $('a', this.textNode)
+                    .mousedown(function (evt) {
+                        evt.preventDefault();
+                    })
+                    .click(function (evt) {
+                        evt.preventDefault();
+                    })
+                    .each(function (node) {
+                        node.draggable = false;
+                    });
+            },
+
             _setupKeyboardEvents: function () {
                 $(document).keyup(function (evt) {
                     var tagName = evt.target.tagName.toLowerCase();
@@ -314,6 +328,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 this._setupToolbar();
                 this._setupText();
                 this._setupForm();
+                this._setupDefaultEvents();
                 this._setupKeyboardEvents();
 
                 this.setType('word');
