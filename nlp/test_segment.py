@@ -28,9 +28,9 @@ def doSegment(elem):
 
 class SegmentTest(unittest.TestCase):
     def testEndTagSegment(self):
-        elem = parseString('this is a sentence<br />\n')
+        elem = parseString('this is a sentence<br />.')
         doSegment(elem)
-        self.assertEqual(elem.toxml(), '<body><sent><word>this</word> <word>is</word> <word>a</word> <word>sentence</word><br/>\n</sent></body>');
+        self.assertEqual(elem.toxml(), '<body><sent><word>this</word> <word>is</word> <word>a</word> <word>sentence</word><br/>.</sent></body>');
 
 class ElementStringTest(unittest.TestCase):
     def testLookup(self):

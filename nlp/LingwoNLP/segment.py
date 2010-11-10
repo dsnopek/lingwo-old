@@ -65,44 +65,18 @@ class ElementString(object):
 
     _SPLIT_START = 1
     _SPLIT_END = 0
-    
-    def _splitEndPoint(self, index, which, walkUpInlineElements=False):
+ 
+    def _splitEndPoint(self, index, which):
         lookupIndex, (pos, elem), localIndex = self._find(index)
         if which == ElementString._SPLIT_END and localIndex == 0:
             # we really want the previous element because we are past the edge
             lookupIndex, (pos, elem), localIndex = self._find(index-1)
             localIndex = len(elem.nodeValue)
-#        elif which == ElementString._SPLIT_START and localIndex == len(elem.nodeValue)-1:
-#            # we really want the next element because we are before the edge
-#            lookupIndex, (pos, elem), localIndex = self._find(index+1)
 
-        def canWalkUp(elem):
-            if walkUpInlineElements:
-                return elem.parentNode.tagName in Segmenter.INLINE_ELEMENTS
-            else:
-                return elem.parentNode.tagName == 'word'
-
-        # we move up the tree if we are on the very edge of a word annotation
-        def walkUpParent(elem):
-            while canWalkUp(elem):
-                if which == ElementString._SPLIT_START and elem == elem.parentNode.firstChild:
-                    elem = elem.parentNode
-                elif which == ElementString._SPLIT_END and elem == elem.parentNode.lastChild:
-                    elem = elem.parentNode
-                else:
-                    break
+        if which == ElementString._SPLIT_START and localIndex == 0:
             return elem
-
-        #print localIndex, len(elem.nodeValue)
-        if which == ElementString._SPLIT_START:
-            if localIndex == 0:
-                return walkUpParent(elem)
-        elif which == ElementString._SPLIT_END:
-            if localIndex == len(elem.nodeValue):
-                return walkUpParent(elem)
-        #print "-> split", which
-        #print "localIndex:", localIndex, "textLen:", len(elem.nodeValue)
-        #print elem
+        elif which == ElementString._SPLIT_END and localIndex == len(elem.nodeValue):
+            return elem
 
         # split and insert into our lookup table
         sibling = Text_split(elem, localIndex)
@@ -113,16 +87,65 @@ class ElementString(object):
         parts = [elem, sibling]
         return parts[which]
 
-    def wrap_in_element(self, elemName, startIndex, endIndex, flags=None):
-        if flags is None:
-            flags = ElementString.FAVOR_INNER
+    # Takes the two end-point indexes and returns two nodes, which mark (and include)
+    # all the content in between the two indexes.  It may have to split text nodes
+    # in order to have two exact nodes.
+    #
+    # By default, it will favor returning nodes that are inside the parent.  For example,
+    # meaning returning the text node in "<span>text</span>" when (startIndex, endIndex)
+    # is (0, 4).  But if the FAVOR_OUTER flag is passed, it will return the span element
+    # instead.
+    def _getEndPointNodes(self, startIndex, endIndex, flags=0):
+        startElem = self._splitEndPoint(startIndex, ElementString._SPLIT_START)
+        endElem = self._splitEndPoint(endIndex, ElementString._SPLIT_END)
 
-        startElem = self._splitEndPoint(startIndex, ElementString._SPLIT_START, flags==ElementString.FAVOR_OUTER)
-        endElem = self._splitEndPoint(endIndex, ElementString._SPLIT_END, flags==ElementString.FAVOR_OUTER)
+        def isFrontEdge(elem):
+            return elem == elem.parentNode.firstChild
+
+        def isBackEdge(elem):
+            return elem == elem.parentNode.lastChild
+
+        def isParentWalkable(elem):
+            return elem.parentNode.tagName in Segmenter.INLINE_ELEMENTS
+
+        # Designed to work with the endElem (hence it only checks if it is the
+        # "back edge" when deciding if we can move up the tree)
+        def findAncestorWithParent(parentNode, elem):
+            while elem.parentNode != None:
+                if elem.parentNode == parentNode:
+                    return elem
+                if isParentWalkable(elem) and isBackEdge(elem):
+                    elem = elem.parentNode
+                else:
+                    # we can go up the tree any further, so give up
+                    return None
+                    
+        # try to walk up the tree, to find nodes where the startElem and endElem share
+        # a parent.
         if startElem.parentNode != endElem.parentNode:
-            #print startElem, endElem
-            #print self._lookup
-            raise SegmentException("(for now) the sentence can only exist where the start and end point have the same parent")
+            while startElem.parentNode != None:
+                endElemAncestor = findAncestorWithParent(startElem.parentNode, endElem)
+                if endElemAncestor is not None:
+                    endElem = endElemAncestor
+                    break
+
+                if isParentWalkable(startElem) and isFrontEdge(startElem):
+                    startElem = startElem.parentNode
+
+            # all that looping and we still couldn't find a way that they will have the same parent
+            if startElem.parentNode != endElem.parentNode:
+                raise SegmentException("couldn't find a way to connect the start element to the end element")
+
+        if flags & ElementString.FAVOR_OUTER:
+            # we walk up the tree as far as we can go
+            while startElem.parentNode == endElem.parentNode and isParentWalkable(startElem) and isFrontEdge(startElem) and isBackEdge(endElem):
+                startElem = startElem.parentNode
+                endElem = endElem.parentNode
+
+        return (startElem, endElem)
+
+    def wrap_in_element(self, elemName, startIndex, endIndex, flags=0):
+        (startElem, endElem) = self._getEndPointNodes(startIndex, endIndex, flags)
 
         doc = startElem.ownerDocument
         sentenceElem = doc.createElement(elemName)
@@ -157,9 +180,9 @@ class Segmenter(object):
     # into our innocent HTML document.
     SKIP_ELEMENTS = ['input','button','label','legend','option','textarea','iframe']
 
-    # Child classes (ie. SentenceSegmenter) can set this to True so that we walk up elements
-    # listed in INLINE_ELEMENTS.
-    walkUpInlineElements = False
+    # Child classes (ie. SentenceSegmenter) can change the flags that will be used to
+    # call ElementString.wrap_in_element()
+    WRAP_FLAGS = ElementString.FAVOR_INNER
     
     def __init__(self, elemName, tokenize):
         self._elemName = elemName
@@ -212,7 +235,7 @@ class Segmenter(object):
 
                 #print startIndex, endIndex, sent
                 try:
-                    self._elemStr.wrap_in_element(self._elemName, startIndex, endIndex, self.walkUpInlineElements)
+                    self._elemStr.wrap_in_element(self._elemName, startIndex, endIndex, self.WRAP_FLAGS)
                 except SegmentException, e:
                     print >> sys.stderr, self.__class__.__name__ + ': Unable to create segment "'+seg+'": '+str(e)
 
@@ -293,7 +316,7 @@ def _sent_tokenize(text, lang):
     return punkt_tokenizer.tokenize(text, realign_boundaries=True)
 
 class SentenceSegmenter(Segmenter):
-    walkUpInlineElements = True
+    WRAP_FLAGS = ElementString.FAVOR_OUTER
 
     def __init__(self, tokenize=_sent_tokenize, lang='en'):
         # if the user is passing the default default tokenize, then
