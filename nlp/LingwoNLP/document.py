@@ -81,6 +81,9 @@ def _serializeBody(doc):
     writeHtml(writer, body.childNodes)
     return buffer.getvalue()
 
+def _isLink(node):
+    return node.nodeType == XmlNode.ELEMENT_NODE and node.tagName == 'a' and node.getAttribute('href') != ''
+
 class Simplifier(object):
     """ Makes cleaned up HTML from the document.
     
@@ -125,7 +128,7 @@ class Simplifier(object):
         # first, we search upward
         node = elem
         while node.parentNode is not None and node.parentNode.nodeType == XmlNode.ELEMENT_NODE:
-            if node.parentNode.tagName == 'a':
+            if _isLink(node.parentNode):
                 return True
             node = node.parentNode
 
@@ -188,7 +191,7 @@ class Simplifier(object):
             anchorIndex = 1
             placeAfter = elem
             # count up along the end edge
-            while placeAfter.nextSibling is None and placeAfter.parentNode is not None and placeAfter.nodeType == XmlNode.ELEMENT_NODE and (placeAfter.parentNode.tagName == 'a' or (placeAfter.parentNode.tagName == 'span' and placeAfter.parentNode.getAttribute('class') in ('anno','anno-text'))):
+            while placeAfter.nextSibling is None and placeAfter.parentNode is not None and placeAfter.nodeType == XmlNode.ELEMENT_NODE and (_isLink(placeAfter.parentNode) or (placeAfter.parentNode.tagName == 'span' and placeAfter.parentNode.getAttribute('class') in ('anno','anno-text'))):
                 placeAfter = placeAfter.parentNode
             # count forward over previously placed anchors
             while placeAfter.nextSibling is not None and placeAfter.nextSibling.nodeType == XmlNode.ELEMENT_NODE and placeAfter.nextSibling.tagName == 'span' and hasClass(placeAfter.nextSibling, 'anno-anchor'):
