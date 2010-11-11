@@ -88,27 +88,22 @@ require.def('lingwo_dictionary/importer/mediawiki/Producer',
                 this._stream = openStream(this.filename);
 
                 var limit = -1;
-                // TODO: report progress
-                try {
-                    if (typeof args.limit != 'undefined') {
-                        limit = args.limit;
-                    }
-                    while (true) {
-                        if (limit == 0) return;
-
-                        try {
-                            this._runOne(args);
-                        }
-                        catch (e) {
-                            print ('ERROR: importing one record: '+e);
-                        }
-
-                        if (limit != -1) limit--;
-                    }
+                if (typeof args.limit != 'undefined') {
+                    limit = args.limit;
                 }
-                catch (e) {
-                    if (e == 'EOF') return;
-                    throw(e);
+                // TODO: report progress
+                while (true) {
+                    if (limit == 0) return;
+
+                    try {
+                        this._runOne(args);
+                    }
+                    catch (e) {
+                        if (e == 'EOF') return;
+                        print ('ERROR: importing one record: '+e);
+                    }
+
+                    if (limit != -1) limit--;
                 }
             }
         });
