@@ -87,18 +87,23 @@ require.def('lingwo_dictionary/importer/mediawiki/Producer',
             run: function (args) {
                 this._stream = openStream(this.filename);
 
-                var i = 0;
+                var limit = -1;
                 // TODO: report progress
                 try {
-                    if (typeof args.limit == 'undefined') {
-                        while (true) {
-                            this._runOne(args);
-                        }
+                    if (typeof args.limit != 'undefined') {
+                        limit = args.limit;
                     }
-                    else {
-                        for (i = 0; i < args.limit; i++) {
+                    while (true) {
+                        if (limit == 0) return;
+
+                        try {
                             this._runOne(args);
                         }
+                        catch (e) {
+                            print ('ERROR: importing one record: '+e);
+                        }
+
+                        if (limit != -1) limit--;
                     }
                 }
                 catch (e) {

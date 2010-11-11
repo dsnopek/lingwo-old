@@ -163,7 +163,7 @@ function _lingwo_korpus_lookup_remote_url($url) {
   if (!empty($field_remote_url) && !empty($text_content_type) && !empty($url)) {
     $field = content_fields($field_remote_url, $text_content_type);
     $db_info = content_database_info($field);
-    $res = db_query("SELECT nid FROM ".$db_info['table']." WHERE ".$db_info['columns']['value']['column']." = '%s' LIMIT 1", $url);
+    $res = db_query("SELECT c.nid FROM ".$db_info['table']." AS c, {node} AS n WHERE ".$db_info['columns']['value']['column']." = '%s' AND c.nid = n.nid AND n.status = 1 LIMIT 1", $url);
     # TODO: limit to only published content!
     if ($obj = db_fetch_object($res)) {
       return $obj->nid;
