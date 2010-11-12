@@ -36,6 +36,18 @@ require.def('lingwo_dictionary/Entry',
                 this.clearCache();
             },
 
+            clone: function () {
+                var entry = new Entry({
+                    language: this.language,
+                    headword: this.headword,
+                    pos: this.pos
+                });
+                entry.copyFrom(this);
+                // TODO: should this be in copyFrom() ?
+                entry.sources = this.sources;
+                return entry;
+            },
+
             clearCache: function () {
                 this._cachedFields = {};
                 this._cachedWords = {};

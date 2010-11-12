@@ -101,6 +101,13 @@ require.def('lingwo_dictionary/importer/mediawiki/Producer',
                     catch (e) {
                         if (e == 'EOF') return;
                         print ('ERROR: importing one record: '+e);
+                        /*
+                        if (e.rhinoException != null) {
+                            //e.rhinoException.printStackTrace();
+                            //print(e.rhinoException.getScriptStackTrace());
+                            print (e.rhinoException.sourceName());
+                        }
+                        */
                     }
 
                     if (limit != -1) limit--;

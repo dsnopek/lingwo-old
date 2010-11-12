@@ -744,8 +744,7 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                         if (text.hasSection(sec)) {
                             var raw = text.getSection(sec),
                                 sections = splitSections(raw),
-                                pos_list = getPosList(sections),
-                                entry;
+                                pos_list = getPosList(sections);
 
                             if (pos_list == null) {
                                 print('posTrans: cant map POS: '+page.title.toString());
@@ -753,11 +752,11 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                             }
 
                             pos_list.forEach(function (pos) {
-                                entry = new Entry({
+                                var entry = new Entry({
                                     headword: page.title.toString(),
                                     language: Language.languages[self.code],
                                     pos: pos
-                                });
+                                }), entryCopy;
 
                                 entry.setSource('pl.wiktionary.org', {
                                     raw: raw,
@@ -773,6 +772,17 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                                 });
 
                                 handler(entry);
+
+                                // HACK: because the pl.wiktionary.org classifies alot of what we
+                                // consider adverbs as particles, we double all particles as adverbs.
+                                // Since we import based off of lists of (language, pos, headword)
+                                // triples, this shouldn't create duplicate entries (as we will list
+                                // them as adverbs, when we call them adverbs)
+                                if (self.code == 'pl' && pos == 'particle') {
+                                    entryCopy = entry.clone();
+                                    entryCopy.pos = 'adverb';
+                                    handler(entryCopy);
+                                }
                             });
                         }
                     };
