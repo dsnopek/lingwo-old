@@ -293,6 +293,10 @@ require.def('lingwo_dictionary/annotation/Annotator',
                                 $('#anno-form-attributive').attr('checked', 
                                     !$('#anno-form-attributive').attr('checked'));
                                 return false;
+                            } else if (evt.which == 68) { // d
+                                $('#anno-form-hidden').attr('checked', 
+                                    !$('#anno-form-hidden').attr('checked'));
+                                return false;
                             } else if (evt.which == 76) { // l
                                 Annotator._lookupSelectedEntry();
                                 return false;
@@ -446,6 +450,8 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 $('#anno-form-pos').val(target.attr('pos') || '');
                 $('#anno-form-attributive').attr('checked',
                     target.attr('attributive') == 'true' ? 'checked' : '');
+                $('#anno-form-hidden').attr('checked',
+                    target.attr('hidden') == 'true' ? 'checked' : '');
 
                 // we can now delete
                 $('#button-delete').removeClass('disabled');
@@ -645,6 +651,14 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 }
                 else {
                     this.selected.removeAttr('attributive');
+                }
+
+                // hidden
+                if ($('#anno-form-hidden').attr('checked')) {
+                    this.selected.attr('hidden', 'true');
+                }
+                else {
+                    this.selected.removeAttr('hidden');
                 }
 
                 // sense
