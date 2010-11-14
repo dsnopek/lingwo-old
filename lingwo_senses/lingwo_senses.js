@@ -1,29 +1,46 @@
 
 Drupal.behaviors.lingwo_senses = function (context) {
-    // TODO: do some slick functional programming and combine this clearly copy-paste coding
+    function makeToggleFunc(checkFunc, togglePart) {
+        return function (node, anim) {
+            var show = checkFunc(node),
+                match, toggleSelector;
 
-    function toggle_sameas(node, anim) {
-        var id = (node.id+'').replace(/same-as/, 'translation'),
-            show = ($(':selected', node).val() == '');
-
-        $('#'+id)[show ? 'show' : 'hide'](anim ? 'fast' : null);
+            // get the full id
+            if (match = /^edit-lingwo-senses-(\d+)/.exec(node.id+'')) {
+                toggleSelector = '#edit-lingwo-senses-'+match[1]+'-data-'+togglePart;
+                $(toggleSelector)[show ? 'show' : 'hide'](anim ? 'fast' : null);
+            }
+        };
     }
 
-    $('.same-as-select', context).change(function (evt) {
-        toggle_sameas(evt.target, true);
-    });
-    $('.same-as-select', context).each(function (i, node) { toggle_sameas(node); });
-
-    function toggle_noequiv(node, anim) {
-        var id = (node.id+'').replace(/no-equivalent/, 'translation-trans'),
-            show = !$(node).is(':checked');
-
-        $('#'+id)[show ? 'show' : 'hide'](anim ? 'fast' : null);
+    function checkSelectHasValue(node) {
+        return $(':selected', node).val() != '';
     }
 
-    $('.no-equivalent-checkbox', context).change(function (evt) {
-        toggle_noequiv(evt.target, true);
-    });
-    $('.no-equivalent-checkbox', context).each(function (i, node) { toggle_noequiv(node); });
+    function checkIsChecked(node) {
+        return $(node).is(':checked');
+    }
+
+    function not(func) {
+        return function () {
+            return !func.apply(null, arguments);
+        };
+    }
+
+    var toggles = {
+        '.same-as-select': makeToggleFunc(not(checkSelectHasValue), 'translation'),
+        '.no-equivalent-checkbox': makeToggleFunc(not(checkIsChecked), 'translation-trans'),
+        '.is-relationship': makeToggleFunc(not(checkSelectHasValue), 'difference')
+    }, selector;
+
+    for(selector in toggles) {
+        (function (selector, toggle) {
+            $(selector).change(function (evt) {
+                console.log('change');
+                toggle(evt.target, true);
+            });
+            $(selector).each(function () { toggle(this); });
+        })(selector, toggles[selector]);
+    }
 };
 

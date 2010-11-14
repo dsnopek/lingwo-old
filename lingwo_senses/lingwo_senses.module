@@ -50,6 +50,7 @@ function lingwo_senses_theme() {
 function lingwo_senses_form_alter(&$form, $form_state, $form_id) {
   if ($form_id == (lingwo_dictionary_settings('entry_content_type') .'_node_form')) {
     $form['lingwo_senses'] = lingwo_senses_widget($form, $form_state);
+    drupal_add_js(drupal_get_path('module', 'lingwo_senses') .'/lingwo_senses.js');
   }
 }
 
@@ -109,6 +110,14 @@ function _lingwo_senses_clean(&$senses) {
     // remove empty translations
     if (isset($sense['data']['trans'])) {
       $sense['data']['trans'] = array_filter($sense['data']['trans']);
+    }
+
+    // if "is" is set, clear difference
+    if (!empty($sense['data']['is']['relationship'])) {
+      unset($sense['data']['difference']);
+    }
+    else {
+      unset($sense['data']['is']);
     }
 
     // remove empty fields
@@ -253,6 +262,42 @@ function lingwo_senses_widget_original(&$form, &$form_state, $node) {
       '#type' => 'textfield',
       '#default_value' => $sense['data']['example'],
       '#maxlength' => 255,
+    );
+
+    # always have the ability to say it "is" a relationship to another entry
+    $row['data']['is'] = array(
+      '#type' => 'fieldset',
+      '#title' => 'Relationship',
+      '#collapsible' => TRUE,
+      '#collapsed' => empty($sense['data']['is']['relationship']),
+      #'#prefix' => '<div class="inline-controls clear-block">',
+      #'#suffix' => '</div>',
+    );
+    $row['data']['is']['relationship'] = array(
+      '#title' => 'is',
+      '#type'  => 'select',
+      # TODO: should come from lingwo_language (or indirectly from a hook)
+      '#options' => array(
+        '' => '-',
+        # imiesłów przymiotnikowy teraźniejszy czynny
+        'imieslow.przy.t.c' => t('present active participle'),
+        # imiesłów przymiotnikowy przeszły bierny
+        'imieslow.przy.p.b' => t('past passive participle'),
+        # imiesłów przymiotnikowy przeszły czynny
+        'imieslow.przy.p.c' => t('past active participle'),
+      ),
+      '#default_value' => $sense['data']['is']['relationship'],
+      '#attributes' => array('class' => 'is-relationship'),
+    );
+    $row['data']['is']['headword'] = array(
+      '#title' => 'to',
+      '#type'  => 'textfield',
+      '#default_value' => $sense['data']['is']['headword'],
+    );
+    $row['data']['is']['pos'] = array(
+      '#type'  => 'select',
+      '#options' => lingwo_dictionary_pos_options(TRUE),
+      '#default_value' => $sense['data']['is']['pos'],
     );
 
     $row['weight'] = array(
@@ -403,8 +448,6 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $node) {
 
     $element[$index++] = $sense_form;
   }
-
-  drupal_add_js(drupal_get_path('module', 'lingwo_senses') .'/lingwo_senses.js');
 
   return $element;
 }
