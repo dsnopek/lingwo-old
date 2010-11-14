@@ -124,15 +124,22 @@ function lingwo_korpus_lookup_entry() {
   global $user, $language;
 
   // lookup via either the 'url' or 'hash' arguments
-  if ($_GET['url']) {
-    // get the "Lingwo ID" out of the 'url' GET argument
-    $url = urldecode($_GET['url']);
-    $url = preg_replace(':.*?'.lingwo_dictionary_settings('lookup_path').'/(.*):', '$1', $url);
-    $entry = LingwoEntry::fromLingwoId($url);
-  }
-  elseif ($_GET['hash']) {
+#  if ($_GET['url']) {
+#    // get the "Lingwo ID" out of the 'url' GET argument
+#    $url = urldecode($_GET['url']);
+#    $url = preg_replace(':.*?'.lingwo_dictionary_settings('lookup_path').'/(.*):', '$1', $url);
+#    $entry = LingwoEntry::fromLingwoId($url);
+#  }
+  if ($_GET['hash']) {
     $target_lang = !empty($_GET['lang']) ? $_GET['lang'] : $language->language;
-    $entry = LingwoEntry::fromHash(urldecode($_GET['hash']), $target_lang);
+
+    # only attempt to show the translation, say entry doesn't exist if we don't have a translation
+    #$entry = LingwoEntry::fromHash(urldecode($_GET['hash']), $target_lang);
+
+    # show the source entry if the translation doesn't exist
+    $entry = LingwoEntry::fromHash(urldecode($_GET['hash']));
+    $trans_entry = $entry->getTranslation($target_lang);
+    if ($trans_entry) $entry = $trans_entry;
   }
   
   if ($entry) {

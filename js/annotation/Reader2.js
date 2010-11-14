@@ -262,6 +262,15 @@ require.def('lingwo_dictionary/annotation/Reader2',
                 this.setSelection(null);
             },
 
+            isInsideBubble: function (node) {
+                while (node = node.parentNode) {
+                    if (node.id == 'lingwo-korpus-entry-view') {
+                        return true;
+                    }
+                }
+                return false;
+            },
+
             showBubble: function () {
                 this.layout.show();
                 this.shown = true;
@@ -289,10 +298,19 @@ require.def('lingwo_dictionary/annotation/Reader2',
             },
 
             handleClick: function (target) {
+                var isInsideBubble;
                 if (this.isWordNode(target)) {
-                    this.setSelection(target);
-                    this.onLoad(this.selectedNode);
-                    this.showBubble();
+                    if (this.isInsideBubble(target)) {
+                        // if the annotation comes from inside the bubble itself, we
+                        // don't change the selection or re-layout the bubble, we just
+                        // load the value.
+                        this.onLoad($(target));
+                    }
+                    else {
+                        this.setSelection(target);
+                        this.onLoad(this.selectedNode);
+                        this.showBubble();
+                    }
                     return false;
                 }
 

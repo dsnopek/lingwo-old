@@ -144,6 +144,12 @@ class LingwoEntry {
     return NULL;
   }
 
+  public function getTranslation($target_lang) {
+    if (!$this->isTranslation()) {
+      return LingwoEntry::fromNid(LingwoEntry::getTranslationForNid($this->node->nid, $target_lang));
+    }
+  }
+
   public function getLanguages($for_humans=FALSE) {
     $node = $this->node;
     if ($source_node = $this->getTranslationSource()) {

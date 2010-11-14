@@ -134,6 +134,51 @@ function _lingwo_senses_clean(&$senses) {
   }
 }
 
+# TODO: should be a hook plus some default values stored in admin
+# TODO: make this code generic, I copied it from lingwo_dictionary_pos_options()
+function _lingwo_senses_relationship_options($translate = FALSE, $option_name = NULL) {
+  $list = array(
+    # imiesłów przymiotnikowy teraźniejszy czynny
+    'imieslow.przy.t.c' => 'present active participle',
+    # imiesłów przymiotnikowy przeszły bierny
+    'imieslow.przy.p.b' => 'past passive participle',
+    # imiesłów przymiotnikowy przeszły czynny
+    'imieslow.przy.p.c' => 'past active participle',
+  );
+
+  // Only translate if we have i18nstrings
+  $translate = $translate && module_exists('i18nstrings');
+
+  $options = array();
+  foreach ($list as $key => $value) {
+    // if we are only looking for one key, skip all the rest
+    if (!is_null($option_name) && $option_name != $key) {
+      continue;
+    }
+
+    if ($translate) {
+      # TODO: we need to integrate this for real with the i18n hooks!!
+      #$value = i18nstrings('lingwo:field:sense_relationships:option_'. $key, $value);
+    }
+
+    if ($option_name == $key) {
+      return $value;
+    }
+
+    $options[$key] = $value;
+  }
+
+  if (!is_null($option_name)) {
+    // we requested an option but it isn't here!  Return the original.
+    return $option_name;
+  }
+
+  asort($options);
+
+  return $options;
+}
+
+
 /**
  * Implementation of hook_nodeapi().
  */
@@ -273,19 +318,12 @@ function lingwo_senses_widget_original(&$form, &$form_state, $node) {
       #'#prefix' => '<div class="inline-controls clear-block">',
       #'#suffix' => '</div>',
     );
+    $is_relationship_options = array('' => '-') + _lingwo_senses_relationship_options(TRUE);
     $row['data']['is']['relationship'] = array(
       '#title' => 'is',
       '#type'  => 'select',
       # TODO: should come from lingwo_language (or indirectly from a hook)
-      '#options' => array(
-        '' => '-',
-        # imiesłów przymiotnikowy teraźniejszy czynny
-        'imieslow.przy.t.c' => t('present active participle'),
-        # imiesłów przymiotnikowy przeszły bierny
-        'imieslow.przy.p.b' => t('past passive participle'),
-        # imiesłów przymiotnikowy przeszły czynny
-        'imieslow.przy.p.c' => t('past active participle'),
-      ),
+      '#options' => $is_relationship_options,
       '#default_value' => $sense['data']['is']['relationship'],
       '#attributes' => array('class' => 'is-relationship'),
     );
@@ -381,57 +419,64 @@ function lingwo_senses_widget_translation(&$form, &$form_state, $node) {
       }
     }
 
-    $sense_form['data']['translation'] = array(
-      '#parents' => array('lingwo_senses', $index, 'data'),
-      '#prefix' => "<div id=\"edit-lingwo-senses-$index-data-translation\">",
-      '#suffix' => '</div>',
-    );
-    if (count($senses) > 1) {
-      $sense_form['data']['translation']['clue'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Clue'),
-        '#description' => t('A couple words that will clue the reader to how this sense is different.'),
-        '#default_value' => $sense['data']['clue'],
-        '#maxlength' => 255,
+    if (!empty($orig_sense['data']['is']['relationship'])) {
+      $sense_form['data']['relationship'] = array(
+        '#value' => _theme_lingwo_senses_relationship($node, $orig_sense['data'])
       );
     }
-
-    $sense_form['data']['translation']['trans'] = array(
-      '#prefix' => "<div id=\"edit-lingwo-senses-$index-data-translation-trans\">",
-      '#suffix' => "</div>",
-    );
-    for ($t = 0; $t < max(3, count($sense['data']['trans'])); $t++) {
-      $sense_form['data']['translation']['trans'][$t] = array(
-        '#type' => 'textfield',
-        '#default_value' => $sense['data']['trans'][$t]
+    else {
+      $sense_form['data']['translation'] = array(
+        '#parents' => array('lingwo_senses', $index, 'data'),
+        '#prefix' => "<div id=\"edit-lingwo-senses-$index-data-translation\">",
+        '#suffix' => '</div>',
       );
-    }
-    $sense_form['data']['translation']['trans']['0']['#title'] = t('Translation');
-
-    $sense_form['data']['translation']['no_equivalent'] = array(
-      '#title' => t('No equivalent in this language'),
-      '#type'  => 'checkbox',
-      '#default_value' => $sense['data']['no_equivalent'],
-      '#attributes' => array('class' => 'no-equivalent-checkbox'),
-    );
-
-    if (count($senses) > 1) {
-      $same_as_options = array('' => '-');
-      $same_as_count = 1;
-      foreach ($senses as $sense2) {
-        if (!empty($sense2['id']) && $sense2['id'] != $sense['id']) {
-          $same_as_options[$sense2['id']] = t('Sense #!sense_num', array('!sense_num' => $same_as_count));
-        }
-        $same_as_count++;
+      if (count($senses) > 1) {
+        $sense_form['data']['translation']['clue'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Clue'),
+          '#description' => t('A couple words that will clue the reader to how this sense is different.'),
+          '#default_value' => $sense['data']['clue'],
+          '#maxlength' => 255,
+        );
       }
 
-      $sense_form['data']['same_as'] = array(
-        '#title' => t('Same as'),
-        '#type' => 'select',
-        '#options' => $same_as_options,
-        '#default_value' => !empty($sense['data']['same_as']) ? $sense['data']['same_as'] : '',
-        '#attributes' => array('class' => 'same-as-select'),
+      $sense_form['data']['translation']['trans'] = array(
+        '#prefix' => "<div id=\"edit-lingwo-senses-$index-data-translation-trans\">",
+        '#suffix' => "</div>",
       );
+      for ($t = 0; $t < max(3, count($sense['data']['trans'])); $t++) {
+        $sense_form['data']['translation']['trans'][$t] = array(
+          '#type' => 'textfield',
+          '#default_value' => $sense['data']['trans'][$t]
+        );
+      }
+      $sense_form['data']['translation']['trans']['0']['#title'] = t('Translation');
+
+      $sense_form['data']['translation']['no_equivalent'] = array(
+        '#title' => t('No equivalent in this language'),
+        '#type'  => 'checkbox',
+        '#default_value' => $sense['data']['no_equivalent'],
+        '#attributes' => array('class' => 'no-equivalent-checkbox'),
+      );
+
+      if (count($senses) > 1) {
+        $same_as_options = array('' => '-');
+        $same_as_count = 1;
+        foreach ($senses as $sense2) {
+          if (!empty($sense2['id']) && $sense2['id'] != $sense['id']) {
+            $same_as_options[$sense2['id']] = t('Sense #!sense_num', array('!sense_num' => $same_as_count));
+          }
+          $same_as_count++;
+        }
+
+        $sense_form['data']['same_as'] = array(
+          '#title' => t('Same as'),
+          '#type' => 'select',
+          '#options' => $same_as_options,
+          '#default_value' => !empty($sense['data']['same_as']) ? $sense['data']['same_as'] : '',
+          '#attributes' => array('class' => 'same-as-select'),
+        );
+      }
     }
 
     if (!$orig_sense) {
@@ -608,6 +653,44 @@ function theme_lingwo_senses_translation_form($form) {
   return theme('table', $header, $rows);
 }
 
+function _theme_lingwo_senses_relationship($node, $sense) {
+  if (lingwo_dictionary_entry_is_translation($node)) {
+    $source_lang = lingwo_dictionary_entry_load_translation_source($node)->language;
+    $target_lang = $node->language;
+    $spec = "$source_lang-$target_lang";
+  }
+  else {
+    $spec = $source_lang = $target_lang = $node->language;
+  }
+
+  $pos = $sense['is']['pos'];
+  $headword = $sense['is']['headword'];
+
+  # TODO: this should be a function!
+  # TODO: this should operate somehow, when we don't have a lookup path!
+  $path = implode('/', array(
+    lingwo_dictionary_settings('lookup_path'),
+    $spec,
+    $headword .'('. $pos .')'
+  ));
+
+  $entry_text = $headword .' ('. lingwo_dictionary_pos_options(TRUE, $pos) .')';
+  // TODO: shouldn't be a link if there is no lookup path and this node doesn't exist!
+  $entry_text = l($entry_text, $path, array(
+    # setup for working in the korpus reader
+    'attributes' => array(
+      # TODO: hashing should be a function call!
+      'data-entry' => sha1(join(':', array($source_lang, $pos, $headword))),
+      'class' => 'anno'
+    )
+  ));
+
+  return t('!rel of !entry', array(
+    '!rel' => _lingwo_senses_relationship_options(TRUE, $sense['is']['relationship']),
+    '!entry' => $entry_text
+  ));
+}
+
 function theme_lingwo_senses_original($node) {
   $items = $node->lingwo_senses;
   if (!empty($items)) {
@@ -618,7 +701,10 @@ function theme_lingwo_senses_original($node) {
       $sense = $sense['data'];
 
       $output .= '<li class="lingwo-sense lingwo-sense-id-'.$sense_id.'">';
-      if ($sense['difference']) {
+      if (!empty($sense['is']['relationship'])) {
+        $output .= '<span class="lingwo-sense-relationship">'. _theme_lingwo_senses_relationship($node, $sense) .'</span>';
+      }
+      else if ($sense['difference']) {
         $output .= '<span class="lingwo-sense-difference">'. $sense['difference'] .'</span>';
       }
       else {
@@ -667,10 +753,13 @@ function theme_lingwo_senses_translation($node) {
     $orig_sense = $sense['orig_sense'];
     $sense_id = $sense['id'];
     $sense = $sense['data'];
-    
+
     $values = array();
     if ($sense['no_equivalent']) {
       $values[] = '<strong><span class="lingwo-sense-no-equivalent">'. t('No equivalent in this language') .'</span></strong>';
+    }
+    else if (!empty($orig_sense['data']['is']['relationship'])) {
+      $values[] = _theme_lingwo_senses_relationship($node, $orig_sense['data']);
     }
     else if (!empty($sense['trans'])) {
       foreach ($sense['trans'] as $value) {

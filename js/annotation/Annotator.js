@@ -56,15 +56,6 @@ require.def('lingwo_dictionary/annotation/Annotator',
             return null;
         }
 
-        function isInsideBubble(node) {
-            while (node = node.parentNode) {
-                if (node.id == 'lingwo-korpus-entry-view') {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         function areSiblings(start, end) {
             if (start == end) return true;
             while (start = start.nextSibling) {
@@ -197,7 +188,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
                             }
                             return Reader.handleClick(wordParent);
                         }
-                        if (!isInsideBubble(evt.target)) {
+                        if (!Reader.isInsideBubble(evt.target)) {
                             Annotator.clearSelection();
                         }
                     }
