@@ -138,10 +138,12 @@ function lingwo_korpus_lookup_entry() {
 
     # show the source entry if the translation doesn't exist
     $entry = LingwoEntry::fromHash(urldecode($_GET['hash']));
-    $trans_entry = $entry->getTranslation($target_lang);
-    if ($trans_entry) $entry = $trans_entry;
+    if ($entry) {
+      $trans_entry = $entry->getTranslation($target_lang);
+      if ($trans_entry) $entry = $trans_entry;
+    }
   }
-  
+
   if ($entry) {
     if (module_exists('rules')) {
       rules_invoke_event('lingwo_korpus_lookup', $user, $entry->getNode());

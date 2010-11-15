@@ -61,9 +61,7 @@
   * Update database: /update.php
 
   * Save the modules page: /admin/build/modules
-
-    (What I want to happen, is for new dependencies to get enabled..  I'm not yet sure
-	 if this step accomplishes that.)
+    (should enable new dependencies)
 
   * Check if features are overridden: /admin/build/features
 
