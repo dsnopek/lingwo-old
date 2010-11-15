@@ -321,7 +321,8 @@ function lingwo_korpus_remote_logout_page() {
 
     // Destroy the current session:
     session_destroy();
-    module_invoke_all('user', 'logout', NULL, $user);
+    $array = array();
+    user_module_invoke('logout', $array, $user);
 
     // Load the anonymous user
     $user = drupal_anonymous_user();
