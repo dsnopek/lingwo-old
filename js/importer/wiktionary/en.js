@@ -273,8 +273,8 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                     // to correct for a very specific data irregularity, where a {{i|...}} template
                     // is put on the same line as the form information.
                     match[2] = match[2].replace(/\}\}\s*\{\{i\|.*$/, '');
-                    // also, happens with {{US}}, {{transitive}} and {{intransitive}}
-                    match[2] = match[2].replace(/\}\}\s*\{\{(?:US|transitive|intransitive).*$/, '');
+                    // also, happens with {{US}}, {{idiom}}, {{transitive}} and {{intransitive}}
+                    match[2] = match[2].replace(/\}\}\s*\{\{(?:US|idiom|transitive|intransitive).*$/, '');
 
                     return [match[1], match[2].substr(1).split('|')];
                 }
