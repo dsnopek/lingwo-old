@@ -5,7 +5,10 @@ require.def('lingwo_dictionary/annotation/Embed',
         var configDefaults = {
                 url: 'http://www.bibliobird.com',
                 lang: 'en',
-                showLinks: true
+                showLinks: true,
+                // TODO: this should be false or not even in this code!
+                //ga: false
+                ga: true
             },
             BiblioBird = {};
 
@@ -24,6 +27,9 @@ require.def('lingwo_dictionary/annotation/Embed',
         }
         // setup config defaults
         extend(BiblioBird, configDefaults, true);
+        if (BiblioBird.ga) {
+            BiblioBird.ga = (typeof window['_gaq'] != 'undefined');
+        }
         // define the BiblioBird object
         extend(BiblioBird, {
             initialized: false,
@@ -149,6 +155,13 @@ require.def('lingwo_dictionary/annotation/Embed',
                 data: { hash: hash, lang: BiblioBird.lang },
                 success: function (res) {
                     Reader.setBubbleContent(res.content);
+
+                    // TODO: this shouldn't be here, but on LinguaTrek somehow!
+                    if (BiblioBird.ga) {
+                        // TODO: determine from the res if we are anonymous or not
+                        _gaq.push(['_trackEvent', 'BiblioBird', 'Anonymous Lookup', BiblioBird.lang]);
+                    }
+
                     $('.node', Reader.contentNode)
                         .removeClass('clear-block')
                         .removeAttr('id');
