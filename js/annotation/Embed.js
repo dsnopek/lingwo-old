@@ -27,9 +27,6 @@ require.def('lingwo_dictionary/annotation/Embed',
         }
         // setup config defaults
         extend(BiblioBird, configDefaults, true);
-        if (BiblioBird.ga) {
-            BiblioBird.ga = (typeof window['_gaq'] != 'undefined');
-        }
         // define the BiblioBird object
         extend(BiblioBird, {
             initialized: false,
@@ -44,6 +41,10 @@ require.def('lingwo_dictionary/annotation/Embed',
             // found on the page.
             start: function () {
                 var self = this;
+                if (BiblioBird.ga) {
+                    // only really enable it if we have it
+                    BiblioBird.ga = (typeof window['_gaq'] != 'undefined');
+                }
                 $('.bibliobird-content').each(function () {
                     self.contentAreas.push(new ContentArea(this));
                 });
