@@ -41,10 +41,6 @@ require.def('lingwo_dictionary/annotation/Embed',
             // found on the page.
             start: function () {
                 var self = this;
-                if (BiblioBird.ga) {
-                    // only really enable it if we have it
-                    BiblioBird.ga = (typeof window['_gaq'] != 'undefined');
-                }
                 $('.bibliobird-content').each(function () {
                     self.contentAreas.push(new ContentArea(this));
                 });
@@ -158,9 +154,12 @@ require.def('lingwo_dictionary/annotation/Embed',
                     Reader.setBubbleContent(res.content);
 
                     // TODO: this shouldn't be here, but on LinguaTrek somehow!
-                    if (BiblioBird.ga) {
+                    if (BiblioBird.ga && typeof window['_gaq'] != 'undefined') {
                         // TODO: determine from the res if we are anonymous or not
                         _gaq.push(['_trackEvent', 'BiblioBird', 'Anonymous Lookup', BiblioBird.lang]);
+                        if (console && console.log) {
+                            console.log('_trackEvent');
+                        }
                     }
 
                     $('.node', Reader.contentNode)
