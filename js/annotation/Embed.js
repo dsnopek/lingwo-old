@@ -157,9 +157,6 @@ require.def('lingwo_dictionary/annotation/Embed',
                     if (BiblioBird.ga && typeof window['_gaq'] != 'undefined') {
                         // TODO: determine from the res if we are anonymous or not
                         _gaq.push(['_trackEvent', 'BiblioBird', 'Anonymous Lookup', BiblioBird.lang]);
-                        if (console && console.log) {
-                            console.log('_trackEvent');
-                        }
                     }
 
                     $('.node', Reader.contentNode)
