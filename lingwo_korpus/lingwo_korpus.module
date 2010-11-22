@@ -428,7 +428,8 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
   $node->body = $text;
   if ($form_state['clicked_button']['#value'] == t('Auto Annotate')) {
     drupal_set_message(t('Automatic annotator complete.'));
-    _lingwo_korpus_autolookup_node($node);
+    $node->lingwo_korpus_auto_annotate = array('segment','lookup');
+    _lingwo_korpus_auto_annotate_node($node);
   }
 
   $node->teaser = node_teaser($node->body, $node->format);
@@ -518,9 +519,9 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
   if ($node->type != lingwo_korpus_text_content_type())
     return;
 
-  if ($op == 'presave' && $node->lingwo_korpus_auto_annotate) {
+  if ($op == 'presave' && !empty($node->lingwo_korpus_auto_annotate)) {
     $orig_body = $node->body;
-    if (!_lingwo_korpus_autolookup_node($node, 'body', $node->lingwo_korpus_auto_annotate == 'full')) {
+    if (!_lingwo_korpus_auto_annotate_node($node, 'body', $node->lingwo_korpus_auto_annotate == 'full')) {
       // if there are any errors, we don't need to continue
       return;
     }
@@ -537,7 +538,7 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
       // I know that we don't show the annotation reader for just the teaser, but 
       // I think segmenting the teaser is the right thing to do...  If one day we want
       // to have the annotation reader in the text browser, it will help.
-      _lingwo_korpus_autolookup_node($node, 'teaser', $node->lingwo_korpus_auto_annotate == 'full');
+      _lingwo_korpus_auto_annotate_node($node, 'teaser', $node->lingwo_korpus_auto_annotate == 'full');
     }
   }
 
@@ -755,15 +756,14 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
       '#tree' => FALSE,
     );
     $form['lingwo_korpus_settings']['lingwo_korpus_auto_annotate'] = array(
-      '#type'  => 'radios',
-      //'#title' => t('Auto Annotate'),
+      '#type'  => 'checkboxes',
+      //'#title' => t('Auto annotate'),
       '#options' => array(
-        ''        => t("Don't auto annotate"),
-        'segment' => t("Segment only"),
-        'full'    => t("Full automatic annotation"),
+        'segment' => t("Segment text into sentences and words"),
+        'lookup'  => t("Try lookup words in the dictionary"),
       ),
       // TODO: the default value should be configurable on the admin page
-      '#default_value' => empty($form['#node']->nid) ? 'segment' : '',
+      '#default_value' => empty($form['#node']->nid) ? array('segment') : array(),
     );
   }
   elseif ($form_id == 'user_login_block' && $_GET['q'] == 'lingwo_korpus/rlogin') {
@@ -830,10 +830,13 @@ function theme_lingwo_korpus_annotation_reader_block($footer_id, $footer_margin)
  * Dealing with the automatic annotator.
  */
 
-function _lingwo_korpus_autolookup_node(&$node, $which='body', $full_lookup=TRUE) {
+function _lingwo_korpus_auto_annotate_node(&$node, $which='body') {
+  if (empty($node->lingwo_korpus_auto_annotate))
+    return TRUE;
   $cmd  = "-l ". $node->language ." ";
-  $cmd .= $full_lookup ? '-' : '-s -';
-  if ($result = _lingwo_korpus_exec_autolookup_py($cmd, $node->$which)) {
+  $cmd .= "-m ". implode(",", array_filter(array_values($node->lingwo_korpus_auto_annotate)));
+  $cmd .= " -";
+  if ($result = _lingwo_korpus_exec_annotate_py($cmd, $node->$which)) {
     $node->$which = rtrim($result);
     return TRUE;
   }
@@ -876,17 +879,17 @@ function _lingwo_korpus_exec_python($script, $args, $data) {
   return $ret;
 }
 
-function _lingwo_korpus_exec_autolookup_py($cmd, $data) {
-  $ret = _lingwo_korpus_exec_python('nlp/autolookup.py', $cmd, $data);
+function _lingwo_korpus_exec_annotate_py($cmd, $data) {
+  $ret = _lingwo_korpus_exec_python('nlp/annotate.py', $cmd, $data);
 
   if (!empty($ret['error'])) {
     if ($ret['return_value'] == 0) {
       drupal_set_message(t('Got warnings when running the automatic annotator.'), 'warning');
-      watchdog('lingwo_korpus', 'Warnings from autolookup.py: '. $ret['error'], NULL, WATCHDOG_WARNING);
+      watchdog('lingwo_korpus', 'Warnings from annotate.py: '. $ret['error'], NULL, WATCHDOG_WARNING);
     }
     else {
       drupal_set_message(t('Error running automatic annotator.'), 'error');
-      watchdog('lingwo_korpus', "Error running autolookup.py: ". $ret['error'], NULL, WATCHDOG_ERROR);
+      watchdog('lingwo_korpus', "Error running annotate.py: ". $ret['error'], NULL, WATCHDOG_ERROR);
     }
   }
 

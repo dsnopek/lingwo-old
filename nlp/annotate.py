@@ -46,24 +46,38 @@ def lookup(remote, doc, lang):
 def main():
     import sys, getopt
 
-    opts, args = getopt.getopt(sys.argv[1:], 'snl:', [])
+    opts, args = getopt.getopt(sys.argv[1:], 'nm:l:', [])
 
-    do_lookup = True
+    do_segment = False
+    do_lookup = False
     do_dryRun = False
+    mode = "all"
     lang = None
     for o, a in opts:
-        if o == '-s':
-            do_lookup = False
+        if o == '-m':
+            mode = a
         elif o == '-n':
             do_dryRun = True
         elif o == '-l':
             lang = a
 
-
     if len(args) != 1:
         print >> sys.stderr, "Should take the nid of the text on the command line!"
         sys.exit(1)
     nid = args[0]
+
+    parts = mode.split(',')
+    for p in parts:
+        if p == 'all':
+            do_segment = True
+            do_lookup = True
+        elif p == 'segment':
+            do_segment = True
+        elif p == 'lookup':
+            do_lookup = True
+        else:
+            print >> sys.stderr, "Invalid mode: "+p
+            sys.exit(1)
 
     conn = Connector()
 
@@ -82,7 +96,9 @@ def main():
         sys.exit(1)
 
     doc = parseString(content_item['body'], lang)
-    doc.segmentize()
+
+    if do_segment:
+        doc.segmentize()
 
     if do_lookup:
         lookup(conn.get(), doc, lang)
