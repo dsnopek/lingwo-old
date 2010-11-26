@@ -147,7 +147,7 @@ require.def('lingwo_dictionary/annotation/Embed',
 
             // lookup the entry on the server
             $.ajax({
-                url: BiblioBird.url+'/lingwo_korpus/lookup_entry',
+                url: BiblioBird.url+'/embed-reader/lookup_entry',
                 dataType: 'jsonp',
                 data: { hash: hash, lang: BiblioBird.lang },
                 success: function (res) {
@@ -205,7 +205,7 @@ require.def('lingwo_dictionary/annotation/Embed',
                 var self = this;
 
                 $.ajax({
-                    url: BiblioBird.url+'/lingwo_korpus/lookup_content',
+                    url: BiblioBird.url+'/embed-reader/lookup_content',
                     dataType: 'jsonp',
                     data: { url: this.url },
                     success: function (res) {
