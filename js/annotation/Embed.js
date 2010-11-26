@@ -122,7 +122,7 @@ require.def('lingwo_dictionary/annotation/Embed',
             logout: function() {
                 var self = this;
                 $.ajax({
-                    url: BiblioBird.url+'/lingwo_korpus/rlogout',
+                    url: BiblioBird.url+'/remote/logout',
                     dataType: 'jsonp',
                     success: function (res) {
                         self.username = null;
@@ -247,7 +247,7 @@ require.def('lingwo_dictionary/annotation/Embed',
                     links.append($('<a></a>')
                         .html('Login')
                         //.attr('href', BiblioBird.url+'/user/login')
-                        .attr('href', BiblioBird.url+'/lingwo_korpus/rlogin' +
+                        .attr('href', BiblioBird.url+'/remote/login' +
                             (BiblioBird.localRelayUrl ? '?relay='+BiblioBird.localRelayUrl : ''))
                         .click(function (evt) { BiblioBird.openEmbedWindow(evt.target.href); return false; })
                     );
