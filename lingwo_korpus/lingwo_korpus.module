@@ -27,17 +27,22 @@ function lingwo_korpus_menu() {
     'file' => 'lingwo_korpus.admin.inc',
     'type' => MENU_LOCAL_TASK,
   );
+
+  # Add the annotation tab to korpus nodes
+  $items['node/%node/annotate'] = array(
+    'title' => 'Annotate',
+    'page arguments' => array('lingwo_korpus_annotator_form', 1),
+    'page callback' => 'drupal_get_form',
+    'access callback' => 'lingwo_korpus_annotator_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  # AJAX callbacks for the text Reader and the annotator
   $items['lingwo_korpus/lookup_entry'] = array(
     'title' => 'Lookup Entry',
     'page arguments' => array(2),
     'page callback' => 'lingwo_korpus_lookup_entry',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-  );
-  $items['lingwo_korpus/lookup_content'] = array(
-    'title' => 'Lookup Content',
-    'page arguments' => array(2),
-    'page callback' => 'lingwo_korpus_lookup_content',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
@@ -53,68 +58,8 @@ function lingwo_korpus_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
-  $items['lingwo_korpus/rlogin'] = array(
-    'title' => 'Login to BiblioBird',
-    'page callback' => 'lingwo_korpus_remote_login_page',
-    'access callback' => '_lingwo_korpus_true',
-    'type' => MENU_CALLBACK,
-  );
-  $items['lingwo_korpus/rlogout'] = array(
-    'title' => 'Remote Logout',
-    'page callback' => 'lingwo_korpus_remote_logout_page',
-    'access callback' => '_lingwo_korpus_true',
-    'type' => MENU_CALLBACK,
-  );
-  $items['lingwo_korpus/rloggedin'] = array(
-    'title' => 'Login Successful',
-    'page callback' => 'lingwo_korpus_remote_loggedin_page',
-    'access callback' => '_lingwo_korpus_true',
-    'type' => MENU_CALLBACK,
-  );
-  $items['lingwo_korpus/admin/list_entries'] = array(
-    'title' => 'List Entries',
-    'page arguments' => array('lingwo_korpus_admin_list_entries'),
-    'page callback' => 'drupal_get_form',
-    'access arguments' => array('access administration pages'),
-    'type' => MENU_CALLBACK,
-  );
-  $items['node/%node/annotate'] = array(
-    'title' => 'Annotate',
-    'page arguments' => array('lingwo_korpus_annotator_form', 1),
-    'page callback' => 'drupal_get_form',
-    'access callback' => 'lingwo_korpus_annotator_access',
-    'access arguments' => array(1),
-    'type' => MENU_LOCAL_TASK,
-  );
 
   return $items;
-}
-
-// Copied and modified version of drupal_json()
-function _lingwo_korpus_jsonp($var = NULL) {
-  // We are returning JavaScript, so tell the browser.
-  drupal_set_header('Content-Type: text/javascript; charset=utf-8');
-
-  $callback = urldecode($_GET['callback']);
-  if (isset($var)) {
-    if (!empty($callback)) {
-      echo $callback .'('. drupal_to_js($var) .')';
-    }
-    else {
-      echo drupal_to_js($var);
-    }
-  }
-  exit();
-}
-
-function _lingwo_korpus_remote_login_page($content, $page_name) {
-  drupal_set_header('Content-Type: text/html; charset=utf-8');
-  echo theme('lingwo_korpus_remote_login_page', $content, $page_name);
-  exit();
-}
-
-function _lingwo_korpus_true() {
-  return TRUE;
 }
 
 /*
@@ -123,90 +68,24 @@ function _lingwo_korpus_true() {
 function lingwo_korpus_lookup_entry() {
   global $user, $language;
 
-  // lookup via either the 'url' or 'hash' arguments
-#  if ($_GET['url']) {
-#    // get the "Lingwo ID" out of the 'url' GET argument
-#    $url = urldecode($_GET['url']);
-#    $url = preg_replace(':.*?'.lingwo_dictionary_settings('lookup_path').'/(.*):', '$1', $url);
-#    $entry = LingwoEntry::fromLingwoId($url);
-#  }
   if ($_GET['hash']) {
-    $target_lang = !empty($_GET['lang']) ? $_GET['lang'] : $language->language;
-
-    # only attempt to show the translation, say entry doesn't exist if we don't have a translation
-    #$entry = LingwoEntry::fromHash(urldecode($_GET['hash']), $target_lang);
-
-    # show the source entry if the translation doesn't exist
-    $entry = LingwoEntry::fromHash(urldecode($_GET['hash']));
-    if ($entry) {
-      $trans_entry = $entry->getTranslation($target_lang);
-      if ($trans_entry) $entry = $trans_entry;
-    }
+    // by passing TRUE, we return the source if the translation can't be found
+    $entry = LingwoEntry::fromHash(urldecode($_GET['hash']), $language->language, TRUE);
   }
 
   if ($entry) {
     if (module_exists('rules')) {
       rules_invoke_event('lingwo_korpus_lookup', $user, $entry->getNode());
     }
-
-    // HACK: force the language to be set to whatever the $node->language is!  This is 
-    // necessary for when we are using embed.js and always load from http://www.bibliobird.com
-    $languages = language_list();
-    $language = $languages[$entry->getNode()->language];
-
     $content = node_view($entry->getNode(), TRUE);
   }
   else {
-    // This should be slicker!  Probably themed, provide a link for creating the entry.
+    // TODO: This should be slicker!  Probably themed, provide a link for creating the entry.
     $content = t('Entry not found.');
   }
 
   // return the HTML to the Ajax caller
-  _lingwo_korpus_jsonp(array('content' => $content));
-}
-
-// Helper function to return the NID of a content item for the given remote URL
-function _lingwo_korpus_lookup_remote_url($url) {
-  $field_remote_url = lingwo_korpus_field_remote_url();
-  $text_content_type = lingwo_korpus_text_content_type();
-  if (!empty($field_remote_url) && !empty($text_content_type) && !empty($url)) {
-    $field = content_fields($field_remote_url, $text_content_type);
-    $db_info = content_database_info($field);
-    $res = db_query("SELECT c.nid FROM ".$db_info['table']." AS c, {node} AS n WHERE ".$db_info['columns']['value']['column']." = '%s' AND c.nid = n.nid AND n.status = 1 LIMIT 1", $url);
-    # TODO: limit to only published content!
-    if ($obj = db_fetch_object($res)) {
-      return $obj->nid;
-    }
-  }
-  return NULL;
-}
-
-/*
- * Our content lookup AJAX callback.
- */
-function lingwo_korpus_lookup_content() {
-  global $user;
-
-  $url = urldecode($_GET['url']);
-
-  $json = array();
-  if ($user->uid != 0) {
-    $json['username'] = $user->name;
-  }
-
-  if ($nid = _lingwo_korpus_lookup_remote_url($url)) {
-    $node = node_load($nid);
-
-    $data = lingwo_korpus_filter_text($node->body, $node->language, $node->nid);
-
-    $json['content'] = $data;
-    $json['nid'] = $nid;
-  }
-  else {
-    $json['not_found'] = TRUE;
-  }
-
-  _lingwo_korpus_jsonp($json);
+  drupal_json(array('content' => $content));
 }
 
 /*
@@ -242,102 +121,10 @@ function lingwo_korpus_pos_list() {
   foreach ($map as $value => $label) {
     $list[] = array('label' => $label, 'value' => $value);
   }
-  _lingwo_korpus_jsonp(array(
+  drupal_json(array(
     'pos_map' => $map,
     'pos_list' => $list
   ));
-}
-
-/*
- * Builds the rlogin page.
- */
-
-function template_preprocess_lingwo_korpus_remote_login_page(&$vars) {
-  $vars['title'] = drupal_get_title();
-  $vars['body_classes'] = 'page-'. $vars['page_name'];
-  // If a theme wants to override this using a CSS file, they can create a theme function
-  // which returns a <link .../> which points to it.
-  $vars['styles'] = theme('lingwo_korpus_remote_login_styles');
-  $vars['messages'] = theme('status_messages', 'error');
-}
-
-function theme_lingwo_korpus_remote_login_styles() {
-  $css = url(drupal_get_path('module', 'lingwo_korpus') .'/lingwo-korpus-remote-login.css');
-  return '<link type="text/css" rel="stylesheet" media="all" href="'.$css.'" />'."\n";
-}
-
-function lingwo_korpus_remote_login_page() {
-  global $user;
-  if ($user->uid) {
-    // if we are already logged in, we send the user to lingwo_korpus/rloggedin
-    if (empty($_GET['relay'])) {
-      drupal_goto('lingwo_korpus/rloggedin');
-    }
-    else {
-      drupal_goto('lingwo_korpus/rloggedin', 'relay='.$_GET['relay']);
-    }
-  }
-  else {
-    $content = drupal_get_form('user_login_block');
-    _lingwo_korpus_remote_login_page($content, 'rlogin');
-  }
-}
-
-function lingwo_korpus_remote_login_submit($form, &$form_state) {
-  global $user;
-  if ($user->uid) {
-    if (empty($_GET['relay'])) {
-      $form_state['redirect'] = 'lingwo_korpus/rloggedin';
-    }
-    else {
-      $form_state['redirect'] = array('lingwo_korpus/rloggedin', 'relay='.$_GET['relay']);;
-    }
-  }
-}
-
-function lingwo_korpus_remote_loggedin_page() {
-  global $user;
-  if ($_GET['callback']) {
-    $json = array();
-    if ($user->uid != 0) {
-      $json['username'] = $user->name;
-    }
-    _lingwo_korpus_jsonp($json);
-  }
-  else {
-    if ($_GET['relay']) {
-      $content = theme('lingwo_korpus_remote_login_relay_iframe',
-        $_GET['relay'], 'login-successful:'. $user->name);
-    }
-    _lingwo_korpus_remote_login_page($content, 'rloggedin');
-  }
-}
-
-function lingwo_korpus_remote_logout_page() {
-  global $user;
-
-  if ($user->uid) {
-    watchdog('user', 'Session closed for %name.', array('%name' => theme('placeholder', $user->name)));
-
-    // Destroy the current session:
-    session_destroy();
-    $array = array();
-    user_module_invoke('logout', $array, $user);
-
-    // Load the anonymous user
-    $user = drupal_anonymous_user();
-  }
-
-  if (!empty($_GET['relay'])) {
-    if ($_GET['relay']) {
-      $content = theme('lingwo_korpus_remote_login_relay_iframe',
-        $_GET['relay'], 'logout-successful');
-    }
-    _lingwo_korpus_remote_login_page($content, 'rlogout');
-  }
-  else {
-    _lingwo_korpus_jsonp(array('success' => TRUE));
-  }
 }
 
 /* 
@@ -458,24 +245,6 @@ function lingwo_korpus_theme() {
         'footer_id' => NULL,
         'footer_margin' => NULL,
       )
-    ),
-    'lingwo_korpus_remote_login_page' => array(
-      'arguments' => array(
-        'content' => NULL,
-        'page_name' => NULL,
-      ),
-      'template' => 'lingwo-korpus-remote-login-page',
-    ),
-    'lingwo_korpus_remote_login_relay_iframe' => array(
-      'arguments' => array(
-        'relay_url' => NULL,
-        'message'   => NULL,
-      ),
-      'template' => 'lingwo-korpus-remote-login-relay-iframe',
-    ),
-    'lingwo_korpus_remote_login_styles' => array(
-      'arguments' => array(),
-      //'template' => 'lingwo-korpus-remote-login-styles',
     ),
   );
 }
@@ -602,14 +371,6 @@ function lingwo_korpus_content_extra_fields($type_name) {
   return $extra;
 }
 
-function _lingwo_korpus_contains_links($el) {
-  $words = $el->find('word');
-  if (!empty($words)) return TRUE;
-  $as = $el->find('a');
-  if (!empty($as)) return TRUE;
-  return FALSE;
-}
-
 function lingwo_korpus_filter_text($text, $language, $cid=NULL) {
   if (!is_null($cid)) {
     $data = cache_get($cid, 'cache_lingwo_korpus');
@@ -659,72 +420,6 @@ function lingwo_korpus_text_entry_list($text, $lang) {
   return $entries;
 }
 
-function lingwo_korpus_admin_list_entries(&$form_state) {
-  $form['input'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Korpus Text'),
-    '#default_value' => $form_state['values']['input'],
-  );
-
-  # TODO: this should be a library function, probably.
-  $language_list = language_list('enabled');
-  foreach ($language_list[1] as $lang_name => $lang) {
-    $language_options[$lang_name] = $lang->name;
-  }
-  $form['from_lang'] = array(
-    '#type' => 'select',
-    '#title' => t('From Language'),
-    '#options' => $language_options,
-    '#default_value' => $form_state['values']['from_lang'],
-  );
-  $form['to_lang'] = array(
-    '#type' => 'select',
-    '#title' => t('To Language'),
-    '#options' => array('' => '-') + $language_options,
-    '#default_value' => $form_state['values']['to_lang'],
-  );
-  $form['as_nid'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('As Nid'),
-    '#default_value' => $form_state['values']['as_nid']
-  );
-
-  if ($form_state['values']['input']) {
-    $links = array();
-    foreach (lingwo_korpus_text_entry_list($form_state['values']['input'], $form_state['values']['from_lang']) as $entry) {
-      $nid = lingwo_dictionary_entry_lookup($entry->language, $entry->pos, $entry->headword);
-
-      if (!empty($form_state['values']['to_lang'])) {
-        $trans = translation_node_get_translations($nid);
-        if ($trans[$form_state['values']['to_lang']]) {
-          $nid = $trans[$form_state['values']['to_lang']]->nid;
-        }
-      }
-
-      if ($form_state['values']['as_nid']) {
-        $links[] = $nid;
-      }
-      else {
-        $links[] = url('node/'. $nid, array('absolute' => TRUE));
-      }
-    }
-
-    $form['output'] = array(
-      '#type' => 'textarea',
-      '#value' => implode("\n", $links)
-    );
-  }
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Submit'),
-  );
-  return $form;
-}
-
-function lingwo_korpus_admin_list_entries_submit($form, &$form_state) {
-  $form_state['rebuild'] = TRUE;
-}
-
 /**
  * Implementation of hook_form_alter().
  */
@@ -734,20 +429,7 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
     unset($form['language']['#options']['']);
     $form['language']['#required'] = TRUE;
 
-    $field_remote_url = lingwo_korpus_field_remote_url();
-    if (!empty($field_remote_url) && !empty($_GET['remote_url'])) {
-      $remote_url = urldecode($_GET['remote_url']);
-
-      require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
-
-      $form[$field_remote_url][0]['#default_value']['value'] = $remote_url;
-
-      $html = file_get_html($remote_url);
-      $content = trim($html->find('.bibliobird-content', 0)->innertext);
-      $form['body_field']['body']['#default_value'] = $content;
-      $form['title']['#default_value'] = $html->find('title', 0)->plaintext;
-    }
-
+    // add the automatic annotation stuff
     $form['lingwo_korpus_settings'] = array(
       '#type' => 'fieldset',
       // TODO: this will take more thought.  If the item isn't there, then we'll have to
@@ -768,22 +450,6 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
       // TODO: the default value should be configurable on the admin page
       '#default_value' => empty($form['#node']->nid) ? array('segment') : array(),
     );
-  }
-  elseif ($form_id == 'user_login_block' && $_GET['q'] == 'lingwo_korpus/rlogin') {
-    unset($form['#action']);
-    $form['#submit'] = array('lingwo_korpus_remote_login_submit');
-
-    # copied/pasted/modified from modules/user.module user_login_block()
-    $items = array();
-    if (variable_get('user_register', 1)) {
-      $items[] = l(t('Create new account'), 'user/register', array('attributes' => array('title' => t('Create a new user account.'), 'target' => '_blank')));
-    }
-    $items[] = l(t('Request new password'), 'user/password', array('attributes' => array('title' => t('Request new password via e-mail.'), 'target' => '_blank')));
-    $form['links'] = array('#value' => theme('item_list', $items));
-
-    // a tiny bit of javascript to focus the username field (tabindex doesn't seem to do the
-    // job in an iframe).
-    $form['js']['#value'] = "<script>document.getElementById('edit-name').focus();</script>";
   }
 }
 
@@ -834,9 +500,6 @@ function theme_lingwo_korpus_annotation_reader_block($footer_id, $footer_margin)
  */
 
 function _lingwo_korpus_auto_annotate_node(&$node, $which='body') {
-  #$auto_annotate = array_filter(array_values($node->lingwo_korpus_auto_annotate));
-  #if (empty($auto_annotate))
-  #  return TRUE;
   $cmd  = "-l ". $node->language ." ";
   $cmd .= "-m ". implode(",", array_filter(array_values($node->lingwo_korpus_auto_annotate)));
   $cmd .= " -";
@@ -926,14 +589,6 @@ function lingwo_korpus_text_content_type($value=NULL) {
   }
 
   variable_set('lingwo_korpus_text_content_type', $value);
-}
-
-function lingwo_korpus_field_remote_url($value=NULL) {
-  if (is_null($value)) {
-    return variable_get('lingwo_korpus_field_remote_url', '');
-  }
-
-  variable_set('lingwo_korpus_field_remote_url', $value);
 }
 
 function lingwo_korpus_python_exec($value=NULL) {
