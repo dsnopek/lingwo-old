@@ -22,6 +22,7 @@ function lingwo_korpus_admin_settings()
 
   $fields = content_fields();
 
+  /*
   // make some lists of the available CCK fields for the various settings
   $available_generic_fields = array('');
   foreach ($fields as $field_name => $field) {
@@ -34,6 +35,7 @@ function lingwo_korpus_admin_settings()
     '#options' => $available_generic_fields,
     '#default_value' => lingwo_korpus_field_remote_url(),
   );
+  */
   
   $form['lingwo_korpus_python_exec'] = array(
     '#type' => 'textfield',
