@@ -3,9 +3,8 @@
  * A really simple test fixture class (ported from an older implementation of Lingwo)
  */
 
-require.def('lingwo_dictionary/util/TestCase',
-    [],
-    function () {
+// TestCase
+define(function () {
         var println = function (text) {
             print(text);
         };
