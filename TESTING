@@ -16,7 +16,7 @@ How to update your test server with data from the live server?
  3. Perform a number of changes to make things "safe" for development:
 
     drush cc all
-    drush sql-query "UPDATE languages SET domain = '', prefix = ''   WHERE language = 'en'"
+    drush sql-query "UPDATE languages SET domain = '', prefix = 'en' WHERE language = 'en'"
     drush sql-query "UPDATE languages SET domain = '', prefix = 'pl' WHERE language = 'pl'"
     drush vset --yes language_negotiation "1"
     drush vset --yes preprocess_css "0"
