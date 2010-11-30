@@ -24,6 +24,7 @@ How to update your test server with data from the live server?
     drush vset --yes site_name "TESTING"
     drush sql-query "DROP TABLE devel_queries; DROP TABLE devel_times"
 	drush sql-query "UPDATE backup_migrate_schedules SET enabled = 0"
+	drush dis googleanalytics --yes
 
  4. Enable the development module:
     

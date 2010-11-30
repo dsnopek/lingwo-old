@@ -33,8 +33,7 @@ function lingwo_data_service() {
     array(
       '#method' => 'lingwo_data.update_entry',
       '#callback' => 'lingwo_data_service_update_entry',
-      // TODO: access is a difficult problem..  Work it out later.
-      //'#access callback' => 'lingwo_data_service_update_entry_access',
+      '#access callback' => 'lingwo_data_service_update_entry_access',
       '#file' => array('file' => 'service.inc', 'module' => 'lingwo_data'),
       '#args' => array(
         array(

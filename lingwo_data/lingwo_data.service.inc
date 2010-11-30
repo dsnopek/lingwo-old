@@ -5,11 +5,9 @@
  * The actual callbacks for this service
  */
 
-// TODO: access is a hard problem..  Come back to this.
-/*
 function lingwo_data_service_update_entry_access($data) {
   $data = json_decode($data);
-  $nid = lingwo_dictionary_entry_lookup($data->pos, $data->language, $data->headword);
+  $nid = lingwo_dictionary_entry_lookup($data->language, $data->pos, $data->headword);
 
   if (is_null($nid)) {
     $entry_type = lingwo_dictionary_settings('entry_content_type');
@@ -20,7 +18,6 @@ function lingwo_data_service_update_entry_access($data) {
   $node = (array) $node;
   return node_access('update', $node);
 }
-*/
 
 class LingwoDataServiceException extends Exception {
   public $message;
