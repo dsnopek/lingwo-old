@@ -32,7 +32,7 @@ require.def(
 
                 popup.show().css({
                     left: left,
-                    top: top,
+                    top: top
                 });
             }
         });

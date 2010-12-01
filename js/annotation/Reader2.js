@@ -176,22 +176,20 @@ require.def('lingwo_dictionary/annotation/Reader2',
             },
 
             setupHoverEvents: function () {
-                var self = this;
-
                 $('.anno, .anno-anchor')
                     // unbind() makes this re-runnable as many times as necessary
                     .unbind('mouseenter mouseleave')
                     .bind('mouseenter', function (evt) {
                         var target = $(evt.target), annoText;
                         target.addClass('hover');
-                        if (annoText = self._getAnnoText(target)) {
+                        if (annoText = Reader._getAnnoText(target)) {
                             annoText.addClass('hover');
                         }
                     })
                     .bind('mouseleave', function (evt) {
                         var target = $(evt.target), annoText;
                         target.removeClass('hover');
-                        if (annoText = self._getAnnoText(target)) {
+                        if (annoText = Reader._getAnnoText(target)) {
                             annoText.removeClass('hover');
                         }
                     });
