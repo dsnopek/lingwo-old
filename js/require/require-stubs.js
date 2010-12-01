@@ -4,7 +4,7 @@
  * any modules, so you must leave the default transporter setting of 
  * resolveDeps on (true) to use this module receiver.
  */
-var require;
+var require, define;
 (function(){
 	var factories = {},
 		modules = {};
@@ -56,7 +56,7 @@ var require;
         }
         callback.apply(req, args);
     };
-    require.def = function(id, deps, factory){
+    define = require.def = function(id, deps, factory){
         if(typeof deps == "function"){
             factories[id] = deps;
         }else{
