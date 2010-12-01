@@ -1,73 +1,41 @@
 
 require.def('lingwo_dictionary/annotation/Reader2',
-    ['jquery'],
-    function ($) {
+    ['jquery',
+     'lingwo_dictionary/layout/Popup',
+     'lingwo_dictionary/util/clobber',
+     'lingwo_dictionary/util/clone',
+     'lingwo_dictionary/util/proxy'
+    ],
+    function ($, PopupLayout, clobber, clone, proxy) {
         var Reader, Layouts,
             isIE6 = /MSIE 6/i.test(navigator.userAgent),
             configDefaults = {
                 layout: 'docked'
             };
 
-        function clobber(obj, old_fn_name, new_fn) {
-            old_fn = obj[old_fn_name];
-            obj[old_fn_name] = function () {
-                old_fn.apply(this, arguments);
-                new_fn();
-            };
-        }
-
-        function clone(obj) {
-            var copy = {}, name;
-            for (name in obj) {
-                copy[name] = obj[name];
-            }
-            return copy;
-        }
-
-        function proxy(func, obj) {
-            return function () {
-                return func.apply(obj, arguments);
-            }
-        }
-
-
         Layouts = {
             popup: {
                 setup: function () {
                     Reader.bubbleNode.addClass('popup');
+                    this._layout = new PopupLayout({ node: Reader.bubbleNode });
                 },
 
                 shutdown: function () {
                     Reader.bubbleNode.removeClass('popup');
+                    this._layout.shutdown();
                 },
 
                 show: function () {
-                    var target = Reader.selectedNode,
-                        bubble = Reader.bubbleNode,
-                        offset = target.offset(),
-                        // X-centered and 40px down
-                        left = offset.left + (target.width() / 2) - 150,
-                        top  = offset.top + target.height() + 40,
-                        maxWidth = $(document).width();
+                    var bubble = Reader.bubbleNode;
 
-                    // clip to our width
-                    if (left + 300 > maxWidth) {
-                        left = maxWidth - 300;
-                    }
-                    if (left < 0) { left = 0; };
-
-                    bubble.show().css({
-                        left: left,
-                        top: top,
-                        height: ''
-                    });
+                    // do the majority of the layout
+                    this._layout.layout(Reader.selectedNode);
 
                     // hack for browsers that don't correctly support max-height
-                    //setTimeout(function () {
-                        if (isIE6 || bubble.height() > 200) {
-                            bubble.css({ height: 200 });
-                        }
-                    //}, 0);
+                    bubble.css('height', '');
+                    if (isIE6 || bubble.height() > 200) {
+                        bubble.css({ height: 200 });
+                    }
                 },
 
                 hide: function () {
@@ -208,22 +176,20 @@ require.def('lingwo_dictionary/annotation/Reader2',
             },
 
             setupHoverEvents: function () {
-                var self = this;
-
                 $('.anno, .anno-anchor')
                     // unbind() makes this re-runnable as many times as necessary
                     .unbind('mouseenter mouseleave')
                     .bind('mouseenter', function (evt) {
                         var target = $(evt.target), annoText;
                         target.addClass('hover');
-                        if (annoText = self._getAnnoText(target)) {
+                        if (annoText = Reader._getAnnoText(target)) {
                             annoText.addClass('hover');
                         }
                     })
                     .bind('mouseleave', function (evt) {
                         var target = $(evt.target), annoText;
                         target.removeClass('hover');
-                        if (annoText = self._getAnnoText(target)) {
+                        if (annoText = Reader._getAnnoText(target)) {
                             annoText.removeClass('hover');
                         }
                     });

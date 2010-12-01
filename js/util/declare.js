@@ -3,7 +3,8 @@
  * Very simple utility function for creating a "class".
  */
 
-require.def('lingwo_dictionary/util/declare',
+// declare
+define(
     ['lingwo_dictionary/util/extendPrototype'],
     function (extendPrototype) {
         return function (props) {
