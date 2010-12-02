@@ -24,6 +24,9 @@ define(
             return isSupported;
         }
 
+        var ua = navigator.userAgent.toLowerCase(),
+            positionFixed = isPositionFixedSupported() && !/iphone|ipod|android/.exec(ua);
+
         return declare({
             _constructor: function (args) {
                 this.node = args.node;
@@ -38,7 +41,7 @@ define(
                 // put the doc
                 $(this.node).css({
                     // TODO: we should use fixed if its supported
-                    position: 'absolute',
+                    position: positionFixed ? 'fixed' : 'absolute',
                     overflow: 'hidden'
                 }).appendTo($('body'));
 
@@ -46,12 +49,16 @@ define(
                 // events if we want)
                 this._layoutProxy = proxy(this.layout, this);
                 $(window).bind('resize', this._layoutProxy);
-                $(window).bind('scroll', this._layoutProxy);
+                if (!positionFixed) {
+                    $(window).bind('scroll', this._layoutProxy);
+                }
             },
 
             shutdown: function () {
                 $(window).unbind('resize', this._layoutProxy);
-                $(window).unbind('scroll', this._layoutProxy);
+                if (!positionFixed) {
+                    $(window).unbind('scroll', this._layoutProxy);
+                }
 
                 $(this.node).remove();
                 $(this.spacer).remove();
@@ -63,9 +70,16 @@ define(
                 var width = Math.min($(window).width(), $(document).width()),
                     windowHeight = $(window).height(),
                     documentHeight = $(document).height(),
-                    top = $(window).scrollTop() + $(window).height() - this.size,
-                    left = $(window).scrollLeft();
+                    top = windowHeight - this.size,
+                    left = 0;
 
+                // when not position fixed we have to take the scroll into account
+                if (!positionFixed) {
+                    top += $(window).scrollTop();
+                    left += $(window).scrollLeft();
+                }
+
+                // clip to the bottom of the document (avoids infinite scroll problem)
                 if (top + this.size > documentHeight) {
                     top = documentHeight - this.size;
                 }
