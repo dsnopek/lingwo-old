@@ -1,7 +1,7 @@
 
 define(
-    ['jquery','lingwo_dictionary/util/declare', 'lingwo_dictionary/util/proxy'],
-    function ($, declare) {
+    ['jquery', 'lingwo_dictionary/util/declare', 'lingwo_dictionary/util/proxy'],
+    function ($, declare, proxy) {
         // TODO: this gives false positives on Android 1.5 browser
         function isPositionFixedSupported(){
             var isSupported = null;
@@ -29,48 +29,58 @@ define(
                 this.node = args.node;
                 this.size = args.size;
 
-                // TODO: we have to create the spacer and put both the 'node' and 
-                // spacer into the document tree.
+                // create the spacer node
+                this.spacerNode = $('<div></div>')
+                    .appendTo($('body'))
+                    .css('height', this.size)
+                    .get(0);
 
-                this._layoutProxy = proxy(this, this.layout);
+                // put the doc
+                $(this.node).css({
+                    // TODO: we should use fixed if its supported
+                    position: 'absolute',
+                    overflow: 'hidden'
+                }).appendTo($('body'));
+
+                // layout on this events (store the proxy function so we can remove these
+                // events if we want)
+                this._layoutProxy = proxy(this.layout, this);
                 $(window).bind('resize', this._layoutProxy);
                 $(window).bind('scroll', this._layoutProxy);
-
-                // TODO: do we call layout right away?
             },
 
             shutdown: function () {
                 $(window).unbind('resize', this._layoutProxy);
                 $(window).unbind('scroll', this._layoutProxy);
+
+                $(this.node).remove();
+                $(this.spacer).remove();
             },
 
+            onlayout: function (top, left, width, height) { },
+
             layout: function () {
-                // TODO: port this code to current structure!
-                
                 var width = Math.min($(window).width(), $(document).width()),
                     windowHeight = $(window).height(),
                     documentHeight = $(document).height(),
-                    top = $(window).scrollTop() + $(window).height() - height,
+                    top = $(window).scrollTop() + $(window).height() - this.size,
                     left = $(window).scrollLeft();
 
-                if (top + height > documentHeight) {
-                    top = documentHeight - height;
+                if (top + this.size > documentHeight) {
+                    top = documentHeight - this.size;
                 }
 
-                //console.log('documentHeight: '+documentHeight);
-                //console.log('top: '+top);
-
-                $(spacer).css('height', height);
-                $(dock).css({
-                    width: width,
-                    height: height,
+                $(this.spacerNode).css('height', this.size);
+                $(this.node).css({
                     top: top,
-                    left: left
+                    left: left,
+                    width: width,
+                    height: this.size
                 });
-                $('#bibliobird-dock-main').css('width', width - 293);
-                size = height;
+
+                this.onlayout(top, left, width, this.size);
             }
         });
     }
-});
+);
 

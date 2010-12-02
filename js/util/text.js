@@ -1,6 +1,6 @@
 
 // text utilities
-define(function () {
+define([], function () {
     return {
         limitString: function (s, max) {
             if (s.length > max) {

@@ -4,7 +4,7 @@
  */
 
 // TestCase
-define(function () {
+define([], function () {
         var println = function (text) {
             print(text);
         };
