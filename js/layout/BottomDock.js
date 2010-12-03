@@ -1,31 +1,12 @@
 
 define(
-    ['jquery', 'lingwo_dictionary/util/declare', 'lingwo_dictionary/util/proxy'],
-    function ($, declare, proxy) {
-        // TODO: this gives false positives on Android 1.5 browser
-        function isPositionFixedSupported(){
-            var isSupported = null;
-            if (document.createElement) {
-                var el = document.createElement('div');
-                if (el && el.style) {
-                    el.style.position = 'fixed';
-                    el.style.top = '10px';
-                    var root = document.body;
-                    if (root && 
-                        root.appendChild && 
-                        root.removeChild)
-                    {
-                        root.appendChild(el);
-                        isSupported = (el.offsetTop === 10);
-                        root.removeChild(el);
-                    }
-                }
-            }
-            return isSupported;
-        }
-
-        var ua = navigator.userAgent.toLowerCase(),
-            positionFixed = isPositionFixedSupported() && !/iphone|ipod|android/.exec(ua);
+    ['jquery',
+     'lingwo_dictionary/util/declare',
+     'lingwo_dictionary/util/proxy',
+     'lingwo_dictionary/layout/isPositionFixedSupported'
+    ],
+    function ($, declare, proxy, isPositionFixedSupported) {
+        var positionFixed = isPositionFixedSupported();
 
         return declare({
             _constructor: function (args) {
