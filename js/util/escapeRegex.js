@@ -1,6 +1,6 @@
 
 // escapeRegex
-define(function () {
+define([], function () {
     var regexSpecial = ['(',')','{','}','*'];
 
     return function (s) {

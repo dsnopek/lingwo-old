@@ -20,6 +20,12 @@ function lingwo_korpus_admin_settings()
     '#default_value' => lingwo_korpus_text_content_type(),
   );
 
+  $form["lingwo_korpus_reader_on_teaser"] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show reader on teaser'),
+    '#default_value' => variable_get('lingwo_korpus_reader_on_teaser', 0),
+  );
+
   $fields = content_fields();
 
   /*

@@ -335,25 +335,55 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
   }
 
   if ($op == 'view') {
+    static $warned = FALSE;
+    static $messaged = FALSE;
+
     // display the text with the reader
-    if ($a4) {
+    if ($a4 || ($a3 && variable_get('lingwo_korpus_reader_on_teaser', 0) && $node->build_mode != NODE_BUILD_RSS)) {
       $node_language = $node->language ? $node->language : language_default();
       if ($node_language == $language->language) {
-        drupal_set_message(t('You are reading a text written in the same language as your language!  Please set "My Language" to your correct native language or find a different text.'), 'error');
+        // Only show this message on a page
+        if ($a4) {
+          drupal_set_message(t('You are reading a text written in the same language as your language!  Please set "My Language" to your correct native language or find a different text.'), 'error');
+        }
+        elseif (!$warned) {
+          drupal_set_message(t('Some texts on this page are written in the same language as your language!  You will not be able to get translations for these texts.  Please check that "My Language" is correct.'), 'warning');
+          $warned = TRUE;
+        }
+        // But skip filtering the text always
         return;
       }
 
-      $node->content['body']['#value'] = lingwo_korpus_filter_text($node->content['body']['#value'], $node_language, $node->nid);
+      if (!$messaged) {
+        drupal_set_message(t('Click on a word to receive a translation in your native language.'));
+        $messaged = TRUE;
+      }
 
-      lingwo_dictionary_add_require_js();
-      drupal_add_js(array(
-        'language' => $language->language,
-        'baseUrl' => url('', array('absolute' => TRUE))
-      ), 'setting');
-      drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.js');
-      drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.css');
-      drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.less');
+      // TODO: we should probably do this filtering always, because we don't want to expose the underlying 
+      // korpus format to outside users (since it isn't valid HTML).  For now, we don't because we use this
+      // to control whether the node can be read or not.
+      $cid = $node->nid . ($a3 ? ':teaser' : '');
+      $node->content['body']['#value'] = lingwo_korpus_filter_text($node->content['body']['#value'], $node_language, $cid);
+
+      _lingwo_korpus_add_reader_js();
     }
+  }
+}
+
+function _lingwo_korpus_add_reader_js() {
+  static $added = FALSE;
+
+  if (!$added) {
+    lingwo_dictionary_add_require_js();
+    drupal_add_js(array(
+      'language' => $language->language,
+      'baseUrl' => url('', array('absolute' => TRUE))
+    ), 'setting');
+    drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.js');
+    drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.css');
+    drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.less');
+
+    $added = TRUE;
   }
 }
 

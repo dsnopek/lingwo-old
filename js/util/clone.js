@@ -1,6 +1,6 @@
 
 // clone
-define(function () {
+define([], function () {
     return function (obj) {
         var copy = {}, name;
         for (name in obj) {
