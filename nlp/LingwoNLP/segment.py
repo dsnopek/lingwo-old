@@ -131,6 +131,8 @@ class ElementString(object):
 
                 if isParentWalkable(startElem) and isFrontEdge(startElem):
                     startElem = startElem.parentNode
+                else:
+                    break
 
             # all that looping and we still couldn't find a way that they will have the same parent
             if startElem.parentNode != endElem.parentNode:
