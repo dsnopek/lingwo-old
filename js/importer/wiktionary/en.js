@@ -298,7 +298,7 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                 // if there are any alternatives)
                 val = WikiText.clean(val);
                 // some qualifier words (unless they *are* the headword!)
-                val = val.replace(/obsolete|collectively|dialect|in (\S+) sense only|archaic|less commonly|dated|poetic|rarely|transitive|intransitive|US|mostly UK|UK|chiefly|North American|British|Commonwealth|plural|common noun|collective noun|and|Depending on meaning, either/g, function ($0) {
+                val = val.replace(/obsolete|collectively|dialect|in (\S+) sense only|archaic|less commonly|dated|poetic|rarely|transitive|intransitive|US|mostly UK|UK|chiefly|North American|British|Commonwealth|plural|common noun|collective noun|and|Depending on meaning, either|when used attributively|otherwise/g, function ($0) {
                     return headword.indexOf($0) != -1 ? $0 : ' ';
                 });
                 // remove comments
