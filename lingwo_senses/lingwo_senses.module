@@ -39,7 +39,7 @@ function lingwo_senses_theme() {
       'arguments' => array('node' => NULL),
     ),
     'lingwo_senses_translation' => array(
-      'arguments' => array('node' => NULL),
+      'arguments' => array('node' => NULL, 'items' => NULL),
     ),
   );
 }
@@ -728,14 +728,17 @@ function theme_lingwo_senses_original($node) {
   return $output;
 }
 
-function theme_lingwo_senses_translation($node) {
+function theme_lingwo_senses_translation($node, $items=NULL) {
   $output = '';
   $output .= '<div class="lingwo-entry">';
   $output .= '<ol class="lingwo-sense-list">';
 
+  if (is_null($items)) {
+    $items = lingwo_senses_get_translations($node);
+  }
+
   # group the ids together
   $ids = array();
-  $items = lingwo_senses_get_translations($node);
   foreach ($items as $sense) {
     if ($sense['data']['same_as']) {
       $ids[$sense['data']['same_as']][] = $sense['id'];
