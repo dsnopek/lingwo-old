@@ -22,6 +22,7 @@ How to update your test server with data from the live server?
     drush vset --yes preprocess_css "0"
     drush vset --yes preprocess_js  "0"
     drush vset --yes site_name "TESTING"
+	drush vset --yes bbcom_news_mailchimp_integration "0"
     drush sql-query "DROP TABLE devel_queries; DROP TABLE devel_times"
 	drush sql-query "UPDATE backup_migrate_schedules SET enabled = 0"
 	drush dis googleanalytics --yes
