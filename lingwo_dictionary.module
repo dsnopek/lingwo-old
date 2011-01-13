@@ -7,10 +7,7 @@
  */
 
 // get our API functions for dealing with entries
-module_load_include('inc', 'lingwo_dictionary', 'lingwo_dictionary.entry-api');
-
-// some helpers
-require_once('includes/sanity.inc');
+include_once('lingwo_dictionary.entry-api.inc');
 
 // Helper for generating UUIDs
 function _ld_make_uuid() {
@@ -83,7 +80,7 @@ function lingwo_dictionary_add_require_js($plugins=array()) {
  * This code was lifted graciously from the path_redirect module.
  */
 function lingwo_dictionary_init() {
-  if (lingwo_dictionary_settings('redirect_node') && lingwo_dictionary_settings('lookup_path')) {
+  if (_lingwo_dictionary_settings('redirect_node') && _lingwo_dictionary_settings('lookup_path')) {
     if (preg_match('/^node\/(\d+)$/', $_GET['q'], $matches)) {
       if ($entry = LingwoEntry::fromNid($matches[1])) {
         $redirect = $entry->getPath();
@@ -119,7 +116,7 @@ function lingwo_dictionary_menu() {
     'weight' => -10,
   );
 
-  if ($lookup_path = lingwo_dictionary_settings('lookup_path')) {
+  if ($lookup_path = _lingwo_dictionary_settings('lookup_path')) {
     $i = count(explode('/', $lookup_path));
     $items[$lookup_path .'/%/%'] = array(
       'page callback' => 'lingwo_dictionary_lookup_page',
@@ -184,7 +181,7 @@ function lingwo_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
 }
 
 function lingwo_dictionary_pos_options($translate = FALSE, $option_name = NULL) {
-  $list = explode("\n", lingwo_dictionary_settings('pos_allowed_values'));
+  $list = explode("\n", _lingwo_dictionary_settings('pos_allowed_values'));
   $list = array_map('trim', $list);
   $list = array_filter($list, 'strlen');
 
@@ -231,7 +228,7 @@ function lingwo_dictionary_pos_options($translate = FALSE, $option_name = NULL) 
  * Implementation of hook_form_alter().
  */
 function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
-  if ($form_id == (lingwo_dictionary_settings('entry_content_type') .'_node_form')) {
+  if ($form_id == (_lingwo_dictionary_settings('entry_content_type') .'_node_form')) {
     $node = $form['#node'];
 
     // allow some fields to be set automagically for new nodes
@@ -287,7 +284,7 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
 function lingwo_dictionary_content_extra_fields($type_name) {
   $extra = array();
 
-  if (lingwo_dictionary_settings('entry_content_type') == $type_name) {
+  if (_lingwo_dictionary_settings('entry_content_type') == $type_name) {
     $extra['pos'] = array(
       'label' => t('Part of Speech'),
       'description' => t('Lingwo Dictionary "Part of Speech" field.'),
@@ -307,7 +304,7 @@ function lingwo_dictionary_generate_hash(&$object) {
  * Implementation of hook_nodeapi().
  */
 function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
-  if ($node->type != lingwo_dictionary_settings('entry_content_type'))
+  if ($node->type != _lingwo_dictionary_settings('entry_content_type'))
     return NULL;
 
   // Operates on both translations and sources
@@ -412,31 +409,34 @@ function lingwo_dictionary_theme() {
  * Settings
  */
 
-// really should be lingwo_dictionary_settings *OR* use namespaces.
-class LingwoDictionarySettings extends Sanity\Settings {
-  protected $base_name = 'lingwo_dictionary';
+// some helpers
+require_once(dirname(__FILE__) .'/includes/settings.inc');
 
-  private $defaults = array(
+// really should be lingwo_dictionary_settings *OR* use namespaces.
+class lingwo_dictionary_settings extends lingwo_settings {
+  protected static $base_name = 'lingwo_dictionary';
+
+  private static $defaults = array(
     'lookup_path' => 'lookup',
     'redirect_node' => FALSE,
     'entry_content_type' => NULL,
     'pos_allowed_values' => "noun|Noun\nadjective|Adjective\nverb|Verb",
   );
 
-  protected function getDefault($name) {
-    return $this->defaults[$name];
+  public static function getDefault($name) {
+    return self::$defaults[$name];
   }
 
-  protected function isValid($name) {
-    return array_key_exists($name, $this->defaults);
+  public static function isValid($name) {
+    return array_key_exists($name, self::$defaults);
   }
 
-  public function getDefaults() {
-    return $this->defaults;
+  public static function getDefaults() {
+    return self::$defaults;
   }
 
-  public function check($message=TRUE) {
-    foreach ($this->defaults as $name => $default) {
+  public static function check($message=TRUE) {
+    foreach (self::$defaults as $name => $default) {
       if (is_null($default) && is_null(variable_get('lingwo_dictionary_'. $name, NULL))) {
         if ($message) {
           drupal_set_message(t('Functionality provided by Lingwo Dictionary will not work correctly until it is configured'));
@@ -452,25 +452,25 @@ class LingwoDictionarySettings extends Sanity\Settings {
 class lingwo_dictionary {
   public static $settings;
 }
-lingwo_dictionary::$settings = new LingwoDictionarySettings;
+lingwo_dictionary::$settings = new lingwo_dictionary_settings;
 
 /**
  * Used to access settings.
  */
-function lingwo_dictionary_settings($name, $value = NULL) {
+function _lingwo_dictionary_settings($name, $value = NULL) {
   if (is_null($name)) {
-    return lingwo_dictionary::$settings->getDefaults();
+    return lingwo_dictionary_settings::getDefaults();
   }
   if (is_null($value)) {
-    return lingwo_dictionary::$settings->__get($name);
+    return lingwo_dictionary_settings::get($name);
   }
-  lingwo_dictionary::$settings->__set($name, $value);
+  lingwo_dictionary_settings::set($name, $value);
 }
 
 /**
  * Checks if lingwo_dictionary is configured.
  */
 function lingwo_dictionary_check_settings($message = TRUE) {
-  return lingwo_dictionary::$settings->check();
+  return lingwo_dictionary_settings::check($message);
 }
 

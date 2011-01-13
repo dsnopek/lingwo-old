@@ -155,7 +155,7 @@ class LingwoDataImportUnitTestCase extends DrupalUnitTestCase {
       ->with('field_pron')
       ->will(WillAction::returnValue('field_pron'));
     
-    $lingwo_dictionary_settings = PHPMockFunction::mock('lingwo_dictionary_settings');
+    $lingwo_dictionary_settings = PHPMockFunction::mock('_lingwo_dictionary_settings');
     $lingwo_dictionary_settings->expects(InvocationRestriction::once())
       ->with('entry_content_type')
       ->will(WillAction::returnValue('entry'));
@@ -187,7 +187,7 @@ class LingwoDataImportUnitTestCase extends DrupalUnitTestCase {
       ->with('field_source_name')
       ->will(WillAction::returnValue('field_source_name'));
 
-    $lingwo_dictionary_settings = PHPMockFunction::mock('lingwo_dictionary_settings');
+    $lingwo_dictionary_settings = PHPMockFunction::mock('_lingwo_dictionary_settings');
     $lingwo_dictionary_settings->expects(InvocationRestriction::exactly(2))
       ->with('entry_content_type')
       ->will(WillAction::returnValue('entry'));

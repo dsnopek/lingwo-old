@@ -9,7 +9,7 @@ class LingwoEntry {
   }
 
   public static function isEntryNode($node) {
-    return $node->type == lingwo_dictionary_settings('entry_content_type');
+    return $node->type == _lingwo_dictionary_settings('entry_content_type');
   }
 
   public static function fromNode(&$node) {
@@ -189,9 +189,9 @@ class LingwoEntry {
   public function getPath() {
     $node = $this->node;
 
-    if (lingwo_dictionary_settings('lookup_path')) {
+    if (_lingwo_dictionary_settings('lookup_path')) {
       return implode('/', array(
-        lingwo_dictionary_settings('lookup_path'),
+        _lingwo_dictionary_settings('lookup_path'),
         $this->getLingwoId(),
       ));
     }

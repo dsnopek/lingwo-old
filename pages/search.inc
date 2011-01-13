@@ -41,7 +41,7 @@ function lingwo_dictionary_search_form_submit($form, &$form_state) {
   global $language;
 
   $form_state['redirect'] = implode('/', array(
-    lingwo_dictionary_settings('lookup_path'),
+    _lingwo_dictionary_settings('lookup_path'),
     $form_state['values']['search_language'] .'-'. $language->language,
     $form_state['values']['search_word']
   ));
@@ -108,7 +108,7 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
   if (empty($nids)) {
     drupal_set_title(t('Entry Not Found: @title', array('@title' => $word)));
 
-    $type_url_str = str_replace('_', '-', lingwo_dictionary_settings('entry_content_type'));
+    $type_url_str = str_replace('_', '-', _lingwo_dictionary_settings('entry_content_type'));
     $url_args = array('headword' => $word);
     if ($pos) {
       $url_args['pos'] = $pos;

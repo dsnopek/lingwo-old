@@ -24,7 +24,7 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
     ));
     variable_set('language_content_type_'. $entry_type->type, TRANSLATION_ENABLED);
     variable_set('i18n_node_'. $entry_type->type, LANGUAGE_SUPPORT_NORMAL);
-    lingwo_dictionary_settings('entry_content_type', $entry_type->type);
+    _lingwo_dictionary_settings('entry_content_type', $entry_type->type);
 
     # create an appropriate user
     $this->drupalLogin(
@@ -94,13 +94,13 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
   }
 
   protected function createEntry($values) {
-    $entry_type = lingwo_dictionary_settings('entry_content_type');
+    $entry_type = _lingwo_dictionary_settings('entry_content_type');
     $edit = $this->getEntryEdit($values);
     $this->drupalPost("node/add/$entry_type", $edit, 'Save');
   }
 
   protected function createField($values) {
-    $entry_type = lingwo_dictionary_settings('entry_content_type');
+    $entry_type = _lingwo_dictionary_settings('entry_content_type');
 
     $edit1 = array();
     $edit2 = array();
@@ -125,7 +125,7 @@ class LingwoDictionaryWebTestCase extends DrupalWebTestCase {
   }
 
   protected function createFieldGroup($values) {
-    $entry_type = lingwo_dictionary_settings('entry_content_type');
+    $entry_type = _lingwo_dictionary_settings('entry_content_type');
 
     // TODO: we could do this via the web-browser, but since I want to learn how to do these
     // programmatically anyway (for embedding in our feature) that's how I'll do it for now.

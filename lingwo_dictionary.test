@@ -12,7 +12,7 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function testUniqueEntries() {
-    $entry_type = lingwo_dictionary_settings('entry_content_type');
+    $entry_type = _lingwo_dictionary_settings('entry_content_type');
 
     $edit = array(
       'headword' => 'czerwony',
@@ -35,7 +35,7 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function testEntryAPI() {
-    $entry_type = lingwo_dictionary_settings('entry_content_type');
+    $entry_type = _lingwo_dictionary_settings('entry_content_type');
 
     // Create the source
     $edit = array(
@@ -98,9 +98,9 @@ class LingwoDictionaryBaseTestCase extends LingwoDictionaryWebTestCase {
 
     // load page, verify the current settings
     $this->drupalGet('admin/settings/lingwo_dictionary');
-    $this->assertFieldByName('lingwo_dictionary_lookup_path', lingwo_dictionary_settings('lookup_path'));
-    $this->assertFieldByName('lingwo_dictionary_entry_content_type', lingwo_dictionary_settings('entry_content_type'));
-    $this->assertFieldByName('lingwo_dictionary_field_pos', lingwo_dictionary_settings('field_pos'));
+    $this->assertFieldByName('lingwo_dictionary_lookup_path', _lingwo_dictionary_settings('lookup_path'));
+    $this->assertFieldByName('lingwo_dictionary_entry_content_type', _lingwo_dictionary_settings('entry_content_type'));
+    $this->assertFieldByName('lingwo_dictionary_field_pos', _lingwo_dictionary_settings('field_pos'));
 
     // save new settings.
     $this->drupalPost(NULL, array(
@@ -132,21 +132,21 @@ class LingwoDictionarySettingsTestCase extends DrupalWebTestCase {
 
   /*
   public function testSettingsWithDefault() {
-    $value = lingwo_dictionary_settings('lookup_path');
+    $value = _lingwo_dictionary_settings('lookup_path');
     $this->assertEqual($value, 'lookup');
 
-    lingwo_dictionary_settings('lookup_path', 'new_path');
-    $value = lingwo_dictionary_settings('lookup_path');
+    _lingwo_dictionary_settings('lookup_path', 'new_path');
+    $value = _lingwo_dictionary_settings('lookup_path');
     $this->pass($value);
     $this->assertEqual($value, 'new_path');
   }
 
   public function testSettingsNoDefault() {
-    $value = lingwo_dictionary_settings('entry_content_type');
+    $value = _lingwo_dictionary_settings('entry_content_type');
     $this->assertNull($value);
 
-    lingwo_dictionary_settings('entry_content_type', 'entry');
-    $value = lingwo_dictionary_settings('entry_content_type');
+    _lingwo_dictionary_settings('entry_content_type', 'entry');
+    $value = _lingwo_dictionary_settings('entry_content_type');
     $this->assertEqual($value, 'entry');
   }
   */
@@ -154,7 +154,7 @@ class LingwoDictionarySettingsTestCase extends DrupalWebTestCase {
   // TODO: find some way to intercept the error/exception!
   /*
   public function testNonExistant() {
-    $value = lingwo_dictionary_settings('blah');
+    $value = _lingwo_dictionary_settings('blah');
     $this->assertNull($value);
   }
   */
@@ -167,8 +167,8 @@ class LingwoDictionarySettingsTestCase extends DrupalWebTestCase {
     $this->drupalGet('node');
     //$this->assertText('Lingwo Dictionary will not work correctly until it is configured');
 
-    lingwo_dictionary_settings('entry_content_type', 'entry');
-    lingwo_dictionary_settings('field_pos', 6);
+    _lingwo_dictionary_settings('entry_content_type', 'entry');
+    _lingwo_dictionary_settings('field_pos', 6);
 
     $check = lingwo_dictionary_check_settings();
     $this->assertTrue($check, t('lingwo_dictionary_check_settings() == TRUE'));

@@ -24,7 +24,7 @@ class LingwoSensesTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function doSingleSense() {
-    $entry_type = lingwo_dictionary_settings('entry_content_type');
+    $entry_type = _lingwo_dictionary_settings('entry_content_type');
 
     // create the entry
     $this->createEntry(array(

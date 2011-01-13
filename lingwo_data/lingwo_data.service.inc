@@ -10,7 +10,7 @@ function lingwo_data_service_update_entry_access($data) {
   $nid = lingwo_dictionary_entry_lookup($data->language, $data->pos, $data->headword);
 
   if (is_null($nid)) {
-    $entry_type = lingwo_dictionary_settings('entry_content_type');
+    $entry_type = _lingwo_dictionary_settings('entry_content_type');
     return node_access('create', $entry_type);
   }
 
@@ -31,7 +31,7 @@ function _lingwo_data_node_save($node) {
 
   $nid = NULL;
 
-  $entry_type = lingwo_dictionary_settings('entry_content_type');
+  $entry_type = _lingwo_dictionary_settings('entry_content_type');
 
   // Setup form_state.
   $form_state = array();
@@ -148,7 +148,7 @@ function _lingwo_data_import_setup_node($nid, $entry, $newExtras=array()) {
   // create the original entry/update the original entry
   if (is_null($nid)) {
     $node = (object)array(
-      'type' => lingwo_dictionary_settings('entry_content_type'),
+      'type' => _lingwo_dictionary_settings('entry_content_type'),
       'title' => $entry['headword'],
       'language' => $entry['language'],
       'pos' => $entry['pos'],
@@ -261,7 +261,7 @@ function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
     }
 
     // get the CCK type name
-    $field_type = content_fields($field_name, lingwo_dictionary_settings('entry_content_type'));
+    $field_type = content_fields($field_name, _lingwo_dictionary_settings('entry_content_type'));
     $field_type = $field_type['type'];
   }
 

@@ -27,7 +27,7 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
   # Also checks for the presense of a bug that existed in early implementations:
   #  (1) CCK would attempt to save empty fields causing database errors.
   public function testCreate() {
-    $entry_type = lingwo_dictionary_settings('entry_content_type');
+    $entry_type = _lingwo_dictionary_settings('entry_content_type');
 
     // get that the create page is all good
     $this->drupalGet('node/add/'. $entry_type);
@@ -61,7 +61,7 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
   }
 
   public function testCreateEmpty() {
-    $entry_type = lingwo_dictionary_settings('entry_content_type');
+    $entry_type = _lingwo_dictionary_settings('entry_content_type');
 
     // get that the create page is all good
     $this->drupalGet('node/add/'. $entry_type);
@@ -83,7 +83,7 @@ class LingwoFieldsTestCase extends LingwoDictionaryWebTestCase {
   // TODO: We have to call the AHAH submit handler to get this problem to happen.
   /*
   public function testValidationConflict() {
-    $entry_type = lingwo_dictionary_settings('entry_content_type');
+    $entry_type = _lingwo_dictionary_settings('entry_content_type');
 
     $entry = array(
       'headword' => 'czerwony',

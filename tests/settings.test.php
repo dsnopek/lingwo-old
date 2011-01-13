@@ -1,6 +1,6 @@
 <?php
 require_once('../includes/3rdparty/simpletest/autorun.php');
-require_once('../includes/sanity.inc');
+require_once('../includes/settings.inc');
 
 // Mock the Drupal variable functions
 $GLOBALS['_test_variables'] = array();
@@ -20,28 +20,28 @@ if (!function_exists('variable_del')) {
   }
 }
 
-class BadSettings extends Sanity\Settings {
+class BadSettings extends lingwo_settings {
 }
 
-class TestSettings extends Sanity\Settings {
-  protected $base_name = 'test';
+class TestSettings extends lingwo_settings {
+  protected static $base_name = 'test';
 
-  protected function getDefault($name) {
+  public static function getDefault($name) {
     switch ($name) {
       case 'var2':
         return 'zen';
     }
   }
 
-  protected function isValid($name) {
+  public static function isValid($name) {
     return preg_match('/^var\d$/', $name);
   }
 }
 
 class SanityTest extends UnitTestCase {
   function testBadSettings() {
-    $this->expectException(new Exception('You must sub-class LingwoSettings and change $base_name!'));
-    new BadSettings();
+    $this->expectException(new Exception('You must sub-class lingwo_settings and change $base_name!'));
+    BadSettings::get('blah');
   }
 
   function testVariablesMock() {

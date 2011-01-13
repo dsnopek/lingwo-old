@@ -220,7 +220,7 @@ class LingwoDataImportWebTestCase extends LingwoDictionaryWebTestCase {
     $this->assertNotNull($nid);
     $this->assertEqual($nid, $_nid);
 
-    $this->drupalGet('node/add/'. lingwo_dictionary_settings('entry_content_type'));
+    $this->drupalGet('node/add/'. _lingwo_dictionary_settings('entry_content_type'));
     //$this->outputWatchdog();
 
     $node = node_load($nid);

@@ -91,7 +91,7 @@ function lingwo_fields_theme() {
  * Implementation of hook_form_alter().
  */
 function lingwo_fields_form_alter(&$form, &$form_state, $form_id) {
-  if ($form_id == (lingwo_dictionary_settings('entry_content_type') .'_node_form')) {
+  if ($form_id == (_lingwo_dictionary_settings('entry_content_type') .'_node_form')) {
     $node = $form['#node'];
     $entry = LingwoEntry::fromNode($node);
     if (!$entry->isTranslation()) {
@@ -107,7 +107,7 @@ function lingwo_fields_form_alter(&$form, &$form_state, $form_id) {
 function lingwo_fields_content_extra_fields($type_name) {
   $extra = array();
 
-  if (lingwo_dictionary_settings('entry_content_type') == $type_name) {
+  if (_lingwo_dictionary_settings('entry_content_type') == $type_name) {
     $extra['lingwo_fields'] = array(
       'label' => t('Lingwo Fields'),
       'description' => t('lingwo_fields module.'),
@@ -175,7 +175,7 @@ function _lingwo_fields_write_record($fields, $is_update) {
  */
 function lingwo_fields_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
   // only applies to entries
-  if ($node->type != lingwo_dictionary_settings('entry_content_type'))
+  if ($node->type != _lingwo_dictionary_settings('entry_content_type'))
     return NULL;
 
   // view should happen for both sources and translations (but only when showing a page)

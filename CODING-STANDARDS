@@ -1,0 +1,57 @@
+
+We follow the Drupal coding standards with the following added requirements.
+
+Naming conventions
+==================
+
+ * Hooks: Only hooks will be named "module_XXX", with the following exceptions:
+
+   o Pages callbacks will be named "module_XXX_page"
+
+   o Form callbacks will be named "module_XXX_form"
+
+   o Submit callbacks will be named "module_XXX_form_submit"
+
+   o Functions to invoke hooks will be named "module_XXX_invoke"
+
+   o A settings class (if necessary) will be called "module_settings"
+
+ * Theme functions: will be named "theme_module_XXX"
+
+ * API functions intended to be called by other modules, will be part of a class
+   with the same name as the module.
+ 
+ * All other functions are considered internal, and will be named '_module_XXX', including:
+
+   o Access callbacks (like returned from hook_menu)
+
+Files
+=====
+
+ * .module file should contain only:
+ 
+   o hooks
+   o require statements
+   o internal functions
+
+ * module.admin.inc should contain form or page callbacks for admin pages
+
+ * module.theme.inc should contain all theme functions
+
+ * module.pages.inc should contain all (non-admin) menu and form callbacks
+
+ * module.api.inc should contain all the API functions (including the definition
+   of the settings class, if there is one)
+
+If there is a public API, then the .module file must require it, as one of the first
+things it does.
+
+Loading includes
+================
+
+If we load includes that are contained under our control, they should always be loaded
+via require_once(dirname(__FILE__) .'/filename.inc').
+
+If we load includes from another module, we should use module_load_include() -- BUT
+we can't use this at the global level, only inside of a function.
+

@@ -6,6 +6,18 @@
  * Implements a CCK field for storing multiple dictionary senses
  */
 
+// get our API functions for dealing with entries
+require_once(dirname(__FILE__) .'/lingwo_senses.api.inc');
+
+/**
+ *
+ * TODO:
+ *
+ * Everything in this file should be a hook!  Everything else should be part of the
+ * "lingwo_senses" class defined in lingwo_senses.base.inc OR if its a callback it
+ * should be part of the "lingwo_senses" namespace and in another file.
+ */
+
 /**
  * Implementation of hook_menu().
  */
@@ -21,6 +33,16 @@ function lingwo_senses_menu() {
     'type' => MENU_CALLBACK
   );
 
+  $items['admin/settings/lingwo_dictionary/senses'] = array(
+    'title' => 'Data',
+    'description' => 'Settings for Lingwo Senses module.',
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('\lingwo_senses\admin_settings_form'),
+    'file' => 'lingwo_senses.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
   return $items;
 }
 
@@ -31,15 +53,19 @@ function lingwo_senses_theme() {
   return array(
     'lingwo_senses_original_form' => array(
       'arguments' => array('form' => NULL),
+      'file' => 'lingwo_senses.theme.inc',
     ),
     'lingwo_senses_translation_form' => array(
       'arguments' => array('form' => NULL),
+      'file' => 'lingwo_senses.theme.inc',
     ),
     'lingwo_senses_original' => array(
       'arguments' => array('node' => NULL),
+      'file' => 'lingwo_senses.theme.inc',
     ),
     'lingwo_senses_translation' => array(
       'arguments' => array('node' => NULL, 'items' => NULL),
+      'file' => 'lingwo_senses.theme.inc',
     ),
   );
 }
@@ -48,7 +74,7 @@ function lingwo_senses_theme() {
  * Implementation of hook_form_alter().
  */
 function lingwo_senses_form_alter(&$form, $form_state, $form_id) {
-  if ($form_id == (lingwo_dictionary_settings('entry_content_type') .'_node_form')) {
+  if ($form_id == (lingwo_dictionary::$settings->entry_content_type .'_node_form')) {
     $form['lingwo_senses'] = lingwo_senses_widget($form, $form_state);
     drupal_add_js(drupal_get_path('module', 'lingwo_senses') .'/lingwo_senses.js');
   }
@@ -60,7 +86,7 @@ function lingwo_senses_form_alter(&$form, $form_state, $form_id) {
 function lingwo_senses_content_extra_fields($type_name) {
   $extra = array();
 
-  if (lingwo_dictionary_settings('entry_content_type') == $type_name) {
+  if (lingwo_dictionary::$settings->entry_content_type == $type_name) {
     $extra['lingwo_senses'] = array(
       'label' => t('Lingwo Senses'),
       'description' => t('lingwo_senses module.'),
@@ -588,71 +614,6 @@ function lingwo_senses_ahah($field_name) {
   drupal_json(array('status' => TRUE, 'data' => $output));
 }
 
-function theme_lingwo_senses_original_form($form) {
-  drupal_add_tabledrag('lingwo-definition-table', 'order', 'sibling', 'sense-weight');
-
-  $elements = element_children($form);
-  if (empty($elements)) {
-    return '';
-  }
-
-  $header = array(
-    '',
-    array(
-      'data' => t('Sense'),
-      'width' => '100%',
-    ),
-    t('Weight'),
-  );
-
-  if (count($elements) > 1) {
-    $header[] = t('Operations');
-  }
-
-  $rows = array();
-  foreach (element_children($form) as $key) {
-    $element = &$form[$key];
-    $element['weight']['#attributes']['class'] = 'sense-weight';
-
-    $weight = drupal_render($element['weight']);
-    $delete = drupal_render($element['remove_sense']);
-
-    $row = array();
-    $row[] = '';
-    $row[] = drupal_render($element);
-    $row[] = $weight;
-
-    if (count($elements) > 1) {
-      $row[] = $delete;
-    }
-
-    $row = array('data' => $row);
-    $row['class'] = !empty($row['class']) ? $row['class'] .' draggable' : 'draggable';
-    $rows[] = $row;
-  }
-
-  return theme('table', $header, $rows, array('id' => 'lingwo-definition-table'));
-}
-
-function theme_lingwo_senses_translation_form($form) {
-  $header = array(
-    t('No.'),
-    t('Sense'),
-  );
-
-  $rows = array();
-  $elements = element_children($form);
-  foreach ($elements as $key) {
-    $row = array();
-    $row[] = ($key + 1);
-    $row[] = drupal_render($form[$key]);
-
-    $rows[] = $row;
-  }
-
-  return theme('table', $header, $rows);
-}
-
 function _theme_lingwo_senses_relationship($node, $sense) {
   if (lingwo_dictionary_entry_is_translation($node)) {
     $source_lang = lingwo_dictionary_entry_load_translation_source($node)->language;
@@ -669,7 +630,7 @@ function _theme_lingwo_senses_relationship($node, $sense) {
   # TODO: this should be a function!
   # TODO: this should operate somehow, when we don't have a lookup path!
   $path = implode('/', array(
-    lingwo_dictionary_settings('lookup_path'),
+    lingwo_dictionary::$settings->lookup_path,
     $spec,
     $headword .'('. $pos .')'
   ));
@@ -691,136 +652,4 @@ function _theme_lingwo_senses_relationship($node, $sense) {
   ));
 }
 
-function theme_lingwo_senses_original($node) {
-  $items = $node->lingwo_senses;
-  if (!empty($items)) {
-    $output .= '<div class="lingwo-entry">';
-    $output .= '<ol class="lingwo-sense-list">';
-    foreach ($items as $sense) {
-      $sense_id = $sense['id'];
-      $sense = $sense['data'];
-
-      $output .= '<li class="lingwo-sense lingwo-sense-id-'.$sense_id.'">';
-      if (!empty($sense['is']['relationship'])) {
-        $output .= '<span class="lingwo-sense-relationship">'. _theme_lingwo_senses_relationship($node, $sense) .'</span>';
-      }
-      else if ($sense['difference']) {
-        $output .= '<span class="lingwo-sense-difference">'. $sense['difference'] .'</span>';
-      }
-      else {
-        $output .= '<span class="lingwo-sense-nodifference">(';
-        $output .= t('No difference given');
-        $output .= ')</span>';
-      }
-      if ($sense['example']) {
-        $output .= ': <blockquote class="lingwo-example">"'. $sense['example'] .'"</blockquote>';
-      }
-      $output .= '</li>';
-    };
-    $output .= '</ol>';
-    $output .= '</div>';
-  }
-  else {
-    $output .= '<p>'. t('No sense distinctions.') .'</p>';
-  }
-
-  drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.css');
-  return $output;
-}
-
-function theme_lingwo_senses_translation($node, $items=NULL) {
-  $output = '';
-  $output .= '<div class="lingwo-entry">';
-  $output .= '<ol class="lingwo-sense-list">';
-
-  if (is_null($items)) {
-    $items = lingwo_senses_get_translations($node);
-  }
-
-  # group the ids together
-  $ids = array();
-  foreach ($items as $sense) {
-    if ($sense['data']['same_as']) {
-      $ids[$sense['data']['same_as']][] = $sense['id'];
-    }
-    else {
-      $ids[$sense['id']][] = $sense['id'];
-    }
-  }
-
-  $without_translations = 0;
-  foreach ($items as $sense) {
-    if (!empty($sense['data']['same_as'])) {
-      continue;
-    }
-    $orig_sense = $sense['orig_sense'];
-    $sense_id = $sense['id'];
-    $sense = $sense['data'];
-
-    $values = array();
-    if ($sense['no_equivalent']) {
-      $values[] = '<strong><span class="lingwo-sense-no-equivalent">'. t('No equivalent in this language') .'</span></strong>';
-    }
-    else if (!empty($orig_sense['data']['is']['relationship'])) {
-      $values[] = _theme_lingwo_senses_relationship($node, $orig_sense['data']);
-    }
-    else if (!empty($sense['trans'])) {
-      foreach ($sense['trans'] as $value) {
-        if (!empty($value)) {
-          // TODO: re-instate this!
-          //$values[] = l($value, 'entry/'. $trans->target_lang .'/'. $entry->pos .'/'. $value);
-          $values[] = $value;
-        }
-      }
-    }
-    if (empty($values)) {
-      //$output .= t('No translation');
-      $without_translations++;
-      continue;
-    }
-
-    $output_ids = array();
-    foreach ($ids[$sense_id] as $id) {
-      $output_ids[] = 'lingwo-sense-id-'. $id;
-    }
-    $output_ids = implode(' ', $output_ids);
-
-    $output .= '<li class="lingwo-sense '. $output_ids .'">';
-    if ($sense['clue']) {
-      $output .= '<span class="lingwo-sense-clue">('. $sense['clue'] .')</span> ';
-    }
-
-    $output .= join(', ', $values);
-
-    if (!empty($orig_sense['data']['example'])) {
-      $output .= '<blockquote class="lingwo-example">"'. $orig_sense['data']['example'] .'"';
-      
-      if (!empty($sense['example_translation'])) {
-        //$output .= ' &rarr; "'. $sense['example_translation'] .'"';
-        $output .= ' -&gt; "'. $sense['example_translation'] .'"';
-      }
-      $output .= '</blockquote>';
-    }
-    $output .= '</li>';
-  };
-  $output .= '</ol>';
-
-  // TODO: while this is an awesome idea, it has problems.  (1) it doesn't belong in lingwo_senses
-  // because it is UX.  It should go in the theme or lingwoorg_dictionary. (2) it doesn't check
-  // for edit permissions.  I've added trac ticket #42 to try and re-instate it somewhere.
-  /*
-  if ($without_translations > 0) {
-    $output .= '<p>';
-    $output .= t('There are @count senses without translations.', array('@count' => $without_translations));
-    $output .= '  ';
-    $output .= l(t('Edit this entry and contribute!'), 'node/'. $node->nid .'/edit');
-    $output .= '</p>';
-  }
-  */
-
-  $output .= '</div>';
-
-  drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.css');
-  return $output;
-}
 
