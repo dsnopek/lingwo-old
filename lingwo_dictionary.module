@@ -9,6 +9,9 @@
 // get our API functions for dealing with entries
 module_load_include('inc', 'lingwo_dictionary', 'lingwo_dictionary.entry-api');
 
+// some helpers
+require_once('includes/sanity.inc');
+
 // Helper for generating UUIDs
 function _ld_make_uuid() {
   if (!isset($GLOBALS['uuid'])) {
@@ -409,50 +412,65 @@ function lingwo_dictionary_theme() {
  * Settings
  */
 
-/**
- * Used to access settings.
- */
-function lingwo_dictionary_settings($name, $value = NULL) {
-  static $_settings = array(
+// really should be lingwo_dictionary_settings *OR* use namespaces.
+class LingwoDictionarySettings extends Sanity\Settings {
+  protected $base_name = 'lingwo_dictionary';
+
+  private $defaults = array(
     'lookup_path' => 'lookup',
     'redirect_node' => FALSE,
     'entry_content_type' => NULL,
     'pos_allowed_values' => "noun|Noun\nadjective|Adjective\nverb|Verb",
   );
 
+  protected function getDefault($name) {
+    return $this->defaults[$name];
+  }
+
+  protected function isValid($name) {
+    return array_key_exists($name, $this->defaults);
+  }
+
+  public function getDefaults() {
+    return $this->defaults;
+  }
+
+  public function check($message=TRUE) {
+    foreach ($this->defaults as $name => $default) {
+      if (is_null($default) && is_null(variable_get('lingwo_dictionary_'. $name, NULL))) {
+        if ($message) {
+          drupal_set_message(t('Functionality provided by Lingwo Dictionary will not work correctly until it is configured'));
+        }
+
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+}
+
+class lingwo_dictionary {
+  public static $settings;
+}
+lingwo_dictionary::$settings = new LingwoDictionarySettings;
+
+/**
+ * Used to access settings.
+ */
+function lingwo_dictionary_settings($name, $value = NULL) {
   if (is_null($name)) {
-    return $_settings;
+    return lingwo_dictionary::$settings->getDefaults();
   }
-
-  if (!array_key_exists($name, $_settings)) {
-    trigger_error(t('No such lingwo_dictionary_setting: @name', array('@name' => $name)), E_USER_ERROR);
-    return NULL;
-  }
-
   if (is_null($value)) {
-    return variable_get('lingwo_dictionary_'. $name, $_settings[$name]);
+    return lingwo_dictionary::$settings->__get($name);
   }
-
-  variable_set('lingwo_dictionary_'. $name, $value);
+  lingwo_dictionary::$settings->__set($name, $value);
 }
 
 /**
  * Checks if lingwo_dictionary is configured.
  */
 function lingwo_dictionary_check_settings($message = TRUE) {
-  $_settings = lingwo_dictionary_settings(NULL);
-
-  // look for settings that aren't configured
-  foreach ($_settings as $name => $default) {
-    if (is_null($default) && is_null(variable_get('lingwo_dictionary_'. $name, NULL))) {
-      if ($message) {
-        drupal_set_message(t('Functionality provided by Lingwo Dictionary will not work correctly until it is configured'));
-      }
-
-      return FALSE;
-    }
-  }
-
-  return TRUE;
+  return lingwo_dictionary::$settings->check();
 }
 
