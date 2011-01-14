@@ -138,7 +138,7 @@ function _lingwo_senses_clean(&$senses) {
     }
 
     // remove empty fields
-    foreach (array('example','example_translation','clue') as $name) {
+    foreach (array('example', 'example_translation', 'clue') as $name) {
       if (empty($sense['data'][$name])) {
         unset($sense['data'][$name]);
       }
@@ -174,8 +174,8 @@ function _lingwo_senses_relationship_options($translate = FALSE, $option_name = 
     }
 
     if ($translate) {
-      # TODO: we need to integrate this for real with the i18n hooks!!
-      #$value = i18nstrings('lingwo:field:sense_relationships:option_'. $key, $value);
+      // TODO: we need to integrate this for real with the i18n hooks!!
+      //$value = i18nstrings('lingwo:field:sense_relationships:option_'. $key, $value);
     }
 
     if ($option_name == $key) {
@@ -213,8 +213,8 @@ function lingwo_senses_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
 
     case 'presave':
     case 'prepare':
-      # prepare: an unclean $node->lingwo_senses can mess up the edit form
-      # presave: clean the senses before save
+      // prepare: an unclean $node->lingwo_senses can mess up the edit form
+      // presave: clean the senses before save
       if (!empty($node->lingwo_senses)) {
         _lingwo_senses_clean($node->lingwo_senses);
       }
@@ -245,11 +245,11 @@ function lingwo_senses_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
       break;
 
     case 'delete revision':
-      db_query("DELETE FROM {lingwo_senses_revisions} WHERE vid = %s", $node->vid);
+      db_query("DELETE FROM {lingwo_senses_revisions} WHERE vid = %d", $node->vid);
       break;
 
     case 'delete':
-      db_query("DELETE FROM {lingwo_senses_revisions} WHERE nid = %s", $node->nid);
+      db_query("DELETE FROM {lingwo_senses_revisions} WHERE nid = %d", $node->nid);
       break;
   }
 }
@@ -282,7 +282,7 @@ function lingwo_senses_widget_original(&$form, &$form_state, $node) {
     '#parents' => array('lingwo_senses'),
   );
 
-  # if there are no items..
+  // if there are no items..
   if (count($items) == 0) {
     $items[] = array('data' => array());
   }
@@ -300,7 +300,7 @@ function lingwo_senses_widget_original(&$form, &$form_state, $node) {
     );
 
     if (count($items) > 1) {
-      # only edit the difference when there are multiple senses
+      // only edit the difference when there are multiple senses
       $row['data']['difference'] = array(
         '#title' => 'Difference',
         '#type' => 'textfield',
@@ -309,7 +309,7 @@ function lingwo_senses_widget_original(&$form, &$form_state, $node) {
       );
     }
     else {
-      # but preserve the value for if we delete down to one sense
+      // but preserve the value for if we delete down to one sense
       if ($sense['data']['difference']) {
         $row['data']['difference'] = array(
           '#title' => 'Difference',
@@ -318,7 +318,7 @@ function lingwo_senses_widget_original(&$form, &$form_state, $node) {
         );
       }
     }
-    # always have an example
+    // always have an example
     $row['data']['example'] = array(
       '#title' => 'Example',
       '#type' => 'textfield',
@@ -326,20 +326,20 @@ function lingwo_senses_widget_original(&$form, &$form_state, $node) {
       '#maxlength' => 255,
     );
 
-    # always have the ability to say it "is" a relationship to another entry
+    // always have the ability to say it "is" a relationship to another entry
     $row['data']['is'] = array(
       '#type' => 'fieldset',
       '#title' => 'Relationship',
       '#collapsible' => TRUE,
       '#collapsed' => empty($sense['data']['is']['relationship']),
-      #'#prefix' => '<div class="inline-controls clear-block">',
-      #'#suffix' => '</div>',
+      //'#prefix' => '<div class="inline-controls clear-block">',
+      //'#suffix' => '</div>',
     );
     $is_relationship_options = array('' => '-') + _lingwo_senses_relationship_options(TRUE);
     $row['data']['is']['relationship'] = array(
       '#title' => 'is',
       '#type'  => 'select',
-      # TODO: should come from lingwo_language (or indirectly from a hook)
+      // TODO: should come from lingwo_language (or indirectly from a hook)
       '#options' => $is_relationship_options,
       '#default_value' => $sense['data']['is']['relationship'],
       '#attributes' => array('class' => 'is-relationship'),
@@ -525,7 +525,7 @@ function lingwo_senses_get_translations(&$node) {
   $trans_map = array();
   $trans_senses = $node->lingwo_senses;
 
-  # build our internal map of id => sense
+  // build our internal map of id => sense
   if (!empty($trans_senses)) {
     foreach ($trans_senses as $trans_sense) {
       $trans_map[$trans_sense['id']] = $trans_sense;
@@ -618,8 +618,8 @@ function _theme_lingwo_senses_relationship($node, $sense) {
   $pos = $sense['is']['pos'];
   $headword = $sense['is']['headword'];
 
-  # TODO: this should be a function!
-  # TODO: this should operate somehow, when we don't have a lookup path!
+  // TODO: this should be a function!
+  // TODO: this should operate somehow, when we don't have a lookup path!
   $path = implode('/', array(
     LingwoEntry::$settings->lookup_path,
     $spec,
@@ -629,9 +629,9 @@ function _theme_lingwo_senses_relationship($node, $sense) {
   $entry_text = $headword .' ('. LingwoEntry::getPosOptions(TRUE, $pos) .')';
   // TODO: shouldn't be a link if there is no lookup path and this node doesn't exist!
   $entry_text = l($entry_text, $path, array(
-    # setup for working in the korpus reader
+    // setup for working in the korpus reader
     'attributes' => array(
-      # TODO: hashing should be a function call!
+      // TODO: hashing should be a function call!
       'data-entry' => sha1(join(':', array($source_lang, $pos, $headword))),
       'class' => 'anno'
     )
