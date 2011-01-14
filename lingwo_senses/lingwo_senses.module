@@ -152,7 +152,7 @@ function _lingwo_senses_clean(&$senses) {
 }
 
 # TODO: should be a hook plus some default values stored in admin
-# TODO: make this code generic, I copied it from lingwo_dictionary_pos_options()
+# TODO: make this code generic, I copied it from LingwoEntry::getPosOptions()
 function _lingwo_senses_relationship_options($translate = FALSE, $option_name = NULL) {
   $list = array(
     # imiesłów przymiotnikowy teraźniejszy czynny
@@ -351,7 +351,7 @@ function lingwo_senses_widget_original(&$form, &$form_state, $node) {
     );
     $row['data']['is']['pos'] = array(
       '#type'  => 'select',
-      '#options' => lingwo_dictionary_pos_options(TRUE),
+      '#options' => LingwoEntry::getPosOptions(TRUE),
       '#default_value' => $sense['data']['is']['pos'],
     );
 
@@ -626,7 +626,7 @@ function _theme_lingwo_senses_relationship($node, $sense) {
     $headword .'('. $pos .')'
   ));
 
-  $entry_text = $headword .' ('. lingwo_dictionary_pos_options(TRUE, $pos) .')';
+  $entry_text = $headword .' ('. LingwoEntry::getPosOptions(TRUE, $pos) .')';
   // TODO: shouldn't be a link if there is no lookup path and this node doesn't exist!
   $entry_text = l($entry_text, $path, array(
     # setup for working in the korpus reader
