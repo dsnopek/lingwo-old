@@ -174,9 +174,9 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
   ), 'setting');
 
   _ld_add_require_js(array('text'));
-  drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotator.js');
-  drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.less');
-  drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotator.less');
+  drupal_add_js(drupal_get_path('module', 'lingwo_korpus') .'/annotator.js');
+  drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.less');
+  drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotator.less');
 
   return $form;
 }
@@ -379,9 +379,9 @@ function _lingwo_korpus_add_reader_js() {
       'language' => $language->language,
       'baseUrl' => url('', array('absolute' => TRUE))
     ), 'setting');
-    drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.js');
+    drupal_add_js(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.js');
     drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.css');
-    drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.less');
+    drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.less');
 
     $added = TRUE;
   }
@@ -546,7 +546,7 @@ function _lingwo_korpus_auto_annotate_node(&$node, $which='body') {
 function _lingwo_korpus_exec_python($script, $args, $data) {
   $cmd = implode(' ', array(
     lingwo_korpus_python_exec(),
-    drupal_get_path('module', 'lingwo_dictionary') .'/'. $script,
+    _ld_project_path() .'/'. $script,
     $args,
   ));
 

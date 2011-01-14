@@ -82,7 +82,7 @@ function theme_lingwo_senses_original($node) {
 
       $output .= '<li class="lingwo-sense lingwo-sense-id-'. $sense_id .'">';
       if (!empty($sense['is']['relationship'])) {
-        $output .= '<span class="lingwo-sense-relationship">'. _theme_lingwo_senses_relationship($node, $sense) .'</span>';
+        $output .= '<span class="lingwo-sense-relationship">'. theme('lingwo_senses_relationship', $node, $sense) .'</span>';
       }
       elseif ($sense['difference']) {
         $output .= '<span class="lingwo-sense-difference">'. $sense['difference'] .'</span>';
@@ -142,7 +142,7 @@ function theme_lingwo_senses_translation($node, $items=NULL) {
       $values[] = '<strong><span class="lingwo-sense-no-equivalent">'. t('No equivalent in this language') .'</span></strong>';
     }
     elseif (!empty($orig_sense['data']['is']['relationship'])) {
-      $values[] = _theme_lingwo_senses_relationship($node, $orig_sense['data']);
+      $values[] = theme('lingwo_senses_relationship', $node, $orig_sense['data']);
     }
     elseif (!empty($sense['trans'])) {
       foreach ($sense['trans'] as $value) {
@@ -202,5 +202,43 @@ function theme_lingwo_senses_translation($node, $items=NULL) {
 
   drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.css');
   return $output;
+}
+
+function theme_lingwo_senses_relationship($node, $sense) {
+  if (_ld_is_translation($node)) {
+    $source_lang = LingwoEntry::fromNode($node)->getSourceLanguage();
+    $target_lang = $node->language;
+    $spec = "$source_lang-$target_lang";
+  }
+  else {
+    $spec = $source_lang = $target_lang = $node->language;
+  }
+
+  $pos = $sense['is']['pos'];
+  $headword = $sense['is']['headword'];
+
+  // TODO: this should be a function!
+  // TODO: this should operate somehow, when we don't have a lookup path!
+  $path = implode('/', array(
+    LingwoEntry::$settings->lookup_path,
+    $spec,
+    $headword .'('. $pos .')'
+  ));
+
+  $entry_text = $headword .' ('. LingwoEntry::getPosOptions(TRUE, $pos) .')';
+  // TODO: shouldn't be a link if there is no lookup path and this node doesn't exist!
+  $entry_text = l($entry_text, $path, array(
+    // setup for working in the korpus reader
+    'attributes' => array(
+      // TODO: hashing should be a function call!
+      'data-entry' => sha1(join(':', array($source_lang, $pos, $headword))),
+      'class' => 'anno'
+    )
+  ));
+
+  return t('!rel of !entry', array(
+    '!rel' => _lingwo_senses_relationship_options(TRUE, $sense['is']['relationship']),
+    '!entry' => $entry_text
+  ));
 }
 
