@@ -84,10 +84,10 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
       }
     }
 
-	// don't add duplicates
-	if (!in_array($nid, $nids)) {
+    // don't add duplicates
+    if (!in_array($nid, $nids)) {
       $nids[] = $nid;
-	}
+    }
   }
 
   // if this is a single node direct link, not a search
@@ -123,7 +123,7 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
       $url_args['language'] = $source_lang;
     }
 
-    $link = l('Click here', "node/add/$type_url_str", array('query' => $url_args));
+    $link = l(t('Click here'), "node/add/$type_url_str", array('query' => $url_args));
     $output .= '<p>'. t('!link to add the entry to dictionary.', array('!link' => $link)) .'</p>';
 
     return $output;
