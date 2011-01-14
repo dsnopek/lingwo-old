@@ -130,7 +130,7 @@ function _lingwo_senses_widget_original($node) {
 }
 
 function _lingwo_senses_widget_translation($node) {
-  $senses = lingwo_senses_get_translations($node);
+  $senses = LingwoEntry::fromNode($node)->senses->getTranslations();
 
   $element = array(
     '#type' => 'fieldset',

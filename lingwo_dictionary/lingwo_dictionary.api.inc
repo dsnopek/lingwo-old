@@ -52,17 +52,19 @@ class LingwoEntry {
    */
 
   public static $settings;
-  public static $MAP = array(
-    'headword' => 'title',
+  private static $MAP_NODE = array(
+    'headword'       => 'title',
+    'pos'            => 'pos',
+    'language'       => 'language',
+    'targetLanguage' => 'language',
   );
+  private static $MAP_FUNC = array(
+    'node'           => 'getNode',
+    'sourceLanguage' => 'getSourceLanguage',
+    'sourceNode'     => 'getTranslationSource',
+  );
+  private static $MAP_EXTS = NULL;
 
-  private static function getName($name) {
-    if (isset(self::$MAP[$name])) {
-      $name = self::$MAP[$name];
-    }
-    return $name;
-  }
- 
   public static function isEntryNode($node) {
     return $node->type == self::$settings->entry_content_type;
   }
@@ -243,47 +245,40 @@ class LingwoEntry {
 
   private $node;
   private $sourceNode;
-  private $ifaces = array();
+  private $exts = array();
  
   public function &getNode() {
     return $this->node;
   }
 
-  public function __set($name, $value) {
-    $name = self::getName($name);
-    $this->node->$name = $value;
-  }
-
-  public function __isset($name) {
-    $name = self::getName($name);
-    return isset($this->node->$name);
-  }
-
-  public function __unset($name) {
-    $name = self::getName($name);
-    unset($this->node->$name);
-  }
-
-  public function getInterface($module) {
-    $args = func_get_args();
-    $key = implode(':', $args);
-    if (isset($this->ifaces[$key])) {
-      return $this->ifaces[$key];
+  public function __get($name) {
+    $x = self::$MAP_NODE[$name];
+    if (!empty($x)) {
+      return $self->node->$x;
     }
 
-    #$module = array_shift($args);
-    #array_unshift($args, $this);
-    #$module = $args[0];
-    $args[0] = $this;
-
-    $func = $module . "_lingwo_entry_interface";
-    if (module_exists($module) && function_exists($func)) {
-      $iface = call_user_func_array($func, $args);
-      $this->ifaces[$key] = $iface;
-      return $iface;
+    $x = self::$MAP_FUNC[$name];
+    if (!empty($x)) {
+      return call_user_func(array($this, $x));
     }
 
-    return NULL;
+    if (is_null(self::$MAP_EXTS)) {
+      self::$MAP_EXTS = module_invoke_all('lingwo_entry_properties');
+    }
+    $x = self::$MAP_EXTS[$name];
+    if (!empty($x)) {
+      if (!isset($this->exts[$name])) {
+        if (class_exists($x['class'])) {
+          $x = $x['class'];
+          $this->exts[$name] = new $x($this);
+        }
+        elseif (is_callable($x['callable'])) {
+          // we don't cache callables!  They might need to be calculated every time
+          return call_user_func($x['callable'], $this);
+        }
+      }
+      return $this->exts[$name];
+    }
   }
 
   public function isTranslation() {

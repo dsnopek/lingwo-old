@@ -30,6 +30,17 @@ function lingwo_senses_menu() {
   return $items;
 }
 
+/*
+ * Implementation of hook_lingwo_dictionary_exts().
+ */
+function lingwo_senses_lingwo_entry_properties() {
+  return array(
+    'senses' => array(
+      'class' => 'LingwoSenses',
+    ),
+  );
+}
+
 /**
  * Implementation of hook_theme().
  */

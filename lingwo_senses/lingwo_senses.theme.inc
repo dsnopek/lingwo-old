@@ -114,8 +114,9 @@ function theme_lingwo_senses_translation($node, $items=NULL) {
   $output .= '<ol class="lingwo-sense-list">';
 
   if (is_null($items)) {
-    $items = lingwo_senses_get_translations($node);
+    $items = LingwoEntry::fromNode($node)->senses->getTranslations();
   }
+  watchdog('debug', print_r($items, TRUE));
 
   # group the ids together
   $ids = array();

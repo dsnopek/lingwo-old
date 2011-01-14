@@ -30,10 +30,14 @@ function lingwo_fields_menu() {
 }
 
 /**
- * Implementation of hook_lingwo_entry_interface().
+ * Implementation of hook_lingwo_entry_ext().
  */
-function lingwo_fields_lingwo_entry_interface($entry) {
-  return new LingwoFields($entry);
+function lingwo_fields_lingwo_entry_properties() {
+  return array(
+    'fields' => array(
+      'class' => 'LingwoFields',
+    ),
+  );
 }
 
 // API function to find all the entries which match this form.  This is a pair to
@@ -258,7 +262,7 @@ function lingwo_fields_widget(&$form, &$form_state, $entry) {
       $node->lingwo_fields = array();
     }
   }
-  $fields = $entry->getInterface('lingwo_fields');
+  $fields = $entry->fields;
 
   // add the from to our form list (we have to do this here because in AHAH we can't
   // do it in the submit handler)
@@ -605,7 +609,7 @@ function theme_lingwo_fields_formatter_default($node) {
 
   // fill element with real FAPI elements that simple display the item
   $element = array();
-  foreach ($entry->getInterface('lingwo_fields') as $name => $field) {
+  foreach ($entry->fields as $name => $field) {
     $def = $field['definition'];
     if ($name == '_noname_') {
       $label = t('Un-named forms');

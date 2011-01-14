@@ -22,61 +22,86 @@ class LingwoSensesSettings extends LingwoSettings {
 }
 
 class LingwoSenses {
+  /*
+   * 
+   * Static properties/methods
+   * =========================
+   *
+   */
+
   public static $settings;
+
+  /*
+   *
+   * Instance properties/methods.
+   * ===========================
+   *
+   */
+
+  private $entry;
+  private $node;
+
+  public function __construct($entry) {
+    $this->entry = $entry;
+    $this->node =& $entry->getNode();
+
+    if (!isset($this->node->lingwo_senses)) {
+      $this->node->lingwo_senses = array();
+    }
+  }
+
+  /* Takes an entry and a trans and makes a list of trans senses in the appropriate
+   * order, connected to the entry senses if one exists.
+   */
+  public function getTranslations() {
+    $orig = $this->entry->sourceNode;
+    // TODO: does this make sense?  Why support not having a translation source??
+    $orig_senses = isset($orig) ? $orig->lingwo_senses : array();
+
+    $trans_map = array();
+    $trans_senses = $this->node->lingwo_senses;
+
+    // build our internal map of id => sense
+    if (!empty($trans_senses)) {
+      foreach ($trans_senses as $trans_sense) {
+        $trans_map[$trans_sense['id']] = $trans_sense;
+      }
+    }
+
+    $senses = array();
+
+    foreach ($orig_senses as $sense) {
+      $trans_sense = $trans_map[$sense['id']];
+      if (!isset($trans_sense)) {
+        $trans_sense = array('id' => $sense['id']);
+      }
+      $trans_sense['orig_sense'] = $sense;
+      
+      $senses[] = $trans_sense;
+      unset($trans_map[$sense['id']]);
+    }
+
+    // TODO: do we still need this?  Source entries without senses is no longer our thing.
+    if (count($senses) == 0) {
+      if ($trans_map && isset($trans_map['*'])) {
+        $only_sense = $trans_map['*'];
+      }
+      else {
+        $only_sense = array('id' => '*', 'data' => array());
+      }
+      $senses[] = $only_sense;
+      unset($trans_map['*']);
+    }
+
+    foreach ($trans_map as $id => $trans_sense) {
+      $senses[] = $trans_sense;
+    }
+
+    return $senses;
+  }
 }
 
 LingwoSenses::$settings = LingwoSensesSettings::get();
-
-/* Takes an entry and a trans and makes a list of trans senses in the appropriate
- * order, connected to the entry senses if one exists.
- */
-// TODO: move to the public API!
-function lingwo_senses_get_translations(&$node) {
-  $orig = LingwoEntry::fromNode($node)->getTranslationSource();
-  // TODO: does this make sense?  Why support not having a translation source??
-  $orig_senses = isset($orig) ? $orig->lingwo_senses : array();
-
-  $trans_map = array();
-  $trans_senses = $node->lingwo_senses;
-
-  // build our internal map of id => sense
-  if (!empty($trans_senses)) {
-    foreach ($trans_senses as $trans_sense) {
-      $trans_map[$trans_sense['id']] = $trans_sense;
-    }
-  }
-
-  $senses = array();
-
-  foreach ($orig_senses as $sense) {
-    $trans_sense = $trans_map[$sense['id']];
-    if (!isset($trans_sense)) {
-      $trans_sense = array('id' => $sense['id']);
-    }
-    $trans_sense['orig_sense'] = $sense;
-    
-    $senses[] = $trans_sense;
-    unset($trans_map[$sense['id']]);
-  }
-
-  // TODO: do we still need this?  Source entries without senses is no longer our thing.
-  if (count($senses) == 0) {
-    if ($trans_map && isset($trans_map['*'])) {
-      $only_sense = $trans_map['*'];
-    }
-    else {
-      $only_sense = array('id' => '*', 'data' => array());
-    }
-    $senses[] = $only_sense;
-    unset($trans_map['*']);
-  }
-
-  foreach ($trans_map as $id => $trans_sense) {
-    $senses[] = $trans_sense;
-  }
-
-  return $senses;
-}
 
 /*
  * 
