@@ -19,7 +19,7 @@ require_once('lingwo_dictionary.api.inc');
  * This code was lifted graciously from the path_redirect module.
  */
 function lingwo_dictionary_init() {
-  if (_lingwo_dictionary_settings('redirect_node') && _lingwo_dictionary_settings('lookup_path')) {
+  if (LingwoEntry::$settings->redirect_node && LingwoEntry::$settings->lookup_path) {
     if (preg_match('/^node\/(\d+)$/', $_GET['q'], $matches)) {
       if ($entry = LingwoEntry::fromNid($matches[1])) {
         $redirect = $entry->getPath();
@@ -55,7 +55,7 @@ function lingwo_dictionary_menu() {
     'weight' => -10,
   );
 
-  if ($lookup_path = _lingwo_dictionary_settings('lookup_path')) {
+  if ($lookup_path = LingwoEntry::$settings->lookup_path) {
     $i = count(explode('/', $lookup_path));
     $items[$lookup_path .'/%/%'] = array(
       'page callback' => 'lingwo_dictionary_lookup_page',
@@ -125,7 +125,7 @@ function lingwo_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
  * Implementation of hook_form_alter().
  */
 function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
-  if ($form_id == (_lingwo_dictionary_settings('entry_content_type') .'_node_form')) {
+  if ($form_id == (LingwoEntry::$settings->entry_content_type .'_node_form')) {
     $node = $form['#node'];
 
     // allow some fields to be set automagically for new nodes
@@ -181,7 +181,7 @@ function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
 function lingwo_dictionary_content_extra_fields($type_name) {
   $extra = array();
 
-  if (_lingwo_dictionary_settings('entry_content_type') == $type_name) {
+  if (LingwoEntry::$settings->entry_content_type == $type_name) {
     $extra['pos'] = array(
       'label' => t('Part of Speech'),
       'description' => t('Lingwo Dictionary "Part of Speech" field.'),
@@ -203,7 +203,7 @@ function _lingwo_dictionary_generate_hash(&$object) {
  * Implementation of hook_nodeapi().
  */
 function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
-  if ($node->type != _lingwo_dictionary_settings('entry_content_type'))
+  if (!LingwoEntry::isEntryNode($node))
     return NULL;
 
   // Operates on both translations and sources

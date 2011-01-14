@@ -13,17 +13,19 @@
 function lingwo_dictionary_admin_settings() {
   $form = array();
 
-  $form['lingwo_dictionary_lookup_path'] = array(
+  $settings = LingwoDictionarySettings::get();
+
+  $form[$settings->name('lookup_path')] = array(
     '#type' => 'textfield',
     '#title' => t('Lookup path'),
-    '#default_value' => _lingwo_dictionary_settings('lookup_path'),
+    '#default_value' => $settings->lookup_path,
     '#description' => t('The drupal path for dictionary lookup. Do not include a trailing slash. Leave empty to disable the lookup path.'),
     '#field_prefix' => url(NULL, array('absolute' => FALSE)) . (variable_get('clean_url', 0) ? '' : '?q=')
   );
-  $form['lingwo_dictionary_redirect_node'] = array(
+  $form[$settings->name('redirect_node')] = array(
     '#type' => 'checkbox',
     '#title' => t('Redirect entry nodes to lookup path'),
-    '#default_value' => _lingwo_dictionary_settings('redirect_node'),
+    '#default_value' => $settings->redirect_node,
     '#description' => t('If you activate this option, by going to an entry nodes <em>node/nid</em> page, you will be redirected to the same page as <em>&lt;Lookup path&gt;/Headword</em>.'),
   );
 
@@ -31,19 +33,19 @@ function lingwo_dictionary_admin_settings() {
     $type_options[$type->type] = $type->name;
   }
 
-  $form['lingwo_dictionary_entry_content_type'] = array(
+  $form[$settings->name('entry_content_type')] = array(
     '#type' => 'select',
     '#title' => t('Entry Content Type'),
-    '#default_value' => _lingwo_dictionary_settings('entry_content_type'),
+    '#default_value' => $settings->entry_content_type,
     '#options' => $type_options,
     '#description' => t('The content type to use as a dictionary entry.'),
     '#required' => TRUE,
   );
 
-  $form['lingwo_dictionary_pos_allowed_values'] = array(
+  $form[$settings->name('pos_allowed_values')] = array(
     '#type' => 'textarea',
     '#title' => t('Part of Speech Allowed Values'),
-    '#default_value' => _lingwo_dictionary_settings('pos_allowed_values'),
+    '#default_value' => $settings->pos_allowed_values,
     '#description' => t('A list of allowed values for the "Part of Speech" field.'),
     '#required' => TRUE,
   );
