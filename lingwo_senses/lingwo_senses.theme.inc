@@ -1,4 +1,10 @@
 <?php
+// $Id: $
+
+/**
+ * @file
+ * Theme functions for lingwo_senses
+ */
 
 function theme_lingwo_senses_original_form($form) {
   drupal_add_tabledrag('lingwo-definition-table', 'order', 'sibling', 'sense-weight');
@@ -74,11 +80,11 @@ function theme_lingwo_senses_original($node) {
       $sense_id = $sense['id'];
       $sense = $sense['data'];
 
-      $output .= '<li class="lingwo-sense lingwo-sense-id-'.$sense_id.'">';
+      $output .= '<li class="lingwo-sense lingwo-sense-id-'. $sense_id .'">';
       if (!empty($sense['is']['relationship'])) {
         $output .= '<span class="lingwo-sense-relationship">'. _theme_lingwo_senses_relationship($node, $sense) .'</span>';
       }
-      else if ($sense['difference']) {
+      elseif ($sense['difference']) {
         $output .= '<span class="lingwo-sense-difference">'. $sense['difference'] .'</span>';
       }
       else {
@@ -135,10 +141,10 @@ function theme_lingwo_senses_translation($node, $items=NULL) {
     if ($sense['no_equivalent']) {
       $values[] = '<strong><span class="lingwo-sense-no-equivalent">'. t('No equivalent in this language') .'</span></strong>';
     }
-    else if (!empty($orig_sense['data']['is']['relationship'])) {
+    elseif (!empty($orig_sense['data']['is']['relationship'])) {
       $values[] = _theme_lingwo_senses_relationship($node, $orig_sense['data']);
     }
-    else if (!empty($sense['trans'])) {
+    elseif (!empty($sense['trans'])) {
       foreach ($sense['trans'] as $value) {
         if (!empty($value)) {
           // TODO: re-instate this!

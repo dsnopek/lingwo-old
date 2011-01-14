@@ -63,7 +63,7 @@ function lingwo_dictionary_add_require_js($plugins=array()) {
     drupal_add_js('require({paths:{lingwo_dictionary:"/'. drupal_get_path('module', 'lingwo_dictionary') .'/js"}});', 'inline');
     drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/js/require.js');
     drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/js/require/jquery-stubs.js');
-    foreach($plugins as $plugin) {
+    foreach ($plugins as $plugin) {
       drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/js/require/'. $plugin .'.js');
     }
     $added = TRUE;
@@ -342,7 +342,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       if ($existing && $existing != $node->nid) {
         form_set_error('title', 
           t('Entry with this language, part of speech and headword combination already exists: !link',
-            array('!link' => l($node->title, 'node/'.$existing))));
+            array('!link' => l($node->title, 'node/'. $existing))));
       }
       break;
     case 'insert':
@@ -356,7 +356,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       drupal_write_record('lingwo_dictionary_entry', $object);
       break;
     case 'delete':
-      db_query("DELETE FROM {lingwo_dictionary_entry} WHERE nid = %s", $node->nid);
+      db_query("DELETE FROM {lingwo_dictionary_entry} WHERE nid = %d", $node->nid);
       break;
   }
 }

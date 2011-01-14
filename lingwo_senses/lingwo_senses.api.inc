@@ -1,4 +1,10 @@
 <?php
+// $Id: $
+
+/**
+ * @file
+ * API for lingwo_senses
+ */
 
 require_once(dirname(__FILE__) .'/../includes/settings.inc');
 

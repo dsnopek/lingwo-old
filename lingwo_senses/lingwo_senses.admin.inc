@@ -6,8 +6,7 @@
  * For the admin pages.
  */
 
-function lingwo_senses_admin_settings_form()
-{
+function lingwo_senses_admin_settings_form() {
   $settings =& lingwo_senses::$settings;
   $form = array();
 
