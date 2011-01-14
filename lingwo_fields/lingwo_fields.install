@@ -74,7 +74,7 @@ function lingwo_fields_schema() {
 
 function _lingwo_fields_insert_new_fields($items) {
   $node = node_load($items[0]->nid);
-  if (lingwo_dictionary_entry_is_translation($entry)) {
+  if (_ld_is_translation($entry)) {
     // we don't want to have fields setup for translations
     return;
   }

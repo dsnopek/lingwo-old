@@ -6,69 +6,8 @@
  * Implements extensions for Lingwo Dictionary
  */
 
-// get our API functions for dealing with entries
-include_once('lingwo_dictionary.entry-api.inc');
-
-// Helper for generating UUIDs
-function _ld_make_uuid() {
-  if (!isset($GLOBALS['uuid'])) {
-    uuid_create(&$GLOBALS['uuid']);
-  }
-
-  uuid_make($GLOBALS['uuid'], UUID_MAKE_V4);
-  uuid_export($GLOBALS['uuid'], UUID_FMT_STR, &$uuidstring);
-
-  return trim($uuidstring);
-}
-
-// Helper for implementing AHAH
-// TODO: now that we are using ahah_helper, this should be removed
-// TODO: actually, AHAH helper appears to not be doing this for us atleast on lingwo_fields
-// when trying to "Add More Forms" and there is no headword
-function _ld_disable_validation(&$form) {
-  foreach (element_children($form) as $child) {
-    $form[$child]['#validated'] = TRUE;
-    _ld_disable_validation(&$form[$child]);
-  }
-}
-
-function _ld_element_process(&$element, $process_func) {
-  $element += _element_info($element['#type']);
-  $element['#process'][] = $process_func;
-}
-
-// Helper for implementing AHAH
-// TODO: now that we are using ahah_helper, this should be removed
-function &_ld_form_to_node(&$form, &$form_state) {
-  $form['#submit'] = array('');
-  $node = node_form_submit_build_node($form, $form_state);
-
-  // hack to stop taxonomy from resetting when the form is rebuilt
-  //$form_state['node']['taxonomy'] = taxonomy_preview_terms($node);
-
-  return $form_state['node'];
-}
-
-// Helper: returns TRUE if the given node is a translation
-function _ld_is_translation($node) {
-  return isset($node->translation_source) ||
-    ($node->nid && $node->tnid != 0 && $node->nid != $node->tnid);
-}
-
-function lingwo_dictionary_add_require_js($plugins=array()) {
-  static $added = FALSE;
-
-  if (!$added) {
-    // add require.js to the page
-    drupal_add_js('require({paths:{lingwo_dictionary:"/'. drupal_get_path('module', 'lingwo_dictionary') .'/js"}});', 'inline');
-    drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/js/require.js');
-    drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/js/require/jquery-stubs.js');
-    foreach ($plugins as $plugin) {
-      drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/js/require/'. $plugin .'.js');
-    }
-    $added = TRUE;
-  }
-}
+// get our API functions
+require_once('lingwo_dictionary.api.inc');
 
 /**
  * Implementation of hook_init().
@@ -122,7 +61,7 @@ function lingwo_dictionary_menu() {
       'page callback' => 'lingwo_dictionary_lookup_page',
       'page arguments' => array($i, $i+1),
       'access arguments' => array('access content'),
-      'file' => 'pages/search.inc',
+      'file' => 'lingwo_dictionary.pages.inc',
       'type' => MENU_CALLBACK
     );
   }
@@ -131,14 +70,16 @@ function lingwo_dictionary_menu() {
 }
 
 /*
- * Implementation of hook_services()
+ * Implementation of hook_service()
  */
 function lingwo_dictionary_service() {
   return array(
     array(
+      # TODO: we should rename this to 'lingwo_dictionary.search'
       '#method' => 'lingwo_dictionary.search_entries',
-      '#callback' => 'lingwo_dictionary_search_entries',
+      '#callback' => 'lingwo_dictionary_search_entries_service',
       '#access arguments' => array('access content'),
+      '#file' => array('file' => 'service.inc', 'module' => 'lingwo_dictionary'),
       '#args' => array(
         array(
           '#name' => 'text',
@@ -171,7 +112,7 @@ function lingwo_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
 
     case 'view':
       if ($delta == 0 && user_access('access content')) {
-        module_load_include('inc', 'lingwo_dictionary', 'pages/search');
+        require_once(dirname(__FILE__) .'/lingwo_dictionary.pages.inc');
         $block['subject'] = t('Search Dictionary');
         $block['content'] = drupal_get_form('lingwo_dictionary_search_form');
         return $block;
@@ -180,6 +121,7 @@ function lingwo_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
   }
 }
 
+// TODO: move to LingwoEntry!
 function lingwo_dictionary_pos_options($translate = FALSE, $option_name = NULL) {
   $list = explode("\n", _lingwo_dictionary_settings('pos_allowed_values'));
   $list = array_map('trim', $list);
@@ -295,6 +237,7 @@ function lingwo_dictionary_content_extra_fields($type_name) {
   return $extra;
 }
 
+// TODO: move into LingwoEntry!
 function lingwo_dictionary_generate_hash(&$object) {
   $object->entry_hash =
     sha1(join(':', array($object->language, $object->pos, $object->headword)));
@@ -337,7 +280,7 @@ function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
       if (isset($node->delete))
         return NULL;
 
-      $existing = lingwo_dictionary_entry_lookup($node->language, $node->pos, $node->title);
+      $existing = LingwoEntry::key2nid($node->language, $node->pos, $node->title);
 
       if ($existing && $existing != $node->nid) {
         form_set_error('title', 
@@ -369,13 +312,13 @@ function lingwo_dictionary_locale($op = 'groups', $group = NULL) {
     case 'groups':
       return array('lingwo' => t('Lingwo'));
     case 'info':
-      $info['lingwo']['refresh callback'] = 'lingwo_dictionary_locale_refresh';
+      $info['lingwo']['refresh callback'] = '_lingwo_dictionary_locale_refresh';
       $info['lingwo']['format'] = FALSE;
       return $info;
   }
 }
 
-function lingwo_dictionary_locale_refresh() {
+function _lingwo_dictionary_locale_refresh() {
   foreach (lingwo_dictionary_pos_options() as $key => $value) {
     i18nstrings_update('lingwo:field:pos:option_'. $key, $value);
   }
@@ -393,83 +336,7 @@ function lingwo_dictionary_views_api() {
   );
 }
 
-/**
- * Implementation of hook_theme().
- */
-function lingwo_dictionary_theme() {
-  return array(
-    'lingwo_dictionary_search_form' => array(
-      'arguments' => array('form' => NULL),
-      'file' => 'pages/search.inc',
-    ),
-  );
-}
-
-/*
- * Settings
- */
-
-// some helpers
-require_once(dirname(__FILE__) .'/includes/settings.inc');
-
-// really should be lingwo_dictionary_settings *OR* use namespaces.
-class lingwo_dictionary_settings extends lingwo_settings {
-  protected static $base_name = 'lingwo_dictionary';
-
-  private static $defaults = array(
-    'lookup_path' => 'lookup',
-    'redirect_node' => FALSE,
-    'entry_content_type' => NULL,
-    'pos_allowed_values' => "noun|Noun\nadjective|Adjective\nverb|Verb",
-  );
-
-  public static function getDefault($name) {
-    return self::$defaults[$name];
-  }
-
-  public static function isValid($name) {
-    return array_key_exists($name, self::$defaults);
-  }
-
-  public static function getDefaults() {
-    return self::$defaults;
-  }
-
-  public static function check($message=TRUE) {
-    foreach (self::$defaults as $name => $default) {
-      if (is_null($default) && is_null(variable_get('lingwo_dictionary_'. $name, NULL))) {
-        if ($message) {
-          drupal_set_message(t('Functionality provided by Lingwo Dictionary will not work correctly until it is configured'));
-        }
-
-        return FALSE;
-      }
-    }
-    return TRUE;
-  }
-}
-
-class lingwo_dictionary {
-  public static $settings;
-}
-lingwo_dictionary::$settings = new lingwo_dictionary_settings;
-
-/**
- * Used to access settings.
- */
-function _lingwo_dictionary_settings($name, $value = NULL) {
-  if (is_null($name)) {
-    return lingwo_dictionary_settings::getDefaults();
-  }
-  if (is_null($value)) {
-    return lingwo_dictionary_settings::get($name);
-  }
-  lingwo_dictionary_settings::set($name, $value);
-}
-
-/**
- * Checks if lingwo_dictionary is configured.
- */
+// TODO: remove!
 function lingwo_dictionary_check_settings($message = TRUE) {
   return lingwo_dictionary_settings::check($message);
 }

@@ -47,11 +47,6 @@ function lingwo_dictionary_search_form_submit($form, &$form_state) {
   ));
 }
 
-function theme_lingwo_dictionary_search_form($form) {
-  //return '<div id="lingwo-dictionary-search-block">'.drupal_render($form).'</div>';
-  return drupal_render($form);
-}
-
 function lingwo_dictionary_lookup_page($lang_pair, $word) {
   list($source_lang, $target_lang) = explode("-", $lang_pair);
 
@@ -69,12 +64,12 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
   // lookup the appropriate node or nodes
   if (!empty($pos)) {
     // ensure this is a single lookup with no magic extensions (forms, fuzzy, etc..)
-    if ($nid = lingwo_dictionary_entry_lookup($source_lang, $pos, $word)) {
+    if ($nid = LingwoEntry::key2nid($source_lang, $pos, $word)) {
       $search = array((object)array('nid' => $nid));
     }
   }
   else {
-    $search = lingwo_dictionary_search_entries($word, array('language' => $source_lang));
+    $search = LingwoEntry::search($word, array('language' => $source_lang));
   }
 
   // translate if necessary
@@ -97,7 +92,7 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
 
   // if this is a single node direct link, not a search
   if (!empty($nids) && !empty($pos)) {
-    return lingwo_dictionary_lookup_page_node($nids[0]);
+    return _lingwo_dictionary_lookup_page_node($nids[0]);
   }
 
   // we only set the search_word context when we didn't find an exact node.
@@ -134,10 +129,10 @@ function lingwo_dictionary_lookup_page($lang_pair, $word) {
     return $output;
   }
 
-  return lingwo_dictionary_lookup_page_list($nids);
+  return _lingwo_dictionary_lookup_page_list($nids);
 }
 
-function lingwo_dictionary_lookup_page_node($nid) {
+function _lingwo_dictionary_lookup_page_node($nid) {
   // Set query path so that the tabs from the node get displayed.
   menu_set_active_item('node/'. $nid);
 
@@ -145,7 +140,7 @@ function lingwo_dictionary_lookup_page_node($nid) {
   return menu_execute_active_handler($url);
 }
 
-function lingwo_dictionary_lookup_page_list($nids) {
+function _lingwo_dictionary_lookup_page_list($nids) {
   // show the teaser for each entry
   $first = 1;
   foreach ($nids as $nid) {

@@ -173,7 +173,7 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
     ),
   ), 'setting');
 
-  lingwo_dictionary_add_require_js(array('text'));
+  _ld_add_require_js(array('text'));
   drupal_add_js(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotator.js');
   drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotation-reader.less');
   drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_korpus/annotator.less');
@@ -374,7 +374,7 @@ function _lingwo_korpus_add_reader_js() {
   static $added = FALSE;
 
   if (!$added) {
-    lingwo_dictionary_add_require_js();
+    _ld_add_require_js();
     drupal_add_js(array(
       'language' => $language->language,
       'baseUrl' => url('', array('absolute' => TRUE))

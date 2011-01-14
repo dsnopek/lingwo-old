@@ -20,28 +20,28 @@ if (!function_exists('variable_del')) {
   }
 }
 
-class BadSettings extends lingwo_settings {
+class BadSettings extends LingwoSettings {
 }
 
-class TestSettings extends lingwo_settings {
-  protected static $base_name = 'test';
+class TestSettings extends LingwoSettings {
+  protected $base_name = 'test';
 
-  public static function getDefault($name) {
+  public function getDefault($name) {
     switch ($name) {
       case 'var2':
         return 'zen';
     }
   }
 
-  public static function isValid($name) {
+  public function isValid($name) {
     return preg_match('/^var\d$/', $name);
   }
 }
 
 class SanityTest extends UnitTestCase {
   function testBadSettings() {
-    $this->expectException(new Exception('You must sub-class lingwo_settings and change $base_name!'));
-    BadSettings::get('blah');
+    $this->expectException(new Exception('You must sub-class LingwoSettings and change $base_name!'));
+    new BadSettings();
   }
 
   function testVariablesMock() {
@@ -82,22 +82,22 @@ class SanityTest extends UnitTestCase {
 
   // test an invalid variable
   function testSettingsBadVariable1() {
-    $this->expectException(new Exception('Invalid property name: invalid'));
+    $this->expectException(new Exception('Invalid setting name: invalid'));
     $settings = new TestSettings();
     $get = $settings->invalid;
   }
   function testSettingsBadVariable2() {
-    $this->expectException(new Exception('Invalid property name: invalid'));
+    $this->expectException(new Exception('Invalid setting name: invalid'));
     $settings = new TestSettings();
     $settings->invalid = 'set';
   }
   function testSettingsBadVariable3() {
-    $this->expectException(new Exception('Invalid property name: invalid'));
+    $this->expectException(new Exception('Invalid setting name: invalid'));
     $settings = new TestSettings();
     isset($settings->invalid);
   }
   function testSettingsBadVariable4() {
-    $this->expectException(new Exception('Invalid property name: invalid'));
+    $this->expectException(new Exception('Invalid setting name: invalid'));
     $settings = new TestSettings();
     unset($settings->invalid);
   }

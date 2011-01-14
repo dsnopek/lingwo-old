@@ -8,12 +8,12 @@
 
 require_once(dirname(__FILE__) .'/../includes/settings.inc');
 
-class lingwo_senses_settings extends lingwo_settings {
+class LingwoSensesSettings extends LingwoSenses {
   protected static $base_name = 'lingwo_senses'; 
 }
 
-class lingwo_senses {
+class LingwoSenses {
   public static $settings;
 }
-lingwo_senses::$settings = new lingwo_senses_settings;
+LingwoSenses::$settings = new LingwoSensesSettings;
 
