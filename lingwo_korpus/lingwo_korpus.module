@@ -96,7 +96,7 @@ function lingwo_korpus_lookup_senses() {
   $pos = urldecode($_GET['pos']);
   $headword = urldecode($_GET['headword']);
 
-  $nid = lingwo_dictionary_entry_lookup($language, $pos, $headword);
+  $nid = LingwoEntry::key2nid($language, $pos, $headword);
   if (!empty($nid)) {
     $node = node_load($nid);
     $senses = array();
@@ -183,7 +183,7 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
 
 
 function lingwo_korpus_annotator_form_submit($form, &$form_state) {
-  require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
+  require_once(_ld_project_path() .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
 
   $node = $form['#node'];
   $node_body = $node->body;
@@ -424,7 +424,7 @@ function lingwo_korpus_filter_text($text, $language, $cid=NULL) {
 }
 
 function lingwo_korpus_text_entry_list($text, $lang) {
-  require_once(drupal_get_path('module', 'lingwo_dictionary') .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
+  require_once(_ld_project_path() .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
 
   $entries = array();
   $found = array();

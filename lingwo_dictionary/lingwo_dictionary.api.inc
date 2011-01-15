@@ -84,7 +84,7 @@ class LingwoEntry {
       $pos  = $matches[2];
     }
 
-    $nid = lingwo_dictionary_entry_lookup($source_lang, $pos, $headword);
+    $nid = self::key2nid($source_lang, $pos, $headword);
 
     if ($target_lang) {
       $nid = self::getTranslationForNid($nid, $target_lang);

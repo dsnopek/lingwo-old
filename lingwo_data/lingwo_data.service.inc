@@ -7,7 +7,7 @@
 
 function lingwo_data_service_update_entry_access($data) {
   $data = json_decode($data);
-  $nid = lingwo_dictionary_entry_lookup($data->language, $data->pos, $data->headword);
+  $nid = LingwoEntry::key2nid($data->language, $data->pos, $data->headword);
 
   if (is_null($nid)) {
     $entry_type = _lingwo_dictionary_settings('entry_content_type');
@@ -226,7 +226,7 @@ function _lingwo_data_import_process_field_values($node, &$items, $type, $values
 
       # Find the number of values we were given.
       if (_ld_is_translation($node)) {
-        $translation_source = lingwo_dictionary_entry_load_translation_source($node);
+        $translation_source = LingwoEntry::fromNode($node)->sourceNode;
         $max = count($translation_source->lingwo_senses);
       }
       else {
@@ -309,7 +309,7 @@ function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
     $languages = _lingwo_data_import_process_language($entry);
 
     // Try to find if the already entry exists.
-    $nid = lingwo_dictionary_entry_lookup($entry['language'], $entry['pos'], $entry['headword']);
+    $nid = LingwoEntry::key2nid($entry['language'], $entry['pos'], $entry['headword']);
     $is_new = $nid ? FALSE : TRUE;
 
     // Process the list of sources given by the $entry.
