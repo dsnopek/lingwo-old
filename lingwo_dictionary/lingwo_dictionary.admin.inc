@@ -13,7 +13,7 @@
 function lingwo_dictionary_admin_settings() {
   $form = array();
 
-  $settings = LingwoDictionarySettings::get();
+  $settings = LingwoEntrySettings::get();
 
   $form[$settings->name('lookup_path')] = array(
     '#type' => 'textfield',

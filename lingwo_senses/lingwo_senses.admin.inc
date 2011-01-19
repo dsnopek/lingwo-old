@@ -7,9 +7,9 @@
  */
 
 function lingwo_senses_admin_settings_form() {
-  $settings =& lingwo_senses::$settings;
+  $settings =& LingwoSensesSettings::get();
   $form = array();
 
-  return $settings->form($form);
+  return system_settings_form($form);
 }
 

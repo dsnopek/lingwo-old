@@ -18,11 +18,11 @@ function lingwo_senses_menu() {
   $items = array();
 
   $items['admin/settings/lingwo_dictionary/senses'] = array(
-    'title' => 'Data',
+    'title' => 'Senses',
     'description' => 'Settings for Lingwo Senses module.',
     'access arguments' => array('administer site configuration'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('\lingwo_senses\admin_settings_form'),
+    'page arguments' => array('lingwo_senses_admin_settings_form'),
     'file' => 'lingwo_senses.admin.inc',
     'type' => MENU_LOCAL_TASK,
   );
