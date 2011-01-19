@@ -442,7 +442,7 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 $('#anno-form-attributive').attr('checked',
                     target.attr('attributive') == 'true' ? 'checked' : '');
                 $('#anno-form-hidden').attr('checked',
-                    target.attr('hidden') == 'true' ? 'checked' : '');
+                    target.get(0).getAttribute('hidden') == 'true' ? 'checked' : '');
 
                 // we can now delete
                 $('#button-delete').removeClass('disabled');
@@ -646,10 +646,10 @@ require.def('lingwo_dictionary/annotation/Annotator',
 
                 // hidden
                 if ($('#anno-form-hidden').attr('checked')) {
-                    this.selected.attr('hidden', 'true');
+                    this.selected.get(0).setAttribute('hidden', 'true');
                 }
                 else {
-                    this.selected.removeAttr('hidden');
+                    this.selected.get(0).removeAttribute('hidden');
                 }
 
                 // sense
