@@ -8,6 +8,7 @@
 
 function _lingwo_senses_widget_original($node) {
   $items = $node->lingwo_senses;
+  $difference = LingwoSenses::$settings->difference;
 
   $element = array(
     '#type' => 'fieldset',
@@ -41,10 +42,11 @@ function _lingwo_senses_widget_original($node) {
       '#value' => $sense['id'],
     );
 
-    if (count($items) > 1) {
-      // only edit the difference when there are multiple senses
+    if ($difference != 'morethanone' || count($items) > 1) {
+	  // if our difference mode is 'morethanone', only edit the
+	  // difference when there are multiple senses
       $row['data']['difference'] = array(
-        '#title' => 'Difference',
+        '#title' => $difference == 'definition' ? t('Definition') : t('Difference'),
         '#type' => 'textfield',
         '#default_value' => $sense['data']['difference'],
         '#maxlength' => 255,
@@ -54,7 +56,7 @@ function _lingwo_senses_widget_original($node) {
       // but preserve the value for if we delete down to one sense
       if ($sense['data']['difference']) {
         $row['data']['difference'] = array(
-          '#title' => 'Difference',
+          '#title' => t('Difference'),
           '#type' => 'item',
           '#value' => $sense['data']['difference'],
         );
@@ -62,7 +64,7 @@ function _lingwo_senses_widget_original($node) {
     }
     // always have an example
     $row['data']['example'] = array(
-      '#title' => 'Example',
+      '#title' => t('Example'),
       '#type' => 'textfield',
       '#default_value' => $sense['data']['example'],
       '#maxlength' => 255,
@@ -71,7 +73,7 @@ function _lingwo_senses_widget_original($node) {
     // always have the ability to say it "is" a relationship to another entry
     $row['data']['is'] = array(
       '#type' => 'fieldset',
-      '#title' => 'Relationship',
+      '#title' => t('Relationship'),
       '#collapsible' => TRUE,
       '#collapsed' => empty($sense['data']['is']['relationship']),
       //'#prefix' => '<div class="inline-controls clear-block">',
