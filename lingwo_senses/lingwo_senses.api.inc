@@ -6,10 +6,26 @@
  * API for lingwo_senses
  */
 
+define('LINGWO_SENSES_DIFFERENCE_MORETHANONE', 'morethanone');
+define('LINGWO_SENSES_DIFFERENCE_ALWAYS',      'always');
+define('LINGWO_SENSES_DIFFERENCE_DEFINITION',  'definition');
+
 require_once(dirname(__FILE__) .'/../includes/settings.inc');
 
 class LingwoSensesSettings extends LingwoSettings {
   protected $base_name = 'lingwo_senses'; 
+
+  private $defaults = array(
+    'difference' => LINGWO_SENSES_DIFFERENCE_DEFINITION,
+  );
+
+  public function getDefault($name) {
+    return $this->defaults[$name];
+  }
+
+  public function isValid($name) {
+    return array_key_exists($name, $this->defaults);
+  }
 
   // singleton boilerplate
   private static $settings = NULL;
