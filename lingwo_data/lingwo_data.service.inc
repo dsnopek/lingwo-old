@@ -7,10 +7,10 @@
 
 function lingwo_data_service_update_entry_access($data) {
   $data = json_decode($data);
-  $nid = lingwo_dictionary_entry_lookup($data->language, $data->pos, $data->headword);
+  $nid = LingwoEntry::key2nid($data->language, $data->pos, $data->headword);
 
   if (is_null($nid)) {
-    $entry_type = lingwo_dictionary_settings('entry_content_type');
+    $entry_type = _lingwo_dictionary_settings('entry_content_type');
     return node_access('create', $entry_type);
   }
 
@@ -31,7 +31,7 @@ function _lingwo_data_node_save($node) {
 
   $nid = NULL;
 
-  $entry_type = lingwo_dictionary_settings('entry_content_type');
+  $entry_type = _lingwo_dictionary_settings('entry_content_type');
 
   // Setup form_state.
   $form_state = array();
@@ -148,7 +148,7 @@ function _lingwo_data_import_setup_node($nid, $entry, $newExtras=array()) {
   // create the original entry/update the original entry
   if (is_null($nid)) {
     $node = (object)array(
-      'type' => lingwo_dictionary_settings('entry_content_type'),
+      'type' => _lingwo_dictionary_settings('entry_content_type'),
       'title' => $entry['headword'],
       'language' => $entry['language'],
       'pos' => $entry['pos'],
@@ -225,8 +225,8 @@ function _lingwo_data_import_process_field_values($node, &$items, $type, $values
       }
 
       # Find the number of values we were given.
-      if (lingwo_dictionary_entry_is_translation($node)) {
-        $translation_source = lingwo_dictionary_entry_load_translation_source($node);
+      if (_ld_is_translation($node)) {
+        $translation_source = LingwoEntry::fromNode($node)->sourceNode;
         $max = count($translation_source->lingwo_senses);
       }
       else {
@@ -237,7 +237,7 @@ function _lingwo_data_import_process_field_values($node, &$items, $type, $values
       # where given.  If so, we have to remove some.
       if (count($items) > $max) {
         for($i = ($max - 1); $i < count($items); $i++) {
-          if (lingwo_dictionary_entry_is_translation($node)) {
+          if (_ld_is_translation($node)) {
             $items[$i]['retire_sense'] = TRUE;
           }
           else {
@@ -261,7 +261,7 @@ function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
     }
 
     // get the CCK type name
-    $field_type = content_fields($field_name, lingwo_dictionary_settings('entry_content_type'));
+    $field_type = content_fields($field_name, _lingwo_dictionary_settings('entry_content_type'));
     $field_type = $field_type['type'];
   }
 
@@ -309,7 +309,7 @@ function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
     $languages = _lingwo_data_import_process_language($entry);
 
     // Try to find if the already entry exists.
-    $nid = lingwo_dictionary_entry_lookup($entry['language'], $entry['pos'], $entry['headword']);
+    $nid = LingwoEntry::key2nid($entry['language'], $entry['pos'], $entry['headword']);
     $is_new = $nid ? FALSE : TRUE;
 
     // Process the list of sources given by the $entry.
