@@ -104,11 +104,11 @@ function lingwo_senses_update_6001() {
   $ret = array();
   db_create_table($ret, 'lingwo_senses_revisions', $schema['lingwo_senses_revisions']);
 
-  # rebuild the schema cache so that drupal_write_record() will work.
+  // rebuild the schema cache so that drupal_write_record() will work.
   drupal_get_schema(NULL, TRUE);
 
-  # copy all the data from the CCK table to this table..
-  $entry_content_type = lingwo_dictionary_settings('entry_content_type');
+  // copy all the data from the CCK table to this table..
+  $entry_content_type = _lingwo_dictionary_settings('entry_content_type');
   if (!empty($entry_content_type)) {
     foreach (content_fields(NULL, $entry_content_type) as $field_name => $field) {
       // dsm()

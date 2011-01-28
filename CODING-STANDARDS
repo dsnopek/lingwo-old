@@ -1,0 +1,74 @@
+
+We follow the Drupal coding standards defined here:
+
+  http://drupal.org/coding-standards
+
+... with the following added requirements.
+
+Naming conventions
+==================
+
+ * Hooks: Only hooks will be named "module_XXX", with the following exceptions:
+
+   o Pages callbacks will be named "module_XXX_page"
+
+   o Form callbacks will be named "module_XXX_form"
+
+   o Submit callbacks will be named "module_XXX_form_submit"
+
+   o Services callbacks will be named "module_XXX_service"
+
+   o Functions to invoke hooks will be named "module_XXX_invoke"
+
+ * Theme functions: will be named "theme_module_XXX"
+
+ * API functions intended to be called by other modules, will be part of a class
+   with the same name as the module (except CamelCase to conform to Drupal 
+   coding standards)
+ 
+ * Settings will be managed by a singleton class named the same as the module plus
+   the "Settings".
+ 
+ * All other functions are considered internal, and will be named '_module_XXX', including:
+
+   o Access callbacks (like returned from hook_menu)
+
+Files
+=====
+
+ * .module file should contain only:
+ 
+   o hooks
+   o require statements
+   o internal functions
+
+ * module.admin.inc should contain form or page callbacks for admin pages
+
+ * module.theme.inc should contain all theme functions
+
+ * module.pages.inc should contain all (non-admin) menu and form callbacks
+   (Optionally, this could use a better name than "pages" if something else seems
+    more appropriate when no full pages are generated -- ex: module.widget.inc)
+ 
+ * module.service.inc should contain all the services
+
+ * module.api.inc should contain all the API functions, including:
+ 
+   o Public API functions declared in a class (as described above)
+   
+   o Settings class
+
+   o Internal functions
+
+If there is a public API, then the .module file must require it, as one of the first
+things it does.
+
+Loading includes
+================
+
+If we load includes that are contained under our control, they should always be loaded
+via require_once(dirname(__FILE__) .'/filename.inc').
+
+If we load includes from another module, we should use module_load_include() -- BUT
+we can't use this at the global level, only inside of a function.
+

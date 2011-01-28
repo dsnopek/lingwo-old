@@ -1,0 +1,294 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Implements extensions for Lingwo Dictionary
+ */
+
+// get our API functions
+require_once('lingwo_dictionary.api.inc');
+
+/**
+ * Implementation of hook_init().
+ *
+ * Early checking of URL requested.
+ * If a entry node is refered to by "node/$node->nid", the user is
+ * redirected using drupal_goto()
+ *
+ * This code was lifted graciously from the path_redirect module.
+ */
+function lingwo_dictionary_init() {
+  if (LingwoEntry::$settings->redirect_node && LingwoEntry::$settings->lookup_path) {
+    if (preg_match('/^node\/(\d+)$/', $_GET['q'], $matches)) {
+      if ($entry = LingwoEntry::fromNid($matches[1])) {
+        $redirect = $entry->getPath();
+      }
+    }
+
+    // do the redirect if we've managed to locate a wikilink
+    if ($redirect) {
+      // if there's a result found, do the redirect
+      unset($_REQUEST['destination']);
+      drupal_goto($redirect);
+    }
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function lingwo_dictionary_menu() {
+  $items = array();
+  $items['admin/settings/lingwo_dictionary'] = array(
+    'title' => 'Lingwo Dictionary Settings',
+    'description' => 'Settings for Lingwo Dictionary module.',
+    'access arguments' => array('administer site configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('lingwo_dictionary_admin_settings'),
+    'file' => 'lingwo_dictionary.admin.inc',
+    'type' => MENU_NORMAL_ITEM
+  );
+  $items['admin/settings/lingwo_dictionary/general'] = array(
+    'title' => 'General',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  if ($lookup_path = LingwoEntry::$settings->lookup_path) {
+    $i = count(explode('/', $lookup_path));
+    $items[$lookup_path .'/%/%'] = array(
+      'page callback' => 'lingwo_dictionary_lookup_page',
+      'page arguments' => array($i, $i+1),
+      'access arguments' => array('access content'),
+      'file' => 'lingwo_dictionary.pages.inc',
+      'type' => MENU_CALLBACK
+    );
+  }
+
+  return $items;
+}
+
+/*
+ * Implementation of hook_service()
+ */
+function lingwo_dictionary_service() {
+  return array(
+    array(
+      # TODO: we should rename this to 'lingwo_dictionary.search'
+      '#method' => 'lingwo_dictionary.search_entries',
+      '#callback' => 'lingwo_dictionary_search_entries_service',
+      '#access arguments' => array('access content'),
+      '#file' => array('file' => 'service.inc', 'module' => 'lingwo_dictionary'),
+      '#args' => array(
+        array(
+          '#name' => 'text',
+          '#type' => 'string',
+          '#description' => t('Text to lookup'),
+        ),
+        array(
+          '#name' => 'options',
+          '#type' => 'struct',
+          '#description' => t('A struct representing search options.'),
+          '#optional' => TRUE,
+        ),
+      ),
+      '#return' => 'array',
+      '#help' => t('An array of structs containing the "nid" of the entries and maybe some other things.'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function lingwo_dictionary_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $blocks[0] = array(
+        'info' => t('Lingwo Dictionary: Search block'),
+      );
+      return $blocks;
+
+    case 'view':
+      if ($delta == 0 && user_access('access content')) {
+        require_once(dirname(__FILE__) .'/lingwo_dictionary.pages.inc');
+        $block['subject'] = t('Search Dictionary');
+        $block['content'] = drupal_get_form('lingwo_dictionary_search_form');
+        return $block;
+      }
+      break; 
+  }
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function lingwo_dictionary_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == (LingwoEntry::$settings->entry_content_type .'_node_form')) {
+    $node = $form['#node'];
+
+    // allow some fields to be set automagically for new nodes
+    if (empty($node->nid)) {
+      if (isset($_GET['headword'])) {
+        $form['title']['#default_value'] = urldecode($_GET['headword']);
+      }
+      if (isset($_GET['language'])) {
+        $form['language']['#default_value'] = $_GET['language'];
+        $node->language = $_GET['language'];
+      }
+      if (isset($_GET['pos']) && !_ld_is_translation($node)) {
+        $node->pos = $_GET['pos'];
+      }
+    }
+
+    // remove language neutral and set language as required (for asthetic purposes)
+    unset($form['language']['#options']['']);
+    $form['language']['#required'] = TRUE;
+
+    // setup the pos select
+    $form['pos'] = array(
+      '#type' => 'select',
+      '#title' => t('Part of Speech'),
+      '#options' => LingwoEntry::getPosOptions(TRUE),
+      '#default_value' => $node->pos,
+      '#required' => TRUE,
+    );
+
+    // when editting a translation or existing node...
+    if (isset($node->nid) || _ld_is_translation($node)) {
+      // make title uneditable
+      $form['title']['#name'] = 'title-disabled';
+      $form['title']['#disabled'] = TRUE;
+      $form['title-hidden'] = array(
+        '#type' => 'hidden',
+        '#name' => 'title',
+        '#value' => $form['title']['#default_value'],
+      );
+
+      // make language uneditable
+      $form['language']['#disabled'] = TRUE;
+
+      // make the pos uneditable
+      $form['pos']['#disabled'] = TRUE;
+    }
+  }
+}
+
+/**
+ * Implementation of hook_content_extra_fields().
+ */
+function lingwo_dictionary_content_extra_fields($type_name) {
+  $extra = array();
+
+  if (LingwoEntry::$settings->entry_content_type == $type_name) {
+    $extra['pos'] = array(
+      'label' => t('Part of Speech'),
+      'description' => t('Lingwo Dictionary "Part of Speech" field.'),
+      'weight' => 0,
+    );
+  }
+
+  return $extra;
+}
+
+// TODO: eventually merge into hook_nodeapi() since the use in *.install will
+// be invalid after the name switch.
+function _lingwo_dictionary_generate_hash(&$object) {
+  $object->entry_hash =
+    sha1(join(':', array($object->language, $object->pos, $object->headword)));
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function lingwo_dictionary_nodeapi(&$node, $op, $a3, $a4) {
+  if (!LingwoEntry::isEntryNode($node))
+    return NULL;
+
+  // Operates on both translations and sources
+  if ($op == 'load') {
+    if ($node->translation_source) {
+      return array('pos' => $node->translation_source->pos);
+    }
+
+    $nid = _ld_is_translation($node) ? $node->tnid : $node->nid;
+    $row = db_fetch_object(db_query("SELECT pos FROM {lingwo_dictionary_entry} WHERE nid = %d", $nid));
+    if (!$row) {
+      // TODO: this should really be a watchdog message because it appears to happen normally when
+      // mass deleting entries.
+      watchdog('lingwo_dictionary', 'Unable to get pos value for this entry: !nid', array('!nid' => $nid), WATCHDOG_WARNING);
+      return NULL;
+    }
+    return array('pos' => $row->pos);
+  }
+  elseif ($op == 'prepare translation') {
+    $node->pos = $node->translation_source->pos;
+    return;
+  }
+
+  // The rest are only on sources
+  if (_ld_is_translation($node))
+    return NULL;
+
+  switch ($op) {
+    case 'validate':
+      if (isset($node->delete))
+        return NULL;
+
+      $existing = LingwoEntry::key2nid($node->language, $node->pos, $node->title);
+
+      if ($existing && $existing != $node->nid) {
+        form_set_error('title', 
+          t('Entry with this language, part of speech and headword combination already exists: !link',
+            array('!link' => l($node->title, 'node/'. $existing))));
+      }
+      break;
+    case 'insert':
+      $object = (object)array(
+        'language' => $node->language,
+        'pos' => $node->pos,
+        'headword' => $node->title,
+        'nid' => $node->nid,
+      );
+      _lingwo_dictionary_generate_hash($object);
+      drupal_write_record('lingwo_dictionary_entry', $object);
+      break;
+    case 'delete':
+      db_query("DELETE FROM {lingwo_dictionary_entry} WHERE nid = %d", $node->nid);
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_locale().
+ */
+function lingwo_dictionary_locale($op = 'groups', $group = NULL) {
+  switch ($op) {
+    case 'groups':
+      return array('lingwo' => t('Lingwo'));
+    case 'info':
+      $info['lingwo']['refresh callback'] = '_lingwo_dictionary_locale_refresh';
+      $info['lingwo']['format'] = FALSE;
+      return $info;
+  }
+}
+
+function _lingwo_dictionary_locale_refresh() {
+  foreach (LingwoEntry::getPosOptions() as $key => $value) {
+    i18nstrings_update('lingwo:field:pos:option_'. $key, $value);
+  }
+
+  return TRUE;
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+function lingwo_dictionary_views_api() {
+  return array(
+    'api'  => 2,
+    'path' => drupal_get_path('module', 'lingwo_dictionary'),
+  );
+}
+
