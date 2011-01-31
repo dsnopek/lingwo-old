@@ -92,8 +92,8 @@ function theme_lingwo_senses_original($node) {
         $output .= t('No difference given');
         $output .= ')</span>';
       }
-      if ($sense['example']) {
-        $output .= ': <blockquote class="lingwo-example">"'. $sense['example'] .'"</blockquote>';
+      if ($sense['example'] && LingwoSenses::$settings->example != 'none') {
+        $output .= ': <blockquote class="lingwo-example">'. (LingwoSenses::$settings->example == 'multiple' ? str_replace("\n", "<br />", $sense['example']) : $sense['example']) .'</blockquote>';
       }
       $output .= '</li>';
     };
@@ -173,12 +173,22 @@ function theme_lingwo_senses_translation($node, $items=NULL) {
 
     $output .= join(', ', $values);
 
-    if (!empty($orig_sense['data']['example'])) {
-      $output .= '<blockquote class="lingwo-example">"'. $orig_sense['data']['example'] .'"';
-      
-      if (!empty($sense['example_translation'])) {
-        //$output .= ' &rarr; "'. $sense['example_translation'] .'"';
-        $output .= ' -&gt; "'. $sense['example_translation'] .'"';
+    if (!empty($orig_sense['data']['example']) && LingwoSenses::$settings->example != 'none') {
+      $output .= '<blockquote class="lingwo-example">';
+      if (LingwoSenses::$settings->example == 'single' && !empty($sense['example_translation'])) {
+        $output .= $orig_sense['data']['example'];
+        if (!empty($sense['example_translation'])) {
+          //$output .= ' &rarr; "'. $sense['example_translation'] .'"';
+          $output .= ' -&gt; "'. $sense['example_translation'] .'"';
+        }
+      }
+      else {
+        $example_lines = array_map(NULL, explode("\n", $orig_sense['data']['example']), explode("\n", $sense['example_translation']));
+        $output .= '<table>';
+        foreach($example_lines as $line) {
+          $output .= '<tr><td class="lingwo-example">'. $line[0] . '</td><td class="lingwo-example">'. $line[1] .'</td></tr>';
+        }
+        $output .= '</table>';
       }
       $output .= '</blockquote>';
     }

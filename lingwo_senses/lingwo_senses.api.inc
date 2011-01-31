@@ -13,6 +13,7 @@ class LingwoSensesSettings extends LingwoSettings {
 
   private $defaults = array(
     'difference' => 'definition',
+    'example'    => 'single',
   );
 
   public function getDefault($name) {
