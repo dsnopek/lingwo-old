@@ -45,8 +45,7 @@ require(
                 entry.pos = 'noun';
                 entry.setSource('pl.wiktionary.org', {raw: text});
 
-                var parser = wiktionary_pl.parsers.pl;
-                parser(entry);
+                wiktionary_pl.parser(entry);
 
                 this.assertEquals(entry.pos, 'noun');
                 this.assertEquals(entry.pron, 'pʲɛs');
