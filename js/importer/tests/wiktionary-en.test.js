@@ -7,11 +7,11 @@ require(
      'lingwo_dictionary/util/json2',
     ],
     function (TestCase, Entry, en, wiktionary_en, JSON) {
-        function doitFactory(pos, compose) {
+        function doFormParserFactory(pos, compose) {
             return function (name, headword, parts) {
                 var forms = wiktionary_en._internal.formParsers[pos](
                     name, new Entry({ headword: headword }), parts);
-                for(var name in forms) {
+                for(name in forms) {
                     if (forms[name] instanceof Array) {
                         forms[name] = forms[name].join(',');
                     }
@@ -20,9 +20,10 @@ require(
             };
         }
 
+        // test form parsing
         TestCase.subclass({
             testParseFormsVerb: function () {
-                var doit = doitFactory('verb', function (forms) {
+                var doit = doFormParserFactory('verb', function (forms) {
                     return [forms['infinitive'], forms['-s'], forms['-ing'], forms['2nd'], forms['3rd']];
                 });
 
@@ -43,7 +44,7 @@ require(
             },
 
             testParseFormsAdj: function () {
-                var doit = doitFactory('adjective', function (forms) {
+                var doit = doFormParserFactory('adjective', function (forms) {
                     return [forms['more'], forms['most']];
                 });
 
@@ -57,7 +58,7 @@ require(
             },
 
             testParseFormsAdv: function () {
-                var doit = doitFactory('adverb', function (forms) {
+                var doit = doFormParserFactory('adverb', function (forms) {
                     return [forms['more'], forms['most']];
                 });
 
@@ -71,7 +72,7 @@ require(
             },
 
             testParseFormsNoun: function () {
-                var doit = doitFactory('noun', function (forms) {
+                var doit = doFormParserFactory('noun', function (forms) {
                     return [forms['plural_type'],forms['plural']];
                 });
 
@@ -99,6 +100,24 @@ require(
 
                 this.assertEquals(doit('en-plural-noun', 'underpants', []), 'plural:');
                 this.assertEquals(doit('en-plural noun', 'underpants', []), 'plural:');
+            }
+        }).run();
+
+        function parsePronunciation(text) {
+            var entry = new Entry();
+            wiktionary_en._internal.parsePronunciation(entry, text);
+            return entry.pron;
+        }
+
+        // test pronunciation parser
+        TestCase.subclass({
+            testParseSimple: function () {
+                var pron = parsePronunciation(
+                    "===Pronunciation===\n" +
+                    "* {{IPA|/ˈstɔːɹi/}}\n\n"
+                );
+
+                this.assertEquals(pron[0].ipa, "ˈstɔːɹi");
             }
         }).run();
     }

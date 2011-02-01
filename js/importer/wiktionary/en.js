@@ -616,10 +616,24 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             }
         }
 
+        function parsePronunciation(entry, text) {
+            var input = new LineReader((new WikiText(text)).getSection('Pronunciation', 2)),
+                line, matches;
+
+            // TODO: it shouldn't always do this, only if it actually found something.
+            entry.pron = [{}];
+
+            while (!input.eof()) {
+                line = input.readline();
+                print ('line: '+line);
+            }
+        }
+
         function parse(entry, text) {
             parseTranslations(entry, text);
             parseSenses(entry, text);
             parseForms(entry, text);
+            parsePronunciation(entry, text);
         }
 
         function getData(text, pos, type) {
@@ -711,7 +725,8 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             },
 
             _internal: {
-                formParsers: formParsers
+                formParsers: formParsers,
+                parsePronunciation: parsePronunciation,
             }
         };
     }
