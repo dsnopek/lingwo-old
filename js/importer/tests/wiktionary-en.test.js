@@ -119,6 +119,8 @@ require(
 
                 this.assertEquals(pron[0].ipa, "ˈstɔːɹi");
             }
+
+            // TODO: note self, good test words include: "story" and "word"
         }).run();
     }
 );
