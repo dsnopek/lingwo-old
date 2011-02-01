@@ -618,14 +618,33 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
 
         function parsePronunciation(entry, text) {
             var input = new LineReader((new WikiText(text)).getSection('Pronunciation', 2)),
-                line, matches;
-
-            // TODO: it shouldn't always do this, only if it actually found something.
-            entry.pron = [{}];
+                line, matches, accent, ipa, pronList = [], pronTagged = {};
 
             while (!input.eof()) {
                 line = input.readline();
                 print ('line: '+line);
+
+                // get the accent specifier
+                if (matches = /\{\{a\|([^\}]+)\}\}/.exec(line)) {
+                    accent = matches[1];
+                    print ('a: '+accent);
+                }
+                else {
+                    accent = null;
+                }
+
+                // get the ipa bit
+                if (matches = /\{\{IPA\|([^}]+)\}\}/.exec(line)) {
+                    ipa = matches[1];
+                    if (matches = /\/([^\/]+)\//.exec(ipa)) {
+                        ipa = matches[1];
+                    }
+                    pronList.push({ ipa: ipa });
+                }
+            }
+
+            if (pronList.length > 0) {
+                entry.pron = pronList;
             }
         }
 
