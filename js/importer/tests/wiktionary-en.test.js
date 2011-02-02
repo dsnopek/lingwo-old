@@ -117,7 +117,43 @@ require(
                     "* {{IPA|/ˈstɔːɹi/}}\n\n"
                 );
 
-                this.assertEquals(pron[0].ipa, "ˈstɔːɹi");
+                this.assertEquals(pron[0].ipa,   "ˈstɔːɹi");
+                this.assertEquals(pron[0].tag,   undefined);
+                this.assertEquals(pron[0].audio, undefined);
+            },
+
+            testParseAccent: function () {
+                var pron = parsePronunciation(
+                    "===Pronunciation===\n" +
+                    "* {{a|US}} {{IPA|/ˈstɔːɹi/}}\n\n"
+                );
+
+                this.assertEquals(pron[0].ipa,   "ˈstɔːɹi");
+                this.assertEquals(pron[0].tag,   "US");
+                this.assertEquals(pron[0].audio, undefined);
+            },
+
+            testParseAudio1: function () {
+                var pron = parsePronunciation(
+                    "===Pronunciation===\n" +
+                    "* {{audio|en-us-story.ogg|Audio (US)}}\n\n"
+                );
+
+                this.assertEquals(pron[0].ipa,   undefined);
+                this.assertEquals(pron[0].tag,   "US");
+                this.assertEquals(pron[0].audio, "http://upload.wikimedia.org/wikipedia/commons/1/11/En-us-story.ogg");
+            },
+
+            testParseAudio2: function () {
+                var pron = parsePronunciation(
+                    "===Pronunciation===\n" +
+                    "* {{a|US}} {{IPA|/ˈstɔːɹi/}}\n" +
+                    "* {{audio|en-us-story.ogg|Audio (US)}}\n\n"
+                );
+
+                this.assertEquals(pron[0].ipa,   "ˈstɔːɹi");
+                this.assertEquals(pron[0].tag,   "US");
+                this.assertEquals(pron[0].audio, "http://upload.wikimedia.org/wikipedia/commons/1/11/En-us-story.ogg");
             }
 
             // TODO: note self, good test words include: "story" and "word"

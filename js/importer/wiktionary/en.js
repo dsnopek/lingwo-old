@@ -618,28 +618,65 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
 
         function parsePronunciation(entry, text) {
             var input = new LineReader((new WikiText(text)).getSection('Pronunciation', 2)),
-                line, matches, accent, ipa, pronList = [], pronTagged = {};
+                line, matches, accent, value, pronList = [], pronTagged = {};
+
+            function addPron(accent, type, value) {
+                var pron;
+                if (accent !== null && typeof pronTagged[accent] != 'undefined') {
+                    pron = pronTagged[accent];
+                }
+                else {
+                    if (accent !== null) {
+                        pronTagged[accent] = pron = {tag: accent};
+                    }
+                    else {
+                        pron = {};
+                    }
+                    pronList.push(pron);
+                }
+
+                pron[type] = value;
+            }
+
+            function getFullFilename(fn) {
+                var md = java.security.MessageDigest.getInstance('md5'),
+                    fn = fn.substr(0, 1).toUpperCase() + fn.substr(1),
+                     d = md.digest((new java.lang.String(fn)).getBytes()),
+                     h = ""+(new java.math.BigInteger(1, d)).toString(16);
+                while (h.length < 32) {
+                    h = "0" + h
+                }
+                return 'http://upload.wikimedia.org/wikipedia/commons/'+h.substr(0, 1)+'/'+h.substr(0,2)+'/'+fn;
+            }
 
             while (!input.eof()) {
                 line = input.readline();
-                print ('line: '+line);
 
                 // get the accent specifier
                 if (matches = /\{\{a\|([^\}]+)\}\}/.exec(line)) {
                     accent = matches[1];
-                    print ('a: '+accent);
                 }
                 else {
                     accent = null;
                 }
 
                 // get the ipa bit
-                if (matches = /\{\{IPA\|([^}]+)\}\}/.exec(line)) {
-                    ipa = matches[1];
-                    if (matches = /\/([^\/]+)\//.exec(ipa)) {
-                        ipa = matches[1];
+                if (/===Pronunciation===/.exec(line)) {
+                    // ignore it
+                }
+                else if (matches = /\{\{IPA\|([^}]+)\}\}/.exec(line)) {
+                    value = matches[1];
+                    // remove the outter slashes "/"
+                    if (matches = /\/([^\/]+)\//.exec(value)) {
+                        value = matches[1];
                     }
-                    pronList.push({ ipa: ipa });
+                    addPron(accent, 'ipa', value);
+                }
+                else if (matches = /\{\{audio\|([^|]+)\|Audio \(([^\)]+)\)\}\}/.exec(line)) {
+                    addPron(matches[2], 'audio', getFullFilename(matches[1]));
+                }
+                else if (line !== null) {
+                    print ('Unknown pron: '+line);
                 }
             }
 
