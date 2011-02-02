@@ -681,7 +681,32 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             }
 
             if (pronList.length > 0) {
-                entry.pron = pronList;
+                // we try to reduce the pron sections by applying the following rule:
+                //
+                //   * If a IPA (with no tag) is specified before an audio with no IPA,
+                //     that the IPA is added to that audio and the IPA section is removed.
+                //
+                // we implement it, by looping backwards
+                entry.pron = (function () {
+                    var ret = [], noIpaList = [];
+                    pronList.reverse();
+                    pronList.forEach(function (pron) {
+                        if (typeof pron.ipa == 'undefined') {
+                            noIpaList.push(pron);
+                            ret.unshift(pron);
+                        }
+                        else if (noIpaList.length > 0 && typeof pron.tag == 'undefined') {
+                            noIpaList.forEach(function (noIpa) {
+                                noIpa.ipa = pron.ipa;
+                            });
+                            noIpaList = [];
+                        }
+                        else {
+                            ret.unshift(pron);
+                        }
+                    });
+                    return ret;
+                })();
             }
         }
 
