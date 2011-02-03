@@ -202,12 +202,12 @@ function _lingwo_data_entry_has_changed($node, $entry_data) {
 }
 
 // Downloads a file to Drupal
-function _lingwo_data_download_file($url) {
+function _lingwo_data_download_file($url, $field_info) {
   $ret = NULL;
 
   $url_info = parse_url($url);
   $filename = rawurldecode(basename($url_info['path']));
-  $tmpfile = tempnam(sys_get_temp_dir(), 'bin');
+  $tmpfile = file_create_filename($filename, file_directory_temp());
   $fp = fopen($tmpfile, 'w');
 
   $ch = curl_init();
@@ -220,13 +220,11 @@ function _lingwo_data_download_file($url) {
   fclose($fp);
 
   if ($success) {
-    // TODO: we should use filefield_widget_file_path($field) for getting the path
-    if ($file = field_file_save_file($tmpfile, array(), file_directory_path() .'/'. $filename)) {
+    if ($file = field_file_save_file($tmpfile, array(), filefield_widget_file_path($field_info))) {
       $file = (object)$file;
       file_set_status($file, FILE_STATUS_PERMANENT);
       $ret = $file->fid;
     }
-    watchdog('debug', 'file -- : '. print_r($file, TRUE));
   }
 
   @unlink($tmpfile);
@@ -234,12 +232,12 @@ function _lingwo_data_download_file($url) {
   return $ret;
 }
 
-function _lingwo_data_import_set_field_value($field, $value, $type) {
+function _lingwo_data_import_set_field_value($field, $value, $info) {
   if (is_null($field)) {
     $field = array();
   }
 
-  switch ($type) {
+  switch ($info['type']) {
     case 'lingwo_fields':
       $field['type'] = $value['type'];
       $field['name'] = $value['name'];
@@ -283,7 +281,11 @@ function _lingwo_data_import_set_field_value($field, $value, $type) {
       break;
     
     case 'filefield':
-      $field['fid'] = _lingwo_data_download_file($value);
+      // so that we aren't downloading the same file a bagillion times, we don't replace the
+      // file if there already is one.
+      if (!empty($field['fid'])) {
+        $field['fid'] = _lingwo_data_download_file($value, $info);
+      }
       break;
 
     default:
@@ -294,8 +296,8 @@ function _lingwo_data_import_set_field_value($field, $value, $type) {
   return $field;
 }
 
-function _lingwo_data_import_process_field_values($node, &$items, $type, $values) {
-  switch ($type) {
+function _lingwo_data_import_process_field_values($node, &$items, $info, $values) {
+  switch ($info['type']) {
     case 'lingwo_senses':
       # convert the 'same_as' field to id rather than indexes
       foreach ($items as &$value) {
@@ -332,7 +334,8 @@ function _lingwo_data_import_process_field_values($node, &$items, $type, $values
 function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
   if (in_array($field_alias, array('senses', 'fields'))) {
     // Not CCK, these are special.
-    $field_name = $field_type = ('lingwo_'.$field_alias);
+    $field_name = 'lingwo_'.$field_alias;
+  $field_info = array('type' => $field_name);
   }
   else {
     $field_name = lingwo_data_settings('field_'. $field_alias);
@@ -341,8 +344,7 @@ function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
     }
 
     // get the CCK type name
-    $field_type = content_fields($field_name, _lingwo_dictionary_settings('entry_content_type'));
-    $field_type = $field_type['type'];
+    $field_info = content_fields($field_name, _lingwo_dictionary_settings('entry_content_type'));
   }
 
   if (!isset($node->$field_name)) {
@@ -351,10 +353,10 @@ function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
   // TODO: we really should merge these, not just overwrite them!
   $field = &$node->$field_name;
   foreach($values as $i => $value) {
-    $field[$i] = _lingwo_data_import_set_field_value($field[$i], $value, $field_type);
+    $field[$i] = _lingwo_data_import_set_field_value($field[$i], $value, $field_info);
   }
 
-  _lingwo_data_import_process_field_values($node, $field, $field_type, $values);
+  _lingwo_data_import_process_field_values($node, $field, $field_info, $values);
 }
 
 function _lingwo_data_import_set_fields(&$node, $fields) {
