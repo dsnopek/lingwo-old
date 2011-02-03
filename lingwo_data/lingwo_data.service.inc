@@ -122,8 +122,7 @@ function _lingwo_data_import_process_original($entry) {
           $res['pron'][] = array(
             'ipa' => $pron['ipa'],
             'tag' => $pron['tag'],
-            // TODO: we need to do something with this!
-            //'pron_audio' => $pron['audio'],
+            'audio' => $pron['audio'],
           );
         }
         else {
@@ -202,6 +201,39 @@ function _lingwo_data_entry_has_changed($node, $entry_data) {
   return $entry_data != $old_entry_data;
 }
 
+// Downloads a file to Drupal
+function _lingwo_data_download_file($url) {
+  $ret = NULL;
+
+  $url_info = parse_url($url);
+  $filename = rawurldecode(basename($url_info['path']));
+  $tmpfile = tempnam(sys_get_temp_dir(), 'bin');
+  $fp = fopen($tmpfile, 'w');
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_FILE, $fp);
+  curl_setopt($ch, CURLOPT_HEADER, 0);
+  @curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+  $success = curl_exec($ch);
+  curl_close($ch);
+  fclose($fp);
+
+  if ($success) {
+    // TODO: we should use filefield_widget_file_path($field) for getting the path
+    if ($file = field_file_save_file($tmpfile, array(), file_directory_path() .'/'. $filename)) {
+      $file = (object)$file;
+      file_set_status($file, FILE_STATUS_PERMANENT);
+      $ret = $file->fid;
+    }
+    watchdog('debug', 'file -- : '. print_r($file, TRUE));
+  }
+
+  @unlink($tmpfile);
+
+  return $ret;
+}
+
 function _lingwo_data_import_set_field_value($field, $value, $type) {
   if (is_null($field)) {
     $field = array();
@@ -248,6 +280,10 @@ function _lingwo_data_import_set_field_value($field, $value, $type) {
         // senses are treated as invalid, unless they have a UUID!
         $field['id'] = _ld_make_uuid();
       }
+      break;
+    
+    case 'filefield':
+      $field['fid'] = _lingwo_data_download_file($value);
       break;
 
     default:
