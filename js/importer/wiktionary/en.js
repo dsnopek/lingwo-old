@@ -202,7 +202,7 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
 
         function parseSenses(entry, text) {
             var input = new LineReader(text), line, parsing = false,
-                sense, sensesMap = {};
+                sense = null, sensesMap = {};
 
             // normalize to just the bare text bits
             function normalize(s) {
@@ -234,12 +234,16 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                         difference: clean(line, 255),
                     };
                     
-                    // If its followed by an example, read that too.
-                    if (/^#:/.exec(input.peekline())) {
-                        sense.example = clean(input.readline(), 255);
-                    }
-
                     sensesMap[normalize(sense.difference)] = sense;
+                }
+                else if (sense !== null && /^#:/.exec(line)) {
+                    if (typeof sense.example == 'undefined') {
+                        sense.example = [];
+                    }
+                    sense.example.push(clean(line, 255));
+                }
+                else {
+                    sense = null;
                 }
             }
 

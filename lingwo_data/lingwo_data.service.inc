@@ -219,6 +219,30 @@ function _lingwo_data_import_set_field_value($field, $value, $type) {
       break;
 
     case 'lingwo_senses':
+      // flatten the example arrays
+      if (!empty($value['example']) && is_array($value['example'])) {
+        if (LingwoSenses::$settings->example == 'single') {
+          $value['example'] = $value['example'][0];
+        }
+        else if (LingwoSenses::$settings->example == 'multiple') {
+          $value['example'] = implode("\n", $value['example']);
+        }
+        else {
+          unset($value['example']);
+        }
+      }
+      if (!empty($value['example_translation']) && is_array($value['example_translation'])) {
+        if (LingwoSenses::$settings->example == 'single') {
+          $value['example_translation'] = $value['example_translation'][0];
+        }
+        else if (LingwoSenses::$settings->example == 'multiple') {
+          $value['example_translation'] = implode("\n", $value['example_translation']);
+        }
+        else {
+          unset($value['example_translation']);
+        }
+      }
+
       $field['data'] = $value;
       if (empty($field['id'])) {
         // senses are treated as invalid, unless they have a UUID!
@@ -309,8 +333,6 @@ function _lingwo_data_import_set_fields(&$node, $fields) {
       _lingwo_data_import_set_field($node, $field_alias, $values);
     }
   }
-  watchdog('debug', 'node');
-  watchdog('debug', print_r($node, TRUE));
 }
 
 function _lingwo_data_import_set_fields_multigroup(&$node, $values, $prefix) {
