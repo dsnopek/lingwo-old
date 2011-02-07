@@ -203,7 +203,7 @@ function _lingwo_data_entry_has_changed($node, $entry_data) {
 
 // Downloads a file to Drupal
 function _lingwo_data_download_file($url, $field_info) {
-  $ret = NULL;
+  $file = NULL;
 
   $url_info = parse_url($url);
   $filename = rawurldecode(basename($url_info['path']));
@@ -223,13 +223,13 @@ function _lingwo_data_download_file($url, $field_info) {
     if ($file = field_file_save_file($tmpfile, array(), filefield_widget_file_path($field_info))) {
       $file = (object)$file;
       file_set_status($file, FILE_STATUS_PERMANENT);
-      $ret = $file->fid;
+      $file = (array)$file;
     }
   }
 
   @unlink($tmpfile);
 
-  return $ret;
+  return $file;
 }
 
 function _lingwo_data_import_set_field_value($field, $value, $info) {
@@ -283,8 +283,11 @@ function _lingwo_data_import_set_field_value($field, $value, $info) {
     case 'filefield':
       // so that we aren't downloading the same file a bagillion times, we don't replace the
       // file if there already is one.
-      if (!empty($field['fid'])) {
-        $field['fid'] = _lingwo_data_download_file($value, $info);
+      if (empty($field['fid']) && !empty($value)) {
+        $file = _lingwo_data_download_file($value, $info);
+        foreach(array_keys($file) as $name) {
+          $field[$name] = $file[$name];
+        }
       }
       break;
 
@@ -335,7 +338,7 @@ function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
   if (in_array($field_alias, array('senses', 'fields'))) {
     // Not CCK, these are special.
     $field_name = 'lingwo_'.$field_alias;
-  $field_info = array('type' => $field_name);
+    $field_info = array('type' => $field_name);
   }
   else {
     $field_name = lingwo_data_settings('field_'. $field_alias);
