@@ -437,8 +437,16 @@ function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
 
       // Setup a $tnode to hold the translated node
       try {
-        $tnode = _lingwo_data_import_setup_node($tnid_list[$lang]->nid, $entry,
-          array('language' => $lang));
+        $newExtras = array('language' => $lang);
+
+        // to prevent i18nsync from wiping out the pron data on the original, by failing
+        // to set it on the translation, we provide it here
+        foreach(array('ipa','tag','audio') as $field_pron) {
+          $field_pron = LingwoImport::$settings->__get('field_pron_'. $field_pron);
+          $newExtras[$field_pron] = $node->$field_pron;
+        }
+
+        $tnode = _lingwo_data_import_setup_node($tnid_list[$lang]->nid, $entry, $newExtras);
       }
       catch (LingwoDataServiceException $e) {
         // if a translation is created by humans, thats not a total failure, keep going to
