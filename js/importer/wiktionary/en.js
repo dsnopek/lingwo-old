@@ -676,7 +676,7 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                     }
                     addPron(accent, 'ipa', value);
                 }
-                else if (matches = /\{\{audio\|([^|]+)\|Audio \(([^\)]+)\)\}\}/.exec(line)) {
+                else if (matches = /\{\{[Aa]udio\|([^|]+)\|[Aa]udio \(([^\)]+)\)\}\}/.exec(line)) {
                     addPron(matches[2], 'audio', getFullFilename(matches[1]));
                 }
                 else if (line !== null) {
