@@ -692,6 +692,9 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                         // break up the example and its translation
                         example_parts = line.split('\u2192');
                         map[name].example.push(text_utils.limitString(WikiText.clean(example_parts[0]), 255));
+                        if (!example_parts[1]) {
+                            example_parts[1] = '';
+                        }
                         if (entry.language.name != 'pl') {
                             // store the example translation
                             entry.translations.pl.senses[idx[name]].example_translation
