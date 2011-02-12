@@ -43,8 +43,8 @@ function _lingwo_senses_widget_original($node) {
     );
 
     if ($difference != 'morethanone' || count($items) > 1) {
-	  // if our difference mode is 'morethanone', only edit the
-	  // difference when there are multiple senses
+      // if our difference mode is 'morethanone', only edit the
+      // difference when there are multiple senses
       $row['data']['difference'] = array(
         '#title' => $difference == 'definition' ? t('Definition') : t('Difference'),
         '#type' => 'textfield',
@@ -62,13 +62,15 @@ function _lingwo_senses_widget_original($node) {
         );
       }
     }
-    // always have an example
-    $row['data']['example'] = array(
-      '#title' => t('Example'),
-      '#type' => 'textfield',
-      '#default_value' => $sense['data']['example'],
-      '#maxlength' => 255,
-    );
+
+    if (LingwoSenses::$settings->example != 'none') {
+      $row['data']['example'] = array(
+        '#title' => t('Example'),
+        '#type' => (LingwoSenses::$settings->example == 'multiple') ? 'textarea' : 'textfield',
+        '#default_value' => $sense['data']['example'],
+        '#maxlength' => 255,
+      );
+    }
 
     // always have the ability to say it "is" a relationship to another entry
     $row['data']['is'] = array(
@@ -157,14 +159,14 @@ function _lingwo_senses_widget_translation($node) {
           '#value' => $orig_sense['data']['difference'],
         );
       }
-      if ($orig_sense['data']['example']) {
+      if ($orig_sense['data']['example'] && LingwoSenses::$settings->example != 'none') {
         $sense_form['data']['example'] = array(
           '#type' => 'item',
           '#title' => t('Example'),
-          '#value' => $orig_sense['data']['example'],
+          '#value' => LingwoSenses::$settings->example == 'multiple' ? str_replace("\n", "<br />", $orig_sense['data']['example']) : $orig_sense['data']['example'],
         );
         $sense_form['data']['example_translation'] = array(
-          '#type' => 'textfield',
+          '#type' => (LingwoSenses::$settings->example == 'multiple') ? 'textarea' : 'textfield',
           '#title' => t('Translation of Example'),
           '#default_value' => $sense['data']['example_translation'],
           '#maxlength' => 255,
