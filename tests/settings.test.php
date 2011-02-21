@@ -1,6 +1,6 @@
 <?php
 require_once('../includes/3rdparty/simpletest/autorun.php');
-require_once('../includes/settings.inc');
+require_once('../../lingwo_oss/includes/settings.inc');
 
 // Mock the Drupal variable functions
 $GLOBALS['_test_variables'] = array();
