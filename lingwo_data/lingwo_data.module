@@ -62,7 +62,7 @@ function lingwo_data_service() {
  */
 // Deal with storing/retrieving the 'imported' field
 function lingwo_data_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
-  if ($node->type != _lingwo_dictionary_settings('entry_content_type'))
+  if ($node->type != LingwoEntry::$settings->entry_content_type)
     return;
 
   switch ($op) {
@@ -103,7 +103,7 @@ function lingwo_data_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
  * Implementation of hook_form_alter().
  */
 function lingwo_data_form_alter(&$form, $form_state, $form_id) {
-  if ($form_id == _lingwo_dictionary_settings('entry_content_type') .'_node_form') {
+  if ($form_id == LingwoEntry::$settings->entry_content_type .'_node_form') {
     $node = $form['#node'];
 
     $form['imported'] = array(
