@@ -202,7 +202,7 @@ function _lingwo_data_import_set_field_value($field, $value, $type) {
       $field['data'] = $value;
       if (empty($field['id'])) {
         // senses are treated as invalid, unless they have a UUID!
-        $field['id'] = _ld_make_uuid();
+        $field['id'] = _lingwo_make_uuid();
       }
       break;
 
