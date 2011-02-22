@@ -225,7 +225,7 @@ function _lingwo_data_import_process_field_values($node, &$items, $type, $values
       }
 
       # Find the number of values we were given.
-      if (_ld_is_translation($node)) {
+      if (_lingwo_is_translation($node)) {
         $translation_source = LingwoEntry::fromNode($node)->sourceNode;
         $max = count($translation_source->lingwo_senses);
       }
@@ -237,7 +237,7 @@ function _lingwo_data_import_process_field_values($node, &$items, $type, $values
       # where given.  If so, we have to remove some.
       if (count($items) > $max) {
         for($i = ($max - 1); $i < count($items); $i++) {
-          if (_ld_is_translation($node)) {
+          if (_lingwo_is_translation($node)) {
             $items[$i]['retire_sense'] = TRUE;
           }
           else {
