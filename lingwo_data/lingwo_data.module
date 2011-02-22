@@ -11,7 +11,7 @@
  */
 function lingwo_data_menu() {
   $items = array();
-  $items['admin/settings/lingwo_dictionary/data'] = array(
+  $items['admin/settings/lingwo/data'] = array(
     'title' => 'Data',
     'description' => 'Settings for Lingwo Data module.',
     'access arguments' => array('administer site configuration'),

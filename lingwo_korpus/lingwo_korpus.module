@@ -20,7 +20,7 @@ function lingwo_korpus_perm() {
  */
 function lingwo_korpus_menu() {
   $items = array();
-  $items['admin/settings/lingwo_dictionary/korpus'] = array(
+  $items['admin/settings/lingwo/korpus'] = array(
     'title' => 'Korpus',
     'description' => 'Settings for Lingwo Korpus module.',
     'access arguments' => array('administer site configuration'),
