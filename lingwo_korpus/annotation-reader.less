@@ -113,6 +113,9 @@ a.external:visited {
 	p, dl, hr, h1, h2, h3, h4, h5, h6, ol, ul, pre, table, address, fieldset {
 	  margin-bottom: 10px;
 	}
+	.lingwo-sense-example table {
+	  margin-bottom: 0;
+	}
 
 	/*
 	 * link lists
@@ -134,8 +137,8 @@ a.external:visited {
 	}
 
 	// show the sense as selected
-	.lingwo-sense-list li.selected,
-	.lingwo-sense-list li.selected blockquote {
+	.lingwo-senses li.selected,
+	.lingwo-senses li.selected blockquote {
 		background-color: yellow;
 		// For IE6, which also applies the .anno.selected rule
 		// here (because it ignores the first item in the selector)
