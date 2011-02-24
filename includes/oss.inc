@@ -16,15 +16,7 @@ function _ld_element_process(&$element, $process_func) {
   $element['#process'][] = $process_func;
 }
 
-function _ld_project_path() {
-  static $project_path = NULL;
-  if (is_null($project_path)) {
-    $project_path = dirname(drupal_get_path('module', 'lingwo_dictionary'));
-  }
-  return $project_path;
-}
-
-// A temporary replacement for _ld_project_path() which works for the code in this directory
+// A temporary replacement for _lingwo_project_path() which works for the code in this directory
 function _ld_project_path_temp() {
   static $project_path = NULL;
   if (is_null($project_path)) {

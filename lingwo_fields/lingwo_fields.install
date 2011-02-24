@@ -176,7 +176,7 @@ function lingwo_fields_update_6001() {
   drupal_get_schema(NULL, TRUE);
 
   # copy all the data from the CCK table to this table..
-  $entry_content_type = LingwoEntry::$settings->entry_content_type;
+  $entry_content_type = LingwoEntry::$settings->content_type;
   if (!empty($entry_content_type)) {
     foreach (content_fields(NULL, $entry_content_type) as $field_name => $field) {
       // dsm()
@@ -209,7 +209,7 @@ function lingwo_fields_update_6001() {
     }
   }
 
-  // we need to happen after the lingwo_dictionary module with weight 50
+  // we need to happen after the lingwo_entry module with weight 50
   update_sql("UPDATE {system} SET weight = 51 WHERE name = 'lingwo_fields'");
 
   return $ret;
@@ -221,7 +221,7 @@ function lingwo_fields_update_6001() {
 function lingwo_fields_install() {
   drupal_install_schema('lingwo_fields');
 
-  // we need to happen after the lingwo_dictionary module with weight 50
+  // we need to happen after the lingwo_entry module with weight 50
   update_sql("UPDATE {system} SET weight = 51 WHERE name = 'lingwo_fields'");
 }
 

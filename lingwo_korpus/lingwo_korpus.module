@@ -382,7 +382,7 @@ function _lingwo_korpus_add_reader_js() {
       'baseUrl' => url('', array('absolute' => TRUE))
     ), 'setting');
     drupal_add_js(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.js');
-    drupal_add_css(drupal_get_path('module', 'lingwo_dictionary') .'/lingwo_dictionary.css');
+    drupal_add_css(drupal_get_path('module', 'lingwo_senses') .'/lingwo_senses.css');
     drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.less');
 
     $added = TRUE;
