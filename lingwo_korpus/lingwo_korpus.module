@@ -6,7 +6,7 @@
  * Extends Lingwo Dictionary for annotating texts
  */
 
-require_once(dirname(__FILE__) .'/../includes/oss.inc');
+require_once(dirname(__FILE__) .'/../includes/internal.inc');
 
 /**
  * Implementation of hook_perm().
@@ -118,7 +118,7 @@ function lingwo_korpus_lookup_senses() {
  */
 function lingwo_korpus_pos_list() {
   // Because JSON can't hold the order in an Object we need to return an Array
-  $map = LingwoEntry::getPosOptions(TRUE);
+  $map = LingwoEntry::getPosOptions($_GET['language'], TRUE);
   $list = array();
   foreach ($map as $value => $label) {
     $list[] = array('label' => $label, 'value' => $value);
@@ -175,7 +175,7 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
     ),
   ), 'setting');
 
-  _ld_add_require_js(array('text'));
+  _lingwo_old_add_require_js(array('text'));
   drupal_add_js(drupal_get_path('module', 'lingwo_korpus') .'/annotator.js');
   drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.less');
   drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotator.less');
@@ -185,7 +185,7 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
 
 
 function lingwo_korpus_annotator_form_submit($form, &$form_state) {
-  require_once(_ld_project_path_temp() .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
+  require_once(_lingwo_old_project_path() .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
 
   $node = $form['#node'];
   $node_body = $node->body;
@@ -376,7 +376,7 @@ function _lingwo_korpus_add_reader_js() {
   static $added = FALSE;
 
   if (!$added) {
-    _ld_add_require_js();
+    _lingwo_old_add_require_js();
     drupal_add_js(array(
       'language' => $language->language,
       'baseUrl' => url('', array('absolute' => TRUE))
@@ -426,7 +426,7 @@ function lingwo_korpus_filter_text($text, $language, $cid=NULL) {
 }
 
 function lingwo_korpus_text_entry_list($text, $lang) {
-  require_once(_ld_project_path_temp() .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
+  require_once(_lingwo_old_project_path() .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
 
   $entries = array();
   $found = array();
@@ -551,7 +551,7 @@ function _lingwo_korpus_auto_annotate_node(&$node, $which='body') {
 function _lingwo_korpus_exec_python($script, $args, $data) {
   $cmd = implode(' ', array(
     lingwo_korpus_python_exec(),
-    _ld_project_path_temp() .'/'. $script,
+    _lingwo_old_project_path() .'/'. $script,
     $args,
   ));
 

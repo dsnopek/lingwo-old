@@ -1,8 +1,8 @@
 
-require.def('lingwo_dictionary/importer/OpenDictionaries',
-    ['lingwo_dictionary/util/declare',
-     'lingwo_dictionary/Entry',
-     'lingwo_dictionary/Language'],
+define(
+    ['lingwo/util/declare',
+     'lingwo/Entry',
+     'lingwo/Language'],
     function (declare, Entry, Language) {
         var IN_BUF_SZ = 1024;
 

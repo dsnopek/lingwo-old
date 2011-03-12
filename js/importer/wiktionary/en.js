@@ -3,14 +3,14 @@
  * For parsing data from en.wikitionary.org.
  */
 
-require.def('lingwo_dictionary/importer/wiktionary/en',
-    ['lingwo_dictionary/util/declare',
-     'lingwo_dictionary/Entry',
-     'lingwo_dictionary/Language',
-     'lingwo_dictionary/importer/mediawiki/WikiText',
-     'lingwo_dictionary/importer/mediawiki/Producer',
-     'lingwo_dictionary/util/text',
-     'lingwo_dictionary/util/json2',
+define(
+    ['lingwo/util/declare',
+     'lingwo/Entry',
+     'lingwo/Language',
+     'lingwo_old/importer/mediawiki/WikiText',
+     'lingwo_old/importer/mediawiki/Producer',
+     'lingwo_old/util/text',
+     'lingwo_old/util/json2',
     ],
     function (declare, Entry, Language, WikiText, MediawikiProducer, text_utils, JSON) {
         var posMap = {

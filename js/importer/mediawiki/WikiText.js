@@ -1,7 +1,7 @@
 
-require.def('lingwo_dictionary/importer/mediawiki/WikiText',
-    ['lingwo_dictionary/util/declare',
-     'lingwo_dictionary/util/escapeRegex',
+define(
+    ['lingwo/util/declare',
+     'lingwo_old/util/escapeRegex',
     ],
     function (declare, escapeRegex) {
         var WikiText = declare({

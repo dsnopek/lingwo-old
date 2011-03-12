@@ -4,7 +4,7 @@
     var layout = 'popup';
 
     Drupal.behaviors.lingwo_korpus = function (context) {
-        require(['lingwo_dictionary/annotation/Reader2'],
+        require(['lingwo_old/annotation/Reader2'],
             function (Reader) {
                 Reader.onLoad = function (target) {
                     var parts = (target.attr('data-entry') || '').split('#'),

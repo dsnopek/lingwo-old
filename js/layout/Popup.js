@@ -1,6 +1,6 @@
 
-require.def(
-    ['jquery','lingwo_dictionary/util/declare'],
+define(
+    ['jquery','lingwo/util/declare'],
     function ($, declare) {
         return declare({
             _constructor: function (args) {

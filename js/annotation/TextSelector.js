@@ -1,6 +1,6 @@
 
-require.def('lingwo_dictionary/annotation/TextSelector',
-    ['lingwo_dictionary/util/declare','jquery'],
+define(
+    ['lingwo/util/declare','jquery'],
     function (declare, $) {
         function getCharIndex(node) {
             var id, match;

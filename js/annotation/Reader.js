@@ -1,5 +1,5 @@
 
-require.def('lingwo_dictionary/annotation/Reader',
+define(
     ['jquery'],
     function ($) {
         var bubble, contentArea, dock, footer, setGlobalEvents = false,

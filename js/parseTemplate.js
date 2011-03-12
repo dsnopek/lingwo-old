@@ -1,5 +1,5 @@
 
-require.def('lingwo_dictionary/parseTemplate', [], function () {
+define([], function () {
     // Modified from:
     //
     //   Simple JavaScript Templating

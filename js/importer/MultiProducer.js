@@ -1,10 +1,10 @@
 
 importPackage(java.io);
 
-require.def('lingwo_dictionary/importer/MultiProducer',
-    ['lingwo_dictionary/util/declare',
-     'lingwo_dictionary/importer/Database',
-     'lingwo_dictionary/importer/DatabaseProducer'],
+define(
+    ['lingwo/util/declare',
+     'lingwo_old/importer/Database',
+     'lingwo_old/importer/DatabaseProducer'],
     function (declare, Database, DatabaseProducer) {
         var COMMIT_INTERVAL = 10;
 

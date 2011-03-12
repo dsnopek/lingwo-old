@@ -3,9 +3,9 @@
  * Test data for English
  */
 
-require.def('lingwo_dictionary/languages/en.test-data',
-    ['lingwo_dictionary/Entry',
-     'lingwo_dictionary/languages/en',
+define(
+    ['lingwo/Entry',
+     'lingwo/languages/en',
     ],
     function (Entry, en) {
         function createEntries(l) {

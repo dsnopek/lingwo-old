@@ -3,7 +3,7 @@
 
 (function () {
     Drupal.behaviors.lingwo_korpus = function (context) {
-        require(['lingwo_dictionary/annotation/Annotator'],
+        require(['lingwo_old/annotation/Annotator'],
             function (Annotator) {
                 Annotator.setup({
                     toolbarId: 'lingwo-korpus-annotator-toolbar',

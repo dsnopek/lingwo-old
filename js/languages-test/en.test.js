@@ -1,7 +1,7 @@
 
-require(
-    ['lingwo_dictionary/util/TestCase',
-     'lingwo_dictionary/languages/en.test-data',
+define(
+    ['lingwo_old/util/TestCase',
+     'lingwo_old/languages/en.test-data',
     ],
     function (TestCase, test_data) {
         TestCase.subclass({

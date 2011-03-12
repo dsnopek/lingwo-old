@@ -1,10 +1,10 @@
 
-require(
-    ['lingwo_dictionary/util/TestCase',
-     'lingwo_dictionary/importer/Database',
-     'lingwo_dictionary/importer/DatabaseProducer',
-     'lingwo_dictionary/Entry',
-     'lingwo_dictionary/Language',
+define(
+    ['lingwo_old/util/TestCase',
+     'lingwo_old/importer/Database',
+     'lingwo_old/importer/DatabaseProducer',
+     'lingwo/Entry',
+     'lingwo/Language',
     ],
     function (TestCase, Database, DatabaseProducer, Entry, Language) {
         TestCase.subclass({
