@@ -60,12 +60,12 @@ if (!OPTS['lang']) {
 }
 
 require([
-        'lingwo_dictionary/importer/Database',
-        'lingwo_dictionary/importer/Service',
-        'lingwo_dictionary/importer/DatabaseProducer',
-        'lingwo_dictionary/importer/MultiProducer',
-        'lingwo_dictionary/importer/languages/'+OPTS['lang'],
-        'lingwo_dictionary/util/json2',
+        'lingwo_old/importer/Database',
+        'lingwo_old/importer/Service',
+        'lingwo_old/importer/DatabaseProducer',
+        'lingwo_old/importer/MultiProducer',
+        'lingwo_old/importer/languages/'+OPTS['lang'],
+        'lingwo_old/util/json2',
     ],
     function (Database, Service, DatabaseProducer, MultiProducer, importer, JSON) {
         var source, service, db, handler, limit, producer, parser, entryList, x;

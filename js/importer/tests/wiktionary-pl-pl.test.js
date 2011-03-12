@@ -1,5 +1,5 @@
 
-define(
+require(
     ['lingwo_old/util/TestCase',
      'lingwo/Entry',
      'lingwo/languages/pl',

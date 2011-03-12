@@ -1,7 +1,7 @@
 
-define(
+require(
     ['lingwo_old/util/TestCase',
-     'lingwo_old/languages/pl.test-data',
+     'lingwo_old/languages-test/pl.test-data',
     ],
     function (TestCase, test_data) {
         function getEntry(entry_name) {

@@ -1,5 +1,5 @@
 
-define(
+require(
     ['lingwo_old/util/TestCase',
      'lingwo_old/importer/Database',
      'lingwo_old/importer/DatabaseProducer',

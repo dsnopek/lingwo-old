@@ -92,7 +92,7 @@ function lingwo_korpus_views_data() {
         'title' => t('Dictionary Entry'),
         'help' => t('The Dictionary Entry for the entry'),
         'relationship' => array(
-          'base' => 'lingwo_entry',
+          'base' => 'lingwo_entry_info',
           'base field' => 'entry_hash',
           'label' => t('dictionary entry'),
         ),
