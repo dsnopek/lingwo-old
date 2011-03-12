@@ -66,6 +66,7 @@ require([
         'lingwo_old/importer/MultiProducer',
         'lingwo_old/importer/languages/'+OPTS['lang'],
         'lingwo_old/util/json2',
+        'lingwo_old/entrySerialization',
     ],
     function (Database, Service, DatabaseProducer, MultiProducer, importer, JSON) {
         var source, service, db, handler, limit, producer, parser, entryList, x;
