@@ -3,7 +3,7 @@ define(
     ['jquery',
      'lingwo/util/declare',
      'lingwo_old/util/proxy',
-     'lingwo_oldingwo_dictionary/layout/isPositionFixedSupported'
+     'lingwo_old/layout/isPositionFixedSupported'
     ],
     function ($, declare, proxy, isPositionFixedSupported) {
         var positionFixed = isPositionFixedSupported();
