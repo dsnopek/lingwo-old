@@ -202,7 +202,7 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
 
         function parseSenses(entry, text) {
             var input = new LineReader(text), line, parsing = false,
-                sense, sensesMap = {};
+                sense = null, sensesMap = {};
 
             // normalize to just the bare text bits
             function normalize(s) {
@@ -234,12 +234,16 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
                         difference: clean(line, 255),
                     };
                     
-                    // If its followed by an example, read that too.
-                    if (/^#:/.exec(input.peekline())) {
-                        sense.example = clean(input.readline(), 255);
-                    }
-
                     sensesMap[normalize(sense.difference)] = sense;
+                }
+                else if (sense !== null && /^#:/.exec(line)) {
+                    if (typeof sense.example == 'undefined') {
+                        sense.example = [];
+                    }
+                    sense.example.push(clean(line, 255));
+                }
+                else {
+                    sense = null;
                 }
             }
 
@@ -616,10 +620,105 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             }
         }
 
+        function parsePronunciation(entry, text) {
+            var input = new LineReader((new WikiText(text)).getSection('Pronunciation', 2)),
+                line, matches, accent, value, pronList = [], pronTagged = {};
+
+            function addPron(accent, type, value) {
+                var pron;
+                if (accent !== null && typeof pronTagged[accent] != 'undefined') {
+                    pron = pronTagged[accent];
+                }
+                else {
+                    if (accent !== null) {
+                        pronTagged[accent] = pron = {tag: accent};
+                    }
+                    else {
+                        pron = {};
+                    }
+                    pronList.push(pron);
+                }
+
+                pron[type] = value;
+            }
+
+            function getFullFilename(fn) {
+                var md = java.security.MessageDigest.getInstance('md5'),
+                    fn = fn.substr(0, 1).toUpperCase() + fn.substr(1),
+                     d = md.digest((new java.lang.String(fn)).getBytes()),
+                     h = ""+(new java.math.BigInteger(1, d)).toString(16);
+                while (h.length < 32) {
+                    h = "0" + h
+                }
+                return 'http://upload.wikimedia.org/wikipedia/commons/'+h.substr(0, 1)+'/'+h.substr(0,2)+'/'+fn;
+            }
+
+            while (!input.eof()) {
+                line = input.readline();
+
+                // get the accent specifier
+                if (matches = /\{\{a\|([^\}]+)\}\}/.exec(line)) {
+                    accent = matches[1];
+                }
+                else {
+                    accent = null;
+                }
+
+                // get the ipa bit
+                if (/===Pronunciation===/.exec(line)) {
+                    // ignore it
+                }
+                else if (matches = /\{\{IPA\|([^}]+)\}\}/.exec(line)) {
+                    value = matches[1];
+                    // remove the outter slashes "/"
+                    if (matches = /\/([^\/]+)\//.exec(value)) {
+                        value = matches[1];
+                    }
+                    addPron(accent, 'ipa', value);
+                }
+                else if (matches = /\{\{[Aa]udio\|([^|]+)\|[Aa]udio \(([^\)]+)\)\}\}/.exec(line)) {
+                    addPron(matches[2], 'audio', getFullFilename(matches[1]));
+                }
+                else if (line !== null) {
+                    print ('Unknown pron: '+line);
+                }
+            }
+
+            if (pronList.length > 0) {
+                // we try to reduce the pron sections by applying the following rule:
+                //
+                //   * If a IPA (with no tag) is specified before an audio with no IPA,
+                //     that the IPA is added to that audio and the IPA section is removed.
+                //
+                // we implement it, by looping backwards
+                entry.pron = (function () {
+                    var ret = [], noIpaList = [];
+                    pronList.reverse();
+                    pronList.forEach(function (pron) {
+                        if (typeof pron.ipa == 'undefined') {
+                            noIpaList.push(pron);
+                            ret.unshift(pron);
+                        }
+                        else if (noIpaList.length > 0 && typeof pron.tag == 'undefined') {
+                            noIpaList.forEach(function (noIpa) {
+                                noIpa.ipa = pron.ipa;
+                            });
+                            noIpaList = [];
+                        }
+                        else {
+                            ret.unshift(pron);
+                        }
+                    });
+                    return ret;
+                })();
+            }
+        }
+
         function parse(entry, text) {
             parseTranslations(entry, text);
             parseSenses(entry, text);
             parseForms(entry, text);
+            parsePronunciation(entry, text);
         }
 
         function getData(text, pos, type) {
@@ -711,7 +810,8 @@ require.def('lingwo_dictionary/importer/wiktionary/en',
             },
 
             _internal: {
-                formParsers: formParsers
+                formParsers: formParsers,
+                parsePronunciation: parsePronunciation,
             }
         };
     }

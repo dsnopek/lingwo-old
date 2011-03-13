@@ -97,12 +97,12 @@ function _lingwo_data_import_process_sources($entry) {
     // put sources into the format we need
     foreach ($entry['sources'] as $source_name => $source) {
       $res[] = array(
-        'source_name'      => $source_name,
-        'source_url'       => $source['url'],
-        'source_copyright' => $source['copyright'],
-        'source_license'   => $source['license'],
-        'source_raw'       => $source['raw'],
-        'source_timestamp' => $source['timestamp'],
+        'name'      => $source_name,
+        'url'       => $source['url'],
+        'copyright' => $source['copyright'],
+        'license'   => $source['license'],
+        'raw'       => $source['raw'],
+        'timestamp' => $source['timestamp'],
       );
     }
   }
@@ -114,8 +114,27 @@ function _lingwo_data_import_process_original($entry) {
   $res = array();
 
   // process pron
-  if (!empty($entry['pron']) && lingwo_data_settings('field_pron')) {
-    $res['pron'] = _lingwo_data_import_process_simple_field($entry, 'pron');
+  if (!empty($entry['pron']) && (lingwo_data_settings('field_pron_ipa') || lingwo_data_settings('field_pron_audio'))) {
+    $res['pron'] = array();
+    if (is_array($entry['pron'])) {
+      foreach ($entry['pron'] as $pron) {
+        if (is_array($pron)) {
+          $res['pron'][] = array(
+            'ipa' => $pron['ipa'],
+            'tag' => $pron['tag'],
+            'audio' => $pron['audio'],
+          );
+        }
+        else {
+          $res['pron'][] = array(
+            'ipa' => $pron
+          );
+        }
+      }
+    }
+    else {
+      $res['pron'][] = array('ipa' => $entry['pron']);
+    }
   }
 
   // process senses
@@ -182,12 +201,43 @@ function _lingwo_data_entry_has_changed($node, $entry_data) {
   return $entry_data != $old_entry_data;
 }
 
-function _lingwo_data_import_set_field_value($field, $value, $type) {
+// Downloads a file to Drupal
+function _lingwo_data_download_file($url, $field_info) {
+  $file = NULL;
+
+  $url_info = parse_url($url);
+  $filename = rawurldecode(basename($url_info['path']));
+  $tmpfile = file_create_filename($filename, file_directory_temp());
+  $fp = fopen($tmpfile, 'w');
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_FILE, $fp);
+  curl_setopt($ch, CURLOPT_HEADER, 0);
+  @curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+  $success = curl_exec($ch);
+  curl_close($ch);
+  fclose($fp);
+
+  if ($success) {
+    if ($file = field_file_save_file($tmpfile, array(), filefield_widget_file_path($field_info))) {
+      $file = (object)$file;
+      file_set_status($file, FILE_STATUS_PERMANENT);
+      $file = (array)$file;
+    }
+  }
+
+  @unlink($tmpfile);
+
+  return $file;
+}
+
+function _lingwo_data_import_set_field_value($field, $value, $info) {
   if (is_null($field)) {
     $field = array();
   }
 
-  switch ($type) {
+  switch ($info['type']) {
     case 'lingwo_fields':
       $field['type'] = $value['type'];
       $field['name'] = $value['name'];
@@ -199,10 +249,45 @@ function _lingwo_data_import_set_field_value($field, $value, $type) {
       break;
 
     case 'lingwo_senses':
+      // flatten the example arrays
+      if (!empty($value['example']) && is_array($value['example'])) {
+        if (LingwoSenses::$settings->example == 'single') {
+          $value['example'] = $value['example'][0];
+        }
+        else if (LingwoSenses::$settings->example == 'multiple') {
+          $value['example'] = implode("\n", $value['example']);
+        }
+        else {
+          unset($value['example']);
+        }
+      }
+      if (!empty($value['example_translation']) && is_array($value['example_translation'])) {
+        if (LingwoSenses::$settings->example == 'single') {
+          $value['example_translation'] = $value['example_translation'][0];
+        }
+        else if (LingwoSenses::$settings->example == 'multiple') {
+          $value['example_translation'] = implode("\n", $value['example_translation']);
+        }
+        else {
+          unset($value['example_translation']);
+        }
+      }
+
       $field['data'] = $value;
       if (empty($field['id'])) {
         // senses are treated as invalid, unless they have a UUID!
         $field['id'] = _ld_make_uuid();
+      }
+      break;
+    
+    case 'filefield':
+      // so that we aren't downloading the same file a bagillion times, we don't replace the
+      // file if there already is one.
+      if (empty($field['fid']) && !empty($value)) {
+        $file = _lingwo_data_download_file($value, $info);
+        foreach(array_keys($file) as $name) {
+          $field[$name] = $file[$name];
+        }
       }
       break;
 
@@ -214,8 +299,8 @@ function _lingwo_data_import_set_field_value($field, $value, $type) {
   return $field;
 }
 
-function _lingwo_data_import_process_field_values($node, &$items, $type, $values) {
-  switch ($type) {
+function _lingwo_data_import_process_field_values($node, &$items, $info, $values) {
+  switch ($info['type']) {
     case 'lingwo_senses':
       # convert the 'same_as' field to id rather than indexes
       foreach ($items as &$value) {
@@ -250,9 +335,10 @@ function _lingwo_data_import_process_field_values($node, &$items, $type, $values
 }
 
 function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
-  if ($field_alias == 'senses' || $field_alias == 'fields') {
+  if (in_array($field_alias, array('senses', 'fields'))) {
     // Not CCK, these are special.
-    $field_name = $field_type = ('lingwo_'.$field_alias);
+    $field_name = 'lingwo_'.$field_alias;
+    $field_info = array('type' => $field_name);
   }
   else {
     $field_name = lingwo_data_settings('field_'. $field_alias);
@@ -261,8 +347,7 @@ function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
     }
 
     // get the CCK type name
-    $field_type = content_fields($field_name, _lingwo_dictionary_settings('entry_content_type'));
-    $field_type = $field_type['type'];
+    $field_info = content_fields($field_name, _lingwo_dictionary_settings('entry_content_type'));
   }
 
   if (!isset($node->$field_name)) {
@@ -271,10 +356,10 @@ function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
   // TODO: we really should merge these, not just overwrite them!
   $field = &$node->$field_name;
   foreach($values as $i => $value) {
-    $field[$i] = _lingwo_data_import_set_field_value($field[$i], $value, $field_type);
+    $field[$i] = _lingwo_data_import_set_field_value($field[$i], $value, $field_info);
   }
 
-  _lingwo_data_import_process_field_values($node, $field, $field_type, $values);
+  _lingwo_data_import_process_field_values($node, $field, $field_info, $values);
 }
 
 function _lingwo_data_import_set_fields(&$node, $fields) {
@@ -282,11 +367,16 @@ function _lingwo_data_import_set_fields(&$node, $fields) {
   $node->imported_data = serialize($fields);
   
   foreach ($fields as $field_alias => $values) {
-    _lingwo_data_import_set_field($node, $field_alias, $values);
+    if ($field_alias == 'pron') {
+      _lingwo_data_import_set_fields_multigroup($node, $values, 'pron');
+    }
+    else {
+      _lingwo_data_import_set_field($node, $field_alias, $values);
+    }
   }
 }
 
-function _lingwo_data_import_set_fields_multigroup(&$node, $values) {
+function _lingwo_data_import_set_fields_multigroup(&$node, $values, $prefix) {
   $flatten = array();
   foreach ($values as $value) {
     foreach ($value as $name => $x) {
@@ -294,7 +384,7 @@ function _lingwo_data_import_set_fields_multigroup(&$node, $values) {
     }
   }
   foreach ($flatten as $name => $x) {
-    _lingwo_data_import_set_field($node, $name, $x);
+    _lingwo_data_import_set_field($node, $prefix .'_'. $name, $x);
   }
 }
 
@@ -328,7 +418,7 @@ function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
 
       // Copy sources data onto $node.
       if ($sources) {
-        _lingwo_data_import_set_fields_multigroup($node, $sources);
+        _lingwo_data_import_set_fields_multigroup($node, $sources, 'source');
       }
 
       // Save the source node.
@@ -347,8 +437,16 @@ function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
 
       // Setup a $tnode to hold the translated node
       try {
-        $tnode = _lingwo_data_import_setup_node($tnid_list[$lang]->nid, $entry,
-          array('language' => $lang));
+        $newExtras = array('language' => $lang);
+
+        // to prevent i18nsync from wiping out the pron data on the original, by failing
+        // to set it on the translation, we provide it here
+        foreach(array('ipa','tag','audio') as $field_pron) {
+          $field_pron = LingwoImport::$settings->__get('field_pron_'. $field_pron);
+          $newExtras[$field_pron] = $node->$field_pron;
+        }
+
+        $tnode = _lingwo_data_import_setup_node($tnid_list[$lang]->nid, $entry, $newExtras);
       }
       catch (LingwoDataServiceException $e) {
         // if a translation is created by humans, thats not a total failure, keep going to
@@ -376,7 +474,7 @@ function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
 
         // Copy sources data onto $tnode.
         if ($sources) {
-          _lingwo_data_import_set_fields_multigroup($tnode, $sources);
+          _lingwo_data_import_set_fields_multigroup($tnode, $sources, 'source');
         }
 
         // Save the translation node.

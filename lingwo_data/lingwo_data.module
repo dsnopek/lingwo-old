@@ -6,6 +6,9 @@
  * For importing dictionary data from external sources
  */
 
+// get our API functions
+require_once(dirname(__FILE__) .'/lingwo_data.api.inc');
+
 /**
  * Implementation of hook_menu().
  */
@@ -127,29 +130,6 @@ function lingwo_data_form_alter(&$form, $form_state, $form_id) {
  * Used to access settings.
  */
 function lingwo_data_settings($name, $value = NULL) {
-  static $_settings = array(
-    'field_pron'             => NULL,
-    'field_source_name'      => NULL,
-    'field_source_url'       => NULL,
-    'field_source_copyright' => NULL,
-    'field_source_license'   => NULL,
-    'field_source_raw'       => NULL,
-    'field_source_timestamp' => NULL,
-  );
-
-  if (is_null($name)) {
-    return $_settings;
-  }
-
-  if (!array_key_exists($name, $_settings)) {
-    trigger_error(t('No such lingwo_data_setting: @name', array('@name' => $name)), E_USER_ERROR);
-    return NULL;
-  }
-
-  if (is_null($value)) {
-    return variable_get('lingwo_data_'. $name, $_settings[$name]);
-  }
-
-  variable_set('lingwo_data_'. $name, $value);
+  return LingwoImport::$settings->__get($name);
 }
 
