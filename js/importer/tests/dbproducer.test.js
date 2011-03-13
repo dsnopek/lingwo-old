@@ -5,6 +5,7 @@ require(
      'lingwo_old/importer/DatabaseProducer',
      'lingwo/Entry',
      'lingwo/Language',
+     'lingwo_old/entrySerialization'
     ],
     function (TestCase, Database, DatabaseProducer, Entry, Language) {
         TestCase.subclass({

@@ -37,8 +37,7 @@ require(
                 entry.pos = 'noun';
                 entry.setSource('pl.wiktionary.org', {raw: text});
 
-                var parser = wiktionary_pl.parsers.en;
-                parser(entry);
+                wiktionary_pl.parser(entry);
 
                 this.assertEquals(entry.pos, 'noun');
                 this.assertEquals(entry.pron, '\ˈnoʊ.təs');
@@ -59,8 +58,7 @@ require(
                 entry.pos = 'verb';
                 entry.setSource('pl.wiktionary.org', {raw: text});
 
-                var parser = wiktionary_pl.parsers.en;
-                parser(entry);
+                wiktionary_pl.parser(entry);
 
                 this.assertEquals(entry.pos, 'verb');
                 this.assertEquals(entry.pron, '\ˈnoʊ.təs');

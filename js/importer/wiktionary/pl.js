@@ -678,16 +678,27 @@ define(
                             return;
                         }
 
+                        // create the example lists
+                        if (typeof map[name].example == 'undefined') {
+                            map[name].example = [];
+                        }
+                        if (entry.language.name != 'pl' && typeof entry.translations.pl.senses[idx[name]].example_translation == 'undefined') {
+                            entry.translations.pl.senses[idx[name]].example_translation = [];
+                        }
+
                         // Remove the sense numbers
                         line = line.replace(/\(\d\.\d\d?\)/g, '');
 
                         // break up the example and its translation
                         example_parts = line.split('\u2192');
-                        map[name].example = text_utils.limitString(WikiText.clean(example_parts[0]), 255);
-                        if (example_parts[1] && entry.language.name != 'pl') {
+                        map[name].example.push(text_utils.limitString(WikiText.clean(example_parts[0]), 255));
+                        if (!example_parts[1]) {
+                            example_parts[1] = '';
+                        }
+                        if (entry.language.name != 'pl') {
                             // store the example translation
-                            entry.translations.pl.senses[idx[name]].example_translation =
-                                text_utils.limitString(WikiText.clean(example_parts[1]), 255);
+                            entry.translations.pl.senses[idx[name]].example_translation
+                                .push(text_utils.limitString(WikiText.clean(example_parts[1]), 255));
                         }
                     });
                 }

@@ -5,6 +5,7 @@
  */
 function lingwo_data_admin_settings()
 {
+  $settings =& LingwoImport::$settings;
   $form = array();
 
   $fields = array(
@@ -23,12 +24,20 @@ function lingwo_data_admin_settings()
     $available_generic_fields[$field_name] = $field['widget']['label'];
   }
 
-  $fields['lingwo_data_field_pron'] = array(
-    '#type' => 'select',
-    '#title' => t('Pronounciation Field'),
-    '#options' => $available_generic_fields,
-    '#default_values' => lingwo_data_settings('field_pron'),
+  $pron = array(
+    '#type' => 'fieldset',
+    '#title' => t('Pronunciation'),
+    '#tree' => FALSE,
   );
+  foreach (array('ipa','audio','tag') as $x) {
+    $pron[$settings->name("field_pron_$x")] = array(
+      '#type' => 'select',
+      '#title' => $x,
+      '#options' => $available_generic_fields,
+      '#default_value' => $settings->__get("field_pron_$x"),
+    );
+  }
+  $fields['pron'] = $pron;
 
   $source = array(
     '#type' => 'fieldset',
@@ -36,11 +45,11 @@ function lingwo_data_admin_settings()
     '#tree' => FALSE,
   );
   foreach(array('name', 'url', 'copyright', 'license', 'raw', 'timestamp') as $x) {
-    $source["lingwo_data_field_source_$x"] = array(
+    $source[$settings->name("field_source_$x")] = array(
       '#type' => 'select',
       '#title' => $x,
       '#options' => $available_generic_fields,
-      '#default_value' => lingwo_data_settings("field_source_$x"),
+      '#default_value' => $settings->__get("field_source_$x"),
     );
   }
   $fields['source'] = $source;

@@ -7,11 +7,11 @@ require(
      'lingwo_old/util/json2',
     ],
     function (TestCase, Entry, en, wiktionary_en, JSON) {
-        function doitFactory(pos, compose) {
+        function doFormParserFactory(pos, compose) {
             return function (name, headword, parts) {
                 var forms = wiktionary_en._internal.formParsers[pos](
                     name, new Entry({ headword: headword }), parts);
-                for(var name in forms) {
+                for(name in forms) {
                     if (forms[name] instanceof Array) {
                         forms[name] = forms[name].join(',');
                     }
@@ -20,9 +20,10 @@ require(
             };
         }
 
+        // test form parsing
         TestCase.subclass({
             testParseFormsVerb: function () {
-                var doit = doitFactory('verb', function (forms) {
+                var doit = doFormParserFactory('verb', function (forms) {
                     return [forms['infinitive'], forms['-s'], forms['-ing'], forms['2nd'], forms['3rd']];
                 });
 
@@ -43,7 +44,7 @@ require(
             },
 
             testParseFormsAdj: function () {
-                var doit = doitFactory('adjective', function (forms) {
+                var doit = doFormParserFactory('adjective', function (forms) {
                     return [forms['more'], forms['most']];
                 });
 
@@ -57,7 +58,7 @@ require(
             },
 
             testParseFormsAdv: function () {
-                var doit = doitFactory('adverb', function (forms) {
+                var doit = doFormParserFactory('adverb', function (forms) {
                     return [forms['more'], forms['most']];
                 });
 
@@ -71,7 +72,7 @@ require(
             },
 
             testParseFormsNoun: function () {
-                var doit = doitFactory('noun', function (forms) {
+                var doit = doFormParserFactory('noun', function (forms) {
                     return [forms['plural_type'],forms['plural']];
                 });
 
@@ -99,6 +100,114 @@ require(
 
                 this.assertEquals(doit('en-plural-noun', 'underpants', []), 'plural:');
                 this.assertEquals(doit('en-plural noun', 'underpants', []), 'plural:');
+            }
+        }).run();
+
+        function parsePronunciation(text) {
+            var entry = new Entry();
+            wiktionary_en._internal.parsePronunciation(entry, text);
+            return entry.pron;
+        }
+
+        // test pronunciation parser
+        TestCase.subclass({
+            testParseSimple: function () {
+                var pron = parsePronunciation(
+                    "===Pronunciation===\n" +
+                    "* {{IPA|/ˈstɔːɹi/}}\n\n"
+                );
+
+                this.assertEquals(pron[0].ipa,   "ˈstɔːɹi");
+                this.assertEquals(pron[0].tag,   undefined);
+                this.assertEquals(pron[0].audio, undefined);
+            },
+
+            testParseAccent: function () {
+                var pron = parsePronunciation(
+                    "===Pronunciation===\n" +
+                    "* {{a|US}} {{IPA|/ˈstɔːɹi/}}\n\n"
+                );
+
+                this.assertEquals(pron[0].ipa,   "ˈstɔːɹi");
+                this.assertEquals(pron[0].tag,   "US");
+                this.assertEquals(pron[0].audio, undefined);
+            },
+
+            testParseAudio1: function () {
+                var pron = parsePronunciation(
+                    "===Pronunciation===\n" +
+                    "* {{audio|en-us-story.ogg|Audio (US)}}\n\n"
+                );
+
+                this.assertEquals(pron[0].ipa,   undefined);
+                this.assertEquals(pron[0].tag,   "US");
+                this.assertEquals(pron[0].audio, "http://upload.wikimedia.org/wikipedia/commons/1/11/En-us-story.ogg");
+            },
+
+            testParseAudio2: function () {
+                var pron = parsePronunciation(
+                    "===Pronunciation===\n" +
+                    "* {{a|US}} {{IPA|/ˈstɔːɹi/}}\n" +
+                    "* {{audio|en-us-story.ogg|Audio (US)}}\n\n"
+                );
+
+                this.assertEquals(pron[0].ipa,   "ˈstɔːɹi");
+                this.assertEquals(pron[0].tag,   "US");
+                this.assertEquals(pron[0].audio, "http://upload.wikimedia.org/wikipedia/commons/1/11/En-us-story.ogg");
+            },
+
+            testParseAudio3: function () {
+                var pron = parsePronunciation(
+                    "===Pronunciation===\n" +
+                    "* {{IPA|/ˈstɔːɹi/}}\n" +
+                    "* {{audio|en-uk-story.ogg|Audio (UK)}}\n" +
+                    "* {{audio|en-us-story.ogg|Audio (US)}}\n" +
+                    "* {{rhymes|ɔːri}}\n\n"
+                );
+
+                this.assertEquals(pron[0].ipa,   "ˈstɔːɹi");
+                this.assertEquals(pron[0].tag,   "UK");
+                this.assertEquals(pron[0].audio, "http://upload.wikimedia.org/wikipedia/commons/8/8c/En-uk-story.ogg");
+
+                this.assertEquals(pron[1].ipa,   "ˈstɔːɹi");
+                this.assertEquals(pron[1].tag,   "US");
+                this.assertEquals(pron[1].audio, "http://upload.wikimedia.org/wikipedia/commons/1/11/En-us-story.ogg");
+            },
+
+            testParseAudio4: function () {
+                var pron = parsePronunciation(
+                    "===Pronunciation===\n" +
+                    "* {{enPR|bo͝ok}}, {{IPA|/bʊk/}}, {{SAMPA|/bUk/}}\n" +
+                    "* {{audio|en-us-book.ogg|Audio (US)}} ''plural'' {{audio|en-us-books.ogg|Audio (US)}}\n" +
+                    "* {{audio|En-uk-book.ogg|Audio (UK)}}\n" +
+                    "* {{rhymes|ʊk}}\n\n"
+                );
+
+                this.assertEquals(pron[0].ipa,   "bʊk");
+                this.assertEquals(pron[0].tag,   "US");
+                this.assertEquals(pron[0].audio, "http://upload.wikimedia.org/wikipedia/commons/3/3d/En-us-book.ogg");
+
+                this.assertEquals(pron[1].ipa,   "bʊk");
+                this.assertEquals(pron[1].tag,   "UK");
+                this.assertEquals(pron[1].audio, "http://upload.wikimedia.org/wikipedia/commons/7/70/En-uk-book.ogg");
+            },
+
+            testParseAudio5: function () {
+                var pron = parsePronunciation(
+                    "===Pronunciation===\n" +
+                    "* {{a|UK}} {{IPA|/wɜː(ɹ)d/}}\n" +
+                    "* {{a|US}} {{enPR|wûrd}}, {{IPA|/wɝd/}}, {{SAMPA|/w3`d/}}\n" +
+                    "* {{audio|en-us-word.ogg|Audio (US)}}\n" +
+                    "* {{rhymes|ɜː(r)d}}\n\n"
+                );
+
+                this.assertEquals(pron[0].ipa,   "wɜː(ɹ)d");
+                this.assertEquals(pron[0].tag,   "UK");
+                this.assertEquals(pron[0].audio, undefined);
+
+                this.assertEquals(pron[1].ipa,   "wɝd");
+                this.assertEquals(pron[1].tag,   "US");
+                this.assertEquals(pron[1].audio, "http://upload.wikimedia.org/wikipedia/commons/b/bf/En-us-word.ogg");
             }
         }).run();
     }
