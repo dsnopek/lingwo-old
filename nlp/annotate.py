@@ -16,7 +16,7 @@ class Connector(object):
 def lookup(remote, doc, lang):
     # TODO: this isn't what we want to do in the end, but it will work now for testing
     def qlookup(word):
-        res = remote.call('lingwo_dictionary.search_entries', word, {'language':lang})
+        res = remote.call('lingwo_entry.search', word, {'language':lang})
         if len(res) > 0:
             return res[0]
         return None

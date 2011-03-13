@@ -3,7 +3,7 @@
 
 /**
  * @file
- * For lingwo_dictionary with views
+ * For lingwo_korpus with views
  */
 
 /**
@@ -72,7 +72,7 @@ function lingwo_korpus_views_data() {
         'title' => t('Part Of Speech'),
         'help' => t('The part of speech of this entry'),
         'field' => array(
-          'handler' => 'lingwo_dictionary_views_handler_field_pos',
+          'handler' => 'lingwo_entry_views_handler_field_pos',
           'click sortable' => TRUE,
         ),
         'sort' => array(
@@ -92,7 +92,7 @@ function lingwo_korpus_views_data() {
         'title' => t('Dictionary Entry'),
         'help' => t('The Dictionary Entry for the entry'),
         'relationship' => array(
-          'base' => 'lingwo_dictionary_entry',
+          'base' => 'lingwo_entry_info',
           'base field' => 'entry_hash',
           'label' => t('dictionary entry'),
         ),

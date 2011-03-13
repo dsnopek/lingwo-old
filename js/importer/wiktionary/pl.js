@@ -3,13 +3,13 @@
  * For parsing data from pl.wikitionary.org.
  */
 
-require.def('lingwo_dictionary/importer/wiktionary/pl',
-    ['lingwo_dictionary/util/declare',
-     'lingwo_dictionary/Entry',
-     'lingwo_dictionary/Language',
-     'lingwo_dictionary/importer/mediawiki/WikiText',
-     'lingwo_dictionary/importer/mediawiki/Producer',
-     'lingwo_dictionary/util/text',
+define(
+    ['lingwo/util/declare',
+     'lingwo/Entry',
+     'lingwo/Language',
+     'lingwo_old/importer/mediawiki/WikiText',
+     'lingwo_old/importer/mediawiki/Producer',
+     'lingwo_old/util/text',
     ],
     function (declare, Entry, Language, WikiText, MediawikiProducer, text_utils) {
         var langNames = {
@@ -682,7 +682,7 @@ require.def('lingwo_dictionary/importer/wiktionary/pl',
                         if (typeof map[name].example == 'undefined') {
                             map[name].example = [];
                         }
-                        if (typeof entry.translations.pl.senses[idx[name]].example_translation == 'undefined') {
+                        if (entry.language.name != 'pl' && typeof entry.translations.pl.senses[idx[name]].example_translation == 'undefined') {
                             entry.translations.pl.senses[idx[name]].example_translation = [];
                         }
 

@@ -1,10 +1,11 @@
 
 require(
-    ['lingwo_dictionary/util/TestCase',
-     'lingwo_dictionary/importer/Database',
-     'lingwo_dictionary/importer/DatabaseProducer',
-     'lingwo_dictionary/Entry',
-     'lingwo_dictionary/Language',
+    ['lingwo_old/util/TestCase',
+     'lingwo_old/importer/Database',
+     'lingwo_old/importer/DatabaseProducer',
+     'lingwo/Entry',
+     'lingwo/Language',
+     'lingwo_old/entrySerialization'
     ],
     function (TestCase, Database, DatabaseProducer, Entry, Language) {
         TestCase.subclass({

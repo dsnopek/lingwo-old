@@ -1,6 +1,6 @@
 
-require.def('lingwo_dictionary/importer/makeMultiParser',
-    ['lingwo_dictionary/Entry'],
+define(
+    ['lingwo/Entry'],
     function (Entry) {
         // Reduces all of an entries translations to a single list
         function getTranslations(entry, langCode) {

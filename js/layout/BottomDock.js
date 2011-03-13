@@ -1,9 +1,9 @@
 
 define(
     ['jquery',
-     'lingwo_dictionary/util/declare',
-     'lingwo_dictionary/util/proxy',
-     'lingwo_dictionary/layout/isPositionFixedSupported'
+     'lingwo/util/declare',
+     'lingwo_old/util/proxy',
+     'lingwo_old/layout/isPositionFixedSupported'
     ],
     function ($, declare, proxy, isPositionFixedSupported) {
         var positionFixed = isPositionFixedSupported();

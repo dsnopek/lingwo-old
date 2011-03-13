@@ -1,10 +1,10 @@
 
 require(
-    ['lingwo_dictionary/util/TestCase',
-     'lingwo_dictionary/Entry',
-     'lingwo_dictionary/languages/pl',
-     'lingwo_dictionary/importer/wiktionary/pl',
-     'lingwo_dictionary/util/json2',
+    ['lingwo_old/util/TestCase',
+     'lingwo/Entry',
+     'lingwo/languages/pl',
+     'lingwo_old/importer/wiktionary/pl',
+     'lingwo_old/util/json2',
     ],
     function (TestCase, Entry, pl, wiktionary_pl, JSON) {
         TestCase.subclass({
