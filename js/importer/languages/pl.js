@@ -3,12 +3,12 @@
  * Connects the bits to make an Polish language importer.
  */
 
-require.def('lingwo_dictionary/importer/languages/pl', 
-    ['lingwo_dictionary/importer/MultiProducer',
-     'lingwo_dictionary/importer/makeMultiParser',
-     'lingwo_dictionary/importer/wiktionary/pl',
-     'lingwo_dictionary/importer/OpenDictionaries',
-     'lingwo_dictionary/languages/pl'],
+define(
+    ['lingwo_old/importer/MultiProducer',
+     'lingwo_old/importer/makeMultiParser',
+     'lingwo_old/importer/wiktionary/pl',
+     'lingwo_old/importer/OpenDictionaries',
+     'lingwo/languages/pl'],
     function (MultiProducer, makeMultiParser, wiktionary_pl, OpenDictionaries, pl) {
         var opendictionaries_pl_en = OpenDictionaries.generateModule('pl', 'en'),
             modules = [

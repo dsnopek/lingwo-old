@@ -1,12 +1,12 @@
 
-require.def('lingwo_dictionary/buildForm',
-    ['lingwo_dictionary/parseTemplate',
-     'text!lingwo_dictionary/buildForm/wrapper.html',
-     'text!lingwo_dictionary/buildForm/text.html',
-     'text!lingwo_dictionary/buildForm/select.html',
-     'text!lingwo_dictionary/buildForm/checkbox.html',
-     'text!lingwo_dictionary/buildForm/radio.html',
-     'text!lingwo_dictionary/buildForm/radios.html'
+define(
+    ['lingwo_old/parseTemplate',
+     'text!lingwo_old/buildForm/wrapper.html',
+     'text!lingwo_old/buildForm/text.html',
+     'text!lingwo_old/buildForm/select.html',
+     'text!lingwo_old/buildForm/checkbox.html',
+     'text!lingwo_old/buildForm/radio.html',
+     'text!lingwo_old/buildForm/radios.html'
     ],
     function (parseTemplate, wrapperTmpl, textTmpl, selectTmpl, checkboxTmpl, radioTmpl, radiosTmpl) {
         var wrapper = parseTemplate(wrapperTmpl),

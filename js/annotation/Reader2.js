@@ -1,10 +1,10 @@
 
-require.def('lingwo_dictionary/annotation/Reader2',
+define(
     ['jquery',
-     'lingwo_dictionary/layout/Popup',
-     'lingwo_dictionary/util/clobber',
-     'lingwo_dictionary/util/clone',
-     'lingwo_dictionary/util/proxy'
+     'lingwo_old/layout/Popup',
+     'lingwo_old/util/clobber',
+     'lingwo_old/util/clone',
+     'lingwo_old/util/proxy'
     ],
     function ($, PopupLayout, clobber, clone, proxy) {
         var Reader, Layouts,

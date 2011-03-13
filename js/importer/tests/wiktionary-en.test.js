@@ -1,10 +1,10 @@
 
 require(
-    ['lingwo_dictionary/util/TestCase',
-     'lingwo_dictionary/Entry',
-     'lingwo_dictionary/languages/en',
-     'lingwo_dictionary/importer/wiktionary/en',
-     'lingwo_dictionary/util/json2',
+    ['lingwo_old/util/TestCase',
+     'lingwo/Entry',
+     'lingwo/languages/en',
+     'lingwo_old/importer/wiktionary/en',
+     'lingwo_old/util/json2',
     ],
     function (TestCase, Entry, en, wiktionary_en, JSON) {
         function doFormParserFactory(pos, compose) {

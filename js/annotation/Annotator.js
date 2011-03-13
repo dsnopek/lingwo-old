@@ -1,13 +1,13 @@
 
-require.def('lingwo_dictionary/annotation/Annotator',
+define(
     ['jquery',
-     'lingwo_dictionary/annotation/Reader2',
-     'lingwo_dictionary/annotation/TextSelector',
-     'lingwo_dictionary/buildForm',
-     'lingwo_dictionary/parseTemplate',
-     'text!lingwo_dictionary/annotation/Annotator/button.html',
-     'text!lingwo_dictionary/annotation/Annotator/button-group.html',
-     'text!lingwo_dictionary/annotation/Annotator/bubble-form.html'
+     'lingwo_old/annotation/Reader2',
+     'lingwo_old/annotation/TextSelector',
+     'lingwo_old/buildForm',
+     'lingwo_old/parseTemplate',
+     'text!lingwo_old/annotation/Annotator/button.html',
+     'text!lingwo_old/annotation/Annotator/button-group.html',
+     'text!lingwo_old/annotation/Annotator/bubble-form.html'
     ],
     function ($, Reader, TextSelector, buildForm, parseTemplate, makeBtn, makeBtnGrp, makeBubbleForm) {
         var Annotator,
@@ -203,7 +203,9 @@ require.def('lingwo_dictionary/annotation/Annotator',
                 Reader.setBubbleContent('');
 
                 // first, we need to get the list of posItems
-                $.getJSON('/lingwo_korpus/pos_list', function (res) {
+                $.getJSON('/lingwo_korpus/pos_list', {
+                    'language': Drupal.settings.lingwo_korpus.text.language
+                }, function (res) {
                     var pos_list = res.pos_list;
                     pos_list.unshift({ label: '-none-', value: '' });
 
@@ -221,7 +223,6 @@ require.def('lingwo_dictionary/annotation/Annotator',
                         Annotator.setBubblePane('anno-form');
                         return false;
                     });
-
                 });
             },
 

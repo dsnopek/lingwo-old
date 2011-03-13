@@ -1,6 +1,0 @@
-; $Id$
-name = Lingwo Dictionary
-description = Implements extensions for Lingwo Dictionary
-package = Lingwo Dictionary
-core = 6.x
-

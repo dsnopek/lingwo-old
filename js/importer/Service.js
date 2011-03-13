@@ -3,9 +3,9 @@
  * For communicating with the lingwo_data service.
  */
 
-require.def('lingwo_dictionary/importer/Service',
-    ['lingwo_dictionary/util/declare',
-     'lingwo_dictionary/Entry',
+define(
+    ['lingwo/util/declare',
+     'lingwo/Entry',
     ],
     function (declare, Entry) {
         // escapes characters, yo!

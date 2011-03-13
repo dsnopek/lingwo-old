@@ -10,7 +10,7 @@ function lingwo_data_service_update_entry_access($data) {
   $nid = LingwoEntry::key2nid($data->language, $data->pos, $data->headword);
 
   if (is_null($nid)) {
-    $entry_type = _lingwo_dictionary_settings('entry_content_type');
+    $entry_type = LingwoEntry::$settings->content_type;
     return node_access('create', $entry_type);
   }
 
@@ -31,7 +31,7 @@ function _lingwo_data_node_save($node) {
 
   $nid = NULL;
 
-  $entry_type = _lingwo_dictionary_settings('entry_content_type');
+  $entry_type = LingwoEntry::$settings->content_type;
 
   // Setup form_state.
   $form_state = array();
@@ -118,7 +118,18 @@ function _lingwo_data_import_process_original($entry) {
     $res['pron'] = array();
     if (is_array($entry['pron'])) {
       foreach ($entry['pron'] as $pron) {
+        $item = array();
         if (is_array($pron)) {
+          if (lingwo_data_settings('field_pron_ipa')) {
+            $item['ipa'] = $pron['ipa'];
+          }
+          if (lingwo_data_settings('field_pron_audio')) {
+            $item['audio'] = $pron['audio'];
+          }
+          if (lingwo_data_settings('field_pron_tag')) {
+            $item['tag'] = $pron['tag'];
+          }
+
           $res['pron'][] = array(
             'ipa' => $pron['ipa'],
             'tag' => $pron['tag'],
@@ -126,13 +137,14 @@ function _lingwo_data_import_process_original($entry) {
           );
         }
         else {
-          $res['pron'][] = array(
-            'ipa' => $pron
-          );
+          if (lingwo_data_settings('field_pron_ipa')) {
+            $item['ipa'] = $pron;
+          }
         }
+        $res['pron'][] = $item;
       }
     }
-    else {
+    elseif (lingwo_data_settings('field_pron_ipa')) {
       $res['pron'][] = array('ipa' => $entry['pron']);
     }
   }
@@ -167,7 +179,7 @@ function _lingwo_data_import_setup_node($nid, $entry, $newExtras=array()) {
   // create the original entry/update the original entry
   if (is_null($nid)) {
     $node = (object)array(
-      'type' => _lingwo_dictionary_settings('entry_content_type'),
+      'type' => LingwoEntry::$settings->content_type,
       'title' => $entry['headword'],
       'language' => $entry['language'],
       'pos' => $entry['pos'],
@@ -276,7 +288,7 @@ function _lingwo_data_import_set_field_value($field, $value, $info) {
       $field['data'] = $value;
       if (empty($field['id'])) {
         // senses are treated as invalid, unless they have a UUID!
-        $field['id'] = _ld_make_uuid();
+        $field['id'] = _lingwo_make_uuid();
       }
       break;
     
@@ -310,7 +322,7 @@ function _lingwo_data_import_process_field_values($node, &$items, $info, $values
       }
 
       # Find the number of values we were given.
-      if (_ld_is_translation($node)) {
+      if (_lingwo_is_translation($node)) {
         $translation_source = LingwoEntry::fromNode($node)->sourceNode;
         $max = count($translation_source->lingwo_senses);
       }
@@ -322,7 +334,7 @@ function _lingwo_data_import_process_field_values($node, &$items, $info, $values
       # where given.  If so, we have to remove some.
       if (count($items) > $max) {
         for($i = ($max - 1); $i < count($items); $i++) {
-          if (_ld_is_translation($node)) {
+          if (_lingwo_is_translation($node)) {
             $items[$i]['retire_sense'] = TRUE;
           }
           else {
@@ -347,7 +359,7 @@ function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
     }
 
     // get the CCK type name
-    $field_info = content_fields($field_name, _lingwo_dictionary_settings('entry_content_type'));
+    $field_info = content_fields($field_name, LingwoEntry::$settings->content_type);
   }
 
   if (!isset($node->$field_name)) {
@@ -439,11 +451,13 @@ function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
       try {
         $newExtras = array('language' => $lang);
 
-        // to prevent i18nsync from wiping out the pron data on the original, by failing
+        // to prevent i18nsync from wiping out the pron data on the original by failing
         // to set it on the translation, we provide it here
         foreach(array('ipa','tag','audio') as $field_pron) {
           $field_pron = LingwoImport::$settings->__get('field_pron_'. $field_pron);
-          $newExtras[$field_pron] = $node->$field_pron;
+          if (!empty($field_pron)) {
+            $newExtras[$field_pron] = $node->$field_pron;
+          }
         }
 
         $tnode = _lingwo_data_import_setup_node($tnid_list[$lang]->nid, $entry, $newExtras);

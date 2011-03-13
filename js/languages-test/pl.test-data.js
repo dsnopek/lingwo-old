@@ -3,9 +3,9 @@
  * Test data for Polish
  */
 
-require.def('lingwo_dictionary/languages/pl.test-data',
-    ['lingwo_dictionary/Entry',
-     'lingwo_dictionary/languages/pl',
+define(
+    ['lingwo/Entry',
+     'lingwo/languages/pl',
     ],
     function (Entry, pl) {
         entries = {};

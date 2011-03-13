@@ -12,11 +12,11 @@ function lingwo_data_admin_settings()
     '#title' => t('Map Fields'),
     '#type' => 'fieldset',
     '#tree' => FALSE,
-    '#description' => t('Here we map fields that may be used in import or export feed to CCK fields on <i>@type</i>, our entry content type.', array('@type' => _lingwo_dictionary_settings('entry_content_type')))
+    '#description' => t('Here we map fields that may be used in import or export feed to CCK fields on <i>@type</i>, our entry content type.', array('@type' => LingwoEntry::$settings->content_type))
   );
 
   // get information from CCK about our type
-  $type = content_types(_lingwo_dictionary_settings('entry_content_type'));
+  $type = content_types(LingwoEntry::$settings->content_type);
 
   // make some lists of the available CCK fields for the various settings
   $available_generic_fields = array('');

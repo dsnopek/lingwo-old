@@ -1,9 +1,10 @@
 
 require(
-    ['lingwo_dictionary/util/TestCase',
-     'lingwo_dictionary/languages/en.test-data',
+    ['lingwo_old/util/TestCase',
+     'lingwo_old/languages-test/en.test-data',
     ],
     function (TestCase, test_data) {
+        print ('zumma!');
         TestCase.subclass({
             // copied from pl.test.js
             checkFieldMulti: function (field_name, field_map) {
@@ -110,5 +111,4 @@ require(
         }).run();
     }
 );
-
 

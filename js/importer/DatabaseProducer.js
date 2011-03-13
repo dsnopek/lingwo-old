@@ -6,9 +6,9 @@
 importPackage(java.sql);
 importPackage(java.io);
 
-require.def('lingwo_dictionary/importer/DatabaseProducer',
-    ['lingwo_dictionary/util/declare',
-     'lingwo_dictionary/Entry'],
+define(
+    ['lingwo/util/declare',
+     'lingwo/Entry'],
     function (declare, Entry) {
         return declare({
             _constructor: function (db, lang, entry_list) {
