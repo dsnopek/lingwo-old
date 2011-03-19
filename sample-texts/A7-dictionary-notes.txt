@@ -1,6 +1,0 @@
-
-== misc ==
-
- * mnemonic (adj & noun): import and check
- * commit to memory: should it be its own verb?
-
