@@ -164,6 +164,7 @@ class Simplifier(object):
             dataEntry = self.hashNode(elem)
 
             newElem = Element_replaceWithTagName(elem, 'span')
+            newElem.setAttribute('tabindex', '0')
             newElem.setAttribute('class', 'anno')
             # if we have a valid entry hash, then we should put it on the span
             if dataEntry is not None:
