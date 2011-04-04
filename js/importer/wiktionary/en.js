@@ -486,6 +486,10 @@ define(
                     more = formInfo[0]+'er';
                     most = formInfo[0]+'est';
                 }
+                else if (formInfo[1] == 'r') {
+                    more = formInfo[0]+'r';
+                    most = formInfo[0]+'st';
+                }
                 else if (formInfo[1] == 'ier') {
                     more = formInfo[0]+'ier';
                     most = formInfo[0]+'iest';
