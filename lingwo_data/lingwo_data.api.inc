@@ -6,7 +6,7 @@
  * API for lingwo_data
  */
 
-require_once(dirname(__FILE__) .'/../../lingwo_oss/includes/settings.inc');
+require_once(drupal_get_path('module', 'lingwo_entry') . '/../includes/settings.inc');
 
 // TODO: We name this LingwoImport because that is what it will eventually be named
 class LingwoImportSettings extends LingwoSettings {
