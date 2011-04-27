@@ -12,9 +12,9 @@
     // load requirejs
     require = {
         paths: {
-            'lingwo': LINGWO_DICTIONARY_PATH+'/../lingwo_oss/js',
+            'lingwo': LINGWO_DICTIONARY_PATH+'/../lingwo/js',
             'lingwo_old': LINGWO_DICTIONARY_PATH+'/js',
-            'lingwo/languages': LINGWO_DICTIONARY_PATH+'/../drupal/sites/default/files/lingwo/languages',
+            'lingwo/languages': LINGWO_DICTIONARY_PATH+'/../bbcom/drupal/sites/default/files/lingwo/languages',
         }
     };
     load(LINGWO_DICTIONARY_PATH + '/js/require.js');
