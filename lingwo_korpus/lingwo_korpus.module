@@ -40,6 +40,13 @@ function lingwo_korpus_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  $item['lingwo_korpus/popup'] = array(
+    'title' => 'Popup',
+    'page callback' => 'lingwo_korpus_popup_page',
+    'access arguments' => array('access content',
+    'type' => MENU_CALLBACK,
+  );
+
   # AJAX callbacks for the text Reader and the annotator
   $items['lingwo_korpus/lookup_entry'] = array(
     'title' => 'Lookup Entry',
@@ -65,6 +72,14 @@ function lingwo_korpus_menu() {
 }
 
 /*
+ * Looks up an entry, replacment for the AJAX version.
+ */
+function lingwo_korpus_popup_page() {
+  // TODO: return some JavaScript to do the actual loading
+  return '<div>Loading...</div>';
+}
+
+/*
  * Our entry lookup AJAX callback.
  */
 function lingwo_korpus_lookup_entry() {
@@ -87,7 +102,7 @@ function lingwo_korpus_lookup_entry() {
   }
 
   // return the HTML to the Ajax caller
-  drupal_json(array('content' => $content));
+  drupal_json(array('content' => $content, 'javascript' => drupal_get_js());
 }
 
 /*
