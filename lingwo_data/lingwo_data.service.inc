@@ -36,6 +36,7 @@ function _lingwo_data_node_save($node) {
   // Setup form_state.
   $form_state = array();
   $form_state['values'] = (array) $node;
+  $form_state['values']['bbcom_dictionary_guidelines_confirm'] = '1';
   $form_state['values']['op'] = t('Save');
 
   // Later on in the chain node_form seems to expect a copy of

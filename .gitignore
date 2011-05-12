@@ -3,3 +3,6 @@ punkt.pickle
 config.py
 *.uncompressed.js
 *.pyc
+scripts/importer/entry-list-test*
+scripts/importer/log
+
