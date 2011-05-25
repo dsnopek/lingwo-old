@@ -13,11 +13,6 @@ class LingwoImportSettings extends LingwoSettings {
   protected $base_name = 'lingwo_data'; 
 
   private $defaults = array(
-	// TODO: This should really be provided by a lingwo_pron module
-    'field_pron_ipa'         => NULL,
-    'field_pron_audio'       => NULL,
-    'field_pron_tag'         => NULL,
-
     'field_source_name'      => NULL,
     'field_source_url'       => NULL,
     'field_source_copyright' => NULL,

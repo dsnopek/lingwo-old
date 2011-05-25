@@ -24,21 +24,6 @@ function lingwo_data_admin_settings()
     $available_generic_fields[$field_name] = $field['widget']['label'];
   }
 
-  $pron = array(
-    '#type' => 'fieldset',
-    '#title' => t('Pronunciation'),
-    '#tree' => FALSE,
-  );
-  foreach (array('ipa','audio','tag') as $x) {
-    $pron[$settings->name("field_pron_$x")] = array(
-      '#type' => 'select',
-      '#title' => $x,
-      '#options' => $available_generic_fields,
-      '#default_value' => $settings->__get("field_pron_$x"),
-    );
-  }
-  $fields['pron'] = $pron;
-
   $source = array(
     '#type' => 'fieldset',
     '#title' => 'Source',
