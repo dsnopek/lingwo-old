@@ -646,6 +646,36 @@ define(
                 pron[type] = value;
             }
 
+            function cleanAccent(accent) {
+                if (/[Dd]ialect/.exec(accent)) {
+                    // snag our special dialectual tag
+                    accent = 'dialectual';
+                }
+                else if (/GA|GenAm|US|Standard/i.exec(accent)) {
+                    // if US or Standard are mentioned at all, then it is our default (US)!
+                    accent = 'US';
+                }
+                else if (/UK|British/i.exec(accent)) {
+                    accent = 'UK';
+                }
+                else if (/Canada|CAN/i.exec(accent)) {
+                    accent = 'CA';
+                }
+                else if (accent == 'AusE') {
+                    accent = 'AU';
+                }
+                else if (accent == 'Tasmanian') {
+                    accent = 'TAS';
+                }
+                // TODO: we should be doing this in reverse, where we remove all not-valid options, but while I'm
+                // working on the importer this is helpful in finding the list of valid ones
+                else if (['WEAE','?'].indexOf(accent) != -1) {
+                    accent = null;
+                }
+                
+                return accent;
+            }
+
             function getFullFilename(fn) {
                 var md = java.security.MessageDigest.getInstance('md5'),
                     fn = fn.substr(0, 1).toUpperCase() + fn.substr(1),
@@ -662,7 +692,7 @@ define(
 
                 // get the accent specifier
                 if (matches = /\{\{a\|([^\}]+)\}\}/.exec(line)) {
-                    accent = matches[1];
+                    accent = cleanAccent(matches[1]);
                 }
                 else {
                     accent = null;
@@ -681,7 +711,7 @@ define(
                     addPron(accent, 'ipa', value);
                 }
                 else if (matches = /\{\{[Aa]udio\|([^|]+)\|[Aa]udio \(([^\)]+)\)\}\}/.exec(line)) {
-                    addPron(matches[2], 'audio', getFullFilename(matches[1]));
+                    addPron(cleanAccent(matches[2]), 'audio', getFullFilename(matches[1]));
                 }
                 else if (line !== null) {
                     print ('Unknown pron: '+line);
