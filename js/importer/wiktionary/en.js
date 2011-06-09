@@ -651,12 +651,24 @@ define(
                     // snag our special dialectual tag
                     accent = 'dialectual';
                 }
-                else if (/GA|GenAm|US|Standard/i.exec(accent)) {
+                else if (/GA|GenAm|US|Standard|America/i.exec(accent)) {
                     // if US or Standard are mentioned at all, then it is our default (US)!
                     accent = 'US';
                 }
+                else if (/noun/i.exec(accent)) {
+                    // TODO: we really should do something smarter!  Like put one on the verb and the
+                    // other on the noun, etc..  But for now, we just make the noun version standard
+                    // and discard the verb version.
+                    accent = 'US';
+                }
+                else if (/verb/i.exec(accent)) {
+                    accent = null;
+                }
                 else if (/UK|British/i.exec(accent)) {
                     accent = 'UK';
+                }
+                else if (/Scot/i.exec(accent)) {
+                    accent = 'Scotland';
                 }
                 else if (/Canada|CAN/i.exec(accent)) {
                     accent = 'CA';
