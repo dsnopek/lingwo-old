@@ -630,6 +630,7 @@ define(
 
             function addPron(accent, type, value) {
                 var pron;
+                //print (accent + ' ' + type + ' ' + value);
                 if (accent !== null && typeof pronTagged[accent] != 'undefined') {
                     pron = pronTagged[accent];
                 }
