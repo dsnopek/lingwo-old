@@ -70,6 +70,7 @@ function lingwo_korpus_schema() {
       'nid_index' => array('nid'),
       'row_hash_index' => array('row_hash'),
       'entry_hash_index' => array('entry_hash'),
+      'sense_index' => array('sense'),
     ),
     // The default collation (utf8_general_ci) treats accented characters (like: ó, ą, ę, ń)
     // as equivalent to their unaccented counter-parts.  Also, we want entry headwords to be
@@ -108,10 +109,9 @@ function lingwo_korpus_update_6002() {
  * Implementation of hook_install().
  */
 function lingwo_korpus_install() {
-  variable_set('lingwo_korpus_schema_version', 6001);
   drupal_install_schema('lingwo_korpus');
 
-  update_sql("UPDATE {system} SET weight = 50 WHERE name = 'lingwo_korpus'");
+  update_sql("UPDATE {system} SET weight = 52 WHERE name = 'lingwo_korpus'");
 }
 
 /**
@@ -119,6 +119,5 @@ function lingwo_korpus_install() {
  */
 function lingwo_korpus_uninstall() {
   drupal_uninstall_schema('lingwo_korpus');
-  variable_del('lingwo_korpus_schema_version');
 }
 
