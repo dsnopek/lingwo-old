@@ -24,7 +24,7 @@
     }
 
     // bind to the remove checkbox and show/hide the 'Replace with' field
-    $('.lingwo-senses-remove', context).change(toggleReplaceWith);
+    $('.lingwo-senses-remove', context).click(toggleReplaceWith);
     $('.lingwo-senses-remove', context).each(toggleReplaceWith);
 
     function updateOptions() {
