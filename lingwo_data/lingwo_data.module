@@ -28,7 +28,7 @@ function lingwo_data_menu() {
 }
 
 /*
- * Implementation of hook_services()
+ * Implementation of hook_service()
  */
 function lingwo_data_service() {
   return array(
