@@ -513,7 +513,7 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
         'lookup'  => t("Try to lookup words in the dictionary"),
       ),
       // TODO: the default value should be configurable on the admin page
-      '#default_value' => empty($form['#node']->nid) ? array('segment') : array(),
+      '#default_value' => empty($form['#node']->nid) ? array('segment', 'lookup') : array(),
     );
 
     $form['#submit'][] = '_lingwo_korpus_content_node_form_submit';
@@ -566,13 +566,28 @@ function _lingwo_korpus_content_node_form_submit($form, &$form_state) {
 
   if ($auto_annotate) {
     $batch = array(
-      'operations' => array(
-        array('_lingwo_korpus_auto_annotate_node', array($node)),
-      ),
+      'operations' => array(),
       'title' => t('Automatically annotating text'),
     );
+    foreach ($node->lingwo_korpus_auto_annotate as $type => $enabled) {
+      if ($enabled) {
+        $batch['operations'][] = array('_lingwo_korpus_batch_auto_annotate_node', array($node->nid, $type));
+      }
+    }
     batch_set($batch);
   }
+}
+
+function _lingwo_korpus_batch_auto_annotate_node($nid, $type, &$context) {
+  $node = node_load($nid);
+  $node->lingwo_korpus_auto_annotate = array($type => $type);
+  _lingwo_korpus_auto_annotate_node($node);
+  node_save($node);
+
+  $context['sandbox']['node'] = $node;
+
+  // clear the node cache!
+  node_load(NULL, NULL, TRUE);
 }
 
 /*
