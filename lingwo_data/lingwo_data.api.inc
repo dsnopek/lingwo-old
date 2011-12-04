@@ -19,6 +19,8 @@ class LingwoImportSettings extends LingwoSettings {
     'field_source_license'   => NULL,
     'field_source_raw'       => NULL,
     'field_source_timestamp' => NULL,
+    'java_path'              => '/usr/bin/java',
+    'config_path'            => '/home/username/importer-config.js',
   );
 
   public function getDefault($name) {

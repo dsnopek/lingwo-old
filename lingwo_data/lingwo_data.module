@@ -14,6 +14,7 @@ require_once('lingwo_data.api.inc');
  */
 function lingwo_data_menu() {
   $items = array();
+
   $items['admin/settings/lingwo/data'] = array(
     'title' => 'Data',
     'description' => 'Settings for Lingwo Data module.',
@@ -22,6 +23,13 @@ function lingwo_data_menu() {
     'page arguments' => array('lingwo_data_admin_settings'),
     'file' => 'lingwo_data.admin.inc',
     'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['lingwo_data/ajax/import/%'] = array(
+    'access arguments' => array('import lingwo_data entries'),
+    'page callback' => '_lingwo_data_import_entry',
+    'page arguments' => array(3),
+    'type' => MENU_CALLBACK,
   );
 
   return $items;
@@ -120,6 +128,28 @@ function lingwo_data_form_alter(&$form, $form_state, $form_id) {
       '#value' => $form_state['values']['imported_data'],
     );
   }
+}
+
+function _lingwo_data_import_entry($entry_id) {
+  list ($language, $pos, $headword) = explode(':', $entry_id);
+
+  $java_path = LingwoImport::$settings->java_path;
+  $config_path = LingwoImport::$settings->config_path;
+  $scripts_path = dirname(dirname(__FILE__)) . '/scripts';
+  $runjs_path = $scripts_path . '/runjs.sh';
+  $importerjs_path = $scripts_path . '/importer/importer.js';
+
+  $cmd = "cd '$scripts_path/importer' && JAVA='$java_path' '$runjs_path' '$importerjs_path' --config '$config_path' --lang $language --single '$entry_id' 2>&1 >/dev/null";
+  system($cmd, $retval);
+
+  if ($retval) {
+    watchdog('lingwo_data', 'Failed to import entry (%entry_id): !cmd', array(
+      '%entry_id' => $entry_id,
+      '!cmd'      => $cmd,
+    ), WATCHDOG_WARNING);
+  }
+
+  drupal_json(array('success' => !$retval));
 }
 
 /*
