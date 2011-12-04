@@ -161,10 +161,19 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
     '#type'  => 'submit',
     '#value' => t('Save'),
   );
+  /*
   $form['auto'] = array(
     '#type'  => 'submit',
     '#value' => t('Auto Annotate'),
   );
+  */
+  // TODO: This shouldn't be added here, but in a hook_form_alter() from a bbcom_* module
+  if (!$node->status) {
+    $form['publish'] = array(
+      '#type'  => 'submit',
+      '#value' => t('Publish'),
+    );
+  }
 
   drupal_add_js(array(
     'lingwo_korpus' => array(
@@ -219,6 +228,10 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
     drupal_set_message(t('Automatic annotator complete.'));
     $node->lingwo_korpus_auto_annotate = array('segment','lookup');
     _lingwo_korpus_auto_annotate_node($node);
+  }
+  elseif ($form_state['clicked_button']['#value'] == t('Publish')) {
+    $node->status = 1;
+    $form_state['redirect'] = 'node/' . $node->nid;
   }
   node_save($node);
 
@@ -342,8 +355,10 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
     }
 
     // if the user has permission to annotate the text, send them to the annotate page
+    // NOTE: we only want this to fire when coming off the node edit form (hence the
+    // $node->form_id check).
     // TODO: should be configurable on the admin page (ex: always, only on new, never)
-    if (user_access('annotate lingwo_korpus texts')) {
+    if (isset($node->form_id) && user_access('annotate lingwo_korpus texts')) {
       $_REQUEST['destination'] = 'node/' . $node->nid . '/annotate';
     }
   }
@@ -502,6 +517,11 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
     );
 
     $form['#submit'][] = '_lingwo_korpus_content_node_form_submit';
+
+    // TODO: This shouldn't be added here, but in a hook_form_alter() from a bbcom_* module
+    if ($form['#node']->nid == 0) {
+      $form['options']['status']['#default_value'] = 0;
+    }
   }
   else if ($form_id == (LingwoEntry::$settings->content_type . '_node_form')) {
     drupal_add_js(drupal_get_path('module', 'lingwo_korpus') . '/lingwo_korpus.entry.js');
