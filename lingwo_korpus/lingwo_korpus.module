@@ -323,13 +323,6 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
   if ($node->type != lingwo_korpus_text_content_type())
     return;
 
-  $auto_annotate = isset($node->lingwo_korpus_auto_annotate) ? array_filter(array_values($node->lingwo_korpus_auto_annotate)) : NULL;
-  $auto_annotate = !empty($auto_annotate);
-
-  if ($op == 'presave' && $auto_annotate) {
-    _lingwo_korpus_auto_annotate_node($node);
-  }
-
   if ($op == 'update' || $op == 'delete') {
     // clear all cached texts for this node
     cache_clear_all($node->nid, 'cache_lingwo_korpus', TRUE);
@@ -348,6 +341,11 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
       }
     }
 
+    // if the user has permission to annotate the text, send them to the annotate page
+    // TODO: should be configurable on the admin page (ex: always, only on new, never)
+    if (user_access('annotate lingwo_korpus texts')) {
+      $_REQUEST['destination'] = 'node/' . $node->nid . '/annotate';
+    }
   }
 
   if ($op == 'view') {
@@ -502,6 +500,8 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
       // TODO: the default value should be configurable on the admin page
       '#default_value' => empty($form['#node']->nid) ? array('segment') : array(),
     );
+
+    $form['#submit'][] = '_lingwo_korpus_content_node_form_submit';
   }
   else if ($form_id == (LingwoEntry::$settings->content_type . '_node_form')) {
     drupal_add_js(drupal_get_path('module', 'lingwo_korpus') . '/lingwo_korpus.entry.js');
@@ -535,6 +535,23 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
         $index++;
       }
     }
+  }
+}
+
+function _lingwo_korpus_content_node_form_submit($form, &$form_state) {
+  $node = (object)$form_state['values'];
+
+  $auto_annotate = isset($node->lingwo_korpus_auto_annotate) ? array_filter(array_values($node->lingwo_korpus_auto_annotate)) : NULL;
+  $auto_annotate = !empty($auto_annotate);
+
+  if ($auto_annotate) {
+    $batch = array(
+      'operations' => array(
+        array('_lingwo_korpus_auto_annotate_node', array($node)),
+      ),
+      'title' => t('Automatically annotating text'),
+    );
+    batch_set($batch);
   }
 }
 
