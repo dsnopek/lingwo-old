@@ -40,6 +40,20 @@ function lingwo_data_admin_settings()
   $fields['source'] = $source;
   $form['fields'] = $fields;
 
+  $form[$settings->name('java_path')] = array(
+    '#title' => t('Java path'),
+    '#type' => 'textfield',
+    '#description' => t('The full path to execute the java interpreter.  For example, <code>/usr/bin/java</code>'),
+    '#default_value' => $settings->java_path,
+  );
+
+  $form[$settings->name('config_path')] = array(
+    '#title' => t('Config path'),
+    '#type' => 'textfield',
+    '#description' => t('The full path to the JSON config for the importer.  For example, <code>/home/username/importer-config.js</code>'),
+    '#default_value' => $settings->config_path,
+  );
+
   return system_settings_form($form);
 }
 

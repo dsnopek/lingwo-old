@@ -22,7 +22,7 @@ define(
             _runAll: function (args) {
                 var handler = args.handler;
                 var limit = args.limit || 0;
-                var offset = 0, entry, self = this, _limit = 10;
+                var offset = 0, entry, self = this, _limit = 10, counter = 0;
 
                 while(true) {
                     if (limit != 0) {
@@ -44,6 +44,7 @@ define(
                     }
 
                     rows.forEach(function (row) {
+                        counter++;
                         // build a fake entry
                         var entry = Entry.deserialize(''+row.data);
                         handler(entry);
@@ -51,6 +52,8 @@ define(
 
                     offset += this.PAGE_SIZE;
                 }
+
+                return counter;
             },
 
             _runList: function (args) {
@@ -74,14 +77,16 @@ define(
 
                     if (limit && counter >= limit) break;
                 }
+
+                return counter;
             },
 
             run: function (args) {
                 if (this.entry_list) {
-                    this._runList(args);
+                    return this._runList(args);
                 }
                 else {
-                    this._runAll(args);
+                    return this._runAll(args);
                 }
             }
         });
