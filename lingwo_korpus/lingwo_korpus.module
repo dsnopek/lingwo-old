@@ -161,10 +161,19 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
     '#type'  => 'submit',
     '#value' => t('Save'),
   );
+  /*
   $form['auto'] = array(
     '#type'  => 'submit',
     '#value' => t('Auto Annotate'),
   );
+  */
+  // TODO: This shouldn't be added here, but in a hook_form_alter() from a bbcom_* module
+  if (!$node->status) {
+    $form['publish'] = array(
+      '#type'  => 'submit',
+      '#value' => t('Publish'),
+    );
+  }
 
   drupal_add_js(array(
     'lingwo_korpus' => array(
@@ -214,11 +223,15 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
     return;
   }
 
-  $node->body = $text;
+  _lingwo_korpus_update_body($node, $text);
   if ($form_state['clicked_button']['#value'] == t('Auto Annotate')) {
     drupal_set_message(t('Automatic annotator complete.'));
     $node->lingwo_korpus_auto_annotate = array('segment','lookup');
     _lingwo_korpus_auto_annotate_node($node);
+  }
+  elseif ($form_state['clicked_button']['#value'] == t('Publish')) {
+    $node->status = 1;
+    $form_state['redirect'] = 'node/' . $node->nid;
   }
   node_save($node);
 
@@ -280,10 +293,10 @@ function lingwo_korpus_generate_hash(&$item) {
 }
 
 function _lingwo_korpus_update_body(&$node, $body) {
-  $old_body = $node->body;
+  $orig_body = $node->body;
   $node->body = $body;
 
-  if ($node->teaser_include && $node->teaser == substr($orig_body, 0, strlen($node->teaser))) {
+  if ($node->teaser == substr($orig_body, 0, strlen($node->teaser))) {
     // The teaser is just a section of the body, they are a connected whole.
     // So, we need to regenerate the teaser bit since we've altered the body
     // (lifted from node/node.module's node_submit() function)
@@ -323,13 +336,6 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
   if ($node->type != lingwo_korpus_text_content_type())
     return;
 
-  $auto_annotate = isset($node->lingwo_korpus_auto_annotate) ? array_filter(array_values($node->lingwo_korpus_auto_annotate)) : NULL;
-  $auto_annotate = !empty($auto_annotate);
-
-  if ($op == 'presave' && $auto_annotate) {
-    _lingwo_korpus_auto_annotate_node($node);
-  }
-
   if ($op == 'update' || $op == 'delete') {
     // clear all cached texts for this node
     cache_clear_all($node->nid, 'cache_lingwo_korpus', TRUE);
@@ -348,6 +354,13 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
       }
     }
 
+    // if the user has permission to annotate the text, send them to the annotate page
+    // NOTE: we only want this to fire when coming off the node edit form (hence the
+    // $node->form_id check).
+    // TODO: should be configurable on the admin page (ex: always, only on new, never)
+    if (isset($node->form_id) && user_access('annotate lingwo_korpus texts')) {
+      $_REQUEST['destination'] = 'node/' . $node->nid . '/annotate';
+    }
   }
 
   if ($op == 'view') {
@@ -500,8 +513,15 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
         'lookup'  => t("Try to lookup words in the dictionary"),
       ),
       // TODO: the default value should be configurable on the admin page
-      '#default_value' => empty($form['#node']->nid) ? array('segment') : array(),
+      '#default_value' => empty($form['#node']->nid) ? array('segment', 'lookup') : array(),
     );
+
+    $form['#submit'][] = '_lingwo_korpus_content_node_form_submit';
+
+    // TODO: This shouldn't be added here, but in a hook_form_alter() from a bbcom_* module
+    if ($form['#node']->nid == 0) {
+      $form['options']['status']['#default_value'] = 0;
+    }
   }
   else if ($form_id == (LingwoEntry::$settings->content_type . '_node_form')) {
     drupal_add_js(drupal_get_path('module', 'lingwo_korpus') . '/lingwo_korpus.entry.js');
@@ -536,6 +556,38 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
       }
     }
   }
+}
+
+function _lingwo_korpus_content_node_form_submit($form, &$form_state) {
+  $node = (object)$form_state['values'];
+
+  $auto_annotate = isset($node->lingwo_korpus_auto_annotate) ? array_filter(array_values($node->lingwo_korpus_auto_annotate)) : NULL;
+  $auto_annotate = !empty($auto_annotate);
+
+  if ($auto_annotate) {
+    $batch = array(
+      'operations' => array(),
+      'title' => t('Automatically annotating text'),
+    );
+    foreach ($node->lingwo_korpus_auto_annotate as $type => $enabled) {
+      if ($enabled) {
+        $batch['operations'][] = array('_lingwo_korpus_batch_auto_annotate_node', array($node->nid, $type));
+      }
+    }
+    batch_set($batch);
+  }
+}
+
+function _lingwo_korpus_batch_auto_annotate_node($nid, $type, &$context) {
+  $node = node_load($nid);
+  $node->lingwo_korpus_auto_annotate = array($type => $type);
+  _lingwo_korpus_auto_annotate_node($node);
+  node_save($node);
+
+  $context['sandbox']['node'] = $node;
+
+  // clear the node cache!
+  node_load(NULL, NULL, TRUE);
 }
 
 /*

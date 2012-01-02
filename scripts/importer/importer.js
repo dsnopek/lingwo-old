@@ -69,7 +69,7 @@ require([
         'lingwo_old/entrySerialization',
     ],
     function (Database, Service, DatabaseProducer, MultiProducer, importer, JSON) {
-        var source, service, db, handler, limit, producer, parser, entryList, x;
+        var source, service, db, handler, limit, producer, parser, entryList, x, counter;
 
         function connectToService(args) {
             var service, res;
@@ -201,6 +201,10 @@ require([
         if (OPTS['entry-list']) {
             entryList = readEntryList(OPTS['entry-list']);
         }
+        if (OPTS['single']) {
+            entryList = {}
+            entryList[OPTS['single']] = true;
+        }
 
         limit = OPTS['limit'];
         if (typeof limit != 'undefined') {
@@ -245,10 +249,15 @@ require([
         }
 
         // run
-        producer.run({
+        counter = producer.run({
             handler: handler,
             limit: limit
         });
+
+        // return error code 1 if --single didn't import exactly one entry
+        if (OPTS['single'] && counter != 1) {
+            java.lang.System.exit(1);
+        }
     }
 );
 

@@ -5,11 +5,12 @@ define(
      'lingwo_old/annotation/TextSelector',
      'lingwo_old/buildForm',
      'lingwo_old/parseTemplate',
+     'lingwo_old/layout/setPositionFixed',
      'text!lingwo_old/annotation/Annotator/button.html',
      'text!lingwo_old/annotation/Annotator/button-group.html',
      'text!lingwo_old/annotation/Annotator/bubble-form.html'
     ],
-    function ($, Reader, TextSelector, buildForm, parseTemplate, makeBtn, makeBtnGrp, makeBubbleForm) {
+    function ($, Reader, TextSelector, buildForm, parseTemplate, setPositionFixed, makeBtn, makeBtnGrp, makeBubbleForm) {
         var Annotator,
             msgWordOn = '<i>Click a word on the left to edit the annotation</i>',
             msgWordOff = '<i>Panel disabled</i>';
@@ -329,6 +330,9 @@ define(
 
                 this.setType('word');
                 this.setMode('edit');
+
+                // make it act like style="position: fixed"
+                setPositionFixed(this.toolbarNode);
             },
 
             _toggleButton: function (which, value) {
@@ -443,7 +447,7 @@ define(
                 $('#anno-form-attributive').attr('checked',
                     target.attr('attributive') == 'true' ? 'checked' : '');
                 $('#anno-form-hidden').attr('checked',
-                    target.get(0).getAttribute('hidden') == 'true' ? 'checked' : '');
+                    (target.get(0).getAttribute('hidden') == 'true' || target.get(0).getAttribute('data-hidden') == 'true') ? 'checked' : '');
 
                 // we can now delete
                 $('#button-delete').removeClass('disabled');
@@ -647,10 +651,10 @@ define(
 
                 // hidden
                 if ($('#anno-form-hidden').attr('checked')) {
-                    this.selected.get(0).setAttribute('hidden', 'true');
+                    this.selected.get(0).setAttribute('data-hidden', 'true');
                 }
                 else {
-                    this.selected.get(0).removeAttribute('hidden');
+                    this.selected.get(0).removeAttribute('data-hidden');
                 }
 
                 // sense

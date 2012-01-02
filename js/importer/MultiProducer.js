@@ -104,6 +104,8 @@ define(
 
                 // get rid of the temporary database
                 (new File(this._db_fn))['delete']();
+
+                return counter;
             }
         });
     }
