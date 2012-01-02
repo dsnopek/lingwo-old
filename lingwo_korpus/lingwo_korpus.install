@@ -106,6 +106,21 @@ function lingwo_korpus_update_6002() {
 }
 
 /**
+ * Replace attribute 'hidden' with 'data-hidden'.
+ */
+function lingwo_korpus_update_6003() {
+  $res = db_query("SELECT r.vid, r.nid, teaser, body FROM {node_revisions} r JOIN {node} n ON n.nid = r.nid WHERE n.type = '%s'", lingwo_korpus_text_content_type());
+  while ($obj = db_fetch_object($res)) {
+    foreach (array('teaser', 'body') as $prop) {
+      $obj->$prop = str_replace(' hidden="true"', ' data-hidden="true"', $obj->$prop);
+    }
+    db_query("UPDATE {node_revisions} SET teaser = '%s', body = '%s' WHERE vid = %d", $obj->teaser, $obj->body, $obj->vid);
+  }
+
+  return array(array('success' => TRUE));
+}
+
+/**
  * Implementation of hook_install().
  */
 function lingwo_korpus_install() {

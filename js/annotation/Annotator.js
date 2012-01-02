@@ -447,7 +447,7 @@ define(
                 $('#anno-form-attributive').attr('checked',
                     target.attr('attributive') == 'true' ? 'checked' : '');
                 $('#anno-form-hidden').attr('checked',
-                    target.get(0).getAttribute('hidden') == 'true' ? 'checked' : '');
+                    (target.get(0).getAttribute('hidden') == 'true' || target.get(0).getAttribute('data-hidden') == 'true') ? 'checked' : '');
 
                 // we can now delete
                 $('#button-delete').removeClass('disabled');
@@ -651,10 +651,10 @@ define(
 
                 // hidden
                 if ($('#anno-form-hidden').attr('checked')) {
-                    this.selected.get(0).setAttribute('hidden', 'true');
+                    this.selected.get(0).setAttribute('data-hidden', 'true');
                 }
                 else {
-                    this.selected.get(0).removeAttribute('hidden');
+                    this.selected.get(0).removeAttribute('data-hidden');
                 }
 
                 // sense
