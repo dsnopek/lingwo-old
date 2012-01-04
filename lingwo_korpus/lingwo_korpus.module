@@ -76,9 +76,7 @@ function lingwo_korpus_lookup_entry() {
   }
 
   if ($entry) {
-    if (module_exists('rules')) {
-      rules_invoke_event('lingwo_korpus_lookup', $user, $entry->getNode());
-    }
+    module_invoke_all('lingwo_korpus_lookup', $user, $entry);
     $content = node_view($entry->getNode(), TRUE);
   }
   else {
@@ -276,6 +274,13 @@ function lingwo_korpus_rules_event_info() {
       ),
     )
   );
+}
+
+// Rules integration
+function lingwo_korpus_lingwo_korpus_lookup($user, $entry) {
+  if (module_exists('rules')) {
+    rules_invoke_event('lingwo_korpus_lookup', $user, $entry->getNode());
+  }
 }
 
 /*
