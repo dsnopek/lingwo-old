@@ -465,7 +465,7 @@ function lingwo_korpus_text_entry_list($text, $lang) {
 
   $html = str_get_html($text); 
   foreach($html->find('word') as $el) {
-    if ($el->attr['hidden'] == 'true') {
+    if ($el->attr['data-hidden'] == 'true') {
       continue;
     }
     // get all the attributes and clear them
