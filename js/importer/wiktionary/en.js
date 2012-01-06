@@ -46,6 +46,7 @@ define(
         var langNames = {
             'en': 'English',
             'pl': 'Polish',
+            'sv': 'Swedish',
         };
 
         var langCodes = (function () {
