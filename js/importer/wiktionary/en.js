@@ -213,6 +213,12 @@ define(
                 return s;
             };
 
+            // if we are importing a non-English word, make sure we are ready
+            // to create some English translations.
+            if (entry.language.name != 'en') {
+                entry.translations.en = {'senses':[]};
+            }
+
             // first we read in the main senses
             while (!input.eof()) {
                 line = input.readline();
@@ -231,11 +237,21 @@ define(
                 }
                 // we find a difference, on a line marked '#'
                 else if (/^#[^:*]/.exec(line)) {
-                    sense = {
-                        difference: clean(line, 255),
-                    };
-                    
-                    sensesMap[normalize(sense.difference)] = sense;
+                    // if we are parsing an English word, that means what we are meeting here are senses.
+                    if (entry.language.name == 'en') {
+                        sense = {
+                            difference: clean(line, 255),
+                        };
+                        
+                        sensesMap[normalize(sense.difference)] = sense;
+                    }
+                    // if not, these are translations!
+                    else {
+                        // put a an empty sense
+                        entry.senses.push({});
+                        // put a new translation
+                        entry.translations.en.senses.push({'trans': clean(line).split(/,\s*/)});
+                    }
                 }
                 else if (sense !== null && /^#:/.exec(line)) {
                     if (typeof sense.example == 'undefined') {
@@ -248,19 +264,21 @@ define(
                 }
             }
 
-            // then we try to match them with existing senses and fill in the
-            // missing data.
-            entry.senses.forEach(function (sense) {
-                var senseKey = normalize(sense.difference), mainSenseKey, mainSense;
-                for (mainSenseKey in sensesMap) {
-                    // if its found anywhere in the string, we call it a match.
-                    if (mainSenseKey.indexOf(senseKey) != -1) {
-                        mainSense = sensesMap[mainSenseKey];
-                        sense.difference = mainSense.difference;
-                        sense.example = mainSense.example;
+            if (entry.language.name == 'en') {
+                // then we try to match them with existing senses and fill in the
+                // missing data.
+                entry.senses.forEach(function (sense) {
+                    var senseKey = normalize(sense.difference), mainSenseKey, mainSense;
+                    for (mainSenseKey in sensesMap) {
+                        // if its found anywhere in the string, we call it a match.
+                        if (mainSenseKey.indexOf(senseKey) != -1) {
+                            mainSense = sensesMap[mainSenseKey];
+                            sense.difference = mainSense.difference;
+                            sense.example = mainSense.example;
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         function getFormsInfo(text) {
