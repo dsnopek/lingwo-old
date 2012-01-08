@@ -19,17 +19,13 @@ def train_en(trainer):
         train_on_corpus(trainer, corpus)
 train_funcs['en'] = train_en
 
-def train_pl(trainer):
-    texts = [
-        'sherlock_holmes.txt',
-        'pan_tadeusz.txt',
-        'szachy_i_warcaby.txt',
-    ]
-    for fn in texts:
-        print "Training on:", fn
-        text = codecs.open(os.path.join('polish_texts', fn), 'Ur', 'utf-8').read()
-        trainer.train(text)
-train_funcs['pl'] = train_pl
+def train(trainer, lang):
+    path = os.path.join('training', lang)
+    for fn in os.listdir(path):
+        if not fn.lower().startswith('readme'):
+            print "Training on:", fn
+            text = codecs.open(os.path.join(path, fn), 'Ur', 'utf-8').read()
+            trainer.train(text)
 
 def main():
     opts, args = getopt.getopt(sys.argv[1:], 'l:', [])
@@ -48,9 +44,7 @@ def main():
 
     lang_vars = MyPunktLanguageVars()
     trainer = PunktTrainer(lang_vars=lang_vars)
-
-    train_func = train_funcs[lang]
-    train_func(trainer)
+    train(trainer, lang)
     trainer.finalize_training(verbose=True)
 
     tokenizer = PunktSentenceTokenizer(trainer.get_params(), lang_vars=lang_vars)
