@@ -96,19 +96,40 @@ function lingwo_korpus_lookup_senses() {
   $pos = urldecode($_GET['pos']);
   $headword = urldecode($_GET['headword']);
 
-  $nid = LingwoEntry::key2nid($language, $pos, $headword);
-  if (!empty($nid)) {
-    $node = node_load($nid);
-    $senses = array();
-    foreach ($node->lingwo_senses as $sense) {
-      $senses[$sense['id']] = array(
-        'example'    => $sense['data']['example'],
-        'difference' => $sense['data']['difference'],
-      );
+  // TODO: after we kill old UI for 'Lookup Entry' in the annotator the !empty($pos) branch
+  // can be removed entirely..
+  if (!empty($pos)) {
+    $nid = LingwoEntry::key2nid($language, $pos, $headword);
+    if (!empty($nid)) {
+      $node = node_load($nid);
+      $senses = array();
+      foreach ($node->lingwo_senses as $sense) {
+        $senses[$sense['id']] = array(
+          'example'    => $sense['data']['example'],
+          'difference' => $sense['data']['difference'],
+        );
+      }
     }
-  }
 
-  drupal_json(array('senses' => $senses));
+    drupal_json(array('senses' => $senses));
+  }
+  else {
+    $result = array();
+    foreach (LingwoEntry::searchHeadword($headword, array('language' => $language)) as $obj) {
+      $result[$obj->pos] = array();
+
+      $entry = LingwoEntry::fromNid($obj->nid);
+      foreach ($entry->senses as $sense) {
+        $result[$obj->pos][] = array(
+          'id'         => $sense->id,
+          'example'    => $sense->example,
+          'difference' => $sense->difference,
+        );
+      }
+    }
+
+    drupal_json(array('senses' => $result));
+  }
 }
 
 /*
