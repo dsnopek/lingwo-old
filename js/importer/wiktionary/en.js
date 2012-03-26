@@ -265,19 +265,28 @@ define(
             }
 
             if (entry.language.name == 'en') {
-                // then we try to match them with existing senses and fill in the
-                // missing data.
-                entry.senses.forEach(function (sense) {
-                    var senseKey = normalize(sense.difference), mainSenseKey, mainSense;
-                    for (mainSenseKey in sensesMap) {
-                        // if its found anywhere in the string, we call it a match.
-                        if (mainSenseKey.indexOf(senseKey) != -1) {
-                            mainSense = sensesMap[mainSenseKey];
-                            sense.difference = mainSense.difference;
-                            sense.example = mainSense.example;
+                if (entry.senses.length > 0) {
+                    // then we try to match them with existing senses and fill in the
+                    // missing data.
+                    entry.senses.forEach(function (sense) {
+                        var senseKey = normalize(sense.difference), mainSenseKey, mainSense;
+                        for (mainSenseKey in sensesMap) {
+                            // if its found anywhere in the string, we call it a match.
+                            if (mainSenseKey.indexOf(senseKey) != -1) {
+                                mainSense = sensesMap[mainSenseKey];
+                                sense.difference = mainSense.difference;
+                                sense.example = mainSense.example;
+                            }
                         }
+                    });
+                }
+                else {
+                    // if there are no senses from the translations, then we use the ones
+                    // we discovered here.
+                    for (var senseKey in sensesMap) {
+                        entry.senses.push(sensesMap[senseKey]);
                     }
-                });
+                }
             }
         }
 
@@ -686,6 +695,9 @@ define(
                 }
                 else if (/UK|British/i.exec(accent)) {
                     accent = 'UK';
+                }
+                else if (/RP|Received/.exec(accent)) {
+                    accent = 'RP';
                 }
                 else if (/Scot/i.exec(accent)) {
                     accent = 'Scotland';
