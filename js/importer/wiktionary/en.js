@@ -705,6 +705,18 @@ define(
                 else if (/Canada|CAN/i.exec(accent)) {
                     accent = 'CA';
                 }
+                else if (/New York|NY/i.exec(accent)) {
+                    accent = 'NYC';
+                }
+                else if (/New Zealand/i.exec(accent)) {
+                    accent = 'NZ';
+                }
+                else if (/French/i.exec(accent)) {
+                    accent = null;
+                }
+                else if (/some accents/i.exec(accent)) {
+                    accent = null;
+                }
                 else if (accent == 'AusE') {
                     accent = 'AU';
                 }
@@ -716,6 +728,12 @@ define(
                 else if (['WEAE','?'].indexOf(accent) != -1) {
                     accent = null;
                 }
+                /*
+                else {
+                    // make all the unknown ones valid
+                    accent = null;
+                }
+                */
                 
                 return accent;
             }
