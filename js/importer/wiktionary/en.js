@@ -720,7 +720,7 @@ define(
                 else if (accent == 'AusE') {
                     accent = 'AU';
                 }
-                else if (accent == 'Tasmanian') {
+                else if (/Tasmanian?/i.exec(accent)) {
                     accent = 'TAS';
                 }
                 // TODO: we should be doing this in reverse, where we remove all not-valid options, but while I'm
