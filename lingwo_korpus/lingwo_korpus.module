@@ -495,7 +495,7 @@ function lingwo_korpus_text_entry_list($text, $lang) {
 
     // get the headword
     $entry = (object)array(
-      'headword' => isset($attrs['headword']) ? $attrs['headword'] : $el->plaintext,
+      'headword' => html_entity_decode(isset($attrs['headword']) ? $attrs['headword'] : $el->plaintext),
       'pos' => $attrs['pos'],
       'language' => $lang,
       'sense' => $attrs['sense'],
