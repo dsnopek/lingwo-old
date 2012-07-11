@@ -593,6 +593,9 @@ define(
             },
             
             en: function (entry, sections) {
+            },
+
+            sv: function (entry, sections) {
             }
         };
 

@@ -130,6 +130,7 @@ require([
             //print (JSON.stringify(entry));
             //print (JSON.stringify(entry.pron));
             //print (JSON.stringify(entry.senses));
+            //print (JSON.stringify(entry.translations.en));
             //print (JSON.stringify(entry.translations.pl));
 
             // find the trans with the bad characters
