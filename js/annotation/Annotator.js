@@ -441,14 +441,15 @@ define(
                 target = $(target);
 
                 this.setBubblePane('anno-form');
+
                 headword = target.attr('headword') || target.text();
                 $('#anno-form-headword').val(headword);
+                this._buildPos(headword, target.attr('pos'), target.attr('sense'));
+
                 $('#anno-form-attributive').attr('checked',
                     target.attr('attributive') == 'true' ? 'checked' : '');
                 $('#anno-form-hidden').attr('checked',
                     (target.get(0).getAttribute('hidden') == 'true' || target.get(0).getAttribute('data-hidden') == 'true') ? 'checked' : '');
-
-                this._buildPos(headword, target.attr('pos'), target.attr('sense'));
 
                 // we can now delete
                 $('#button-delete').removeClass('disabled');
@@ -522,22 +523,17 @@ define(
                     $.getJSON('/lingwo_korpus/pos_list', {
                         'language': Drupal.settings.lingwo_korpus.text.language
                     }, function (res) {
-                        var pos_list = res.pos_list;
-                        pos_list.unshift({ label: Drupal.t('None'), value: '' });
-                        Annotator.pos_list = pos_list;
-                        wrapper(pos_list);
+                        Annotator.pos_list = res.pos_list;
+                        wrapper(res.pos_list);
                     });
                 }
-            },
-
-            _buildPosAdd: function (pos_div, pos, sense_list) {
             },
 
             _buildPosInternal: function (pos_list, sense_list, current_pos, current_sense) {
                 var name = 'anno-form-pos',
                     pos_div = $('#' + name),
                     add;
-
+                
                 add = function (pos) {
                     var name = 'anno-form-pos',
                         item = {
@@ -546,12 +542,13 @@ define(
                             'label': pos.label,
                             'id': name + '-' + pos.value,
                             'value': pos.value,
-                            'attributes': {'class': 'lingwo-korpus-pos'},
                             'prefix': '<div class="lingwo-korpus-pos-seperator">',
-                            'suffix': '</div>'
+                            'suffix': '</div>',
+                            'attributes': {'class': 'lingwo-korpus-pos'}
                         },
-                        html = buildForm(item);
+                        html;
 
+                    html = buildForm(item);
                     $(html).appendTo(pos_div);
 
                     if (pos.value && sense_list && sense_list[pos.value]) {
@@ -578,9 +575,24 @@ define(
 
                 // clear it out
                 pos_div.html('');
+                
+                // add the empty item
+                add({ label: '<em>' + Drupal.t('Unknown') + '</em>', value: '' });
 
+                if (sense_list) {
+                    // first, put the POS with senses
+                    $.each(pos_list, function (i, pos) {
+                        if (sense_list[pos.value]) {
+                            add(pos);
+                        }
+                    });
+                }
+
+                // put the remaining items without senses
                 $.each(pos_list, function (i, pos) {
-                    add(pos);
+                    if (!(sense_list && sense_list[pos.value])) {
+                        add(pos);
+                    }
                 });
 
                 // set the current value
