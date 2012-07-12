@@ -544,6 +544,7 @@ define(
                             'value': pos.value,
                             'prefix': '<div class="lingwo-korpus-pos-seperator">',
                             'suffix': '</div>',
+                            'checked': pos.checked,
                             'attributes': {'class': 'lingwo-korpus-pos'}
                         },
                         html;
@@ -552,9 +553,9 @@ define(
                     $(html).appendTo(pos_div);
 
                     if (pos.value && sense_list && sense_list[pos.value]) {
-                        $.each(sense_list[pos.value], function (sense_id, sense) {
+                        $.each(sense_list[pos.value], function (i, sense) {
                             var label = '<div class="sense-data">'+
-                                   ((!sense.difference && !sense.example) ? sense_id : (
+                                   ((!sense.difference && !sense.example) ? sense.id : (
                                    (sense.difference ? ('<div><b>'+Drupal.t('Difference')+'</b>: '+sense.difference+'</div>') : '') +
                                    (sense.example    ? ('<div><b>'+Drupal.t('Example')+'</b>: '+sense.example+'</div>') : ''))) +
                                    '</div>',
@@ -562,8 +563,8 @@ define(
                                     'name': name,
                                     'type': 'radio',
                                     'label': label,
-                                    'id': name + '-' + pos.value + '-' + sense_id,
-                                    'value': pos.value + '-' + sense_id,
+                                    'id': name + '-' + pos.value + '-' + sense.id,
+                                    'value': pos.value + '-' + sense.id,
                                     'attributes': {'class': 'lingwo-korpus-pos-sense'}
                                 },
                                 html = buildForm(item);
@@ -577,7 +578,7 @@ define(
                 pos_div.html('');
                 
                 // add the empty item
-                add({ label: '<em>' + Drupal.t('Unknown') + '</em>', value: '' });
+                add({ label: '<em>' + Drupal.t('Unknown') + '</em>', value: '', checked: true });
 
                 if (sense_list) {
                     // first, put the POS with senses
@@ -599,6 +600,10 @@ define(
                 if (current_pos) {
                     this.setPos(current_pos, current_sense, animate);
                 }
+                else {
+                    // scroll undefined into view too
+                    this._scrollPosIntoView(animate);
+                }
             },
 
             setPos: function (pos, sense, animate) {
@@ -613,7 +618,7 @@ define(
                 if (sense && $(sense_id).size() > 0) {
                     item = $(sense_id);
                 }
-                if ($(pos_id).size()) {
+                else if ($(pos_id).size()) {
                     item = $(pos_id);
                 }
                 else {
@@ -633,15 +638,17 @@ define(
                 var item = $('#anno-form-pos .form-radio:checked'),
                     p = $('#anno-form-pos'),
                     scrollTop = p.scrollTop(),
-                    pos;
+                    pos = 0;
 
-                // get an accurate position
-                p.scrollTop(0);
-                pos = item.position();
-                p.scrollTop(scrollTop);
+                if (item.size() > 0 && item.val() != '') {
+                    // get an accurate position
+                    p.scrollTop(0);
+                    pos = item.position();
+                    p.scrollTop(scrollTop);
 
-                // if it's not available, make it 0
-                pos = pos ? pos.top : 0;
+                    // if it's not available, make it 0
+                    pos = pos ? pos.top : 0;
+                }
 
                 if (animate) {
                     p.animate({scrollTop: pos}, 450);
@@ -658,15 +665,15 @@ define(
             _getPosParts: function () {
                 var value = this._getPosValue(),
                     parts = String(value).split('-');
-                return parts;
+                return [parts[0], parts.slice(1).join('-')];
             },
 
             getPos: function () {
-                return this._getPosParts()[0];
+                return this._getPosParts()[0] || '';
             },
 
             getSense: function () {
-                return this._getPosParts()[1];
+                return this._getPosParts()[1] || '';
             },
 
             _onSelectionStart: function (selStart) {
