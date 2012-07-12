@@ -108,6 +108,8 @@ define(
             onlyMissing: false,
             selected: null,
 
+            pos_list: null,
+
             _selector: null,
             _setupDone: false,
 
@@ -201,30 +203,27 @@ define(
             },
 
             _setupForm: function () {
+                var headwordTimer = null,
+                    headwordLookup = function () {
+                        var pos = Annotator.getPos(), sense = Annotator.getSense();
+                        Annotator._buildPos($('#anno-form-headword').val(), pos, sense);
+                    };
+
                 Reader.setBubbleContent('');
 
-                // first, we need to get the list of posItems
-                $.getJSON('/lingwo_korpus/pos_list', {
-                    'language': Drupal.settings.lingwo_korpus.text.language
-                }, function (res) {
-                    var pos_list = res.pos_list;
-                    pos_list.unshift({ label: '-none-', value: '' });
+                this.bubbleFormNode = $('<div id="bubble-form"></div>');
+                this.bubbleFormNode
+                    .html(makeBubbleForm({ message: msgWordOn }))
+                    .appendTo(Reader.contentNode);
 
-                    Annotator.bubbleFormNode = $('<div id="bubble-form"></div>');
-                    Annotator.bubbleFormNode
-                        .html(makeBubbleForm({ pos_list: pos_list, message: msgWordOn }))
-                        .appendTo(Reader.contentNode);
-
-                    $('#anno-form-lookup-entry').click(function (evt) {
-                        Annotator._lookupSelectedEntry();
-                        return false;
-                    });
-
-                    $('#sense-form-return').click(function (evt) {
-                        Annotator.setBubblePane('anno-form');
-                        return false;
-                    });
+                $('#anno-form-headword').bind('keydown', function (evt) {
+                    if (headwordTimer) {
+                        clearTimeout(headwordTimer);
+                    }
+                    headwordTimer = setTimeout(headwordLookup, 500);
                 });
+                
+                this._buildPos();
             },
 
             _setupDefaultEvents: function () {
@@ -271,7 +270,8 @@ define(
                                 $('#anno-form-headword').focus().select();
                                 return false;
                             } else if (evt.which == 80) { // p
-                                $('#anno-form-pos').focus();
+                                $('#anno-form-pos .form-radio:first').focus();
+                                $('#anno-form-pos .form-radio:checked').focus();
                                 // NOTE: this only happens when using keydown() and not keyup()!
                                 // for some reason, the select also seems to take the keydown
                                 // event and this will change its value.  So, we re-instate the
@@ -289,9 +289,6 @@ define(
                             } else if (evt.which == 68) { // d
                                 $('#anno-form-hidden').attr('checked', 
                                     !$('#anno-form-hidden').attr('checked'));
-                                return false;
-                            } else if (evt.which == 76) { // l
-                                Annotator._lookupSelectedEntry();
                                 return false;
                             } else if (evt.which == 27) { // escape
                                 Annotator.clearSelection();
@@ -434,6 +431,8 @@ define(
             },
 
             _selectWord: function (target) {
+                var headword;
+
                 // save the previously selected word
                 if (this.selected !== null) {
                     this.saveAnnotation();
@@ -442,18 +441,17 @@ define(
                 target = $(target);
 
                 this.setBubblePane('anno-form');
-                $('#anno-form-headword').val(target.attr('headword') || target.text());
-                $('#anno-form-pos').val(target.attr('pos') || '');
+                headword = target.attr('headword') || target.text();
+                $('#anno-form-headword').val(headword);
                 $('#anno-form-attributive').attr('checked',
                     target.attr('attributive') == 'true' ? 'checked' : '');
                 $('#anno-form-hidden').attr('checked',
                     (target.get(0).getAttribute('hidden') == 'true' || target.get(0).getAttribute('data-hidden') == 'true') ? 'checked' : '');
 
+                this._buildPos(headword, target.attr('pos'), target.attr('sense'));
+
                 // we can now delete
                 $('#button-delete').removeClass('disabled');
-
-                // clear the old sense form, so that we don't accidently save it to this annotation
-                $('#sense-form-data').html('');
 
                 this.selected = target;
             },
@@ -501,57 +499,134 @@ define(
                 this._selectRelativeWord(-1);
             },
 
-            _lookupSelectedEntry: function () {
-                var dataNode = $('#sense-form-data');
-
-                this.setBubblePane('sense-form');
-                dataNode.text('Loading...');
-
-                $.getJSON('/lingwo_korpus/lookup_senses', {
-                    'language': Drupal.settings.lingwo_korpus.text.language,
-                    'headword': $('#anno-form-headword').val(),
-                    'pos': $('#anno-form-pos :selected').val()
-                }, function (res) {
-                    var sense_id, sense, options = [];
-
-                    if (res.senses) {
-                        if (Annotator.selected !== null) {
-                            Annotator.selected.removeClass('missing');
-                        }
-
-                        options.push({
-                            label: 'None',
-                            value: ''
+            _buildPos: function (headword, current_pos, current_sense) {
+                var wrapper = function (pos_list) {
+                    if (headword) {
+                        $.getJSON('/lingwo_korpus/lookup_senses', {
+                            'language': Drupal.settings.lingwo_korpus.text.language,
+                            'headword': headword,
+                        }, function (res) {
+                            Annotator._buildPosInternal(pos_list, res.senses, current_pos, current_sense);
                         });
-
-                        for (sense_id in res.senses) {
-                            sense = res.senses[sense_id];
-                            options.push({
-                                label: '<div class="sense-data">'+
-                                       ((!sense.difference && !sense.example) ? sense_id : (
-                                       (sense.difference ? ('<div><b>'+Drupal.t('Difference')+'</b>: '+sense.difference+'</div>') : '') +
-                                       (sense.example    ? ('<div><b>'+Drupal.t('Example')+'</b>: '+sense.example+'</div>') : ''))) +
-                                       '</div>',
-                                value: sense_id
-                            });
-                        }
-
-                        dataNode.html(buildForm({
-                            type: 'radios',
-                            name: 'sense-form-selector',
-                            options: options,
-                            default_value: Annotator.selected.attr('sense')
-                        }));
-                        $('.form-item', dataNode).addClass('clear-block');
-                        $('#sense-form-selector .form-radio:checked').focus();
                     }
                     else {
-                        dataNode.html('<i>No entry found.</i>');
-                        if (Annotator.selected !== null) {
-                            Annotator.selected.addClass('missing');
-                        }
+                        Annotator._buildPosInternal(pos_list, null, current_pos, current_sense);
                     }
+                };
+
+                if (Annotator.pos_list) {
+                    wrapper(Annotator.pos_list);
+                }
+                else {
+                    // first, we need to get the list of posItems
+                    $.getJSON('/lingwo_korpus/pos_list', {
+                        'language': Drupal.settings.lingwo_korpus.text.language
+                    }, function (res) {
+                        var pos_list = res.pos_list;
+                        pos_list.unshift({ label: Drupal.t('None'), value: '' });
+                        Annotator.pos_list = pos_list;
+                        wrapper(pos_list);
+                    });
+                }
+            },
+
+            _buildPosAdd: function (pos_div, pos, sense_list) {
+            },
+
+            _buildPosInternal: function (pos_list, sense_list, current_pos, current_sense) {
+                var name = 'anno-form-pos',
+                    pos_div = $('#' + name),
+                    add;
+
+                add = function (pos) {
+                    var name = 'anno-form-pos',
+                        item = {
+                            'name': name,
+                            'type': 'radio',
+                            'label': pos.label,
+                            'id': name + '-' + pos.value,
+                            'value': pos.value,
+                            'attributes': {'class': 'lingwo-korpus-pos'},
+                            'prefix': '<div class="lingwo-korpus-pos-seperator">',
+                            'suffix': '</div>'
+                        },
+                        html = buildForm(item);
+
+                    $(html).appendTo(pos_div);
+
+                    if (pos.value && sense_list && sense_list[pos.value]) {
+                        $.each(sense_list[pos.value], function (sense_id, sense) {
+                            var label = '<div class="sense-data">'+
+                                   ((!sense.difference && !sense.example) ? sense_id : (
+                                   (sense.difference ? ('<div><b>'+Drupal.t('Difference')+'</b>: '+sense.difference+'</div>') : '') +
+                                   (sense.example    ? ('<div><b>'+Drupal.t('Example')+'</b>: '+sense.example+'</div>') : ''))) +
+                                   '</div>',
+                                item = {
+                                    'name': name,
+                                    'type': 'radio',
+                                    'label': label,
+                                    'id': name + '-' + pos.value + '-' + sense_id,
+                                    'value': pos.value + '-' + sense_id,
+                                    'attributes': {'class': 'lingwo-korpus-pos-sense'}
+                                },
+                                html = buildForm(item);
+
+                            $(html).appendTo(pos_div);
+                        });
+                    }
+                };
+
+                // clear it out
+                pos_div.html('');
+
+                $.each(pos_list, function (i, pos) {
+                    add(pos);
                 });
+
+                // set the current value
+                if (current_pos) {
+                    this.setPos(current_pos, current_sense);
+                }
+            },
+
+            setPos: function (pos, sense, focus) {
+                var pos_id = '#anno-form-pos-' + pos,
+                    sense_id = pos_id + '-' + sense,
+                    item;
+
+                // clear value
+                //$('input[name="anno-form-pos"]').removeAttr('checked');
+                $('#anno-form-pos .form-radio:checked').removeAttr('checked');
+
+                if (sense && $(sense_id).size() > 0) {
+                    item = $(sense_id).attr('checked', 'checked');
+                }
+                else {
+                    item = $(pos_id).attr('checked', 'checked');
+                }
+
+                // focus the element - this is the default
+                if (focus) {
+                    item.focus();
+                }
+            },
+
+            _getPosValue: function () {
+                return $('#anno-form-pos .form-radio:checked').val();
+            },
+
+            _getPosParts: function () {
+                var value = this._getPosValue(),
+                    parts = String(value).split('-');
+                return parts;
+            },
+
+            getPos: function () {
+                return this._getPosParts()[0];
+            },
+
+            getSense: function () {
+                return this._getPosParts()[1];
             },
 
             _onSelectionStart: function (selStart) {
@@ -633,7 +708,7 @@ define(
                 }
 
                 // pos
-                pos = $('#anno-form-pos :selected').val();
+                pos = this.getPos();
                 if (pos) {
                     this.selected.attr('pos', pos);
                 }
@@ -658,7 +733,7 @@ define(
                 }
 
                 // sense
-                sense = $("input[@name='sense-form-selector']:checked").val();
+                sense = this.getSense();
                 if (sense) {
                     this.selected.attr('sense', sense);
                 }
