@@ -444,7 +444,7 @@ define(
 
                 headword = target.attr('headword') || target.text();
                 $('#anno-form-headword').val(headword);
-                this._buildPos(headword, target.attr('pos'), target.attr('sense'));
+                this._buildPos(headword, target.attr('pos'), target.attr('sense'), true);
 
                 $('#anno-form-attributive').attr('checked',
                     target.attr('attributive') == 'true' ? 'checked' : '');
@@ -500,18 +500,18 @@ define(
                 this._selectRelativeWord(-1);
             },
 
-            _buildPos: function (headword, current_pos, current_sense) {
+            _buildPos: function (headword, current_pos, current_sense, animate) {
                 var wrapper = function (pos_list) {
                     if (headword) {
                         $.getJSON('/lingwo_korpus/lookup_senses', {
                             'language': Drupal.settings.lingwo_korpus.text.language,
                             'headword': headword,
                         }, function (res) {
-                            Annotator._buildPosInternal(pos_list, res.senses, current_pos, current_sense);
+                            Annotator._buildPosInternal(pos_list, res.senses, current_pos, current_sense, animate);
                         });
                     }
                     else {
-                        Annotator._buildPosInternal(pos_list, null, current_pos, current_sense);
+                        Annotator._buildPosInternal(pos_list, null, current_pos, current_sense, animate);
                     }
                 };
 
@@ -529,7 +529,7 @@ define(
                 }
             },
 
-            _buildPosInternal: function (pos_list, sense_list, current_pos, current_sense) {
+            _buildPosInternal: function (pos_list, sense_list, current_pos, current_sense, animate) {
                 var name = 'anno-form-pos',
                     pos_div = $('#' + name),
                     add;
@@ -597,29 +597,57 @@ define(
 
                 // set the current value
                 if (current_pos) {
-                    this.setPos(current_pos, current_sense);
+                    this.setPos(current_pos, current_sense, animate);
                 }
             },
 
-            setPos: function (pos, sense, focus) {
-                var pos_id = '#anno-form-pos-' + pos,
+            setPos: function (pos, sense, animate) {
+                var unknown_id = '#anno-form-pos-',
+                    pos_id = unknown_id + pos,
                     sense_id = pos_id + '-' + sense,
                     item;
 
                 // clear value
-                //$('input[name="anno-form-pos"]').removeAttr('checked');
                 $('#anno-form-pos .form-radio:checked').removeAttr('checked');
 
                 if (sense && $(sense_id).size() > 0) {
-                    item = $(sense_id).attr('checked', 'checked');
+                    item = $(sense_id);
+                }
+                if ($(pos_id).size()) {
+                    item = $(pos_id);
                 }
                 else {
-                    item = $(pos_id).attr('checked', 'checked');
+                    item = $(unknown_id);
                 }
 
-                // focus the element - this is the default
-                if (focus) {
-                    item.focus();
+                // check the radio box
+                item.attr('checked', 'checked');
+
+                // scroll the item into view
+                setTimeout(function () {
+                    Annotator._scrollPosIntoView(animate);
+                }, 0);
+            },
+
+            _scrollPosIntoView: function (animate) {
+                var item = $('#anno-form-pos .form-radio:checked'),
+                    p = $('#anno-form-pos'),
+                    scrollTop = p.scrollTop(),
+                    pos;
+
+                // get an accurate position
+                p.scrollTop(0);
+                pos = item.position();
+                p.scrollTop(scrollTop);
+
+                // if it's not available, make it 0
+                pos = pos ? pos.top : 0;
+
+                if (animate) {
+                    p.animate({scrollTop: pos}, 450);
+                }
+                else {
+                    p.scrollTop(pos);
                 }
             },
 
