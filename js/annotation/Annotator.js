@@ -675,6 +675,9 @@ define(
                     pos = pos ? pos.top : 0;
                 }
 
+                // disable animation for now -- seems too annoying
+                animate = false;
+
                 if (animate) {
                     p.stop();
                     p.animate({scrollTop: pos}, 450);
