@@ -4,12 +4,13 @@
         {   type: 'text',
             id: 'anno-form-headword',
             label: 'Headword'
-        },
-        {   type: 'select',
-            id: 'anno-form-pos',
-            options: pos_list,
-            label: 'Part of Speech'
-        },
+        }
+    ]) %>
+    <div id="anno-form-pos-wrapper" class="form-item form-radios">
+        <label for="anno-form-pos"><%= Drupal.t("Part of speech") %>: </label>
+        <div id="anno-form-pos" style="position: relative;"></div>
+    </div>
+    <%= buildForm([
         {   type: 'checkbox',
             id: 'anno-form-attributive',
             label: 'Attributive'

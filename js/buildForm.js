@@ -50,6 +50,23 @@ define(
                 return func;
             })(itemTypes[name]);
         }
+
+        function htmlEscape(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function generateAttributes(attributes) {
+            var output = '';
+            $.each(attributes, function (name, value) {
+                output += ' ' + name + '="' + htmlEscape(value) + '"';
+            });
+            return output;
+        }
         
         function applyDefaults(item) {
             var name, typeDefaults = itemTypes[item.type].defaults;
@@ -70,6 +87,13 @@ define(
             if (typeof item.label == 'undefined') {
                 item.label = '';
             }
+
+            if (typeof item.attributes == 'undefined') {
+                item.attributes = {}
+            }
+            item.attributes['class'] = 'form-' + item.type + ' ' + item.attributes['class'];
+            item.attributes = generateAttributes(item.attributes);
+
             return item;
         }
 
