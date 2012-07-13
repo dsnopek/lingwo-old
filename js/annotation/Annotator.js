@@ -42,6 +42,10 @@ define(
          * Utility functions.
          */
 
+        function cleanNodeId(id) {
+            return String(id).replace(/ /g, '-');
+        }
+
         function findParentWord(node) {
             var name;
             while (node = node.parentNode) {
@@ -244,11 +248,28 @@ define(
                 $(document).keyup(function (evt) {
                     var tagName = evt.target.tagName.toLowerCase();
                     if (tagName != 'textarea' && tagName != 'select' && !(tagName == 'input' && evt.target.type == 'text')) {
-                        if (evt.which == 46) { // delete
+                        if (tagName == 'input' && evt.target.type == 'radio' && $(evt.target).parents('#anno-form-pos').size() > 0) {
+                            // we are on the pos select
+                            if (evt.which == 38 || evt.which == 40) {
+                                // if the user presses up or down
+                                // TODO: only do it if it's out of view
+                                Annotator._scrollPosIntoView();
+                                return false;
+                            }
+                            else if (evt.which == 27 || evt.which == 13) { // escape, enter
+                                $(evt.target).blur();
+                                return false;
+                            }
+                            else {
+                                Annotator._selectNextPos(String.fromCharCode(evt.which));
+                            }
+                            return false;
+                        }
+                        else if (evt.which == 46) { // delete
                             Annotator.deleteAnnotation();
                             return false;
                         }
-                        if (evt.which == 78) { // n
+                        else if (evt.which == 78) { // n
                             if (evt.shiftKey) {
                                 Annotator.selectPreviousWord();
                             }
@@ -257,20 +278,19 @@ define(
                             }
                             return false;
                         }
-                        if (evt.which == 65 && Annotator.mode == 'edit') {
+                        else if (evt.which == 65 && Annotator.mode == 'edit') {
                             Annotator.setMode('add');
                             return false;
                         }
-                        if (evt.which == 69 && Annotator.mode == 'add') {
+                        else if (evt.which == 69 && Annotator.mode == 'add') {
                             Annotator.setMode('edit');
                             return false;
                         }
-                        if (Annotator.bubblePane == 'anno-form') {
+                        else if (Annotator.bubblePane == 'anno-form') {
                             if (evt.which == 72) { // h
                                 $('#anno-form-headword').focus().select();
                                 return false;
                             } else if (evt.which == 80) { // p
-                                $('#anno-form-pos .form-radio:first').focus();
                                 $('#anno-form-pos .form-radio:checked').focus();
                                 // NOTE: this only happens when using keydown() and not keyup()!
                                 // for some reason, the select also seems to take the keydown
@@ -540,7 +560,7 @@ define(
                             'name': name,
                             'type': 'radio',
                             'label': pos.label,
-                            'id': name + '-' + pos.value,
+                            'id': name + '-' + cleanNodeId(pos.value),
                             'value': pos.value,
                             'prefix': '<div class="lingwo-korpus-pos-seperator">',
                             'suffix': '</div>',
@@ -563,7 +583,7 @@ define(
                                     'name': name,
                                     'type': 'radio',
                                     'label': label,
-                                    'id': name + '-' + pos.value + '-' + sense.id,
+                                    'id': name + '-' + cleanNodeId(pos.value) + '-' + sense.id,
                                     'value': pos.value + '-' + sense.id,
                                     'attributes': {'class': 'lingwo-korpus-pos-sense'}
                                 },
@@ -606,9 +626,9 @@ define(
                 }
             },
 
-            setPos: function (pos, sense, animate) {
+            setPos: function (pos, sense, animate, focus) {
                 var unknown_id = '#anno-form-pos-',
-                    pos_id = unknown_id + pos,
+                    pos_id = unknown_id + cleanNodeId(pos),
                     sense_id = pos_id + '-' + sense,
                     item;
 
@@ -632,6 +652,11 @@ define(
                 setTimeout(function () {
                     Annotator._scrollPosIntoView(animate);
                 }, 0);
+
+                // set focus if requested
+                if (focus) {
+                    item.focus();
+                }
             },
 
             _scrollPosIntoView: function (animate) {
@@ -651,6 +676,7 @@ define(
                 }
 
                 if (animate) {
+                    p.stop();
                     p.animate({scrollTop: pos}, 450);
                 }
                 else {
@@ -674,6 +700,55 @@ define(
 
             getSense: function () {
                 return this._getPosParts()[1] || '';
+            },
+
+            _selectNextPos: function (c) {
+                var pos_list = this.pos_list === null ? [] : this.pos_list.slice(0),
+                    pos = this.getPos(),
+                    i = 0;
+
+                // make character lowercase
+                c = String(c).toLowerCase();
+
+                // add unknown to front of pos_list
+                pos_list.unshift({ 'value': 'unknown' });
+
+                function matches_first(x) {
+                    return x.substring(0, 1) == c;
+                }
+
+                function find(start) {
+                    var i;
+                    start = start ? start : 0;
+                    for (i = start; i < pos_list.length; i++) {
+                        if (matches_first(pos_list[i].value)) {
+                            return i;
+                        }
+                    }
+                    return null;
+                }
+
+                if (matches_first(pos)) {
+                    // we already selected a pos that starts with this letter, so we need to find the next one
+                    // first find where in the pos list we are
+                    for (i = 0; i < pos_list.length; i++) {
+                        if (pos_list[i].value == pos) {
+                            break;
+                        }
+                    }
+                    i = find(i + 1);
+                    if (i !== null) {
+                        this.setPos(pos_list[i].value, '', false, true);
+                        return;
+                    }
+                }
+
+                // we're starting from the beginning, either because it's a different character, or because
+                // we couldn't find a pos after the current one that started with the given letter
+                i = find();
+                if (i !== null) {
+                    this.setPos(pos_list[i].value, '', false, true);
+                }
             },
 
             _onSelectionStart: function (selStart) {
