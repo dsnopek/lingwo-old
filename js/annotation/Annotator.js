@@ -709,7 +709,7 @@ define(
                 var items = $('#anno-form-pos input[type="radio"].lingwo-korpus-pos'),
                     pos_list = [],
                     pos = this.getPos(),
-                    i = 0;
+                    found = false, i;
 
                 // make character lowercase
                 c = String(c).toLowerCase();
@@ -738,14 +738,16 @@ define(
                     return null;
                 }
 
-                if (matches_first(pos)) {
-                    // we already selected a pos that starts with this letter, so we need to find the next one
-                    // first find where in the pos list we are
-                    for (i = 0; i < pos_list.length; i++) {
-                        if (pos_list[i].value == pos) {
-                            break;
-                        }
+                // find the index of the currently selected POS
+                for (i = 0; i < pos_list.length; i++) {
+                    if (pos_list[i].value == pos) {
+                        found = true;
+                        break;
                     }
+                }
+
+                if (found && matches_first(pos_list[i].label)) {
+                    // if we already selected a pos that starts with this letter, we need to find the next one
                     i = find(i + 1);
                     if (i !== null) {
                         this.setPos(pos_list[i].value, '', false, true);
