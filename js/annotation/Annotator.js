@@ -706,15 +706,22 @@ define(
             },
 
             _selectNextPos: function (c) {
-                var pos_list = this.pos_list === null ? [] : this.pos_list.slice(0),
+                var items = $('#anno-form-pos input[type="radio"].lingwo-korpus-pos'),
+                    pos_list = [],
                     pos = this.getPos(),
                     i = 0;
 
                 // make character lowercase
                 c = String(c).toLowerCase();
 
-                // add unknown to front of pos_list
-                pos_list.unshift({ 'value': 'unknown' });
+                // build the pos list
+                items.each(function (i, el) {
+                    el = $(el);
+                    pos_list.push({
+                        'label': el.parent().text().trim().toLowerCase(),
+                        'value': el.val(),
+                    });
+                });
 
                 function matches_first(x) {
                     return x.substring(0, 1) == c;
@@ -724,7 +731,7 @@ define(
                     var i;
                     start = start ? start : 0;
                     for (i = start; i < pos_list.length; i++) {
-                        if (matches_first(pos_list[i].value)) {
+                        if (matches_first(pos_list[i].label)) {
                             return i;
                         }
                     }
