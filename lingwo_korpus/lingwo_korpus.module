@@ -121,6 +121,7 @@ function lingwo_korpus_lookup_senses() {
       $entry = LingwoEntry::fromNid($obj->nid);
       foreach ($entry->senses as $sense) {
         $result[$obj->pos][] = array(
+          'nid'        => $obj->nid,
           'id'         => $sense->id,
           'example'    => $sense->example,
           'difference' => $sense->difference,
@@ -163,6 +164,10 @@ function lingwo_korpus_annotator_access($node) {
 function lingwo_korpus_annotator_form(&$form_state, $node) {
   $text = $node->body;
 
+  if (module_exists('automodal')) {
+    automodal_add('.automodal');
+  }
+
   $form['#node'] = $node;
 
   $form['lingwo-annotator-toolbar'] = array(
@@ -200,6 +205,7 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
         'nid'      => $node->nid,
         'language' => $node->language,
       ),
+      'entry_type' => LingwoEntry::$settings->content_type,
     ),
   ), 'setting');
 

@@ -43,7 +43,7 @@
           else {
             val = Drupal.t('Sense #@sense_num', {'@sense_num': index});
           }
-          $('select.lingwo-korpus-replace-with option[@value='+id+']').text(val);
+          $('select.lingwo-korpus-replace-with option[value='+id+']').text(val);
         }
       }
     }
