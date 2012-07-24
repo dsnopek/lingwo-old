@@ -98,7 +98,7 @@ define(
 
         // callback for automodal if it's being used
         if (Drupal.automodal) {
-            Drupal.automodal.onSubmitCallback.lingwo_korpus = function () {
+            Drupal.automodal.onSubmitCallback.lingwo_korpus = function (args, statusMessage) {
                 Annotator._rebuildPos();
             };
         }
@@ -528,7 +528,7 @@ define(
             },
 
             _rebuildPos: function () {
-              $('#anno-form-headword').val(headword);
+              var headword = $('#anno-form-headword').val();
               this._buildPos(headword, this.getPos(), this.getSense(), false);
             },
 
