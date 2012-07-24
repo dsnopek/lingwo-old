@@ -123,6 +123,7 @@ define(
 
             _selector: null,
             _setupDone: false,
+            _senseRequest: null,
 
             _setupToolbar: function () {
                 this.toolbarNode.html(
@@ -535,11 +536,18 @@ define(
             _buildPos: function (headword, current_pos, current_sense, animate) {
                 var wrapper = function (pos_list) {
                     if (headword) {
-                        $.getJSON('/lingwo_korpus/lookup_senses', {
+                        // if we already started a look up and not we're doing another one, 
+                        // cancel the first!
+                        if (Annotator._senseRequest) {
+                            Annotator._senseRequest.abort();
+                        }
+                        Annotator._senseRequest = $.getJSON('/lingwo_korpus/lookup_senses', {
                             'language': Drupal.settings.lingwo_korpus.text.language,
                             'headword': headword,
                         }, function (res) {
                             Annotator._buildPosInternal(pos_list, res.senses, current_pos, current_sense, animate);
+                            // clear the sense request, to indicate that the control is ready!
+                            Annotator._senseRequest = null;
                         });
                     }
                     else {
@@ -596,7 +604,7 @@ define(
                         }
                     }
 
-                    $(html).appendTo(pos_div).append(link);
+                    $('label', $(html).appendTo(pos_div)).append(link);
 
                     if (pos.value && sense_list && sense_list[pos.value]) {
                         $.each(sense_list[pos.value], function (i, sense) {
@@ -857,7 +865,7 @@ define(
             saveAnnotation: function () {
                 var headword, pos, changed = false, sense;
 
-                if (this.selected === null) {
+                if (this.selected === null || this._senseRequest !== null) {
                     return;
                 }
 
