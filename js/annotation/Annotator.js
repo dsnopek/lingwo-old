@@ -96,6 +96,13 @@ define(
             return newNode;
         }
 
+        // callback for automodal if it's being used
+        if (Drupal.automodal) {
+            Drupal.automodal.onSubmitCallback.lingwo_korpus = function (args, statusMessage) {
+                Annotator._rebuildPos();
+            };
+        }
+
         /*
          * Declare the Annotator.
          */
@@ -520,6 +527,11 @@ define(
                 this._selectRelativeWord(-1);
             },
 
+            _rebuildPos: function () {
+              var headword = $('#anno-form-headword').val();
+              this._buildPos(headword, this.getPos(), this.getSense(), false);
+            },
+
             _buildPos: function (headword, current_pos, current_sense, animate) {
                 var wrapper = function (pos_list) {
                     if (headword) {
@@ -556,6 +568,8 @@ define(
                 
                 add = function (pos) {
                     var name = 'anno-form-pos',
+                        has_senses = pos.value && sense_list && sense_list[pos.value],
+                        link = pos.value ? $('<a class="lingwo-korpus-pos-link automodal"></a>') : null,
                         item = {
                             'name': name,
                             'type': 'radio',
@@ -567,10 +581,22 @@ define(
                             'checked': pos.checked,
                             'attributes': {'class': 'lingwo-korpus-pos'}
                         },
-                        html;
+                        html = buildForm(item);
+                    
+                    // finish building the link if it's needed
+                    if (link) {
+                        link.text(Drupal.t(has_senses ? 'Edit' : 'Add'))
+                        if (has_senses) {
+                            link.attr('href', Drupal.settings.basePath + 'node/' + sense_list[pos.value][0].nid + '/edit');
+                        }
+                        else {
+                            link.attr('href',
+                                Drupal.settings.basePath + 'node/add/' + Drupal.settings.lingwo_korpus.entry_type +
+                                '?language=' + Drupal.settings.lingwo_korpus.text.language + '&pos=' + pos.value);
+                        }
+                    }
 
-                    html = buildForm(item);
-                    $(html).appendTo(pos_div);
+                    $(html).appendTo(pos_div).append(link);
 
                     if (pos.value && sense_list && sense_list[pos.value]) {
                         $.each(sense_list[pos.value], function (i, sense) {
@@ -585,7 +611,7 @@ define(
                                     'label': label,
                                     'id': name + '-' + cleanNodeId(pos.value) + '-' + sense.id,
                                     'value': pos.value + '-' + sense.id,
-                                    'attributes': {'class': 'lingwo-korpus-pos-sense'}
+                                    'attributes': {'class': 'lingwo-korpus-pos-sense'},
                                 },
                                 html = buildForm(item);
 
@@ -615,6 +641,9 @@ define(
                         add(pos);
                     }
                 });
+
+                // run the behaviors on the new data
+                Drupal.attachBehaviors(pos_div.get(0));
 
                 // set the current value
                 if (current_pos) {
