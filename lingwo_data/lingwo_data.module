@@ -154,14 +154,14 @@ function lingwo_data_import_entry($language, $pos, $headword) {
   $runjs_path = $scripts_path . '/runjs.sh';
   $importerjs_path = $scripts_path . '/importer/importer.js';
 
-  $cmd = "cd '$scripts_path/importer' && JAVA=$java_path '$runjs_path' '$importerjs_path' --config $config_path --lang $language --single '$entry_id' 2>&1 >/dev/null";
+  $cmd = "cd '$scripts_path/importer' && JAVA=$java_path '$runjs_path' '$importerjs_path' --config $config_path --lang $language --single '$entry_id' 2>&1";
   exec($cmd, $output, $retval);
 
   if ($retval) {
     watchdog('lingwo_data', 'Failed to import entry (%entry_id) "!cmd" with error: !output', array(
       '%entry_id' => $entry_id,
       '!cmd'      => $cmd,
-      '!output'   => implode("\n", $output),
+      '!output'   => count($output) > 0 ? $output[count($output)-1] : '',
     ), WATCHDOG_WARNING);
   }
 
