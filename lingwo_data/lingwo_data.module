@@ -148,6 +148,13 @@ function lingwo_data_form_alter(&$form, $form_state, $form_id) {
 
 function lingwo_data_import_entry($language, $pos, $headword) {
   $entry_id = implode(':', array($language, $pos, $headword));
+
+  // check if the entry is in the blacklist
+  $blacklist = array_filter(array_map('trim', explode("\n", LingwoImport::$settings->importer_blacklist)));
+  if (in_array($entry_id, $blacklist)) {
+    return FALSE;
+  }
+
   $java_path = escapeshellarg(LingwoImport::$settings->java_path);
   $config_path = escapeshellarg(LingwoImport::$settings->config_path);
   $scripts_path = dirname(dirname(__FILE__)) . '/scripts';
