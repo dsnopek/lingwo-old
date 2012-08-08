@@ -54,6 +54,13 @@ function lingwo_data_admin_settings()
     '#default_value' => $settings->config_path,
   );
 
+  $form[$settings->name('importer_blacklist')] = array(
+    '#title' => t('Importer blacklist'),
+    '#type' => 'textarea',
+    '#description' => t('A list of entries that should <em>not</em> be imported. They are seperated by the newline and take the form <em>language:pos:headword</em>.'),
+    '#default_value' => $settings->importer_blacklist,
+  );
+
   return system_settings_form($form);
 }
 
