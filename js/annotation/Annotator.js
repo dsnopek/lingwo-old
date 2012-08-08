@@ -545,13 +545,13 @@ define(
                             'language': Drupal.settings.lingwo_korpus.text.language,
                             'headword': headword,
                         }, function (res) {
-                            Annotator._buildPosInternal(pos_list, res.senses, current_pos, current_sense, animate);
+                            Annotator._buildPosInternal(headword, pos_list, res.senses, current_pos, current_sense, animate);
                             // clear the sense request, to indicate that the control is ready!
                             Annotator._senseRequest = null;
                         });
                     }
                     else {
-                        Annotator._buildPosInternal(pos_list, null, current_pos, current_sense, animate);
+                        Annotator._buildPosInternal(headword, pos_list, null, current_pos, current_sense, animate);
                     }
                 };
 
@@ -569,7 +569,7 @@ define(
                 }
             },
 
-            _buildPosInternal: function (pos_list, sense_list, current_pos, current_sense, animate) {
+            _buildPosInternal: function (headword, pos_list, sense_list, current_pos, current_sense, animate) {
                 var name = 'anno-form-pos',
                     pos_div = $('#' + name),
                     add;
@@ -600,7 +600,9 @@ define(
                         else {
                             link.attr('href',
                                 Drupal.settings.basePath + 'node/add/' + Drupal.settings.lingwo_korpus.entry_type +
-                                '?language=' + Drupal.settings.lingwo_korpus.text.language + '&pos=' + pos.value);
+                                '?language=' + Drupal.settings.lingwo_korpus.text.language +
+                                '&pos=' + encodeURIComponent(pos.value) +
+                                '&headword=' + encodeURIComponent(headword));
                         }
                     }
 
