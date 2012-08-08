@@ -27,12 +27,28 @@ function lingwo_data_menu() {
 
   $items['lingwo_data/ajax/import/%'] = array(
     'access arguments' => array('import lingwo_data entries'),
-    'page callback' => '_lingwo_data_import_entry',
+    'page callback' => '_lingwo_data_import_entry_callback',
     'page arguments' => array(3),
     'type' => MENU_CALLBACK,
   );
 
   return $items;
+}
+
+/**
+ * Implementation of hook_menu_alter().
+ */
+function lingwo_data_menu_alter(&$items) {
+  $type_url_str = str_replace('_', '-', LingwoEntry::$settings->content_type);
+  $item =& $items['node/add/' . $type_url_str];
+  $item['page callback'] = '_lingwo_data_node_add_entry_page';
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function lingwo_data_perm() {
+  return array('import lingwo_data entries');
 }
 
 /*
@@ -130,26 +146,62 @@ function lingwo_data_form_alter(&$form, $form_state, $form_id) {
   }
 }
 
-function _lingwo_data_import_entry($entry_id) {
-  list ($language, $pos, $headword) = explode(':', $entry_id);
-
-  $java_path = LingwoImport::$settings->java_path;
-  $config_path = LingwoImport::$settings->config_path;
+function lingwo_data_import_entry($language, $pos, $headword) {
+  $entry_id = implode(':', array($language, $pos, $headword));
+  $java_path = escapeshellarg(LingwoImport::$settings->java_path);
+  $config_path = escapeshellarg(LingwoImport::$settings->config_path);
   $scripts_path = dirname(dirname(__FILE__)) . '/scripts';
   $runjs_path = $scripts_path . '/runjs.sh';
   $importerjs_path = $scripts_path . '/importer/importer.js';
 
-  $cmd = "cd '$scripts_path/importer' && JAVA='$java_path' '$runjs_path' '$importerjs_path' --config '$config_path' --lang $language --single '$entry_id' 2>&1 >/dev/null";
-  system($cmd, $retval);
+  $cmd = "cd '$scripts_path/importer' && JAVA=$java_path '$runjs_path' '$importerjs_path' --config $config_path --lang $language --single '$entry_id' 2>&1 >/dev/null";
+  exec($cmd, $output, $retval);
 
   if ($retval) {
-    watchdog('lingwo_data', 'Failed to import entry (%entry_id): !cmd', array(
+    watchdog('lingwo_data', 'Failed to import entry (%entry_id) "!cmd" with error: !output', array(
       '%entry_id' => $entry_id,
       '!cmd'      => $cmd,
+      '!output'   => implode("\n", $output),
     ), WATCHDOG_WARNING);
   }
 
-  drupal_json(array('success' => !$retval));
+  return !$retval;
+}
+
+function _lingwo_data_import_entry_callback($entry_id) {
+  list ($language, $pos, $headword) = explode(':', $entry_id);
+  $success = lingwo_data_import_entry($language, $pos, $headword);
+  drupal_json(array('success' => $success));
+}
+
+// Replace the add entry page
+function _lingwo_data_node_add_entry_page($type_url_str) {
+  if (!empty($_GET['language']) && !empty($_GET['pos']) && !empty($_GET['headword']) && user_access('import lingwo_data entries')) {
+    
+    // used to preserve GET arguments when redirecting
+    $args = (array)$_GET;
+    unset($args['q']);
+    unset($args['language']);
+    unset($args['pos']);
+    unset($args['headword']);
+
+    if ($nid = LingwoEntry::key2nid($_GET['language'], $_GET['pos'], $_GET['headword'])) {
+      drupal_set_message(t('Entry already exists! You can edit it here.'), 'warning');
+      return drupal_goto("node/{$nid}/edit", $args);
+    }
+    elseif (lingwo_data_import_entry($_GET['language'], $_GET['pos'], $_GET['headword']) && ($nid = LingwoEntry::key2nid($_GET['language'], $_GET['pos'], $_GET['headword']))) {
+      drupal_set_message(t('Successfully imported this entry! Please check, correct it and save.'));
+      return drupal_goto("node/{$nid}/edit", $args);
+    }
+    else {
+      drupal_set_message(t('Unable to import this entry. Please add it to the dictionary manually.'), 'warning');
+    }
+  }
+  elseif (empty($_GET['nowizard'])) {
+    // TODO: show entry add wizard
+  }
+  
+  return node_add($type_url_str);
 }
 
 /*
