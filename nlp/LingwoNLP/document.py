@@ -155,7 +155,7 @@ class Simplifier(object):
         # first pass: we simply convert the <word>'s to <span>'s
         for elem in self.doc.getElementsByTagName('word'):
             # remove hidden annotations
-            if elem.getAttribute('hidden') == 'true':
+            if elem.getAttribute('data-hidden') == 'true':
                 Element_replaceWithChildren(elem)
                 continue
 
