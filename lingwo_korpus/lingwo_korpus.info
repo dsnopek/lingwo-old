@@ -4,5 +4,4 @@ description = Extends Lingwo Dictionary for annotating texts
 package = Lingwo Dictionary
 core = 6.x
 dependencies[] = lingwo_entry
-dependencies[] = less
 

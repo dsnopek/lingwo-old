@@ -239,7 +239,7 @@ class Segmenter(object):
                 try:
                     self._elemStr.wrap_in_element(self._elemName, startIndex, endIndex, self.WRAP_FLAGS)
                 except SegmentException, e:
-                    print >> sys.stderr, self.__class__.__name__ + ': Unable to create segment "'+seg+'": '+str(e)
+                    print >> sys.stderr, self.__class__.__name__ + ': Unable to create segment "'+repr(seg)+'": '+str(e)
 
         self._elemStr.reset()
 

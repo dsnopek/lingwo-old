@@ -26,9 +26,9 @@ function lingwo_korpus_admin_settings()
     '#default_value' => variable_get('lingwo_korpus_reader_on_teaser', 0),
   );
 
+  /*
   $fields = content_fields();
 
-  /*
   // make some lists of the available CCK fields for the various settings
   $available_generic_fields = array('');
   foreach ($fields as $field_name => $field) {

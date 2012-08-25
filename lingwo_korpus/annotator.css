@@ -1,0 +1,99 @@
+.c.selected {
+  color:white;
+  background-color:blue;
+}
+.selection-error .c.selected { background-color:red; }
+#lingwo-korpus-entry-view input.form-text { width:270px; }
+word {
+  border:1px solid white;
+  padding:0 1px;
+}
+.mode-edit word {
+  background-color:blue;
+  color:white;
+  cursor:pointer;
+}
+.mode-edit word.changed, .mode-edit word.added {
+  color:white;
+  background-color:green;
+}
+.mode-edit word.selected { background-color:red; }
+word.missing {
+  color:black !important;
+  background-color:yellow !important;
+}
+word.missing.selected { border:1px dashed red !important; }
+.mode-add word.added {
+  color:white;
+  background-color:green;
+}
+.mode-add word { background-color:LightGrey; }
+#sense-form-selector .form-radio {
+  display:block;
+  float:left;
+  width:20px;
+  margin-right:10px;
+}
+#sense-form-selector .sense-data {
+  float:left;
+  width:200px;
+}
+#anno-form-pos .lingwo-korpus-pos-link {
+  float:right;
+  padding-right:10px;
+}
+#anno-form-pos .lingwo-korpus-pos-seperator .form-item {
+  background-color:lightGrey;
+  margin:0;
+  padding:5px 0;
+}
+#anno-form-pos input.lingwo-korpus-pos-sense {
+  padding-right:10px;
+  display:block;
+  float:left;
+}
+#anno-form-pos .sense-data { margin-left:25px; }
+#anno-form-pos {
+  border:1px solid black;
+  height:200px;
+  width:250px;
+  overflow:auto;
+}
+#lingwo-korpus-annotator-toolbar .floatLeft {
+  display:block;
+  float:left;
+}
+#lingwo-korpus-annotator-toolbar .button-group-title {
+  display:block;
+  float:left;
+  margin-right:5px;
+}
+#lingwo-korpus-annotator-toolbar .button-group-title:after { content:': '; }
+#lingwo-korpus-annotator-toolbar .button-group .button { margin-right:5px; }
+#lingwo-korpus-annotator-toolbar .button-group {
+  display:block;
+  float:left;
+  margin-right:10px;
+}
+#lingwo-korpus-annotator-toolbar .button {
+  display:block;
+  float:left;
+  margin-right:15px;
+  cursor:pointer;
+}
+#lingwo-korpus-annotator-toolbar .button.pressed {
+  text-decoration:none;
+  color:black;
+  font-weight:bold;
+}
+#lingwo-korpus-annotator-toolbar .button.disabled {
+  color:DarkGrey;
+  cursor:text;
+  font-style:italic;
+}
+#lingwo-korpus-annotator-toolbar {
+  padding:10px;
+  border:1px solid DarkGrey;
+  background-color:LightGrey;
+  margin:10px 0;
+}

@@ -36,6 +36,7 @@ function _lingwo_data_node_save($node) {
   // Setup form_state.
   $form_state = array();
   $form_state['values'] = (array) $node;
+  $form_state['values']['bbcom_dictionary_guidelines_confirm'] = '1';
   $form_state['values']['op'] = t('Save');
 
   // Later on in the chain node_form seems to expect a copy of
@@ -114,37 +115,34 @@ function _lingwo_data_import_process_original($entry) {
   $res = array();
 
   // process pron
-  if (!empty($entry['pron']) && (lingwo_data_settings('field_pron_ipa') || lingwo_data_settings('field_pron_audio'))) {
+  if (!empty($entry['pron']) && module_exists('lingwo_pron')) {
     $res['pron'] = array();
     if (is_array($entry['pron'])) {
       foreach ($entry['pron'] as $pron) {
         $item = array();
         if (is_array($pron)) {
-          if (lingwo_data_settings('field_pron_ipa')) {
+          if (LingwoPron::$settings->isFieldEnabled('ipa')) {
             $item['ipa'] = $pron['ipa'];
           }
-          if (lingwo_data_settings('field_pron_audio')) {
+          if (LingwoPron::$settings->isFieldEnabled('audio')) {
             $item['audio'] = $pron['audio'];
           }
-          if (lingwo_data_settings('field_pron_tag')) {
+          if (LingwoPron::$settings->isFieldEnabled('tag')) {
             $item['tag'] = $pron['tag'];
           }
-
-          $res['pron'][] = array(
-            'ipa' => $pron['ipa'],
-            'tag' => $pron['tag'],
-            'audio' => $pron['audio'],
-          );
         }
         else {
-          if (lingwo_data_settings('field_pron_ipa')) {
+          if (LingwoPron::$settings->isFieldEnabled('ipa')) {
             $item['ipa'] = $pron;
           }
         }
-        $res['pron'][] = $item;
+
+        if (!empty($item)) {
+          $res['pron'][] = $item;
+        }
       }
     }
-    elseif (lingwo_data_settings('field_pron_ipa')) {
+    elseif (LingwoPron::$settings->isFieldEnabled('ipa')) {
       $res['pron'][] = array('ipa' => $entry['pron']);
     }
   }
@@ -215,11 +213,13 @@ function _lingwo_data_entry_has_changed($node, $entry_data) {
 
 // Downloads a file to Drupal
 function _lingwo_data_download_file($url, $field_info) {
+  global $user;
+
   $file = NULL;
 
   $url_info = parse_url($url);
   $filename = rawurldecode(basename($url_info['path']));
-  $tmpfile = file_create_filename($filename, file_directory_temp());
+  $tmpfile = file_destination(file_create_path(file_directory_path() . '/' . $filename), FILE_EXISTS_RENAME);
   $fp = fopen($tmpfile, 'w');
 
   $ch = curl_init();
@@ -232,14 +232,19 @@ function _lingwo_data_download_file($url, $field_info) {
   fclose($fp);
 
   if ($success) {
-    if ($file = field_file_save_file($tmpfile, array(), filefield_widget_file_path($field_info))) {
-      $file = (object)$file;
-      file_set_status($file, FILE_STATUS_PERMANENT);
-      $file = (array)$file;
-    }
-  }
+    // code copied from file_save_upload() in includes/file.inc -- this code in Drupal really needs to
+    // be refactored so that you can create files without the data coming from $_FILES
+    $file->uid = $user->uid;
+    $file->filename = $filename;
+    $file->filepath = $tmpfile;
+    $file->filemime = file_get_mimetype($file->filename);
+    $file->filesize = filesize($file->filepath);
+    $file->status = FILE_STATUS_TEMPORARY;
+    $file->timestamp = time();
+    $file->origname = $file->filename;
 
-  @unlink($tmpfile);
+    drupal_write_record('files', $file);
+  }
 
   return $file;
 }
@@ -250,6 +255,16 @@ function _lingwo_data_import_set_field_value($field, $value, $info) {
   }
 
   switch ($info['type']) {
+    case 'lingwo_pron':
+      $field['ipa'] = $value['ipa'];
+      $field['tag'] = $value['tag'];
+      // so that we aren't downloading the same file a bagillion times, we don't replace the
+      // file if there already is one.
+      if ((empty($field['audio']) || empty($field['audio']->fid)) && !empty($value['audio'])) {
+        $field['audio'] = _lingwo_data_download_file($value['audio'], $info);
+      }
+      break;
+
     case 'lingwo_fields':
       $field['type'] = $value['type'];
       $field['name'] = $value['name'];
@@ -289,17 +304,6 @@ function _lingwo_data_import_set_field_value($field, $value, $info) {
       if (empty($field['id'])) {
         // senses are treated as invalid, unless they have a UUID!
         $field['id'] = _lingwo_make_uuid();
-      }
-      break;
-    
-    case 'filefield':
-      // so that we aren't downloading the same file a bagillion times, we don't replace the
-      // file if there already is one.
-      if (empty($field['fid']) && !empty($value)) {
-        $file = _lingwo_data_download_file($value, $info);
-        foreach(array_keys($file) as $name) {
-          $field[$name] = $file[$name];
-        }
       }
       break;
 
@@ -347,7 +351,7 @@ function _lingwo_data_import_process_field_values($node, &$items, $info, $values
 }
 
 function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
-  if (in_array($field_alias, array('senses', 'fields'))) {
+  if (in_array($field_alias, array('senses', 'fields', 'pron'))) {
     // Not CCK, these are special.
     $field_name = 'lingwo_'.$field_alias;
     $field_info = array('type' => $field_name);
@@ -379,12 +383,7 @@ function _lingwo_data_import_set_fields(&$node, $fields) {
   $node->imported_data = serialize($fields);
   
   foreach ($fields as $field_alias => $values) {
-    if ($field_alias == 'pron') {
-      _lingwo_data_import_set_fields_multigroup($node, $values, 'pron');
-    }
-    else {
-      _lingwo_data_import_set_field($node, $field_alias, $values);
-    }
+    _lingwo_data_import_set_field($node, $field_alias, $values);
   }
 }
 
@@ -450,16 +449,6 @@ function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
       // Setup a $tnode to hold the translated node
       try {
         $newExtras = array('language' => $lang);
-
-        // to prevent i18nsync from wiping out the pron data on the original by failing
-        // to set it on the translation, we provide it here
-        foreach(array('ipa','tag','audio') as $field_pron) {
-          $field_pron = LingwoImport::$settings->__get('field_pron_'. $field_pron);
-          if (!empty($field_pron)) {
-            $newExtras[$field_pron] = $node->$field_pron;
-          }
-        }
-
         $tnode = _lingwo_data_import_setup_node($tnid_list[$lang]->nid, $entry, $newExtras);
       }
       catch (LingwoDataServiceException $e) {

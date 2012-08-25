@@ -24,21 +24,6 @@ function lingwo_data_admin_settings()
     $available_generic_fields[$field_name] = $field['widget']['label'];
   }
 
-  $pron = array(
-    '#type' => 'fieldset',
-    '#title' => t('Pronunciation'),
-    '#tree' => FALSE,
-  );
-  foreach (array('ipa','audio','tag') as $x) {
-    $pron[$settings->name("field_pron_$x")] = array(
-      '#type' => 'select',
-      '#title' => $x,
-      '#options' => $available_generic_fields,
-      '#default_value' => $settings->__get("field_pron_$x"),
-    );
-  }
-  $fields['pron'] = $pron;
-
   $source = array(
     '#type' => 'fieldset',
     '#title' => 'Source',
@@ -54,6 +39,27 @@ function lingwo_data_admin_settings()
   }
   $fields['source'] = $source;
   $form['fields'] = $fields;
+
+  $form[$settings->name('java_path')] = array(
+    '#title' => t('Java path'),
+    '#type' => 'textfield',
+    '#description' => t('The full path to execute the java interpreter.  For example, <code>/usr/bin/java</code>'),
+    '#default_value' => $settings->java_path,
+  );
+
+  $form[$settings->name('config_path')] = array(
+    '#title' => t('Config path'),
+    '#type' => 'textfield',
+    '#description' => t('The full path to the JSON config for the importer.  For example, <code>/home/username/importer-config.js</code>'),
+    '#default_value' => $settings->config_path,
+  );
+
+  $form[$settings->name('importer_blacklist')] = array(
+    '#title' => t('Importer blacklist'),
+    '#type' => 'textarea',
+    '#description' => t('A list of entries that should <em>not</em> be imported. They are seperated by the newline and take the form <em>language:pos:headword</em>.'),
+    '#default_value' => $settings->importer_blacklist,
+  );
 
   return system_settings_form($form);
 }

@@ -70,6 +70,7 @@ function lingwo_korpus_schema() {
       'nid_index' => array('nid'),
       'row_hash_index' => array('row_hash'),
       'entry_hash_index' => array('entry_hash'),
+      'sense_index' => array('sense'),
     ),
     // The default collation (utf8_general_ci) treats accented characters (like: ó, ą, ę, ń)
     // as equivalent to their unaccented counter-parts.  Also, we want entry headwords to be
@@ -105,13 +106,27 @@ function lingwo_korpus_update_6002() {
 }
 
 /**
+ * Replace attribute 'hidden' with 'data-hidden'.
+ */
+function lingwo_korpus_update_6003() {
+  $res = db_query("SELECT r.vid, r.nid, teaser, body FROM {node_revisions} r JOIN {node} n ON n.nid = r.nid WHERE n.type = '%s'", lingwo_korpus_text_content_type());
+  while ($obj = db_fetch_object($res)) {
+    foreach (array('teaser', 'body') as $prop) {
+      $obj->$prop = str_replace(' hidden="true"', ' data-hidden="true"', $obj->$prop);
+    }
+    db_query("UPDATE {node_revisions} SET teaser = '%s', body = '%s' WHERE vid = %d", $obj->teaser, $obj->body, $obj->vid);
+  }
+
+  return array(array('success' => TRUE));
+}
+
+/**
  * Implementation of hook_install().
  */
 function lingwo_korpus_install() {
-  variable_set('lingwo_korpus_schema_version', 6001);
   drupal_install_schema('lingwo_korpus');
 
-  update_sql("UPDATE {system} SET weight = 50 WHERE name = 'lingwo_korpus'");
+  update_sql("UPDATE {system} SET weight = 52 WHERE name = 'lingwo_korpus'");
 }
 
 /**
@@ -119,6 +134,5 @@ function lingwo_korpus_install() {
  */
 function lingwo_korpus_uninstall() {
   drupal_uninstall_schema('lingwo_korpus');
-  variable_del('lingwo_korpus_schema_version');
 }
 

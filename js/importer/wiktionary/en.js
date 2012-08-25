@@ -46,6 +46,7 @@ define(
         var langNames = {
             'en': 'English',
             'pl': 'Polish',
+            'sv': 'Swedish',
         };
 
         var langCodes = (function () {
@@ -212,6 +213,12 @@ define(
                 return s;
             };
 
+            // if we are importing a non-English word, make sure we are ready
+            // to create some English translations.
+            if (entry.language.name != 'en') {
+                entry.translations.en = {'senses':[]};
+            }
+
             // first we read in the main senses
             while (!input.eof()) {
                 line = input.readline();
@@ -230,11 +237,21 @@ define(
                 }
                 // we find a difference, on a line marked '#'
                 else if (/^#[^:*]/.exec(line)) {
-                    sense = {
-                        difference: clean(line, 255),
-                    };
-                    
-                    sensesMap[normalize(sense.difference)] = sense;
+                    // if we are parsing an English word, that means what we are meeting here are senses.
+                    if (entry.language.name == 'en') {
+                        sense = {
+                            difference: clean(line, 255),
+                        };
+                        
+                        sensesMap[normalize(sense.difference)] = sense;
+                    }
+                    // if not, these are translations!
+                    else {
+                        // put a an empty sense
+                        entry.senses.push({});
+                        // put a new translation
+                        entry.translations.en.senses.push({'trans': clean(line).split(/,\s*/)});
+                    }
                 }
                 else if (sense !== null && /^#:/.exec(line)) {
                     if (typeof sense.example == 'undefined') {
@@ -247,19 +264,30 @@ define(
                 }
             }
 
-            // then we try to match them with existing senses and fill in the
-            // missing data.
-            entry.senses.forEach(function (sense) {
-                var senseKey = normalize(sense.difference), mainSenseKey, mainSense;
-                for (mainSenseKey in sensesMap) {
-                    // if its found anywhere in the string, we call it a match.
-                    if (mainSenseKey.indexOf(senseKey) != -1) {
-                        mainSense = sensesMap[mainSenseKey];
-                        sense.difference = mainSense.difference;
-                        sense.example = mainSense.example;
+            if (entry.language.name == 'en') {
+                if (entry.senses.length > 0) {
+                    // then we try to match them with existing senses and fill in the
+                    // missing data.
+                    entry.senses.forEach(function (sense) {
+                        var senseKey = normalize(sense.difference), mainSenseKey, mainSense;
+                        for (mainSenseKey in sensesMap) {
+                            // if its found anywhere in the string, we call it a match.
+                            if (mainSenseKey.indexOf(senseKey) != -1) {
+                                mainSense = sensesMap[mainSenseKey];
+                                sense.difference = mainSense.difference;
+                                sense.example = mainSense.example;
+                            }
+                        }
+                    });
+                }
+                else {
+                    // if there are no senses from the translations, then we use the ones
+                    // we discovered here.
+                    for (var senseKey in sensesMap) {
+                        entry.senses.push(sensesMap[senseKey]);
                     }
                 }
-            });
+            }
         }
 
         function getFormsInfo(text) {
@@ -630,6 +658,7 @@ define(
 
             function addPron(accent, type, value) {
                 var pron;
+                //print (accent + ' ' + type + ' ' + value);
                 if (accent !== null && typeof pronTagged[accent] != 'undefined') {
                     pron = pronTagged[accent];
                 }
@@ -644,6 +673,69 @@ define(
                 }
 
                 pron[type] = value;
+            }
+
+            function cleanAccent(accent) {
+                if (/[Dd]ialect/.exec(accent)) {
+                    // snag our special dialectual tag
+                    accent = 'dialectual';
+                }
+                else if (/GA|GenAm|US|Standard|America/i.exec(accent)) {
+                    // if US or Standard are mentioned at all, then it is our default (US)!
+                    accent = 'US';
+                }
+                else if (/noun/i.exec(accent)) {
+                    // TODO: we really should do something smarter!  Like put one on the verb and the
+                    // other on the noun, etc..  But for now, we just make the noun version standard
+                    // and discard the verb version.
+                    accent = 'US';
+                }
+                else if (/verb/i.exec(accent)) {
+                    accent = null;
+                }
+                else if (/UK|British/i.exec(accent)) {
+                    accent = 'UK';
+                }
+                else if (/RP|Received/.exec(accent)) {
+                    accent = 'RP';
+                }
+                else if (/Scot/i.exec(accent)) {
+                    accent = 'Scotland';
+                }
+                else if (/Canada|CAN/i.exec(accent)) {
+                    accent = 'CA';
+                }
+                else if (/New York|NY/i.exec(accent)) {
+                    accent = 'NYC';
+                }
+                else if (/New Zealand/i.exec(accent)) {
+                    accent = 'NZ';
+                }
+                else if (/French/i.exec(accent)) {
+                    accent = null;
+                }
+                else if (/some accents/i.exec(accent)) {
+                    accent = null;
+                }
+                else if (accent == 'AusE') {
+                    accent = 'AU';
+                }
+                else if (/Tasmanian?/i.exec(accent)) {
+                    accent = 'TAS';
+                }
+                // TODO: we should be doing this in reverse, where we remove all not-valid options, but while I'm
+                // working on the importer this is helpful in finding the list of valid ones
+                else if (['WEAE','?'].indexOf(accent) != -1) {
+                    accent = null;
+                }
+                /*
+                else {
+                    // make all the unknown ones valid
+                    accent = null;
+                }
+                */
+                
+                return accent;
             }
 
             function getFullFilename(fn) {
@@ -662,7 +754,7 @@ define(
 
                 // get the accent specifier
                 if (matches = /\{\{a\|([^\}]+)\}\}/.exec(line)) {
-                    accent = matches[1];
+                    accent = cleanAccent(matches[1]);
                 }
                 else {
                     accent = null;
@@ -681,7 +773,7 @@ define(
                     addPron(accent, 'ipa', value);
                 }
                 else if (matches = /\{\{[Aa]udio\|([^|]+)\|[Aa]udio \(([^\)]+)\)\}\}/.exec(line)) {
-                    addPron(matches[2], 'audio', getFullFilename(matches[1]));
+                    addPron(cleanAccent(matches[2]), 'audio', getFullFilename(matches[1]));
                 }
                 else if (line !== null) {
                     print ('Unknown pron: '+line);
