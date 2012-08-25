@@ -211,8 +211,8 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
 
   _lingwo_old_add_require_js(array('text'));
   drupal_add_js(drupal_get_path('module', 'lingwo_korpus') .'/annotator.js');
-  drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.less');
-  drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotator.less');
+  drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.css');
+  drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotator.css');
 
   return $form;
 }
@@ -442,7 +442,7 @@ function _lingwo_korpus_add_reader_js() {
     ), 'setting');
     drupal_add_js(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.js');
     drupal_add_css(drupal_get_path('module', 'lingwo_senses') .'/lingwo_senses.css');
-    drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.less');
+    drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.css');
 
     $added = TRUE;
   }
