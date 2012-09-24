@@ -444,6 +444,12 @@ function _lingwo_korpus_add_reader_js() {
     drupal_add_css(drupal_get_path('module', 'lingwo_senses') .'/lingwo_senses.css');
     drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.css');
 
+    // hack for lingwo_pron's audio player
+    // TODO: remove this once we go to the iframe based reader!
+    if (module_exists('lingwo_pron')) {
+      drupal_add_js(drupal_get_path('module', 'lingwo_pron') . '/lingwo_pron.player.js');
+    }
+
     $added = TRUE;
   }
 }

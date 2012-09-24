@@ -24,9 +24,9 @@
                                 $('.lingwo-sense-id-'+sense, Reader.contentNode).addClass('selected');
                             }
 
-                            // hack to integrate the flag module
-                            if (Drupal.flagLink) {
-                                Drupal.flagLink(Reader.contentNode);
+                            // run behaviors on the new data
+                            if (Drupal.attachBehaviors) {
+                                Drupal.attachBehaviors(Reader.contentNode);
                             }
                         }
                     );
@@ -34,7 +34,10 @@
 
                 Reader.setup({ layout: layout });
                 $('body', context).click(function (evt) {
-                    return Reader.handleClick(evt.target);
+                    // hack to prevent the popup from being closed when an audio tag is clicked
+                    if (evt.target.tagName.toLowerCase() !== 'audio') {
+                        return Reader.handleClick(evt.target);
+                    }
                 });
             }
         );
