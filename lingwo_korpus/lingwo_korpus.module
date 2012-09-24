@@ -40,10 +40,11 @@ function lingwo_korpus_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
-  $item['lingwo_korpus/popup'] = array(
+  $items['lingwo_korpus/popup/%'] = array(
     'title' => 'Popup',
     'page callback' => 'lingwo_korpus_popup_page',
-    'access arguments' => array('access content',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
 
@@ -71,12 +72,58 @@ function lingwo_korpus_menu() {
   return $items;
 }
 
+/**
+ * Implementation of hook_theme_registry_alter().
+ */
+function lingwo_korpus_theme_registry_alter(&$theme_registry) {
+  if (isset($theme_registry['page']) && isset($theme_registry['page']['theme paths'])) {
+    array_unshift($theme_registry['page']['preprocess functions'], 'lingwo_korpus_pre_preprocess_page');
+  }
+}
+
+/**
+ * Pre-preprocess so that we can make sure the messages aren't retrieved when showing an entry.
+ */
+function lingwo_korpus_pre_preprocess_page(&$vars) {
+  if (!empty($GLOBALS['lingwo_korpus_popup'])) {
+    $vars['show_messages'] = FALSE;
+  }
+}
+
 /*
  * Looks up an entry, replacment for the AJAX version.
  */
-function lingwo_korpus_popup_page() {
-  // TODO: return some JavaScript to do the actual loading
-  return '<div>Loading...</div>';
+function lingwo_korpus_popup_page($hash) {
+  global $user, $language;
+
+  // mark us as inside the popup!
+  $GLOBALS['lingwo_korpus_popup'] = TRUE;
+
+  // we are inside a modal frame
+  modalframe_child_js();
+
+  // by passing TRUE, we return the source if the translation can't be found
+  $entry = LingwoEntry::fromHash($hash, $language->language, TRUE);
+
+  if (!$entry) {
+    drupal_set_title(t('Entry not found'));
+    // TODO: This should be slicker!  Probably themed, provide a link for creating the entry, etc.
+    return t('Entry not found.');
+  }
+  elseif (!node_access('view', $entry->getNode())) {
+    // TODO: OR rather than node_access() we could check the menu item, because that will allow
+    // the unpublished goodness to still go down?
+    return drupal_access_denied();
+  }
+
+  // let other modules know that an entry has been looked up! This is used for metrics gathering,
+  // and maintaining the WIAL, etc.
+  module_invoke_all('lingwo_korpus_lookup', $user, $entry);
+
+  drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/lingwo-entry-popup.css');
+
+  drupal_set_title(check_plain($entry->getNode()->title)); 
+  return node_view($entry->getNode(), TRUE, FALSE);
 }
 
 /*
@@ -100,7 +147,7 @@ function lingwo_korpus_lookup_entry() {
   }
 
   // return the HTML to the Ajax caller
-  drupal_json(array('content' => $content, 'javascript' => drupal_get_js());
+  drupal_json(array('content' => $content));
 }
 
 /*

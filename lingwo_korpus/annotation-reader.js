@@ -11,6 +11,7 @@
                         hash  = parts[0],
                         sense = parts[1];
 
+                    /*
                     Reader.setBubbleLoading();
 
                     // lookup the entry on the server
@@ -30,6 +31,9 @@
                             }
                         }
                     );
+                    */
+
+                    Reader.setBubbleContent('<iframe border="0" src="' + Drupal.settings.baseUrl + '/lingwo_korpus/popup/' + hash + '"></iframe>');
                 };
 
                 Reader.setup({ layout: layout });

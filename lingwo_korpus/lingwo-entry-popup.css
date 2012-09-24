@@ -1,0 +1,29 @@
+
+/**
+ * TODO: how much of this belongs in the theme, and how much here?
+ */
+
+#modalframe-page h1,
+#modalframe-page h2 {
+  font-size: 1.5em;
+  margin: 0 0 10px 0;
+}
+
+#modalframe-page .lingwo-sense-example {
+  background-color: LightGrey;
+  padding: 5px 10px;
+  margin: 5px 0;
+}
+
+#modalframe-page .node {
+  margin: 0;
+}
+
+#modalframe-page .node .content {
+  margin: 0;
+}
+
+#modalframe-page .node ul.links {
+  margin: 0;
+}
+
