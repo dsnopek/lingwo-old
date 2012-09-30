@@ -411,7 +411,9 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
           drupal_set_message(t('Some texts on this page are written in the same language as your language!  You will not be able to get translations for these texts.  Please check that "My Language" is correct.'), 'warning');
           $warned = TRUE;
         }
-        // But skip filtering the text always
+
+        // Filter out our data
+        $node->content['body']['#value'] = _lingwo_korpus_remove_annotations($node->content['body']['#value']);
         return;
       }
 
@@ -428,7 +430,18 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
 
       _lingwo_korpus_add_reader_js();
     }
+    else {
+      // Filter out our data
+      $node->content['body']['#value'] = _lingwo_korpus_remove_annotations($node->content['body']['#value']);
+    }
   }
+}
+
+/**
+ * Removes annotation information from HTML.
+ */
+function _lingwo_korpus_remove_annotations($text) {
+  return preg_replace(',</?(word|sent)[^>]*>,s', '', $text);
 }
 
 function _lingwo_korpus_add_reader_js() {
