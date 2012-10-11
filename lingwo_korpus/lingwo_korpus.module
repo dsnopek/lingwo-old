@@ -158,11 +158,30 @@ function lingwo_korpus_annotator_access($node) {
          lingwo_korpus_text_content_type() == $node->type;
 }
 
+/**
+ * Escape certain text that isn't safe in the annotator.
+ */
+function _lingwo_korpus_annotator_escape($text) {
+  // iframes with a 'src' attr that points to another domain will lose their 'src' attr when
+  // coming back out of the annotator (because of browser security features). Since we can't really
+  // annotate an iframe anyway, we simply escape it in an HTML comment.
+  $text = preg_replace(',(<iframe.*?</iframe>),s', '<!--ESCAPE:$1:ESCAPE-->', $text);
+  return $text;
+}
+
+/**
+ * Unescape text that was escaped by the previous function.
+ */
+function _lingwo_korpus_annotator_unescape($text) {
+  $text = preg_replace(',<!--ESCAPE:(.*?):ESCAPE-->,s', '$1', $text);
+  return $text;
+}
+
 /*
  * Show the annotator.
  */
 function lingwo_korpus_annotator_form(&$form_state, $node) {
-  $text = $node->body;
+  $text = _lingwo_korpus_annotator_escape($node->body);
 
   if (module_exists('automodal')) {
     automodal_add('.automodal');
@@ -233,6 +252,9 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
   // invalid XHTML!
   $text = preg_replace('/<embed ([^>]*)(?<!\/)>/i','<embed \1 />', $text);
   $text = preg_replace('/<param ([^>]*)(?<!\/)>/i','<param \1 />', $text);
+
+  // ultimately do our unescape
+  $text = _lingwo_korpus_annotator_unescape($text);
 
   if (str_get_html($text)->plaintext != str_get_html($node_body)->plaintext) {
     drupal_set_message(t('Annotator modified the content of the text'), 'error');
