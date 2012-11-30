@@ -361,7 +361,6 @@ define(
 
                 // make it act like style="position: fixed"
                 setPositionFixed(this.toolbarNode);
-
             },
 
             _toggleButton: function (which, value) {

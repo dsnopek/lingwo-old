@@ -63,6 +63,13 @@ function lingwo_korpus_menu() {
     'access callback' => 'lingwo_korpus_annotator_ajax_access',
     'type' => MENU_CALLBACK,
   );
+  $items['lingwo_korpus/%node/check_html'] = array(
+    'title' => 'Check HTML from annotator',
+    'page callback' => 'lingwo_korpus_check_html',
+    'page arguments' => array(1),
+    'access callback' => 'lingwo_korpus_annotator_ajax_access',
+    'type' => MENU_CALLBACK,
+  );
 
   return $items;
 }
@@ -149,6 +156,17 @@ function lingwo_korpus_pos_list() {
   drupal_json(array(
     'pos_map' => $map,
     'pos_list' => $list
+  ));
+}
+
+/**
+ * Does a sanity check on the HTML passed back from the annotator.
+ */
+function lingwo_korpus_check_html($node) {
+  $text = _lingwo_korpus_annotator_fix_html($_POST['html']);
+
+  drupal_json(array(
+    'ok' => (bool)_lingwo_korpus_annotator_check_html($node->body, $text),
   ));
 }
 
@@ -255,15 +273,8 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
   return $form;
 }
 
-
-function lingwo_korpus_annotator_form_submit($form, &$form_state) {
-  require_once(_lingwo_old_project_path() .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
-
-  $node = $form['#node'];
-  $node_body = $node->body;
-  $node_body = preg_replace('/\r/', '', $node_body);
-
-  $text = $form_state['values']['korpus-text-value'];
+// Fix the HTML back from the annotator
+function _lingwo_korpus_annotator_fix_html($text) {
   $text = preg_replace('/\r/', '', $text);
 
   // There is weird tendency for self-closed <embed> and <param> tags to come back
@@ -275,17 +286,36 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
   // ultimately do our unescape
   $text = _lingwo_korpus_annotator_unescape($text);
 
+  return $text;
+}
+
+// Compare original node body against the text back from the annotator to see if it's good
+function _lingwo_korpus_annotator_check_html($node_body, $text) {
+  require_once(_lingwo_old_project_path() .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
+
+  $node_body = preg_replace('/\r/', '', $node_body);
+
   if (str_get_html($text)->plaintext != str_get_html($node_body)->plaintext) {
-    drupal_set_message(t('Annotator modified the content of the text'), 'error');
     // For debugging this situation!
     // TODO: When we have normal users using the annotator, we should log this somewhere
     // we can get to it later to diagnose problems...
-    /*
-    file_put_contents('ttt-node.txt', str_get_html($node_body)->plaintext);
-    file_put_contents('ttt-anno.txt', str_get_html($text)->plaintext);
-    file_put_contents('ttt-node.html', $node_body);
-    file_put_contents('ttt-anno.html', $text);
-    */
+    file_put_contents('/tmp/ttt-node.txt', str_get_html($node_body)->plaintext);
+    file_put_contents('/tmp/ttt-anno.txt', str_get_html($text)->plaintext);
+    file_put_contents('/tmp/ttt-node.html', $node_body);
+    file_put_contents('/tmp/ttt-anno.html', $text);
+
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+function lingwo_korpus_annotator_form_submit($form, &$form_state) {
+  $node = $form['#node'];
+  $text = _lingwo_korpus_annotator_fix_html($form_state['values']['korpus-text-value']);
+
+  if (!_lingwo_korpus_annotator_check_html($node->body, $text)) {
+    drupal_set_message(t('Annotator modified the content of the text'), 'error');
     return;
   }
 
