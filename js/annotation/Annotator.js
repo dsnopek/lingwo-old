@@ -212,6 +212,9 @@ define(
                 this._selector = new TextSelector(this.textNode.get(0));
                 this._selector.onSelectionStart = function () { return Annotator._onSelectionStart.apply(Annotator, arguments); };
                 this._selector.onSelectionStop = function () { return Annotator._onSelectionStop.apply(Annotator, arguments); };
+
+                // set all 'auto' words to have the 'auto' class
+                $('[auto="true"]', this.textNode).addClass('auto');
             },
 
             _setupForm: function () {
@@ -358,6 +361,7 @@ define(
 
                 // make it act like style="position: fixed"
                 setPositionFixed(this.toolbarNode);
+
             },
 
             _toggleButton: function (which, value) {
@@ -916,6 +920,10 @@ define(
 
                 // show that it is changed to the user
                 this.selected.addClass(this.mode == 'edit' ? 'changed' : 'added');
+
+                // clear the 'auto' attribute
+                this.selected.get(0).removeAttribute('auto');
+                this.selected.removeClass('auto');
             },
 
             deleteAnnotation: function () {
