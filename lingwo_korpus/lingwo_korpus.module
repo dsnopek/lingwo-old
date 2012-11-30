@@ -228,12 +228,14 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
   );
   */
   // TODO: This shouldn't be added here, but in a hook_form_alter() from a bbcom_* module
+  /*
   if (!$node->status) {
     $form['publish'] = array(
       '#type'  => 'submit',
       '#value' => t('Publish'),
     );
   }
+  */
 
   drupal_add_js(array(
     'lingwo_korpus' => array(
@@ -292,10 +294,12 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
     drupal_set_message(t('Automatic annotator complete.'));
     _lingwo_korpus_auto_annotate_node($node);
   }
+  /*
   elseif ($form_state['clicked_button']['#value'] == t('Publish')) {
     $node->status = 1;
     $form_state['redirect'] = 'node/' . $node->nid;
   }
+  */
   node_save($node);
 
   drupal_set_message(t('Annotation saved.'));
@@ -609,9 +613,11 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
     );
 
     // TODO: This shouldn't be added here, but in a hook_form_alter() from a bbcom_* module
+    /*
     if ($form['#node']->nid == 0) {
       $form['options']['status']['#default_value'] = 0;
     }
+    */
   }
   else if ($form_id == (LingwoEntry::$settings->content_type . '_node_form')) {
     drupal_add_js(drupal_get_path('module', 'lingwo_korpus') . '/lingwo_korpus.entry.js');
