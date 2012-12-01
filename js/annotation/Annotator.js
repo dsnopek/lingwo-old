@@ -372,6 +372,42 @@ define(
 
                 // make it act like style="position: fixed"
                 setPositionFixed(this.toolbarNode);
+
+                // perform sanity check
+                this.sanityCheck();
+            },
+
+            _insane: function () {
+                var t = Drupal.t('Discovered an error in the HTML! The annotator will not work until this error is fixed.');
+                
+                // alert the user
+                alert(t);
+
+                // disable the form in a super crude way
+                $(this.textNode)
+                    .after($('<div class="message error"></div>').text(t))
+                    .remove();
+            },
+
+            sanityCheck: function () {
+                var value = this._selector.getText();
+
+                $.ajax({
+                    'url': '/lingwo_korpus/' + Drupal.settings.lingwo_korpus.text.nid + '/check_html',
+                    'type': 'POST',
+                    'dataType': 'json',
+                    'data': {
+                        'html': value,
+                    },
+                    'success': function (data) {
+                        if (!data.ok) {
+                            Annotator._insane();
+                        }
+                    },
+                    'error': function () {
+                        Annotator._insane();
+                    }
+                });
             },
 
             _toggleButton: function (which, value) {
