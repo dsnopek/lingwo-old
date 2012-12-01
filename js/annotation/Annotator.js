@@ -127,10 +127,12 @@ define(
 
             _setupToolbar: function () {
                 this.toolbarNode.html(
+                    /*
                     makeBtnGrp('Type', [
                         makeBtn('Sentence', 'button-type-sent'),
                         makeBtn('Word',     'button-type-word')
                     ]) +
+                    */
                     makeBtnGrp('Mode', [
                         makeBtn('Add',  'button-mode-add'),
                         makeBtn('Edit', 'button-mode-edit')
@@ -139,16 +141,20 @@ define(
                     makeBtnGrp('Step', [
                         makeBtn('Previous', 'button-prev'),
                         makeBtn('Next',     'button-next')
-                    ]) +
-                    makeBtn('Missing', 'button-missing')
+                    ])
+                    /*
+                    + makeBtn('Missing', 'button-missing')
+                    */
                 );
 
+                /*
                 $.each(['word','sent'], function (i,x) {
                     $('#button-type-'+x).click(function () {
                         Annotator.setType(x);
                         return false;
                     });
                 });
+                */
 
                 $.each(['add','edit'], function (i,x) {
                     $('#button-mode-'+x).click(function () {
@@ -172,12 +178,14 @@ define(
                     return false;
                 });
 
+                /*
                 $('#button-missing').click(function () {
                     if (Annotator.type == 'word') {
                       Annotator.setOnlyMissing(!Annotator.onlyMissing);
                     }
                     return false;
                 });
+                */
             },
 
             _setupText: function() {
