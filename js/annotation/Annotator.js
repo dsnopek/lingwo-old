@@ -181,6 +181,9 @@ define(
             },
 
             _setupText: function() {
+                // copy the data from the value node to the text node
+                this.textNode.html(this.textValueNode.val());
+
                 // setup Reader to work for the Annotator
                 Reader.onLoad = function (target) {
                     Annotator._selectWord(target);

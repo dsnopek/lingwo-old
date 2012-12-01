@@ -224,15 +224,21 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
 
   $form['#node'] = $node;
 
+  $form['changed'] = array(
+    '#type' => 'hidden',
+    '#default_value' => $node->changed,
+  );
+
   $form['lingwo-annotator-toolbar'] = array(
     '#value' => '<div id="lingwo-korpus-annotator-toolbar" class="clear-block"></div>',
   );
 
   $form['korpus-text'] = array(
-    '#value' => '<div id="edit-korpus-text">'. $text .'</div>',
+    '#value' => '<div id="edit-korpus-text">' . t('Loading annotator...') . '</div>',
   );
   $form['korpus-text-value'] = array(
     '#type' => 'hidden',
+    '#default_value' => $text,
   );
 
   $form['save'] = array(
@@ -310,14 +316,24 @@ function _lingwo_korpus_annotator_check_html($node_body, $text) {
   return TRUE;
 }
 
-function lingwo_korpus_annotator_form_submit($form, &$form_state) {
+function lingwo_korpus_annotator_form_validate($form, &$form_state) {
   $node = $form['#node'];
   $text = _lingwo_korpus_annotator_fix_html($form_state['values']['korpus-text-value']);
 
-  if (!_lingwo_korpus_annotator_check_html($node->body, $text)) {
-    drupal_set_message(t('Annotator modified the content of the text'), 'error');
+  if (node_last_changed($node->nid) > $form_state['values']['changed']) {
+    form_set_error('save', t('This content has been modified by another user, changes cannot be saved.'));
     return;
   }
+
+  if (!_lingwo_korpus_annotator_check_html($node->body, $text)) {
+    form_set_error('save', t('Annotator modified the content in an unsafe way, changes cannot be saved.'));
+    return;
+  }
+}
+
+function lingwo_korpus_annotator_form_submit($form, &$form_state) {
+  $node = $form['#node'];
+  $text = _lingwo_korpus_annotator_fix_html($form_state['values']['korpus-text-value']);
 
   _lingwo_korpus_update_body($node, $text);
   if ($form_state['clicked_button']['#value'] == t('Auto Annotate')) {
@@ -330,6 +346,14 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
     $form_state['redirect'] = 'node/' . $node->nid;
   }
   */
+
+  // set the revision flag if this node type has it set as the default
+  $node_options = variable_get('node_options_' . $node->type, array('status', 'promote'));
+  if (in_array('revision', $node_options)) {
+    $node->revision = TRUE;
+    $node->log = '';
+  }
+
   node_save($node);
 
   drupal_set_message(t('Annotation saved.'));
