@@ -48,7 +48,7 @@ function lingwo_korpus_menu() {
     'title' => 'Lookup Entry',
     'page arguments' => array(2),
     'page callback' => 'lingwo_korpus_lookup_entry',
-    'access callback' => 'lingwo_korpus_annotator_ajax_access',
+    'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
   $items['lingwo_korpus/lookup_senses'] = array(
