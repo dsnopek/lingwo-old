@@ -127,10 +127,12 @@ define(
 
             _setupToolbar: function () {
                 this.toolbarNode.html(
+                    /*
                     makeBtnGrp('Type', [
                         makeBtn('Sentence', 'button-type-sent'),
                         makeBtn('Word',     'button-type-word')
                     ]) +
+                    */
                     makeBtnGrp('Mode', [
                         makeBtn('Add',  'button-mode-add'),
                         makeBtn('Edit', 'button-mode-edit')
@@ -139,16 +141,20 @@ define(
                     makeBtnGrp('Step', [
                         makeBtn('Previous', 'button-prev'),
                         makeBtn('Next',     'button-next')
-                    ]) +
-                    makeBtn('Missing', 'button-missing')
+                    ])
+                    /*
+                    + makeBtn('Missing', 'button-missing')
+                    */
                 );
 
+                /*
                 $.each(['word','sent'], function (i,x) {
                     $('#button-type-'+x).click(function () {
                         Annotator.setType(x);
                         return false;
                     });
                 });
+                */
 
                 $.each(['add','edit'], function (i,x) {
                     $('#button-mode-'+x).click(function () {
@@ -172,15 +178,20 @@ define(
                     return false;
                 });
 
+                /*
                 $('#button-missing').click(function () {
                     if (Annotator.type == 'word') {
                       Annotator.setOnlyMissing(!Annotator.onlyMissing);
                     }
                     return false;
                 });
+                */
             },
 
             _setupText: function() {
+                // copy the data from the value node to the text node
+                this.textNode.html(this.textValueNode.val());
+
                 // setup Reader to work for the Annotator
                 Reader.onLoad = function (target) {
                     Annotator._selectWord(target);
@@ -212,6 +223,9 @@ define(
                 this._selector = new TextSelector(this.textNode.get(0));
                 this._selector.onSelectionStart = function () { return Annotator._onSelectionStart.apply(Annotator, arguments); };
                 this._selector.onSelectionStop = function () { return Annotator._onSelectionStop.apply(Annotator, arguments); };
+
+                // set all 'auto' words to have the 'auto' class
+                $('[auto="true"]', this.textNode).addClass('auto');
             },
 
             _setupForm: function () {
@@ -358,6 +372,42 @@ define(
 
                 // make it act like style="position: fixed"
                 setPositionFixed(this.toolbarNode);
+
+                // perform sanity check
+                this.sanityCheck();
+            },
+
+            _insane: function () {
+                var t = Drupal.t('Discovered an error in the HTML! The annotator will not work until this error is fixed.');
+                
+                // alert the user
+                alert(t);
+
+                // disable the form in a super crude way
+                $(this.textNode)
+                    .after($('<div class="message error"></div>').text(t))
+                    .remove();
+            },
+
+            sanityCheck: function () {
+                var value = this._selector.getText();
+
+                $.ajax({
+                    'url': '/lingwo_korpus/' + Drupal.settings.lingwo_korpus.text.nid + '/check_html',
+                    'type': 'POST',
+                    'dataType': 'json',
+                    'data': {
+                        'html': value,
+                    },
+                    'success': function (data) {
+                        if (!data.ok) {
+                            Annotator._insane();
+                        }
+                    },
+                    'error': function () {
+                        Annotator._insane();
+                    }
+                });
             },
 
             _toggleButton: function (which, value) {
@@ -916,6 +966,10 @@ define(
 
                 // show that it is changed to the user
                 this.selected.addClass(this.mode == 'edit' ? 'changed' : 'added');
+
+                // clear the 'auto' attribute
+                this.selected.get(0).removeAttribute('auto');
+                this.selected.removeClass('auto');
             },
 
             deleteAnnotation: function () {

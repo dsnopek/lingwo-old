@@ -28,6 +28,10 @@ def lookup(remote, doc, lang):
             # us they hae been processed -- we should be able to do better!)
             if token.dom.hasAttribute('pos'):
                 continue
+            
+            # mark all tokens that are processed here as 'auto'
+            # TODO: should we have a better heuristic?
+            token.dom.setAttribute('auto', 'true');
 
             word = unicode(token)
 
@@ -35,7 +39,7 @@ def lookup(remote, doc, lang):
             res = qlookup(word)
             if res is None:
                 res = qlookup(word.lower())
-
+            
             if res is not None:
                 if word != res['headword']:
                     token.dom.setAttribute('headword', res['headword'])

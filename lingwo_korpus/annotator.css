@@ -13,11 +13,18 @@ word {
   color:white;
   cursor:pointer;
 }
+.mode-edit word.auto {
+  color: black;
+  background-color: yellow;
+}
 .mode-edit word.changed, .mode-edit word.added {
   color:white;
   background-color:green;
 }
-.mode-edit word.selected { background-color:red; }
+.mode-edit word.selected {
+  color: white;
+  background-color: red;
+}
 word.missing {
   color:black !important;
   background-color:yellow !important;
