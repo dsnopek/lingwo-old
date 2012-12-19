@@ -5,6 +5,10 @@
  * The actual callbacks for this service
  */
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function lingwo_data_service_update_entry_access($data) {
   $data = json_decode($data);
   $nid = LingwoEntry::key2nid($data->language, $data->pos, $data->headword);
@@ -44,7 +48,7 @@ function _lingwo_data_node_save($node) {
   $form_state['node'] = (array) $node;
 
   // execute the form
-  $ret = drupal_execute($entry_type .'_node_form', $form_state, $node);
+  $ret = drupal_form_submit($entry_type . '_node_form', $form_state, $node);
 
   if ($node->nid) {
     // If the node is immediately reloaded after update, it will
@@ -76,7 +80,7 @@ function _lingwo_data_import_process_language($entry) {
   // make sure this entry is for an enabled language
   if (!$languages[$entry['language']]) {
     throw new LingwoDataServiceException(
-      t('The language of this entry <i>@lang</i> is not enabled on this site', 
+      t('The language of this entry <i>@lang</i> is not enabled on this site',
       array('@lang' => $entry['language'])), 400);
   }
 
@@ -98,11 +102,11 @@ function _lingwo_data_import_process_sources($entry) {
     // put sources into the format we need
     foreach ($entry['sources'] as $source_name => $source) {
       $res[] = array(
-        'name'      => $source_name,
-        'url'       => $source['url'],
+        'name' => $source_name,
+        'url' => $source['url'],
         'copyright' => $source['copyright'],
-        'license'   => $source['license'],
-        'raw'       => $source['raw'],
+        'license' => $source['license'],
+        'raw' => $source['raw'],
         'timestamp' => $source['timestamp'],
       );
     }
@@ -173,10 +177,10 @@ function _lingwo_data_import_process_translation($entry) {
   return $res;
 }
 
-function _lingwo_data_import_setup_node($nid, $entry, $newExtras=array()) {
+function _lingwo_data_import_setup_node($nid, $entry, $newExtras = array()) {
   // create the original entry/update the original entry
   if (is_null($nid)) {
-    $node = (object)array(
+    $node = (object) array(
       'type' => LingwoEntry::$settings->content_type,
       'title' => $entry['headword'],
       'language' => $entry['language'],
@@ -193,7 +197,7 @@ function _lingwo_data_import_setup_node($nid, $entry, $newExtras=array()) {
       // TODO: what we should really do is stash the data we got and save it for later.
       throw new LingwoDataServiceException(
         t('Existing entry was created by humans, cant overwrite'), 400);
-    };
+    }
   }
   // gets this marked as imported
   $node->imported = -1;
@@ -203,8 +207,9 @@ function _lingwo_data_import_setup_node($nid, $entry, $newExtras=array()) {
 
 function _lingwo_data_entry_has_changed($node, $entry_data) {
   // If this is a new node, then it has changed!
-  if (empty($node->nid))
+  if (empty($node->nid)) {
     return TRUE;
+  }
 
   // compare the data from the previous import with the data we have now
   $old_entry_data = unserialize($node->imported_data);
@@ -239,8 +244,8 @@ function _lingwo_data_download_file($url, $field_info) {
     $file->filepath = $tmpfile;
     $file->filemime = file_get_mimetype($file->filename);
     $file->filesize = filesize($file->filepath);
-    $file->status = FILE_STATUS_TEMPORARY;
-    $file->timestamp = time();
+    $file->status = ~FILE_STATUS_PERMANENT;
+    $file->timestamp = REQUEST_TIME;
     $file->origname = $file->filename;
 
     drupal_write_record('files', $file);
@@ -337,7 +342,7 @@ function _lingwo_data_import_process_field_values($node, &$items, $info, $values
       # Check if the number of senses on this node exceeds the number of values we
       # where given.  If so, we have to remove some.
       if (count($items) > $max) {
-        for($i = ($max - 1); $i < count($items); $i++) {
+        for ($i = ($max - 1); $i < count($items); $i++) {
           if (_lingwo_is_translation($node)) {
             $items[$i]['retire_sense'] = TRUE;
           }
@@ -347,17 +352,17 @@ function _lingwo_data_import_process_field_values($node, &$items, $info, $values
         }
       }
       break;
-  };
+  }
 }
 
 function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
   if (in_array($field_alias, array('senses', 'fields', 'pron'))) {
     // Not CCK, these are special.
-    $field_name = 'lingwo_'.$field_alias;
+    $field_name = 'lingwo_' . $field_alias;
     $field_info = array('type' => $field_name);
   }
   else {
-    $field_name = lingwo_data_settings('field_'. $field_alias);
+    $field_name = lingwo_data_settings('field_' . $field_alias);
     if (empty($field_name)) {
       return;
     }
@@ -371,7 +376,7 @@ function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
   }
   // TODO: we really should merge these, not just overwrite them!
   $field = &$node->$field_name;
-  foreach($values as $i => $value) {
+  foreach ($values as $i => $value) {
     $field[$i] = _lingwo_data_import_set_field_value($field[$i], $value, $field_info);
   }
 
@@ -381,7 +386,7 @@ function _lingwo_data_import_set_field(&$node, $field_alias, $values) {
 function _lingwo_data_import_set_fields(&$node, $fields) {
   // stash the fields data on imported_data so we can compare it on later revisions
   $node->imported_data = serialize($fields);
-  
+
   foreach ($fields as $field_alias => $values) {
     _lingwo_data_import_set_field($node, $field_alias, $values);
   }
@@ -395,14 +400,18 @@ function _lingwo_data_import_set_fields_multigroup(&$node, $values, $prefix) {
     }
   }
   foreach ($flatten as $name => $x) {
-    _lingwo_data_import_set_field($node, $prefix .'_'. $name, $x);
+    _lingwo_data_import_set_field($node, $prefix . '_' . $name, $x);
   }
 }
 
 /*
  * Updates an entry based on JSON data from the importer.
  */
-function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
+function lingwo_data_service_update_entry($data, $force_changed = FALSE) {
   $entry = json_decode($data, TRUE);
 
   try {
@@ -417,7 +426,7 @@ function lingwo_data_service_update_entry($data, $force_changed=FALSE) {
     $sources = _lingwo_data_import_process_sources($entry);
 
     // Setup a $node to hold the original (not translated) entry
-    $node = _lingwo_data_import_setup_node($nid, $entry); 
+    $node = _lingwo_data_import_setup_node($nid, $entry);
 
     // Process the $entry creating an array holding the data which will be put on our node
     $entry_original = _lingwo_data_import_process_original($entry);

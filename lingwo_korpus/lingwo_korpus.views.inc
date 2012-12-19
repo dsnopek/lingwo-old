@@ -7,7 +7,7 @@
  */
 
 /**
- * Implementation of hook_views_data().
+ * Implements hook_views_data().
  */
 function lingwo_korpus_views_data() {
   return array(
@@ -20,7 +20,6 @@ function lingwo_korpus_views_data() {
           'help' => t('An entry on a Lingwo Korpus text'),
         ),
       ),
-
       'nid' => array(
         'title' => t('Korpus Text Nid'),
         'help' => t('The Nid of the korpus text that this entry is on'),
@@ -42,7 +41,6 @@ function lingwo_korpus_views_data() {
           'label' => t('korpus node'),
         ),
       ),
-
       'headword' => array(
         'title' => t('Headword'),
         'help' => t('The headword of this entry'),
@@ -54,7 +52,6 @@ function lingwo_korpus_views_data() {
           'handler' => 'views_handler_sort',
         ),
       ),
-
       'language' => array(
         'title' => t('Language'),
         'help' => t('The language of this entry'),
@@ -67,7 +64,6 @@ function lingwo_korpus_views_data() {
           'handler' => 'views_handler_sort',
         ),
       ),
-
       'pos' => array(
         'title' => t('Part Of Speech'),
         'help' => t('The part of speech of this entry'),
@@ -79,15 +75,13 @@ function lingwo_korpus_views_data() {
           'handler' => 'views_handler_sort',
         ),
       ),
-
       'sense' => array(
         'title' => t('Sense ID'),
         'help' => t('The sense ID of this entry'),
         'field' => array(
           'handler' => 'views_handler_field',
-        )
+        ),
       ),
-
       'entry_hash' => array(
         'title' => t('Dictionary Entry'),
         'help' => t('The Dictionary Entry for the entry'),

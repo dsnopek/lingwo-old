@@ -3,16 +3,19 @@
 /*
  * Implementation of hook_form_alter()
  */
-function lingwo_data_admin_settings()
-{
-  $settings =& LingwoImport::$settings;
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
+function lingwo_data_admin_settings($form, &$form_state) {
+  $settings = &LingwoImport::$settings;
   $form = array();
 
   $fields = array(
     '#title' => t('Map Fields'),
     '#type' => 'fieldset',
     '#tree' => FALSE,
-    '#description' => t('Here we map fields that may be used in import or export feed to CCK fields on <i>@type</i>, our entry content type.', array('@type' => LingwoEntry::$settings->content_type))
+    '#description' => t('Here we map fields that may be used in import or export feed to CCK fields on <i>@type</i>, our entry content type.', array('@type' => LingwoEntry::$settings->content_type)),
   );
 
   // get information from CCK about our type
@@ -29,7 +32,7 @@ function lingwo_data_admin_settings()
     '#title' => 'Source',
     '#tree' => FALSE,
   );
-  foreach(array('name', 'url', 'copyright', 'license', 'raw', 'timestamp') as $x) {
+  foreach (array('name', 'url', 'copyright', 'license', 'raw', 'timestamp') as $x) {
     $source[$settings->name("field_source_$x")] = array(
       '#type' => 'select',
       '#title' => $x,

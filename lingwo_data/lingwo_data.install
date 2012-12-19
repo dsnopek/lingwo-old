@@ -6,7 +6,7 @@
  */
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function lingwo_data_schema() {
   $schema['lingwo_data_node_imported'] = array(
@@ -17,31 +17,31 @@ function lingwo_data_schema() {
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'default' => 0
+        'default' => 0,
       ),
       'nid' => array(
         'description' => 'The primary identifier for the entry node.',
         'type' => 'int',
         'unsigned' => TRUE,
-        'not null' => TRUE
+        'not null' => TRUE,
       ),
       'imported' => array(
         'description' => 'Boolean indicating whether this entry was imported automatically',
         'type' => 'int',
         'default' => 0,
-        'not null' => TRUE
+        'not null' => TRUE,
       ),
       'imported_data' => array(
         'description' => 'Holds a serialized object of the data that was imported',
         'type' => 'text',
         'size' => 'big',
-        'not null' => TRUE
+        'not null' => TRUE,
       ),
     ),
     'primary key' => array('vid'),
     'indexes' => array(
       'nid' => array('nid'),
-    )
+    ),
   );
 
   return $schema;
@@ -50,6 +50,10 @@ function lingwo_data_schema() {
 /*
  * Implementation of hook_enable()
  */
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function lingwo_data_enable() {
   cache_clear_all('services:methods', 'cache');
 }
@@ -57,23 +61,29 @@ function lingwo_data_enable() {
 /*
  * Implementation of hook_disable()
  */
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function lingwo_data_disable() {
   cache_clear_all('services:methods', 'cache');
 }
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function lingwo_data_install() {
   variable_set('lingwo_data_schema_version', 6000);
-  drupal_install_schema('lingwo_data');
+  // TODO The drupal_(un)install_schema functions are called automatically in D7.
+  // drupal_install_schema('lingwo_data')
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function lingwo_data_uninstall() {
-  drupal_uninstall_schema('lingwo_data');
+  // TODO The drupal_(un)install_schema functions are called automatically in D7.
+  // drupal_uninstall_schema('lingwo_data')
   variable_del('lingwo_data_schema_version');
 }
 

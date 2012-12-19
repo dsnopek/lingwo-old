@@ -2,7 +2,10 @@
 name = Lingwo Dictionary Data
 description = Provides import, export and web services on top of Lingwo Dictionary data
 package = Lingwo Dictionary
-core = 6.x
+core = 7.x
 dependencies[] = lingwo_entry
 dependencies[] = services
 
+
+files[] = lingwo_data.api.inc
+files[] = lingwo_data.service.inc

@@ -6,24 +6,30 @@
  * Extends Lingwo Dictionary for annotating texts
  */
 
-require_once(dirname(__FILE__) .'/../includes/internal.inc');
+require_once DRUPAL_ROOT . '/' . dirname(__FILE__) . '/../includes/internal.inc';
 
 /**
- * Implementation of hook_perm().
+ * Implements hook_permission().
  */
-function lingwo_korpus_perm() {
+function lingwo_korpus_permission() {
   return array(
-    'annotate lingwo_korpus texts',
-    'annotate own lingwo_korpus texts',
+    'annotate lingwo_korpus texts' => array(
+      'title' => t('annotate lingwo_korpus texts'),
+      'description' => t('TODO Add a description for \'annotate lingwo_korpus texts\''),
+    ),
+    'annotate own lingwo_korpus texts' => array(
+      'title' => t('annotate own lingwo_korpus texts'),
+      'description' => t('TODO Add a description for \'annotate own lingwo_korpus texts\''),
+    ),
   );
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function lingwo_korpus_menu() {
   $items = array();
-  $items['admin/settings/lingwo/korpus'] = array(
+  $items['admin/config/lingwo/korpus'] = array(
     'title' => 'Korpus',
     'description' => 'Settings for Lingwo Korpus module.',
     'access arguments' => array('administer site configuration'),
@@ -77,6 +83,10 @@ function lingwo_korpus_menu() {
 /*
  * Our entry lookup AJAX callback.
  */
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function lingwo_korpus_lookup_entry() {
   global $user, $language;
 
@@ -95,11 +105,15 @@ function lingwo_korpus_lookup_entry() {
   }
 
   // return the HTML to the Ajax caller
-  drupal_json(array('content' => $content));
+  drupal_json_output(array('content' => $content));
 }
 
 /*
  * Our senses lookup AJAX callback.
+ */
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
  */
 function lingwo_korpus_lookup_senses() {
   $language = urldecode($_GET['language']);
@@ -113,30 +127,37 @@ function lingwo_korpus_lookup_senses() {
     $entry = LingwoEntry::fromNid($obj->nid);
     foreach ($entry->senses as $sense) {
       $result[$obj->pos][] = array(
-        'nid'        => $obj->nid,
-        'id'         => $sense->id,
-        'example'    => $sense->example,
+        'nid' => $obj->nid,
+        'id' => $sense->id,
+        'example' => $sense->example,
         'difference' => $sense->difference,
       );
     }
   }
 
-  drupal_json(array('senses' => $result));
+  drupal_json_output(array('senses' => $result));
 }
 
 /*
  * Returns a list of the POS
+ */
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
  */
 function lingwo_korpus_pos_list() {
   // Because JSON can't hold the order in an Object we need to return an Array
   $map = LingwoEntry::getPosOptions($_GET['language'], TRUE);
   $list = array();
   foreach ($map as $value => $label) {
-    $list[] = array('label' => $label, 'value' => $value);
+    $list[] = array(
+      'label' => $label,
+      'value' => $value,
+    );
   }
-  drupal_json(array(
+  drupal_json_output(array(
     'pos_map' => $map,
-    'pos_list' => $list
+    'pos_list' => $list,
   ));
 }
 
@@ -146,13 +167,17 @@ function lingwo_korpus_pos_list() {
 function lingwo_korpus_check_html($node) {
   $text = _lingwo_korpus_annotator_fix_html($_POST['html']);
 
-  drupal_json(array(
-    'ok' => (bool)_lingwo_korpus_annotator_check_html($node->body, $text),
+  drupal_json_output(array(
+    'ok' => (bool) _lingwo_korpus_annotator_check_html($node->body, $text),
   ));
 }
 
-/* 
+/*
  * Check if the user can annotate texts.
+ */
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
  */
 function lingwo_korpus_annotator_access($node, $account = NULL) {
   global $user;
@@ -196,7 +221,11 @@ function _lingwo_korpus_annotator_unescape($text) {
 /*
  * Show the annotator.
  */
-function lingwo_korpus_annotator_form(&$form_state, $node) {
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
+function lingwo_korpus_annotator_form($form, &$form_state, $node) {
   $text = _lingwo_korpus_annotator_escape($node->body);
 
   if (module_exists('automodal')) {
@@ -223,39 +252,39 @@ function lingwo_korpus_annotator_form(&$form_state, $node) {
   );
 
   $form['save'] = array(
-    '#type'  => 'submit',
+    '#type' => 'submit',
     '#value' => t('Save'),
   );
   /*
-  $form['auto'] = array(
-    '#type'  => 'submit',
-    '#value' => t('Auto Annotate'),
-  );
-  */
+   $form['auto'] = array(
+   '#type'  => 'submit',
+   '#value' => t('Auto Annotate'),
+   );
+   */
   // TODO: This shouldn't be added here, but in a hook_form_alter() from a bbcom_* module
   /*
-  if (!$node->status) {
-    $form['publish'] = array(
-      '#type'  => 'submit',
-      '#value' => t('Publish'),
-    );
-  }
-  */
+   if (!$node->status) {
+   $form['publish'] = array(
+   '#type'  => 'submit',
+   '#value' => t('Publish'),
+   );
+   }
+   */
 
   drupal_add_js(array(
     'lingwo_korpus' => array(
       'text' => array(
-        'nid'      => $node->nid,
+        'nid' => $node->nid,
         'language' => $node->language,
       ),
       'entry_type' => LingwoEntry::$settings->content_type,
     ),
-  ), 'setting');
+  ), array('type' => 'setting', 'scope' => JS_DEFAULT));
 
   _lingwo_old_add_require_js(array('text'));
-  drupal_add_js(drupal_get_path('module', 'lingwo_korpus') .'/annotator.js');
-  drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.css');
-  drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotator.css');
+  drupal_add_js(drupal_get_path('module', 'lingwo_korpus') . '/annotator.js');
+  drupal_add_css(drupal_get_path('module', 'lingwo_korpus') . '/annotation-reader.css');
+  drupal_add_css(drupal_get_path('module', 'lingwo_korpus') . '/annotator.css');
 
   return $form;
 }
@@ -265,10 +294,10 @@ function _lingwo_korpus_annotator_fix_html($text) {
   $text = preg_replace('/\r/', '', $text);
 
   // There is weird tendency for self-closed <embed> and <param> tags to come back
-  // without the self-closing slash, which breaks simplehtmldom -- and makes for 
+  // without the self-closing slash, which breaks simplehtmldom -- and makes for
   // invalid XHTML!
-  $text = preg_replace('/<embed ([^>]*)(?<!\/)>/i','<embed \1 />', $text);
-  $text = preg_replace('/<param ([^>]*)(?<!\/)>/i','<param \1 />', $text);
+  $text = preg_replace('/<embed ([^>]*)(?<!\/)>/i', '<embed \1 />', $text);
+  $text = preg_replace('/<param ([^>]*)(?<!\/)>/i', '<param \1 />', $text);
 
   // ultimately do our unescape
   $text = _lingwo_korpus_annotator_unescape($text);
@@ -278,7 +307,7 @@ function _lingwo_korpus_annotator_fix_html($text) {
 
 // Compare original node body against the text back from the annotator to see if it's good
 function _lingwo_korpus_annotator_check_html($node_body, $text) {
-  require_once(_lingwo_old_project_path() .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
+  require_once DRUPAL_ROOT . '/' . _lingwo_old_project_path() . '/includes/3rdparty/simplehtmldom/simple_html_dom.php';
 
   $node_body = preg_replace('/\r/', '', $node_body);
 
@@ -297,6 +326,10 @@ function _lingwo_korpus_annotator_check_html($node_body, $text) {
   return TRUE;
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function lingwo_korpus_annotator_form_validate($form, &$form_state) {
   $node = $form['#node'];
   $text = _lingwo_korpus_annotator_fix_html($form_state['values']['korpus-text-value']);
@@ -312,6 +345,10 @@ function lingwo_korpus_annotator_form_validate($form, &$form_state) {
   }
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function lingwo_korpus_annotator_form_submit($form, &$form_state) {
   $node = $form['#node'];
   $text = _lingwo_korpus_annotator_fix_html($form_state['values']['korpus-text-value']);
@@ -322,11 +359,11 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
     _lingwo_korpus_auto_annotate_node($node);
   }
   /*
-  elseif ($form_state['clicked_button']['#value'] == t('Publish')) {
-    $node->status = 1;
-    $form_state['redirect'] = 'node/' . $node->nid;
-  }
-  */
+   elseif ($form_state['clicked_button']['#value'] == t('Publish')) {
+   $node->status = 1;
+   $form_state['redirect'] = 'node/' . $node->nid;
+   }
+   */
 
   // set the revision flag if this node type has it set as the default
   $node_options = variable_get('node_options_' . $node->type, array('status', 'promote'));
@@ -341,11 +378,11 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
 }
 
 /**
- * Implementation of hook_views_api().
+ * Implements hook_views_api().
  */
 function lingwo_korpus_views_api() {
   return array(
-    'api'  => 2,
+    'api' => 2,
     'path' => drupal_get_path('module', 'lingwo_korpus'),
   );
 }
@@ -353,13 +390,17 @@ function lingwo_korpus_views_api() {
 /*
  * Implementation of hook_theme().
  */
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function lingwo_korpus_theme() {
   return array(
     'lingwo_korpus_annotation_reader_block' => array(
-      'arguments' => array(
+      'variables' => array(
         'footer_id' => NULL,
         'footer_margin' => NULL,
-      )
+      ),
     ),
   );
 }
@@ -367,20 +408,34 @@ function lingwo_korpus_theme() {
 /*
  * Implementation of hook_rules_event_info().
  */
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function lingwo_korpus_rules_event_info() {
   return array(
     'lingwo_korpus_lookup' => array(
       'label' => t('User looks up an entry using the annotation reader.'),
       'module' => 'Lingwo Korpus',
       'arguments' => array(
-        'user' => array('type' => 'user', 'label' => t('User which looks up the entry.')),
-        'node' => array('type' => 'node', 'label' => t('The node looked up.'))
+        'user' => array(
+          'type' => 'user',
+          'label' => t('User which looks up the entry.'),
+        ),
+        'node' => array(
+          'type' => 'node',
+          'label' => t('The node looked up.'),
+        ),
       ),
-    )
+    ),
   );
 }
 
 // Rules integration
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function lingwo_korpus_lingwo_korpus_lookup($user, $entry) {
   if (module_exists('rules')) {
     rules_invoke_event('lingwo_korpus_lookup', $user, $entry->getNode());
@@ -390,10 +445,18 @@ function lingwo_korpus_lingwo_korpus_lookup($user, $entry) {
 /*
  * Implementation of hook_flush_caches().
  */
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function lingwo_korpus_flush_caches() {
   return array('cache_lingwo_korpus');
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function lingwo_korpus_generate_hash(&$item) {
   $item->row_hash =
     sha1(join(':', array($item->nid, $item->language, $item->pos, $item->headword, $item->sense)));
@@ -424,10 +487,11 @@ function _lingwo_korpus_update_body(&$node, $body) {
 /*
  * Implementation of hook_nodeapi().
  */
-function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
-  global $user, $language;
-
-  if ($node->type == LingwoEntry::$settings->content_type && $op == 'presave' && module_exists('lingwo_senses')) {
+/**
+ * Implements hook_node_presave().
+ */
+function lingwo_korpus_node_presave($node) {
+  if ($node->type == LingwoEntry::$settings->content_type && TRUE && module_exists('lingwo_senses')) {
     $search = array();
     $replace = array();
     foreach ($node->lingwo_senses as $sense) {
@@ -441,19 +505,47 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
     }
     return;
   }
+}
 
-  if ($node->type != lingwo_korpus_text_content_type())
-    return;
-
-  if ($op == 'update' || $op == 'delete') {
+/**
+ * Implements hook_node_update().
+ */
+function lingwo_korpus_node_update($node) {
+  if (TRUE || TRUE) {
     // clear all cached texts for this node
     cache_clear_all($node->nid, 'cache_lingwo_korpus', TRUE);
 
     // clear the entries used in this corpus text
-    db_query('DELETE FROM {lingwo_korpus_entry} WHERE nid = %d', $node->nid);
+    // TODO Please review the conversion of this statement to the D7 database API syntax.
+    /* db_query('DELETE FROM {lingwo_korpus_entry} WHERE nid = %d', $node->nid) */
+    db_delete('lingwo_korpus_entry')
+  ->condition('nid', $node->nid)
+  ->execute();
   }
+}
 
-  if ($op == 'insert' || $op == 'update') {
+/**
+ * Implements hook_node_delete().
+ */
+function lingwo_korpus_node_delete($node) {
+  if (TRUE || TRUE) {
+    // clear all cached texts for this node
+    cache_clear_all($node->nid, 'cache_lingwo_korpus', TRUE);
+
+    // clear the entries used in this corpus text
+    // TODO Please review the conversion of this statement to the D7 database API syntax.
+    /* db_query('DELETE FROM {lingwo_korpus_entry} WHERE nid = %d', $node->nid) */
+    db_delete('lingwo_korpus_entry')
+  ->condition('nid', $node->nid)
+  ->execute();
+  }
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function lingwo_korpus_node_insert($node) {
+  if (TRUE || TRUE) {
     // record all the entries used in this corpus text
     foreach (lingwo_korpus_text_entry_list($node->body, $node->language) as $entry) {
       if (!empty($entry->pos)) {
@@ -462,7 +554,7 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
         drupal_write_record('lingwo_korpus_entry', $entry);
       }
     }
-    
+
     $auto_annotate = isset($node->lingwo_korpus_auto_annotate) ? array_filter(array_values($node->lingwo_korpus_auto_annotate)) : NULL;
     if (!empty($auto_annotate)) {
       _lingwo_korpus_batch_auto_annotate_node($node);
@@ -473,11 +565,45 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
     // $node->form_id check).
     // TODO: should be configurable on the admin page (ex: always, only on new, never)
     if (isset($node->form_id) && lingwo_korpus_annotator_access($node)) {
-      $_REQUEST['destination'] = 'node/' . $node->nid . '/annotate';
+      $_GET['destination'] = 'node/' . $node->nid . '/annotate';
     }
   }
+}
 
-  if ($op == 'view') {
+/**
+ * Implements hook_node_update().
+ */
+function lingwo_korpus_node_update($node) {
+  if (TRUE || TRUE) {
+    // record all the entries used in this corpus text
+    foreach (lingwo_korpus_text_entry_list($node->body, $node->language) as $entry) {
+      if (!empty($entry->pos)) {
+        $entry->nid = $node->nid;
+        lingwo_korpus_generate_hash($entry);
+        drupal_write_record('lingwo_korpus_entry', $entry);
+      }
+    }
+
+    $auto_annotate = isset($node->lingwo_korpus_auto_annotate) ? array_filter(array_values($node->lingwo_korpus_auto_annotate)) : NULL;
+    if (!empty($auto_annotate)) {
+      _lingwo_korpus_batch_auto_annotate_node($node);
+    }
+
+    // if the user has permission to annotate the text, send them to the annotate page
+    // NOTE: we only want this to fire when coming off the node edit form (hence the
+    // $node->form_id check).
+    // TODO: should be configurable on the admin page (ex: always, only on new, never)
+    if (isset($node->form_id) && lingwo_korpus_annotator_access($node)) {
+      $_GET['destination'] = 'node/' . $node->nid . '/annotate';
+    }
+  }
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function lingwo_korpus_node_view($node, $view_mode = 'full') {
+  if (TRUE) {
     static $warned = FALSE;
     static $messaged = FALSE;
 
@@ -504,7 +630,7 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
         $messaged = TRUE;
       }
 
-      // TODO: we should probably do this filtering always, because we don't want to expose the underlying 
+      // TODO: we should probably do this filtering always, because we don't want to expose the underlying
       // korpus format to outside users (since it isn't valid HTML).  For now, we don't because we use this
       // to control whether the node can be read or not.
       $cid = $node->nid . ($a3 ? ':teaser' : '');
@@ -516,6 +642,18 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
       // Filter out our data
       $node->content['body']['#value'] = _lingwo_korpus_remove_annotations($node->content['body']['#value']);
     }
+  }
+}
+
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
+function lingwo_korpus_nodeapi_OLD(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  // TODO Remaining code in this function needs to be moved to the appropriate new hook function.
+  global $user, $language;
+  if ($node->type != lingwo_korpus_text_content_type()) {
+    return;
   }
 }
 
@@ -533,11 +671,11 @@ function _lingwo_korpus_add_reader_js() {
     _lingwo_old_add_require_js();
     drupal_add_js(array(
       'language' => $language->language,
-      'baseUrl' => url('', array('absolute' => TRUE))
-    ), 'setting');
-    drupal_add_js(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.js');
-    drupal_add_css(drupal_get_path('module', 'lingwo_senses') .'/lingwo_senses.css');
-    drupal_add_css(drupal_get_path('module', 'lingwo_korpus') .'/annotation-reader.css');
+      'baseUrl' => url('', array('absolute' => TRUE)),
+    ), array('type' => 'setting', 'scope' => JS_DEFAULT));
+    drupal_add_js(drupal_get_path('module', 'lingwo_korpus') . '/annotation-reader.js');
+    drupal_add_css(drupal_get_path('module', 'lingwo_senses') . '/lingwo_senses.css');
+    drupal_add_css(drupal_get_path('module', 'lingwo_korpus') . '/annotation-reader.css');
 
     // hack for lingwo_pron's audio player
     // TODO: remove this once we go to the iframe based reader!
@@ -550,7 +688,7 @@ function _lingwo_korpus_add_reader_js() {
 }
 
 /**
- * Implementation of hook_content_extra_fields().
+ * Implements hook_content_extra_fields().
  */
 function lingwo_korpus_content_extra_fields($type_name) {
   $extra = array();
@@ -566,7 +704,11 @@ function lingwo_korpus_content_extra_fields($type_name) {
   return $extra;
 }
 
-function lingwo_korpus_filter_text($text, $language, $cid=NULL) {
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
+function lingwo_korpus_filter_text($text, $language, $cid = NULL) {
   if (!is_null($cid)) {
     $data = cache_get($cid, 'cache_lingwo_korpus');
     if ($data) {
@@ -581,18 +723,22 @@ function lingwo_korpus_filter_text($text, $language, $cid=NULL) {
 
     return $filtered;
   }
-  
+
   return $text;
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function lingwo_korpus_text_entry_list($text, $lang) {
-  require_once(_lingwo_old_project_path() .'/includes/3rdparty/simplehtmldom/simple_html_dom.php');
+  require_once DRUPAL_ROOT . '/' . _lingwo_old_project_path() . '/includes/3rdparty/simplehtmldom/simple_html_dom.php';
 
   $entries = array();
   $found = array();
 
-  $html = str_get_html($text); 
-  foreach($html->find('word') as $el) {
+  $html = str_get_html($text);
+  foreach ($html->find('word') as $el) {
     if ($el->attr['data-hidden'] == 'true') {
       continue;
     }
@@ -601,14 +747,14 @@ function lingwo_korpus_text_entry_list($text, $lang) {
     $el->attr = array();
 
     // get the headword
-    $entry = (object)array(
+    $entry = (object) array(
       'headword' => html_entity_decode(isset($attrs['headword']) ? $attrs['headword'] : $el->plaintext),
       'pos' => $attrs['pos'],
       'language' => $lang,
       'sense' => $attrs['sense'],
     );
 
-    $key = $entry->language.':'.$entry->pos.':'.$entry->headword;
+    $key = $entry->language . ':' . $entry->pos . ':' . $entry->headword;
     if (!isset($found[$key])) {
       $found[$key] = TRUE;
       $entries[] = $entry;
@@ -619,10 +765,10 @@ function lingwo_korpus_text_entry_list($text, $lang) {
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  */
 function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
-  if ($form_id == (lingwo_korpus_text_content_type() .'_node_form')) {
+  if ($form_id == (lingwo_korpus_text_content_type() . '_node_form')) {
     // remove language neutral and set language as required (for asthetic purposes)
     unset($form['language']['#options']['']);
     $form['language']['#required'] = TRUE;
@@ -637,11 +783,11 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
       '#tree' => FALSE,
     );
     $form['lingwo_korpus_settings']['lingwo_korpus_auto_annotate'] = array(
-      '#type'  => 'checkboxes',
+      '#type' => 'checkboxes',
       //'#title' => t('Auto annotate'),
       '#options' => array(
         'segment' => t("Segment text into sentences and words"),
-        'lookup'  => t("Try to lookup words in the dictionary"),
+        'lookup' => t("Try to lookup words in the dictionary"),
       ),
       // TODO: the default value should be configurable on the admin page
       '#default_value' => empty($form['#node']->nid) ? array('segment', 'lookup') : array(),
@@ -649,10 +795,10 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
 
     // TODO: This shouldn't be added here, but in a hook_form_alter() from a bbcom_* module
     /*
-    if ($form['#node']->nid == 0) {
-      $form['options']['status']['#default_value'] = 0;
-    }
-    */
+     if ($form['#node']->nid == 0) {
+     $form['options']['status']['#default_value'] = 0;
+     }
+     */
   }
   else if ($form_id == (LingwoEntry::$settings->content_type . '_node_form')) {
     drupal_add_js(drupal_get_path('module', 'lingwo_korpus') . '/lingwo_korpus.entry.js');
@@ -662,14 +808,14 @@ function lingwo_korpus_form_alter(&$form, $form_state, $form_id) {
       // make a list of options
       $options = array();
       foreach (element_children($form['lingwo_senses']['wrapper']['senses']) as $key) {
-        $row =& $form['lingwo_senses']['wrapper']['senses'][$key];
+        $row = &$form['lingwo_senses']['wrapper']['senses'][$key];
         $options[$row['id']['#value']] = t('Sense #@sense_num', array('@sense_num' => $key + 1));
       }
 
       // we add a 'Replace with' select for all old senses
       $index = 0;
       foreach (element_children($form['lingwo_senses']['wrapper']['senses']) as $key) {
-        $row =& $form['lingwo_senses']['wrapper']['senses'][$key];
+        $row = &$form['lingwo_senses']['wrapper']['senses'][$key];
 
         if (isset($row['operations']) && !$row['new']['#value']) {
           $row['operations']['replace_with'] = array(
@@ -716,43 +862,73 @@ function _lingwo_korpus_operation_auto_annotate_node($nid, $type, &$context) {
 /*
  * Implementation of hook_block().
  */
-function lingwo_korpus_block($op = 'list', $delta = 0, $edit = array()) {
-  switch ($op) {
-    case 'list':
-      $blocks[0] = array(
-        'info' => t('Lingwo Korpus: Annotation Reader block'),
-      );
-      return $blocks;
-    case 'configure':
-      if ($delta == 0) {
-        $form['footer_id'] = array(
-          '#type' => 'textfield',
-          '#title' => t('Footer ID'),
-          '#default_value' => variable_get('lingwo_korpus_annotation_reader_block_footer_id', 'footer')
-        );
-        $form['footer_margin'] = array(
-          '#type' => 'textfield',
-          '#title' => t('Footer Margin'),
-          '#default_value' => variable_get('lingwo_korpus_annotation_reader_block_footer_margin', '0')
-        );
-        return $form;
-      }
-    case 'save':
-      if ($delta == 0) {
-        variable_set('lingwo_korpus_annotation_reader_block_footer_id', $edit['footer_id']);
-        variable_set('lingwo_korpus_annotation_reader_block_footer_margin', $edit['footer_margin']);
-      }
-    case 'view':
-      $footer_id = variable_get('lingwo_korpus_annotation_reader_block_footer_id', 'footer');
-      $footer_margin = variable_get('lingwo_korpus_annotation_reader_block_footer_margin', '0');
+/**
+ * Implements hook_block_info().
+ */
+function lingwo_korpus_block_info() {
+  // TODO Rename block deltas (e.g. delta-0) to readable strings.
+  $blocks['delta-0'] = array(
+    'info' => t('Lingwo Korpus: Annotation Reader block'),
+  );
+  return $blocks;
+}
 
-      $block['content'] = theme('lingwo_korpus_annotation_reader_block', $footer_id, $footer_margin);
-      return $block;
+/**
+ * Implements hook_block_configure().
+ */
+function lingwo_korpus_block_configure($delta) {
+  // TODO Rename block deltas (e.g. delta-0) to readable strings.
+  if ($delta == 'delta-0') {
+    $form['footer_id'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Footer ID'),
+      '#default_value' => variable_get('lingwo_korpus_annotation_reader_block_footer_id', 'footer'),
+    );
+    $form['footer_margin'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Footer Margin'),
+      '#default_value' => variable_get('lingwo_korpus_annotation_reader_block_footer_margin', '0'),
+    );
+    return $form;
   }
 }
 
-function theme_lingwo_korpus_annotation_reader_block($footer_id, $footer_margin) {
-  return '<div id="lingwo-korpus-dock" data-footer-id="'.$footer_id.'" data-footer-margin="'.$footer_margin.'"></div>';
+/**
+ * Implements hook_block_save().
+ */
+function lingwo_korpus_block_save($delta, $edit) {
+  // TODO Rename block deltas (e.g. delta-0) to readable strings.
+  if ($delta == 'delta-0') {
+    variable_set('lingwo_korpus_annotation_reader_block_footer_id', $edit['footer_id']);
+    variable_set('lingwo_korpus_annotation_reader_block_footer_margin', $edit['footer_margin']);
+  }
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function lingwo_korpus_block_view($delta) {
+  $footer_id = variable_get('lingwo_korpus_annotation_reader_block_footer_id', 'footer');
+  $footer_margin = variable_get('lingwo_korpus_annotation_reader_block_footer_margin', '0');
+
+  $block['content'] = theme('lingwo_korpus_annotation_reader_block', array('footer_id' => $footer_id, 'footer_margin' => $footer_margin));
+  return $block;
+}
+
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
+function lingwo_korpus_block_OLD($op = 'list', $delta = 0, $edit = array()) { }
+
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
+function theme_lingwo_korpus_annotation_reader_block($variables) {
+  $footer_id = $variables['footer_id'];
+  $footer_margin = $variables['footer_margin'];
+  return '<div id="lingwo-korpus-dock" data-footer-id="' . $footer_id . '" data-footer-margin="' . $footer_margin . '"></div>';
 }
 
 /*
@@ -760,8 +936,8 @@ function theme_lingwo_korpus_annotation_reader_block($footer_id, $footer_margin)
  */
 
 function _lingwo_korpus_auto_annotate_node(&$node, $which = 'body', $type = array('segment', 'lookup')) {
-  $cmd  = "-l ". $node->language ." ";
-  $cmd .= "-m ". implode(",", $type);
+  $cmd  = "-l " . $node->language . " ";
+  $cmd .= "-m " . implode(",", $type);
   $cmd .= " -";
   if ($result = _lingwo_korpus_exec_annotate_py($cmd, $node->$which)) {
     $result = rtrim($result);
@@ -782,7 +958,7 @@ function _lingwo_korpus_auto_annotate_node(&$node, $which = 'body', $type = arra
 function _lingwo_korpus_exec_python($script, $args, $data) {
   $cmd = implode(' ', array(
     lingwo_korpus_python_exec(),
-    _lingwo_old_project_path() .'/'. $script,
+    _lingwo_old_project_path() . '/' . $script,
     $args,
   ));
 
@@ -821,11 +997,11 @@ function _lingwo_korpus_exec_annotate_py($cmd, $data) {
   if (!empty($ret['error'])) {
     if ($ret['return_value'] == 0) {
       drupal_set_message(t('Got warnings when running the automatic annotator.'), 'warning');
-      watchdog('lingwo_korpus', 'Warnings from annotate.py: '. $ret['error'], NULL, WATCHDOG_WARNING);
+      watchdog('lingwo_korpus', 'Warnings from annotate.py: ' . $ret['error'], NULL, WATCHDOG_WARNING);
     }
     else {
       drupal_set_message(t('Error running automatic annotator.'), 'error');
-      watchdog('lingwo_korpus', "Error running annotate.py: ". $ret['error'], NULL, WATCHDOG_ERROR);
+      watchdog('lingwo_korpus', "Error running annotate.py: " . $ret['error'], NULL, WATCHDOG_ERROR);
     }
   }
 
@@ -844,7 +1020,7 @@ function _lingwo_korpus_exec_korpus2html_py($cmd, $data) {
   }
   else {
     drupal_set_message(t('Error converting content item to HTML.'), 'error');
-    watchdog('lingwo_korpus', "Error running korpus2html.py: ". $ret['error'], NULL, WATCHDOG_ERROR);
+    watchdog('lingwo_korpus', "Error running korpus2html.py: " . $ret['error'], NULL, WATCHDOG_ERROR);
   }
 }
 
@@ -860,12 +1036,13 @@ function _lingwo_korpus_replace_content($search, $replace) {
 
   $block = 0;
   $blocksize = 10;
-  while ($result = db_query_range("SELECT DISTINCT nid FROM {lingwo_korpus_entry} WHERE sense IN (" . db_placeholders($search, 'varchar') . ")", $search, $block * $blocksize, $blocksize)) {
+  // TODO Please convert this statement to the D7 database API syntax.
+  while ($result = db_query_range("SELECT DISTINCT nid FROM {lingwo_korpus_entry} WHERE sense IN (" . db_placeholders($search, 'varchar') . ")", $search)) {
     $nids = array();
     while ($row = db_fetch_array($result)) {
-       $nids[] = $row['nid'];
+      $nids[] = $row['nid'];
     }
-    if(count($nids) == 0) {
+    if (count($nids) == 0) {
       break;
     }
     $batch['operations'][] = array('_lingwo_korpus_batch_replace_content', array($nids, $search, $replace));
@@ -894,7 +1071,11 @@ function _lingwo_korpus_batch_replace_content($nids, $search, $replace) {
  * Settings
  */
 
-function lingwo_korpus_text_content_type($value=NULL) {
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
+function lingwo_korpus_text_content_type($value = NULL) {
   if (is_null($value)) {
     return variable_get('lingwo_korpus_text_content_type', '');
   }
@@ -902,7 +1083,11 @@ function lingwo_korpus_text_content_type($value=NULL) {
   variable_set('lingwo_korpus_text_content_type', $value);
 }
 
-function lingwo_korpus_python_exec($value=NULL) {
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
+function lingwo_korpus_python_exec($value = NULL) {
   if (is_null($value)) {
     return variable_get('lingwo_korpus_python_exec', '/usr/bin/python');
   }

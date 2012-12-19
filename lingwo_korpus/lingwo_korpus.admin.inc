@@ -3,12 +3,15 @@
 /*
  * Implementation of hook_form_alter()
  */
-function lingwo_korpus_admin_settings()
-{
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
+function lingwo_korpus_admin_settings($form, &$form_state) {
   $form = array();
 
   $type_options[''] = '';
-  foreach (node_get_types() as $type) {
+  foreach (node_type_get_types() as $type) {
     $type_options[$type->type] = $type->name;
   }
 
@@ -27,22 +30,22 @@ function lingwo_korpus_admin_settings()
   );
 
   /*
-  $fields = content_fields();
+   $fields = content_fields();
 
-  // make some lists of the available CCK fields for the various settings
-  $available_generic_fields = array('');
-  foreach ($fields as $field_name => $field) {
-    $available_generic_fields[$field_name] = $field['widget']['label'];
-  }
+   // make some lists of the available CCK fields for the various settings
+   $available_generic_fields = array('');
+   foreach ($fields as $field_name => $field) {
+   $available_generic_fields[$field_name] = $field['widget']['label'];
+   }
 
-  $form['lingwo_korpus_field_remote_url'] = array(
-    '#type' => 'select',
-    '#title' => t('Remote URL Field'),
-    '#options' => $available_generic_fields,
-    '#default_value' => lingwo_korpus_field_remote_url(),
-  );
-  */
-  
+   $form['lingwo_korpus_field_remote_url'] = array(
+   '#type' => 'select',
+   '#title' => t('Remote URL Field'),
+   '#options' => $available_generic_fields,
+   '#default_value' => lingwo_korpus_field_remote_url(),
+   );
+   */
+
   $form['lingwo_korpus_python_exec'] = array(
     '#type' => 'textfield',
     '#title' => t('Python Executable Path'),

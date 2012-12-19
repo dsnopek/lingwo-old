@@ -2,6 +2,7 @@
 name = Lingwo Korpus
 description = Extends Lingwo Dictionary for annotating texts
 package = Lingwo Dictionary
-core = 6.x
+core = 7.x
 dependencies[] = lingwo_entry
+
 

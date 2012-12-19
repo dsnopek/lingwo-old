@@ -6,22 +6,22 @@
  * API for lingwo_data
  */
 
-require_once(drupal_get_path('module', 'lingwo_entry') . '/../includes/settings.inc');
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'lingwo_entry') . '/../includes/settings.inc';
 
 // TODO: We name this LingwoImport because that is what it will eventually be named
 class LingwoImportSettings extends LingwoSettings {
-  protected $base_name = 'lingwo_data'; 
+  protected $base_name = 'lingwo_data';
 
   private $defaults = array(
-    'field_source_name'      => NULL,
-    'field_source_url'       => NULL,
+    'field_source_name' => NULL,
+    'field_source_url' => NULL,
     'field_source_copyright' => NULL,
-    'field_source_license'   => NULL,
-    'field_source_raw'       => NULL,
+    'field_source_license' => NULL,
+    'field_source_raw' => NULL,
     'field_source_timestamp' => NULL,
-    'java_path'              => '/usr/bin/java',
-    'config_path'            => '/home/username/importer-config.js',
-    'importer_blacklist'     => '',
+    'java_path' => '/usr/bin/java',
+    'config_path' => '/home/username/importer-config.js',
+    'importer_blacklist' => '',
   );
 
   public function getDefault($name) {
