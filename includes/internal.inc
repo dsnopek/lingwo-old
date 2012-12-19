@@ -25,12 +25,14 @@ function _lingwo_old_add_require_js($plugins = array()) {
     $old_project_path = _lingwo_old_project_path();
     $project_path = _lingwo_project_path();
     // add require.js to the page
-    drupal_add_js('require({paths:{lingwo_old:"/' . $old_project_path . '/js",lingwo:"/' . $project_path . '/js"}});', array('type' => 'inline', 'scope' => JS_DEFAULT));
     drupal_add_js($old_project_path . '/js/require.js');
     drupal_add_js($old_project_path . '/js/require/jquery-stubs.js');
     foreach ($plugins as $plugin) {
       drupal_add_js($old_project_path . '/js/require/' . $plugin . '.js');
     }
+
+    drupal_add_js('require({paths:{lingwo_old:"/' . $old_project_path . '/js",lingwo:"/' . $project_path . '/js"}});', array('type' => 'inline', 'scope' => JS_DEFAULT));
+
     $added = TRUE;
   }
 }

@@ -82,90 +82,17 @@ function lingwo_korpus_schema() {
 }
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
-function lingwo_korpus_update_6001() {
-  $ret = array();
-  // TODO update_sql has been removed. Use the database API for any schema or data changes.
-  $ret[] = array() /* update_sql("ALTER TABLE {lingwo_korpus_entry} MODIFY COLUMN pos VARCHAR(24) NOT NULL DEFAULT ''") */;
-  // hook_update_N() no longer returns a $ret array. Instead, return
-  // nothing or a translated string indicating the update ran successfully.
-  // See http://drupal.org/node/224333#update_sql.
-  return t('TODO Add a descriptive string here to show in the UI.') /* $ret */;
-}
-
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
-function lingwo_korpus_update_6002() {
-  $ret = array();
-  // TODO update_sql has been removed. Use the database API for any schema or data changes.
-  $ret[] = array() /* update_sql("ALTER TABLE {lingwo_korpus_entry} ADD COLUMN row_hash CHAR(40) NOT NULL DEFAULT ''") */;
-  // TODO update_sql has been removed. Use the database API for any schema or data changes.
-  $ret[] = array() /* update_sql("ALTER TABLE {lingwo_korpus_entry} ADD COLUMN entry_hash CHAR(40) NOT NULL DEFAULT ''") */;
-
-  $res = db_query('SELECT nid, language, pos, headword, sense FROM {lingwo_korpus_entry}');
-  while ($item = db_fetch_object($res)) {
-    lingwo_korpus_generate_hash($item);
-    drupal_write_record('lingwo_korpus_entry', $item,
-      array('nid', 'language', 'pos', 'headword', 'sense'));
-  }
-
-  // TODO update_sql has been removed. Use the database API for any schema or data changes.
-  $ret[] = array() /* update_sql("CREATE INDEX row_hash_index ON {lingwo_korpus_entry} (row_hash)") */;
-  // TODO update_sql has been removed. Use the database API for any schema or data changes.
-  $ret[] = array() /* update_sql("CREATE INDEX entry_hash_index ON {lingwo_korpus_entry} (entry_hash)") */;
-
-  // hook_update_N() no longer returns a $ret array. Instead, return
-  // nothing or a translated string indicating the update ran successfully.
-  // See http://drupal.org/node/224333#update_sql.
-  return t('TODO Add a descriptive string here to show in the UI.') /* $ret */;
-}
-
-/**
- * Replace attribute 'hidden' with 'data-hidden'.
- */
-function lingwo_korpus_update_6003() {
-  $res = db_query("SELECT r.vid, r.nid, teaser, body FROM {node_revisions} r JOIN {node} n ON n.nid = r.nid WHERE n.type = :n.type", array(':n.type' => lingwo_korpus_text_content_type()));
-  while ($obj = db_fetch_object($res)) {
-    foreach (array('teaser', 'body') as $prop) {
-      $obj->$prop = str_replace(' hidden="true"', ' data-hidden="true"', $obj->$prop);
-    }
-    // TODO Please review the conversion of this statement to the D7 database API syntax.
-    /* db_query("UPDATE {node_revisions} SET teaser = '%s', body = '%s' WHERE vid = %d", $obj->teaser, $obj->body, $obj->vid) */
-    db_update('node_revisions')
-  ->fields(array(
-    'teaser' => $obj->teaser,
-    'body' => $obj->body,
-  ))
-  ->condition('vid', $obj->vid)
-  ->execute();
-  }
-
-  // hook_update_N() no longer returns a $ret array. Instead, return
-  // nothing or a translated string indicating the update ran successfully.
-  // See http://drupal.org/node/224333#update_sql.
-  return t('TODO Add a descriptive string here to show in the UI.') /* array(array('success' => TRUE)) */;
-}
-
-/**
  * Implements hook_install().
  */
 function lingwo_korpus_install() {
-  // TODO The drupal_(un)install_schema functions are called automatically in D7.
-  // drupal_install_schema('lingwo_korpus')
-
-  // TODO update_sql has been removed. Use the database API for any schema or data changes.
-  array() /* update_sql("UPDATE {system} SET weight = 52 WHERE name = 'lingwo_korpus'") */;
+  // TODO: is this still necessary?
+  /* update_sql("UPDATE {system} SET weight = 52 WHERE name = 'lingwo_korpus'") */;
 }
 
 /**
  * Implements hook_uninstall().
  */
 function lingwo_korpus_uninstall() {
-  // TODO The drupal_(un)install_schema functions are called automatically in D7.
-  // drupal_uninstall_schema('lingwo_korpus')
+  // TODO: How to remove all our variables?
 }
 

@@ -5,4 +5,3 @@ package = Lingwo Dictionary
 core = 7.x
 dependencies[] = lingwo_entry
 
-

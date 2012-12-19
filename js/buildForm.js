@@ -1,6 +1,7 @@
 
 define(
-    ['lingwo_old/parseTemplate',
+    ['jquery',
+     'lingwo_old/parseTemplate',
      'text!lingwo_old/buildForm/wrapper.html',
      'text!lingwo_old/buildForm/text.html',
      'text!lingwo_old/buildForm/select.html',
@@ -8,7 +9,7 @@ define(
      'text!lingwo_old/buildForm/radio.html',
      'text!lingwo_old/buildForm/radios.html'
     ],
-    function (parseTemplate, wrapperTmpl, textTmpl, selectTmpl, checkboxTmpl, radioTmpl, radiosTmpl) {
+    function ($, parseTemplate, wrapperTmpl, textTmpl, selectTmpl, checkboxTmpl, radioTmpl, radiosTmpl) {
         var wrapper = parseTemplate(wrapperTmpl),
             itemTypes = {
                 text: {

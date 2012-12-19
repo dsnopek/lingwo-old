@@ -82,18 +82,18 @@ word.missing.selected { border:1px dashed red !important; }
   float:left;
   margin-right:10px;
 }
-#lingwo-korpus-annotator-toolbar .button {
+#lingwo-korpus-annotator-toolbar .annotator-button {
   display:block;
   float:left;
   margin-right:15px;
   cursor:pointer;
 }
-#lingwo-korpus-annotator-toolbar .button.pressed {
+#lingwo-korpus-annotator-toolbar .annotator-button.pressed {
   text-decoration:none;
   color:black;
   font-weight:bold;
 }
-#lingwo-korpus-annotator-toolbar .button.disabled {
+#lingwo-korpus-annotator-toolbar .annotator-button.disabled {
   color:DarkGrey;
   cursor:text;
   font-style:italic;

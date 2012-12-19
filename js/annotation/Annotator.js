@@ -379,13 +379,13 @@ define(
 
             _insane: function () {
                 var t = Drupal.t('Discovered an error in the HTML! The annotator will not work until this error is fixed.');
-                
+
                 // alert the user
                 alert(t);
 
                 // disable the form in a super crude way
                 $(this.textNode)
-                    .after($('<div class="message error"></div>').text(t))
+                    .after($('<div class="messages error"></div>').text(t))
                     .remove();
             },
 

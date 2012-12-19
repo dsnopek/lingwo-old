@@ -1,7 +1,7 @@
 
 (function () {
   var senses = {}, senses_reverse = {};
-  Drupal.behaviors.lingwo_korpus = function (context) {
+  Drupal.behaviors.lingwo_korpus = function (context, settings) {
     $('.lingwo-senses-id').each(function () {
       var id = $(this).val(), match;
       if (match = /edit-lingwo-senses-(\d+)-id/.exec(''+this.id)) {
