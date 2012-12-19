@@ -2,7 +2,7 @@
 DOMAIN = 'domain'
 KEY = '<secret key>'
 USERNAME = 'username'
-PASSWORD = 'password';
+PASSWORD = 'password'
 
 URL = 'http://www.bibliobird.com/services/xmlrpc'
 
