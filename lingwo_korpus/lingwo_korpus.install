@@ -48,6 +48,8 @@ function lingwo_korpus_schema() {
         'description' => 'The sense of the entry.',
         'type' => 'varchar',
         'length' => 36,
+        // TODO: this probably should be NULL-able
+        'not null' => TRUE,
         'default' => '',
       ),
       'row_hash' => array(

@@ -90,7 +90,7 @@ function lingwo_korpus_lookup_entry() {
 
   if ($entry) {
     module_invoke_all('lingwo_korpus_lookup', $user, $entry);
-    $content = node_view($entry->getNode(), TRUE);
+    $content = render(node_view($entry->getNode(), TRUE));
   }
   else {
     // TODO: This should be slicker!  Probably themed, provide a link for creating the entry.
@@ -337,7 +337,8 @@ function lingwo_korpus_annotator_form_submit($form, &$form_state) {
   $node = $form['#node'];
   $text = _lingwo_korpus_annotator_fix_html($form_state['values']['korpus-text-value']);
 
-  _lingwo_korpus_update_body($node, $text);
+  $node->body['und'][0]['value'] = $text;
+
   if (isset($form_state['clicked_button']['#value']) && $form_state['clicked_button']['#value'] == t('Auto Annotate')) {
     drupal_set_message(t('Automatic annotator complete.'));
     _lingwo_korpus_auto_annotate_node($node);
@@ -435,27 +436,6 @@ function lingwo_korpus_generate_hash(&$item) {
     sha1(join(':', array($item->language, $item->pos, $item->headword)));
 }
 
-// TODO: this is going to have to be TOTALLY different for Drupal 7!
-function _lingwo_korpus_update_body(&$node, $body) {
-  $orig_body = $node->body;
-  $node->body = $body;
-
-  if ($node->teaser == substr($orig_body, 0, strlen($node->teaser))) {
-    // The teaser is just a section of the body, they are a connected whole.
-    // So, we need to regenerate the teaser bit since we've altered the body
-    // (lifted from node/node.module's node_submit() function)
-    $node->teaser = node_teaser($node->body, isset($node->format) ? $node->format : NULL);
-
-    // Return TRUE so that the caller knows that the teaser has been handled
-    return TRUE;
-  }
-
-  // The teaser and body are two distinct parts, the teaser isn't shown when
-  // on the node display page (atleast I think this is what teaser_include is about)
-  // Return FALSE so that the caller knows it needs to handle teaser seperately
-  return FALSE;
-}
-
 /**
  * Implements hook_node_presave().
  */
@@ -464,7 +444,7 @@ function lingwo_korpus_node_presave($node) {
     $search = array();
     $replace = array();
     foreach ($node->lingwo_senses as $sense) {
-      if ($sense['remove'] && !empty($sense['replace_with'])) {
+      if (isset($sense['remove']) && $sense['remove'] && !empty($sense['replace_with'])) {
         $search[] = $sense['id'];
         $replace[] = $sense['replace_with'];
       }
@@ -664,7 +644,7 @@ function lingwo_korpus_text_entry_list($text, $lang) {
 
   $html = str_get_html($text);
   foreach ($html->find('word') as $el) {
-    if ($el->attr['data-hidden'] == 'true') {
+    if (isset($el->attr['data-hidden']) && $el->attr['data-hidden'] == 'true') {
       continue;
     }
     // get all the attributes and clear them
@@ -676,7 +656,7 @@ function lingwo_korpus_text_entry_list($text, $lang) {
       'headword' => html_entity_decode(isset($attrs['headword']) ? $attrs['headword'] : $el->plaintext),
       'pos' => $attrs['pos'],
       'language' => $lang,
-      'sense' => $attrs['sense'],
+      'sense' => isset($attrs['sense']) ? $attrs['sense'] : '',
     );
 
     $key = $entry->language . ':' . $entry->pos . ':' . $entry->headword;
@@ -846,20 +826,13 @@ function theme_lingwo_korpus_annotation_reader_block($variables) {
  * Dealing with the automatic annotator.
  */
 
-function _lingwo_korpus_auto_annotate_node(&$node, $which = 'body', $type = array('segment', 'lookup')) {
+function _lingwo_korpus_auto_annotate_node(&$node, $which = 'value', $type = array('segment', 'lookup')) {
   $cmd  = "-l " . $node->language . " ";
   $cmd .= "-m " . implode(",", $type);
   $cmd .= " -";
-  if ($result = _lingwo_korpus_exec_annotate_py($cmd, $node->$which)) {
+  if ($result = _lingwo_korpus_exec_annotate_py($cmd, $node->body['und'][0][$which])) {
     $result = rtrim($result);
-    if ($which == 'body') {
-      if (!_lingwo_korpus_update_body($node, $result)) {
-        _lingwo_korpus_auto_annotate_node($node, 'teaser', $type);
-      }
-    }
-    else {
-      $node->$which = $result;
-    }
+    $node->body['und'][0][$which] = $result;
 
     return TRUE;
   }
@@ -969,11 +942,8 @@ function _lingwo_korpus_batch_replace_content($nids, $search, $replace) {
   foreach ($nids as $nid) {
     $node = node_load($nid);
     $body = str_replace($search, $replace, $node->body['und'][0]['value']);
-    // update the body and attempt to automatically update the teaser
-    if (!_lingwo_korpus_update_body($node, $body)) {
-      // couldn't update the teaser automatically, so we do it here
-      $node->teaser = str_replace($search, $replace, $node->teaser);
-    }
+    $node->body['und'][0]['value'] = $body;
+
     node_save($node);
   }
 }
