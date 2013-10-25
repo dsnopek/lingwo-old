@@ -484,6 +484,7 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
     // display the text with the reader
     if ($a4 || ($a3 && variable_get('lingwo_korpus_reader_on_teaser', 0) && $node->build_mode != NODE_BUILD_RSS)) {
       $node_language = $node->language ? $node->language : language_default();
+      /*
       if ($node_language == $language->language) {
         // Only show this message on a page
         if ($a4) {
@@ -498,6 +499,7 @@ function lingwo_korpus_nodeapi(&$node, $op, $a3=NULL, $a4=NULL) {
         $node->content['body']['#value'] = _lingwo_korpus_remove_annotations($node->content['body']['#value']);
         return;
       }
+      */
 
       if (!$messaged) {
         drupal_set_message(t('Click on a word to receive a translation in your native language.'));
