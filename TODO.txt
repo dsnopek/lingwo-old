@@ -1,0 +1,4 @@
+
+ * Deal with body values where the summary is manually set and it's the beginning of the value
+   o How does WYSIWYG handle placing the teaser break?
+
